@@ -1,67 +1,145 @@
-# 🐍 SnakeLink Raspberry
 
-The Raspberry Pi 4B data-collector for the SnakeLink Smart Terrarium System.  
-Built with Node.js, it reads live sensor data or mocks them, and sends them to your main server.
+# 🌿 Smart Terrarium Monitoring System (Node.js + Nuxt 3)
 
-## 📦 Features
+A lightweight, stable and extendable DIY smart monitoring system for a corn snake terrarium.  
+Built with a Node.js backend and a Nuxt 3 frontend for real-time local display and data visualization.
 
-- ✅ Runs on Raspberry Pi 4B
-- ✅ Mock sensor data or real GPIO (planned)
-- ✅ Configurable sensors (name, type, unit)
-- ✅ Outputs live JSON file
-- ✅ WebSocket data broadcast (to connect with main server)
-- ✅ Lightweight Express server
-- ✅ `/api/sensors` and `/api/config` endpoints
+This project is designed to run on a **Raspberry Pi 4B**, but can also be developed and tested **locally with mocked endpoints**.
+
+---
+
+## 🧠 Project Goals
+
+- ✅ Offline-first & Raspberry Pi-ready
+- ✅ Live temperature & humidity monitoring
+- ✅ Modern UI built with Nuxt 3 & TailwindCSS
+- ✅ Extendable (camera, notifications, automation)
+- ✅ Minimal dependencies, no Docker required
+- ✅ Optional SurrealDB support for logging & querying
+
+---
+
+## 📦 Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Backend | Node.js (Express) |
+| Frontend | Nuxt 3 |
+| Data Source | JSON file or SurrealDB |
+| Styling | Tailwind CSS |
+| Charts | Chart.js or ECharts |
+| Deployment | systemd / PM2 (no Docker needed) |
+
+---
+
+## 📁 Project Structure (planned)
+
+```
+project-root/
+├── snake-link-raspbery/
+│   ├── data/
+│   │   └── values.json           # Live sensor data (mock or real)
+│   ├── routes/
+│   │   └── api.js                # API endpoints
+│   ├── mock/
+│   │   └── mockData.js           # Optional fake/mock data
+│   └── index.js                  # Express server
+├── frontend/
+│   └── (Nuxt 3 project here)     # Live dashboard
+├── README.md
+```
 
 ---
 
 ## 🧪 Development Setup
 
-```bash
-git clone https://github.com/YOUR-USER/snake-link-raspberry.git
-cd snake-link-raspberry
+### 1. Clone the repo
 
+```bash
+git clone https://github.com/your-username/smart-terrarium.git
+cd smart-terrarium
+```
+
+### 2. Install dependencies
+
+```bash
+# Backend
+cd backend
+npm install
+
+# Frontend
+cd ../frontend
 npm install
 ```
 
-Edit your `.env`:
-
-```env
-PORT=3000
-USE_MOCK=true
-```
-
----
-
-## 🚀 Start in Mock Mode
+### 3. Run in development mode (mocked data)
 
 ```bash
-npm run start
+# Backend
+cd backend
+npm run dev:mock
+
+# Frontend (Nuxt 3)
+cd ../frontend
+npm run dev
 ```
 
-Sensor values will update every 3 seconds and are stored in `./data/liveData.json`.
+---
+
+## 🔌 Sensor Data Flow
+
+- Real values will be read from GPIO sensors (DHT22, BME280) on the Pi.
+- During development, mocked values will be injected for seamless testing.
+
+You can switch between mock mode and real mode via ENV variable or CLI flag.
 
 ---
 
-## 🔌 API Endpoints
+## 🎨 Frontend Features (Nuxt 3)
 
-- `GET /api/sensors` → live data
-- `GET /api/config` → sensor config
-- (WebSocket support enabled on same port)
+- 🌡️ Live display: temperature & humidity
+- 📈 Chart: min/max trends
+- 🌘 Dark mode + responsive layout
+- 📷 (Planned) Embedded Pi Camera stream
+- 🔔 (Planned) Telegram/Discord alert integration
 
 ---
 
-## 🧩 Planned Features
+## 🧩 Optional Features
 
-- Real sensor integration (e.g. DHT22, BME280)
-- Water level check
-- Camera motion detection → alerts
-- Local logging
-- WebSocket connection to external server
-- Per-animal presets
+- SurrealDB support (fast, modern embedded DB)
+- Smart plug control (via API)
+- Cron-based logging (daily CSV/JSON exports)
+- Multiple terrarium support
+
+---
+
+## 🚀 Deployment (Raspberry Pi)
+
+```bash
+# Install PM2 (optional)
+npm install pm2 -g
+
+# Start backend
+cd backend
+pm2 start index.js --name backend
+
+# Start frontend (build first)
+cd ../frontend
+npm run build
+npm run preview
+```
+
+You can also create `systemd.service` files for fully native Pi deployment.
+
+---
+
+## 🤝 Contributing
+
+Feel free to fork, improve and send PRs. This is a hobbyist project to help reptile lovers get more control over their enclosures 🦎
 
 ---
 
 ## 📄 License
 
-MIT – for hobby reptiles and hackers 🦎
+MIT – Do whatever you want, but don't sue me if your lizard becomes self-aware 😄
