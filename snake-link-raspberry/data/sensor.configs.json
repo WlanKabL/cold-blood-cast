@@ -7,7 +7,11 @@
             "unit": "°C",
             "min": 28,
             "max": 32,
-            "active": true
+            "active": true,
+            "hardware": {
+                "pin": 4,
+                "model": "22"
+            }
         },
         {
             "id": "cold_zone_temp",
@@ -16,7 +20,11 @@
             "unit": "°C",
             "min": 22,
             "max": 26,
-            "active": true
+            "active": true,
+            "hardware": {
+                "pin": 17,
+                "model": "22"
+            }
         },
         {
             "id": "humidity_sensor",
@@ -25,14 +33,21 @@
             "unit": "%",
             "min": 40,
             "max": 60,
-            "active": true
+            "active": true,
+            "hardware": {
+                "i2cAddress": 118,
+                "i2cBusNo": 1
+            }
         },
         {
             "id": "water_sensor",
             "name": "Trinkschale",
             "type": "water",
             "unit": "present",
-            "active": true
+            "active": true,
+            "hardware": {
+                "mock": true
+            }
         }
     ]
 }
