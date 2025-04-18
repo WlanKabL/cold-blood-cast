@@ -1,0 +1,38 @@
+{
+    "sensors": [
+        {
+            "id": "warm_zone_temp",
+            "name": "Warme Zone",
+            "type": "temperature",
+            "unit": "°C",
+            "min": 28,
+            "max": 32,
+            "active": true
+        },
+        {
+            "id": "cold_zone_temp",
+            "name": "Kalte Zone",
+            "type": "temperature",
+            "unit": "°C",
+            "min": 22,
+            "max": 26,
+            "active": true
+        },
+        {
+            "id": "humidity_sensor",
+            "name": "Feuchtigkeitssensor",
+            "type": "humidity",
+            "unit": "%",
+            "min": 40,
+            "max": 60,
+            "active": true
+        },
+        {
+            "id": "water_sensor",
+            "name": "Trinkschale",
+            "type": "water",
+            "unit": "present",
+            "active": true
+        }
+    ]
+}

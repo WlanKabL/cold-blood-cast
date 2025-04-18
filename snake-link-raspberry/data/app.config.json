@@ -1,0 +1,12 @@
+{
+    "general": {
+        "name": "ColdBloodCast"
+    },
+    "sensorSystem": {
+        "pollingIntervalMs": 10000,
+        "retentionMinutes": 60,
+        "autoLogIntervalMs": 60000,
+        "logFileLimit": 100,
+        "remoteSyncEnabled": false
+    }
+}

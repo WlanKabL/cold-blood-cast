@@ -21,11 +21,11 @@ This project is part of the **SnakeLink ecosystem** and is designed to collect d
 
 ## 🧠 Sensor Types & Units
 
-| Type        | Units          |
-|-------------|----------------|
-| temperature | `°C`, `°F`     |
-| humidity    | `%`            |
-| water       | `present`, `ml`|
+| Type        | Units           |
+| ----------- | --------------- |
+| temperature | `°C`, `°F`      |
+| humidity    | `%`             |
+| water       | `present`, `ml` |
 
 Each sensor can define `min`, `max`, and `active` flags for later alerting or UI logic.
 
@@ -92,10 +92,10 @@ This starts the server on the specified port and simulates sensor data based on 
 
 ## 🔌 REST Endpoints
 
-| Endpoint         | Description                |
-|------------------|----------------------------|
-| `/api/sensors`   | Returns current sensor data |
-| `/api/config`    | Returns sensor config       |
+| Endpoint       | Description                 |
+| -------------- | --------------------------- |
+| `/api/sensors` | Returns current sensor data |
+| `/api/config`  | Returns sensor config       |
 
 ---
 
