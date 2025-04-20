@@ -12,10 +12,33 @@ const router = Router();
 const dataStore = new DataStorageService("./data");
 const regKeyStore = dataStore.getRegistrationKeysStore();
 
-function hashPassword(password: string, salt: string): string {
+/**
+ * Derives a hashed password using PBKDF2 with a secret pepper.
+ *
+ * Combines the plaintext password and a master pepper from the environment,
+ * then runs PBKDF2 with SHA‑512, 100 000 iterations, and a 128‑byte key length.
+ *
+ * @param password  The user's plaintext password
+ * @param salt      A unique, per-user salt (must be stored alongside the hash)
+ * @returns         Hex‑encoded derived key (256 hex characters for 128 bytes)
+ * @throws          If PEPPER is missing in the environment
+ */
+export function hashPassword(password: string, salt: string): string {
     const env = validateEnv(process.env);
-    const PEPPER = env.PEPPER;
-    return crypto.pbkdf2Sync(password + PEPPER, salt, 100_000, 64, "sha512").toString("hex");
+    const { PEPPER } = env;
+    if (!PEPPER) {
+        throw new Error("Environment variable PEPPER is required for password hashing");
+    }
+
+    const derivedKey = crypto.pbkdf2Sync(
+        /* password+pepper */ password + PEPPER,
+        /* salt */ salt,
+        /* iterations */ 100_000,
+        /* key length */ 128,
+        /* digest */ "sha512",
+    );
+
+    return derivedKey.toString("hex");
 }
 
 function generateToken(user: User): string {
@@ -115,7 +138,7 @@ router.post("/register", (req: Request, res: any) => {
     keys.splice(keyIndex, 1);
     regKeyStore.save(keys);
 
-    const salt = crypto.randomBytes(16).toString("hex");
+    const salt = crypto.randomBytes(64).toString("hex");
     const passwordHash = hashPassword(password, salt);
 
     const newUser: User = {
@@ -140,7 +163,6 @@ router.post("/register", (req: Request, res: any) => {
     userStore.add(newUser);
 
     const token = generateToken(newUser);
-    res.headers.set("Authorization", `Bearer ${token}`);
     res.status(201).json({ token });
 });
 
