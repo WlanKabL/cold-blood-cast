@@ -5,8 +5,8 @@
  */
 
 import chalk from "chalk";
-import type { SensorReader } from "./sensorReader.interface";
-import type { SensorConfig, SensorReading } from "../types/sensor";
+import type { SensorReader } from "./sensorReader.interface.js";
+import type { SensorConfig, SensorReading } from "../types/sensor.js";
 
 const isWindows = process.platform === "win32";
 
@@ -40,6 +40,7 @@ export class BMEReader implements SensorReader {
         }
 
         try {
+            // @ts-ignore – bme280-sensor ist optional
             const mod = await import("bme280-sensor");
             const BME280 = mod.default ?? mod;
             this.sensorInstance = new BME280({

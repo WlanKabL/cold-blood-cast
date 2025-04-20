@@ -20,6 +20,8 @@ export const EnvSchema = z.object({
         .regex(/^(true|false)$/i, "USE_MOCK must be 'true' or 'false'")
         .optional()
         .default("false"),
+    JWT_SECRET: z.string().min(1, "JWT_SECRET must be set"),
+    PEPPER: z.string().min(1, "PEPPER must be set"),
 });
 
 /**
@@ -41,6 +43,9 @@ export interface AppEnv {
     CORS_ORIGINS: string;
     /** Parsed CORS options for Express middleware */
     CORS_OPTIONS: CorsOptions;
+
+    JWT_SECRET: string;
+    PEPPER: string;
 }
 
 /**
@@ -72,5 +77,7 @@ export function validateEnv(env: NodeJS.ProcessEnv): AppEnv {
         DATA_DIR: parsed.DATA_DIR,
         CORS_ORIGINS: parsed.CORS_ORIGINS,
         CORS_OPTIONS: corsOptions,
+        JWT_SECRET: parsed.JWT_SECRET,
+        PEPPER: parsed.PEPPER,
     };
 }

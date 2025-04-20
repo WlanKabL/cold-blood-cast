@@ -8,6 +8,7 @@
             "min": 28,
             "max": 32,
             "active": true,
+            "reader": "dht",
             "hardware": {
                 "pin": 4,
                 "model": "22"
@@ -21,6 +22,7 @@
             "min": 22,
             "max": 26,
             "active": true,
+            "reader": "dht",
             "hardware": {
                 "pin": 17,
                 "model": "22"
@@ -34,6 +36,7 @@
             "min": 40,
             "max": 60,
             "active": true,
+            "reader": "bme280",
             "hardware": {
                 "i2cAddress": 118,
                 "i2cBusNo": 1
@@ -44,9 +47,13 @@
             "name": "Trinkschale",
             "type": "water",
             "unit": "present",
+            "min": 1,
+            "max": 1,
             "active": true,
+            "reader": "dht",
             "hardware": {
-                "mock": true
+                "pin": 27,
+                "model": "11"
             }
         }
     ]

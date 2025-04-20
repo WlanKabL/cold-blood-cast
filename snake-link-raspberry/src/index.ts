@@ -12,18 +12,20 @@ import cors from "cors";
 import helmet from "helmet";
 import chalk from "chalk";
 import { WebSocketServer, WebSocket } from "ws";
-import { DataStorageService } from "./storage/dataStorageService";
-import configRoutes from "./routes/api/config.routes";
-import sensorRoutes from "./routes/api/sensors.routes";
-import presetRoutes from "./routes/api/presets.routes";
-import logRoutes from "./routes/api/logs.routes";
-import liveRoutes from "./routes/api/live.routes";
-import healthRoutes from "./routes/health.routes";
-import { startSensorPolling } from "./services/sensorPollingService";
-import { startSensorLogging } from "./logger/sensorLogger";
-import { broadcast } from "./utils/broadcast";
-import { errorMiddleware } from "./middlewares/error.middleware";
-import { validateEnv } from "./config";
+import { DataStorageService } from "./storage/dataStorageService.js";
+import configRoutes from "./routes/api/config.routes.js";
+import sensorRoutes from "./routes/api/sensors.routes.js";
+import presetRoutes from "./routes/api/presets.routes.js";
+import logRoutes from "./routes/api/logs.routes.js";
+import liveRoutes from "./routes/api/live.routes.js";
+import healthRoutes from "./routes/health.routes.js";
+import { startSensorPolling } from "./services/sensorPollingService.js";
+import { startSensorLogging } from "./logger/sensorLogger.js";
+import { broadcast } from "./utils/broadcast.js";
+import { errorMiddleware } from "./middlewares/error.middleware.js";
+import { validateEnv } from "./config.js";
+import authRoutes from "./routes/api/auth.routes.js";
+import { swaggerDocsHandler, swaggerSpec, swaggerUiHandler } from "./docs/swagger.js";
 
 /**
  * Bootstraps the application:
@@ -53,6 +55,11 @@ async function bootstrap(): Promise<void> {
     apiRouter.use("/presets", presetRoutes);
     apiRouter.use("/logs", logRoutes);
     apiRouter.use("/live", liveRoutes);
+    apiRouter.use("/auth", authRoutes);
+    apiRouter.use("/docs", swaggerUiHandler, swaggerDocsHandler);
+    app.get("/api/docs.json", (req, res) => {
+        res.json(swaggerSpec);
+    });
 
     app.use("/api", apiRouter);
     app.use("/health", healthRoutes);

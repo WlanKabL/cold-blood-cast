@@ -6,6 +6,45 @@ const store = new DataStorageService("./data");
 const logStore = store.getSensorLogStore();
 
 // GET /api/logs/?from=timestamp&to=timestamp&sensor=sensorId&limit=number&offset=number
+/**
+ * @openapi
+ * /api/logs:
+ *   get:
+ *     tags:
+ *       - Logs
+ *     summary: Get logs
+ *     parameters:
+ *       - name: from
+ *         in: query
+ *         required: false
+ *         description: Start timestamp (in milliseconds)
+ *         schema:
+ *           type: integer
+ *       - name: to
+ *         in: query
+ *         required: false
+ *         description: End timestamp (in milliseconds)
+ *         schema:
+ *           type: integer
+ *       - name: sensor
+ *         in: query
+ *         required: false
+ *         description: Sensor ID to filter logs by
+ *         schema:
+ *           type: string
+ *       - name: limit
+ *         in: query
+ *         required: false
+ *         description: Number of logs to return (default is 500)
+ *         schema:
+ *           type: integer
+ *       - name: offset
+ *         in: query
+ *         required: false
+ *         description: Offset for pagination (default is 0)
+ *         schema:
+ *           type: integer
+ */
 router.get("/", (req: Request, res: any, next: NextFunction) => {
     try {
         const allLogs = logStore.load([]);

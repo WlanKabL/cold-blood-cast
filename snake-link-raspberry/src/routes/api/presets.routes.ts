@@ -7,6 +7,28 @@ const configStore = dataStore.getSensorConfigStore();
 const presetsStore = dataStore.getPresetsStore();
 
 // GET /api/presets
+/**
+ * @openapi
+ * /api/presets:
+ *   get:
+ *     tags:
+ *       - Presets
+ *     summary: Get all presets
+ *     responses:
+ *       200:
+ *         description: A list of presets.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ */
 router.get("/", (req: Request, res: any, next: NextFunction) => {
     try {
         const allPresets = presetsStore.load();
@@ -26,6 +48,24 @@ router.get("/", (req: Request, res: any, next: NextFunction) => {
 });
 
 // GET /api/presets/:id
+/**
+ * @openapi
+ * /api/presets/{id}:
+ *   get:
+ *     tags:
+ *       - Presets
+ *     summary: Get preset by ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: Preset ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Preset details
+ */
 router.get("/:id", (req: Request, res: any, next: NextFunction) => {
     try {
         const allPresets = presetsStore.load();
@@ -45,6 +85,24 @@ router.get("/:id", (req: Request, res: any, next: NextFunction) => {
 });
 
 // POST /api/presets/apply/:id
+/**
+ * @openapi
+ * /api/presets/apply/{id}:
+ *   post:
+ *     tags:
+ *       - Presets
+ *     summary: Apply a preset by ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: Preset ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Preset applied successfully
+ */
 router.post("/apply/:id", (req: Request, res: any, next: NextFunction) => {
     try {
         const allPresets = presetsStore.load();

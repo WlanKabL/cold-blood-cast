@@ -5,8 +5,8 @@
  */
 
 import chalk from "chalk";
-import type { SensorReader } from "./sensorReader.interface";
-import type { SensorConfig, SensorReading } from "../types/sensor";
+import type { SensorReader } from "./sensorReader.interface.js";
+import type { SensorConfig, SensorReading } from "../types/sensor.js";
 
 const isWindows = process.platform === "win32";
 
@@ -43,6 +43,7 @@ export class DHTReader implements SensorReader {
         }
 
         try {
+            // @ts-ignore – node-dht-sensor ist optional
             const mod = await import("node-dht-sensor");
             this.sensorLib = mod.default ?? mod;
             // Some versions require `.initialize()`, uncomment if needed:

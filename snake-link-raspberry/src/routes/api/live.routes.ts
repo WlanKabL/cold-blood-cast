@@ -7,13 +7,28 @@ const store = new DataStorageService("./data");
 const liveStore = store.getLiveDataStore();
 const configStore = store.getSensorConfigStore();
 
-// GET /api/sensors/live
+/**
+ * @openapi
+ * /api/live:
+ *   get:
+ *     tags:
+ *       - Live
+ *     summary: Get all sensors
+ *     responses:
+ *       200:
+ *         description: List of sensors
+ */
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
     try {
         const config = configStore.load();
         const live = liveStore.load();
 
         const result = config.sensors.map((sensor) => {
+            delete sensor.active; // Remove the active property from the response
+            delete sensor.hardware; // Remove the hardware property from the response
+            delete sensor.reader; // Remove the reader property from the response
+            delete sensor.private; // Remove the private property from the response
+
             const reading = live[sensor.id] ?? null;
             const status = calculateSensorStatus(sensor, reading);
 
@@ -30,7 +45,24 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-// GET /api/sensors/live/:sensorId
+/**
+ * @openapi
+ * /api/live/{sensorId}:
+ *   get:
+ *     tags:
+ *       - Live
+ *     summary: Get sensor by ID
+ *     parameters:
+ *       - name: sensorId
+ *         in: path
+ *         required: true
+ *         description: Sensor ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Sensor details
+ */
 router.get("/:sensorId", (req: Request, res: any, next: NextFunction) => {
     try {
         const { sensorId } = req.params;
@@ -39,6 +71,11 @@ router.get("/:sensorId", (req: Request, res: any, next: NextFunction) => {
 
         const sensor = config.sensors.find((s) => s.id === sensorId);
         if (!sensor) return res.status(404).json({ error: "Sensor not found" });
+
+        delete sensor.active; // Remove the active property from the response
+        delete sensor.hardware; // Remove the hardware property from the response
+        delete sensor.reader; // Remove the reader property from the response
+        delete sensor.private; // Remove the private property from the response
 
         const reading = live[sensor.id] ?? null;
         const status = calculateSensorStatus(sensor, reading);

@@ -1,5 +1,5 @@
-import { SensorReader } from "./sensorReader.interface";
-import { SensorConfig, SensorReading } from "../types/sensor";
+import { SensorReader } from "./sensorReader.interface.js";
+import { SensorConfig, SensorReading } from "../types/sensor.js";
 
 export class MockReader implements SensorReader {
     async read(config: SensorConfig): Promise<SensorReading> {

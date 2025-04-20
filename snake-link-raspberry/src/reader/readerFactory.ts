@@ -6,11 +6,11 @@
  * Includes fallback to MockReader.
  */
 
-import type { SensorConfig } from "../types/sensor";
-import type { SensorReader } from "./sensorReader.interface";
-import { MockReader } from "./mockReader";
-import { DHTReader } from "./dhtReader";
-import { BMEReader } from "./bmeReader";
+import type { SensorConfig } from "../types/sensor.js";
+import type { SensorReader } from "./sensorReader.interface.js";
+import { MockReader } from "./mockReader.js";
+import { DHTReader } from "./dhtReader.js";
+import { BMEReader } from "./bmeReader.js";
 
 /**
  * Returns a SensorReader instance corresponding to the hardware described in config.

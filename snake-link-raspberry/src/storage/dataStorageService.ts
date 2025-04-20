@@ -10,6 +10,7 @@ import type { SensorConfig, SensorReading } from "../types/sensor.js";
 import type { PresetDefinition } from "../types/presets.js";
 import type { AppConfig } from "../types/config.js";
 import type { LogEntry } from "../types/logs.js";
+import { User } from "../types/users.js";
 
 /**
  * Generic JSON file store.
@@ -85,7 +86,7 @@ export class FileStore<T> {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-        fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2), "utf-8");
+        fs.writeFileSync(this.filePath, JSON.stringify(data, null, 4), "utf-8");
     }
 }
 
@@ -142,5 +143,13 @@ export class DataStorageService {
      */
     getSensorLogStore(): FileStore<LogEntry[]> {
         return new FileStore(path.join(this.basePath, "sensor.logs.json"), []);
+    }
+
+    getRegistrationKeysStore(): FileStore<string[]> {
+        return new FileStore(path.join(this.basePath, "registration.keys.json"), []);
+    }
+
+    getUserStore(): FileStore<User[]> {
+        return new FileStore(path.join(this.basePath, "users.json"), []);
     }
 }

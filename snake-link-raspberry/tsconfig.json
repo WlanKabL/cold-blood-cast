@@ -1,15 +1,16 @@
 {
     "extends": "@tsconfig/node20/tsconfig.json",
     "compilerOptions": {
-        "module": "ESNext",
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "target": "ES2022",
         "esModuleInterop": true,
         "strict": true,
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "outDir": "dist",
-        "types": ["node"]
+        "types": ["node"],
+        "typeRoots": ["./types", "./node_modules/@types"]
     },
     "ts-node": {
         "esm": true

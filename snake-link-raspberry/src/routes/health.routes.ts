@@ -2,6 +2,17 @@ import { Router } from "express";
 
 const router = Router();
 
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     tags:
+ *       - Health
+ *     summary: Get health status of the server
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ */
 router.get("/", (req, res) => {
     const uptimeSec = Math.floor(process.uptime());
     const hours = Math.floor(uptimeSec / 3600);
