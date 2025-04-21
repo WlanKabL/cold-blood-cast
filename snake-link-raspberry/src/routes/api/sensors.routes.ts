@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
-import { SensorReading } from "../../types/sensor.js";
-import { calculateSensorStatus } from "../../utils/sensorStatus.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
+import { hasPermission } from "../../utils/permissions.js";
+import { detectI2CSensors } from "../../services/sensorDetectionService.js";
 
 const router = Router();
 const store = new DataStorageService("./data");
@@ -73,6 +73,25 @@ router.patch("/:id/deactivate", authMiddleware, (req: Request, res: any, next: N
     } catch (err) {
         next(err);
     }
+});
+
+/**
+ * @openapi
+ * /api/sensors:
+ *   get:
+ *     tags:
+ *       - Sensors
+ *     summary: Get all sensor readings
+ */
+router.get("/scan", authMiddleware, async (req: Request, res: any) => {
+    const user = req.user!;
+
+    if (!hasPermission(user, "detectNewSensors")) {
+        return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const found = await detectI2CSensors();
+    res.json({ i2c: found });
 });
 
 export default router;

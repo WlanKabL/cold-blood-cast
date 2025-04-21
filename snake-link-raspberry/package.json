@@ -9,6 +9,7 @@
         "start": "node dist/index.js",
         "format": "prettier --check .",
         "format:fix": "prettier --write .",
+        "install": "npm install && npm install i2c-bus node-dht-sensor bme280-sensor",
         "postman": "npm run build && node generate-postman.js"
     },
     "keywords": [],
