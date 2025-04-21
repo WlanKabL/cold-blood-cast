@@ -19,13 +19,14 @@ import presetRoutes from "./routes/api/presets.routes.js";
 import logRoutes from "./routes/api/logs.routes.js";
 import liveRoutes from "./routes/api/live.routes.js";
 import healthRoutes from "./routes/health.routes.js";
-import { startSensorPolling } from "./services/sensorPollingService.js";
-import { startSensorLogging } from "./logger/sensorLogger.js";
 import { broadcast } from "./utils/broadcast.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { validateEnv } from "./config.js";
 import authRoutes from "./routes/api/auth.routes.js";
 import { swaggerDocsHandler, swaggerSpec, swaggerUiHandler } from "./docs/swagger.js";
+import { SensorPollingService } from "./services/sensorPolling.js";
+import { SensorLoggingService } from "./services/sensorLogging.js";
+import { servicesStore } from "./stores/servicesStore.js";
 
 /**
  * Bootstraps the application:
@@ -87,13 +88,29 @@ async function bootstrap(): Promise<void> {
     // 7) Start listening and background services
     httpServer.listen(port, () => {
         console.log(chalk.green(`🌿 Backend listening on port ${port}`));
-        startSensorPolling(configStore, liveStore, appConfigStore, broadcast);
-        startSensorLogging(liveStore, logStore, appConfig.sensorSystem.autoLogIntervalMs);
+
+        const sensorPollingService = new SensorPollingService(
+            configStore,
+            liveStore,
+            appConfigStore,
+            broadcast,
+        );
+        sensorPollingService.start();
+
+        const sensorLoggingService = new SensorLoggingService(liveStore, logStore, appConfigStore);
+        sensorLoggingService.start();
+
+        servicesStore.register("sensorLoggingService", sensorLoggingService);
+        servicesStore.register("sensorPollingService", sensorPollingService);
     });
 
     // 8) Graceful shutdown logic
     const shutdown = (): void => {
         console.log(chalk.yellow("🛑 Shutting down..."));
+
+        servicesStore.get<SensorPollingService>("sensorPollingService").stop();
+        servicesStore.get<SensorLoggingService>("sensorLoggingService").stop();
+
         wss.close();
         httpServer.close(() => {
             console.log(chalk.yellow("✔️ Shutdown complete."));

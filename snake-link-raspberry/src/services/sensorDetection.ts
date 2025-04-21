@@ -1,6 +1,3 @@
-// @ts-ignore – i2c-bus ist optional
-import i2c from "i2c-bus";
-
 /**
  * Known I2C sensor addresses and their metadata.
  */
@@ -28,6 +25,9 @@ const KNOWN_I2C_SENSORS: Record<number, { name: string; id: string; type: string
  * @returns {Promise<DetectedSensor[]>}
  */
 export async function detectI2CSensors(): Promise<DetectedSensor[]> {
+    // @ts-ignore – i2c-bus ist optional
+    const i2c = require("i2c-bus");
+
     try {
         const bus = await i2c.openPromisified(1);
         const devices = await bus.scan();

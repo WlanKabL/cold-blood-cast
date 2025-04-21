@@ -4,6 +4,9 @@ import { isValidPartialSensorConfig, SensorConfig } from "../../types/sensor.js"
 import { isValidPartialAppConfig } from "../../types/config.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { hasPermission, isAdmin } from "../../utils/permissions.js";
+import { servicesStore } from "../../stores/servicesStore.js";
+import { SensorPollingService } from "../../services/sensorPolling.js";
+import { SensorLoggingService } from "../../services/sensorLogging.js";
 
 const router = Router();
 const store = new DataStorageService("./data");
@@ -75,6 +78,7 @@ router.post("/sensors", authMiddleware, (req: Request, res: any, next: NextFunct
         const sensors = req.body as SensorConfig[];
 
         sensorConfigStore.save({ sensors });
+
         res.status(200).json({ success: true });
     } catch (err) {
         next(err);
@@ -250,6 +254,13 @@ router.post("/app", authMiddleware, (req: Request, res: any, next: NextFunction)
 
         const merged = { ...current, ...update };
         appConfigStore.save(merged);
+
+        const pollingService = servicesStore.get<SensorPollingService>("sensorPollingService");
+        const loggingService = servicesStore.get<SensorLoggingService>("sensorLoggingService");
+
+        pollingService.restart();
+        loggingService.restart();
+
         res.status(200).json({ success: true });
     } catch (err) {
         next(err);

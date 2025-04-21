@@ -47,7 +47,7 @@ const logStore = store.getSensorLogStore();
  */
 router.get("/", (req: Request, res: any, next: NextFunction) => {
     try {
-        const allLogs = logStore.load([]);
+        const allLogs = logStore.load();
 
         const now = Date.now();
         const defaultTo = now;

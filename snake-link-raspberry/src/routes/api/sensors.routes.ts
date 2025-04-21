@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { detectI2CSensors } from "../../services/sensorDetectionService.js";
+import { detectI2CSensors } from "../../services/sensorDetection.js";
 
 const router = Router();
 const store = new DataStorageService("./data");
