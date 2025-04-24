@@ -1,42 +1,48 @@
 <template>
-    <nav
-        class="w-full px-6 py-4 bg-zinc-900 text-zinc-100 shadow-sm border-b border-zinc-800"
-    >
+    <nav class="w-full px-4 sm:px-6 py-4 text-zinc-100 shadow-sm border-b border-zinc-800">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <!-- Logo -->
             <NuxtLink
                 to="/"
-                class="text-2xl font-semibold tracking-tight hover:text-indigo-400 transition-colors"
+                class="text-2xl tracking-tight hover:text-indigo-400 transition-colors"
             >
-                &lt;/WlanKabL&gt;
+                <code> Cold-Blood-Cast 🐍 </code>
             </NuxtLink>
-
-            <!-- Navigation -->
             <div class="hidden md:flex gap-6 items-center text-sm font-medium">
-                <NuxtLink
-                    to="/projects"
-                    class="hover:text-indigo-400 transition-colors"
-                >
-                    {{ $t("project_title") }}
-                </NuxtLink>
-                <NuxtLink
-                    to="/about"
-                    class="hover:text-indigo-400 transition-colors"
-                >
-                    About
-                </NuxtLink>
-                <NuxtLink
-                    to="/contact"
-                    class="hover:text-indigo-400 transition-colors"
-                >
-                    Contact
-                </NuxtLink>
+                <Navbar-Links />
                 <LanguageSwitcher />
             </div>
+            <button
+                class="md:hidden text-zinc-100 focus:outline-none"
+                @click="menuOpen = !menuOpen"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16"
+                    />
+                </svg>
+            </button>
+        </div>
+        <div
+            v-if="menuOpen"
+            class="md:hidden mt-4 space-y-3 text-sm font-medium px-4 flex flex-col"
+        >
+            <Navbar-Links />
+            <LanguageSwitcher />
         </div>
     </nav>
 </template>
 
 <script setup lang="ts">
-// nothing needed here
+import { ref } from "vue";
+
+const menuOpen = ref(false);
 </script>

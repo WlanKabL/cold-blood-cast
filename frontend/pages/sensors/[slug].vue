@@ -1,6 +1,6 @@
 <template>
     <div class="p-8">
-        <h1 class="text-3xl font-bold">Projekt: {{ slug }}</h1>
+        <h1 class="text-3xl font-bold">Sensor ID: {{ slug }}</h1>
         <p class="text-gray-400 mt-2">Du bist auf einer Projekt-Detailseite.</p>
     </div>
 </template>

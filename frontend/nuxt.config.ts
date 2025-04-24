@@ -3,6 +3,9 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
     compatibilityDate: "2024-11-01",
     devtools: { enabled: true },
+    devServer: {
+        port: parseInt(process.env.PORT ?? "3001"),
+    },
     css: ["./assets/tailwind.css"],
     modules: [
         "@nuxt/eslint",
@@ -33,6 +36,7 @@ export default defineNuxtConfig({
     vite: {
         define: {
             "process.env.DEBUG": false,
+            "process.env.PORT": process.env.PORT || 3001,
         },
         build: {
             minify: true,
