@@ -1,6 +1,4 @@
-import { SensorConfig, SensorReading } from "../types/sensor.js";
-
-export type SensorStatus = "ok" | "warning" | "unknown";
+import { SensorConfig, SensorReading, SensorStatus } from "../types/sensor.js";
 
 export function calculateSensorStatus(
     sensor: SensorConfig,

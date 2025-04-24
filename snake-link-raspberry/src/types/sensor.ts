@@ -21,12 +21,7 @@ export type WaterUnit = z.infer<typeof WaterUnitSchema>;
 export const PressureUnitSchema = z.enum(["hPa", "mmHg"]);
 export type PressureUnit = z.infer<typeof PressureUnitSchema>;
 
-export const ReaderSchema = z.enum([
-    "mock",
-    "dht11",
-    "dht22",
-    "bme280",
-]);
+export const ReaderSchema = z.enum(["mock", "dht11", "dht22", "bme280"]);
 export type Reader = z.infer<typeof ReaderSchema>;
 
 /**
@@ -169,3 +164,17 @@ export function isValidPartialSensorConfig(input: unknown): input is Partial<Sen
 export function isValidSensorConfig(input: unknown): input is SensorConfig {
     return SensorConfigSchema.safeParse(input).success;
 }
+
+export type SensorStatus = "ok" | "warning" | "unknown";
+
+/**
+ * Returned sensor config in API, with reading & status.
+ * Fields like `hardware`, `reader`, `private`, and `active` are omitted.
+ */
+export type PublicSensorResponse = Omit<
+    SensorConfig,
+    "hardware" | "reader" | "private" | "active"
+> & {
+    reading: SensorReading | null;
+    status: SensorStatus;
+};

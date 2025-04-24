@@ -45,7 +45,14 @@ async function bootstrap(): Promise<void> {
     // 2) Create Express app
     const app: Application = express();
     app.use(helmet()); // basic security headers
-    app.use(cors(env.CORS_OPTIONS)); // configurable CORS
+    app.use(
+        cors({
+            origin: env.CORS_ORIGINS.split(",").map((origin) => origin.trim()), // allow multiple origins
+            methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            credentials: true,
+        }),
+    ); // configurable CORS
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 

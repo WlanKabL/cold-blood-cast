@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
 import { calculateSensorStatus } from "../../utils/sensorStatus.js";
+import { PublicSensorResponse } from "../../types/sensor.js";
 
 const router = Router();
 const store = new DataStorageService("./data");
@@ -23,21 +24,24 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
         const config = configStore.load();
         const live = liveStore.load();
 
-        const result = config.sensors.map((sensor) => {
-            delete sensor.active; // Remove the active property from the response
-            delete sensor.hardware; // Remove the hardware property from the response
-            delete sensor.reader; // Remove the reader property from the response
-            delete sensor.private; // Remove the private property from the response
+        const result: PublicSensorResponse[] = config.sensors.map(
+            (sensor): PublicSensorResponse => {
+                const { id, name, type, unit, min, max } = sensor;
+                const reading = live[sensor.id] ?? null;
+                const status = calculateSensorStatus(sensor, reading);
 
-            const reading = live[sensor.id] ?? null;
-            const status = calculateSensorStatus(sensor, reading);
-
-            return {
-                ...sensor,
-                reading,
-                status,
-            };
-        });
+                return {
+                    id,
+                    name,
+                    type,
+                    unit,
+                    min,
+                    max,
+                    reading,
+                    status,
+                };
+            },
+        );
 
         res.json(result);
     } catch (err) {

@@ -40,21 +40,20 @@
 
 <script setup lang="ts">
 import { format } from "~/utils/date";
-import { Thermometer, Droplet, Waves, GaugeCircle } from "lucide-vue-next"; // Beispiel-Icons
+import { ThermometerSun, Droplet, Waves, GaugeCircle } from "lucide-vue-next";
 
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 
 const props = defineProps<{ sensor: PublicSensorResponse }>();
 
-// Icon Mapping je nach Sensor-Typ
 const iconMap = {
-    temperature: Thermometer,
-    humidity: Droplet,
-    water: Waves,
-    pressure: GaugeCircle,
-} as const;
+    ThermometerSun,
+    Droplet,
+    Waves,
+    GaugeCircle,
+};
 
 const iconComponent = computed(() => {
-    return iconMap[props.sensor.type] ?? GaugeCircle;
+    return iconMap[getSensorIcon(props.sensor.type)] ?? GaugeCircle;
 });
 </script>
