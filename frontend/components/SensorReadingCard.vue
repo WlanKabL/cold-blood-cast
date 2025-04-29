@@ -57,7 +57,8 @@
             </template>
         </div>
         <p class="mt-2 text-xs text-gray-500 block">
-            Last updated: {{ format(sensor.reading?.timestamp ?? 0) }}
+            Last updated:
+            {{ sensor.reading?.timestamp ? format(sensor.reading.timestamp) : "Unknown" }}
         </p>
     </div>
 </template>
