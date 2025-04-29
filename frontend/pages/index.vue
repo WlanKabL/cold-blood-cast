@@ -48,6 +48,7 @@ import { AlertTriangle } from "lucide-vue-next";
 import { useQuery } from "@tanstack/vue-query";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 import { liveService } from "~/services/liveService";
+import { useAppConfigStore } from "~/stores/appConfigStore";
 
 const app = useAppConfigStore();
 

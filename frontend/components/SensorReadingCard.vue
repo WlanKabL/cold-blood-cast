@@ -2,7 +2,9 @@
     <div
         class="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-4 sm:p-6 shadow-lg border border-zinc-700 relative overflow-hidden"
     >
-        <div class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 text-xl sm:text-2xl text-indigo-400 opacity-80">
+        <div
+            class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 text-xl sm:text-2xl text-indigo-400 opacity-80"
+        >
             <component :is="iconComponent" />
         </div>
         <div class="flex items-center justify-between mb-1">

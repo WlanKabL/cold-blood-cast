@@ -1,6 +1,7 @@
 import { computed } from "vue";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 import { ThermometerSun, Droplet, Waves, Gauge } from "lucide-vue-next";
+import { useAppConfigStore } from "~/stores/appConfigStore";
 
 /**
  * Composable that returns reactive icon component and color class

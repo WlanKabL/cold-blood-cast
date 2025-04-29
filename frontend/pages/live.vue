@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/vue-query";
 import SensorReadingCard from "@/components/SensorReadingCard.vue";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 import { liveService } from "~/services/liveService";
+import { useAppConfigStore } from "~/stores/appConfigStore";
 
 const app = useAppConfigStore();
 
