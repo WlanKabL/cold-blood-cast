@@ -127,7 +127,12 @@ export class DataStorageService {
      */
     getAppConfigStore(): FileStore<AppConfig> {
         return new FileStore(path.join(this.basePath, "app.config.json"), {
-            general: { name: "ColdBloodCast" },
+            general: {
+                name: "ColdBloodCast",
+                dayStartHour: 8,
+                nightStartHour: 20,
+                timezone: "Europe/Berlin",
+            },
             sensorSystem: {
                 pollingIntervalMs: 10_000,
                 retentionMinutes: 60,

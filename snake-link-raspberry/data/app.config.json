@@ -1,8 +1,8 @@
 {
     "general": {
         "name": "ColdBloodCast",
-        "dayStartHour": 6,
-        "nightStartHour": 18,
+        "dayStartHour": 8,
+        "nightStartHour": 20,
         "timezone": "Europe/Berlin"
     },
     "sensorSystem": {
