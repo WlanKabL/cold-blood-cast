@@ -7,7 +7,6 @@ import { detectI2CSensors } from "../../services/sensorDetection.js";
 const router = Router();
 const store = new DataStorageService("./data");
 const configStore = store.getSensorConfigStore();
-const liveStore = store.getLiveDataStore();
 
 /**
  * @openapi

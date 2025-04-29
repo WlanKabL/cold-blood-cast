@@ -2,29 +2,29 @@
     "warm_zone_temp": {
         "name": "Warme Zone",
         "type": "temperature",
+        "value": 30,
         "unit": "°C",
-        "value": null,
-        "timestamp": 1745112256876
+        "timestamp": 1745953951914
     },
     "cold_zone_temp": {
         "name": "Kalte Zone",
         "type": "temperature",
+        "value": 23.3,
         "unit": "°C",
-        "value": null,
-        "timestamp": 1745112256876
+        "timestamp": 1745953951914
     },
     "humidity_sensor": {
         "name": "Feuchtigkeitssensor",
         "type": "humidity",
+        "value": 38.2,
         "unit": "%",
-        "value": null,
-        "timestamp": 1745112256877
+        "timestamp": 1745953951914
     },
     "water_sensor": {
         "name": "Trinkschale",
         "type": "water",
+        "value": 0,
         "unit": "present",
-        "value": null,
-        "timestamp": 1745112256877
+        "timestamp": 1745953951915
     }
 }

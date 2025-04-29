@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-const GeneralConfigSchema = z.object({ name: z.string() });
+const GeneralConfigSchema = z.object({
+    name: z.string(),
+    dayStartHour: z.number().int().min(0).max(23),
+    nightStartHour: z.number().int().min(0).max(23),
+    timezone: z.string(),
+});
 const SensorSystemConfigSchema = z.object({
     pollingIntervalMs: z.number().int(),
     retentionMinutes: z.number().int(),
@@ -31,4 +36,8 @@ export const PartialAppConfigSchema = z.object({
 /** Runtime guard for ANY partial of AppConfig */
 export function isValidPartialAppConfig(input: unknown): input is Partial<AppConfig> {
     return PartialAppConfigSchema.safeParse(input).success;
+}
+
+export function isValidAppConfig(input: unknown): input is AppConfig {
+    return AppConfigSchema.safeParse(input).success;
 }

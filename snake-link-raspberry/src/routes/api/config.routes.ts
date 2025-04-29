@@ -1,7 +1,11 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
-import { isValidPartialSensorConfig, SensorConfig } from "../../types/sensor.js";
-import { isValidPartialAppConfig } from "../../types/config.js";
+import {
+    isValidPartialSensorConfig,
+    isValidSensorConfig,
+    SensorConfig,
+} from "../../types/sensor.js";
+import { isValidAppConfig, isValidPartialAppConfig } from "../../types/config.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { hasPermission, isAdmin } from "../../utils/permissions.js";
 import { servicesStore } from "../../stores/servicesStore.js";
@@ -35,7 +39,7 @@ const appConfigStore = store.getAppConfigStore();
  *       500:
  *         description: Internal server error.
  */
-router.get("/sensors", authMiddleware, (req: Request, res: Response, next: NextFunction) => {
+router.get("/sensors", (req: Request, res: Response, next: NextFunction) => {
     try {
         const config = sensorConfigStore.load();
         res.json(config.sensors);
@@ -163,8 +167,13 @@ router.put("/sensor/:id", authMiddleware, (req: Request, res: any, next: NextFun
         const { id } = req.params;
         const update = req.body;
 
-        if (!isValidPartialSensorConfig(update)) {
+        // Jetzt vollständiges Objekt erwarten
+        if (!isValidSensorConfig(update)) {
             return res.status(400).json({ error: "Invalid SensorConfig structure" });
+        }
+
+        if (update.id !== id) {
+            return res.status(400).json({ error: "Sensor ID mismatch" });
         }
 
         const config = sensorConfigStore.load();
@@ -174,7 +183,8 @@ router.put("/sensor/:id", authMiddleware, (req: Request, res: any, next: NextFun
             return res.status(404).json({ error: "Sensor not found" });
         }
 
-        config.sensors[index] = { ...config.sensors[index], ...update };
+        config.sensors[index] = update;
+
         sensorConfigStore.save(config);
 
         res.status(200).json({ success: true });
@@ -201,15 +211,8 @@ router.put("/sensor/:id", authMiddleware, (req: Request, res: any, next: NextFun
  *             schema:
  *               $ref: '#/components/schemas/AppConfig'
  */
-router.get("/app", authMiddleware, (req: Request, res: any, next: NextFunction) => {
+router.get("/app", (req: Request, res: any, next: NextFunction) => {
     try {
-        const user = req.user!;
-        const allowed = hasPermission(user, "manageAppConfig");
-
-        if (!allowed) {
-            return res.status(403).json({ error: "Forbidden" });
-        }
-
         const config = appConfigStore.load();
         res.json(config);
     } catch (err) {
@@ -246,14 +249,11 @@ router.post("/app", authMiddleware, (req: Request, res: any, next: NextFunction)
 
         const update = req.body;
 
-        if (!isValidPartialAppConfig(update)) {
+        if (!isValidAppConfig(update)) {
             return res.status(400).json({ error: "Invalid AppConfig structure" });
         }
 
-        const current = appConfigStore.load();
-
-        const merged = { ...current, ...update };
-        appConfigStore.save(merged);
+        appConfigStore.save(update);
 
         const pollingService = servicesStore.get<SensorPollingService>("sensorPollingService");
         const loggingService = servicesStore.get<SensorLoggingService>("sensorLoggingService");

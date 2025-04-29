@@ -1,11 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
 import { calculateSensorStatus } from "../../utils/sensorStatus.js";
+import { PublicSensorResponse } from "../../types/sensor.js";
 
 const router = Router();
 const store = new DataStorageService("./data");
 const liveStore = store.getLiveDataStore();
 const configStore = store.getSensorConfigStore();
+const appConfigStore = store.getAppConfigStore();
 
 /**
  * @openapi
@@ -23,21 +25,28 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
         const config = configStore.load();
         const live = liveStore.load();
 
-        const result = config.sensors.map((sensor) => {
-            delete sensor.active; // Remove the active property from the response
-            delete sensor.hardware; // Remove the hardware property from the response
-            delete sensor.reader; // Remove the reader property from the response
-            delete sensor.private; // Remove the private property from the response
+        const result: PublicSensorResponse[] = config.sensors.map(
+            (sensor): PublicSensorResponse => {
+                const { id, name, type, unit, readingLimits, limitsType } = sensor;
+                const reading = live[sensor.id] ?? null;
+                const status = calculateSensorStatus(
+                    sensor,
+                    reading,
+                    appConfigStore.load().general,
+                );
 
-            const reading = live[sensor.id] ?? null;
-            const status = calculateSensorStatus(sensor, reading);
-
-            return {
-                ...sensor,
-                reading,
-                status,
-            };
-        });
+                return {
+                    id,
+                    name,
+                    type,
+                    unit,
+                    limitsType,
+                    readingLimits,
+                    reading,
+                    status,
+                };
+            },
+        );
 
         res.json(result);
     } catch (err) {
@@ -78,7 +87,7 @@ router.get("/:sensorId", (req: Request, res: any, next: NextFunction) => {
         delete sensor.private; // Remove the private property from the response
 
         const reading = live[sensor.id] ?? null;
-        const status = calculateSensorStatus(sensor, reading);
+        const status = calculateSensorStatus(sensor, reading, appConfigStore.load().general);
 
         res.json({
             ...sensor,
