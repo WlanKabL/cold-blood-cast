@@ -2,6 +2,9 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,nuxtjs,node,dotenv
 
 snake-link-raspberry/data/*
+build.zip
+build.rar
+build.7z
 
 ### dotenv ###
 .env
