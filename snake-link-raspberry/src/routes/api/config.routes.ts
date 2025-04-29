@@ -1,7 +1,11 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
-import { isValidPartialSensorConfig, SensorConfig } from "../../types/sensor.js";
-import { isValidPartialAppConfig } from "../../types/config.js";
+import {
+    isValidPartialSensorConfig,
+    isValidSensorConfig,
+    SensorConfig,
+} from "../../types/sensor.js";
+import { isValidAppConfig, isValidPartialAppConfig } from "../../types/config.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { hasPermission, isAdmin } from "../../utils/permissions.js";
 import { servicesStore } from "../../stores/servicesStore.js";
@@ -163,8 +167,13 @@ router.put("/sensor/:id", authMiddleware, (req: Request, res: any, next: NextFun
         const { id } = req.params;
         const update = req.body;
 
-        if (!isValidPartialSensorConfig(update)) {
+        // Jetzt vollständiges Objekt erwarten
+        if (!isValidSensorConfig(update)) {
             return res.status(400).json({ error: "Invalid SensorConfig structure" });
+        }
+
+        if (update.id !== id) {
+            return res.status(400).json({ error: "Sensor ID mismatch" });
         }
 
         const config = sensorConfigStore.load();
@@ -174,7 +183,8 @@ router.put("/sensor/:id", authMiddleware, (req: Request, res: any, next: NextFun
             return res.status(404).json({ error: "Sensor not found" });
         }
 
-        config.sensors[index] = { ...config.sensors[index], ...update };
+        config.sensors[index] = update;
+
         sensorConfigStore.save(config);
 
         res.status(200).json({ success: true });
@@ -246,14 +256,11 @@ router.post("/app", authMiddleware, (req: Request, res: any, next: NextFunction)
 
         const update = req.body;
 
-        if (!isValidPartialAppConfig(update)) {
+        if (!isValidAppConfig(update)) {
             return res.status(400).json({ error: "Invalid AppConfig structure" });
         }
 
-        const current = appConfigStore.load();
-
-        const merged = { ...current, ...update };
-        appConfigStore.save(merged);
+        appConfigStore.save(update);
 
         const pollingService = servicesStore.get<SensorPollingService>("sensorPollingService");
         const loggingService = servicesStore.get<SensorLoggingService>("sensorLoggingService");

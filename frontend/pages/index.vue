@@ -54,7 +54,9 @@ import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/s
 
 // Fetch sensors
 const fetchLiveData = async () => {
-    const { data } = await useNuxtApp().$axios.get("/api/live");
+    const { data } = await useNuxtApp().$axios.get("/api/live", {
+        withCredentials: true,
+    });
     return (data as PublicSensorResponse[]) ?? [];
 };
 

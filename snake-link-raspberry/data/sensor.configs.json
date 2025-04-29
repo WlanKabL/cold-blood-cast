@@ -5,13 +5,21 @@
             "name": "Warme Zone",
             "type": "temperature",
             "unit": "°C",
-            "min": 28,
-            "max": 32,
             "active": true,
-            "reader": "dht",
+            "reader": "dht22",
             "hardware": {
                 "pin": 4,
                 "model": "22"
+            },
+            "timeBasedLimits": {
+                "day": {
+                    "min": 28,
+                    "max": 32
+                },
+                "night": {
+                    "min": 22,
+                    "max": 25
+                }
             }
         },
         {

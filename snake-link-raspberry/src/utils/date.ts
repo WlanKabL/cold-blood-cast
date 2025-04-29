@@ -5,3 +5,26 @@ export function todayAsFilename(): string {
     const day = String(now.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}.json`;
 }
+
+import { DateTime } from "luxon";
+import { AppConfig } from "../types/config.js";
+import { SensorConfig } from "../types/sensor.js";
+
+export function isNight(appConfig: AppConfig): boolean {
+    const now = DateTime.now().setZone(appConfig.general.timezone);
+    const hour = now.hour;
+    return (
+        hour < appConfig.general.dayStartHour || hour >= appConfig.general.nightStartHour
+    );
+}
+
+export function getEffectiveRange(
+    sensor: SensorConfig,
+    appConfig: AppConfig,
+): { min?: number; max?: number } {
+    if (!sensor.timeBasedLimits) return { min: sensor.min, max: sensor.max };
+
+    const night = isNight(appConfig);
+    const range = night ? sensor.timeBasedLimits.night : sensor.timeBasedLimits.day;
+    return { min: range.min ?? sensor.min, max: range.max ?? sensor.max };
+}

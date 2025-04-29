@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     devServer: {
         port: parseInt(process.env.PORT ?? "3001"),
+        host: "0.0.0.0"
     },
     css: ["./assets/tailwind.css"],
     modules: [

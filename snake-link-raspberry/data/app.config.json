@@ -1,6 +1,9 @@
 {
     "general": {
-        "name": "ColdBloodCast"
+        "name": "ColdBloodCast",
+        "dayStartHour": 6,
+        "nightStartHour": 18,
+        "timezone": "Europe/Berlin"
     },
     "sensorSystem": {
         "pollingIntervalMs": 10000,
