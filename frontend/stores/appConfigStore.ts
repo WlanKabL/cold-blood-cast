@@ -1,4 +1,3 @@
-// src/stores/useAppConfigStore.ts
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { configService } from "@/services/configService";
