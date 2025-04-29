@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const GeneralConfigSchema = z.object({ 
+const GeneralConfigSchema = z.object({
     name: z.string(),
     dayStartHour: z.number().int().min(0).max(23),
     nightStartHour: z.number().int().min(0).max(23),

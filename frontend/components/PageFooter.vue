@@ -8,7 +8,11 @@
             </div>
 
             <div class="text-zinc-600 hover:text-indigo-400 transition-colors">
-                <a href="https://github.com/WlanKabL/cold-blood-stream" target="_blank" rel="noopener">
+                <a
+                    href="https://github.com/WlanKabL/cold-blood-stream"
+                    target="_blank"
+                    rel="noopener"
+                >
                     → Check the source on GitHub
                 </a>
             </div>

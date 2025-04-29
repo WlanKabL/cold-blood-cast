@@ -2,7 +2,9 @@
     <section class="relative min-h-screen flex items-center justify-center px-4 py-20">
         <div
             class="absolute inset-0 bg-cover bg-center z-0"
-            style="background-image: url('https://downloads.crowd-nation.com/Portfolio.png')"
+            style="
+                background-image: url(&quot;https://downloads.crowd-nation.com/Portfolio.png&quot;);
+            "
         >
             <div
                 class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-[#0D1117]"

@@ -29,7 +29,11 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
             (sensor): PublicSensorResponse => {
                 const { id, name, type, unit, readingLimits, limitsType } = sensor;
                 const reading = live[sensor.id] ?? null;
-                const status = calculateSensorStatus(sensor, reading, appConfigStore.load().general);
+                const status = calculateSensorStatus(
+                    sensor,
+                    reading,
+                    appConfigStore.load().general,
+                );
 
                 return {
                     id,

@@ -9,13 +9,13 @@ export default defineNuxtConfig({
     },
     css: ["./assets/tailwind.css"],
     modules: [
-      "@nuxt/eslint",
-      "@nuxt/icon",
-      "@nuxt/ui",
-      "@nuxt/scripts",
-      "@nuxt/fonts",
-      "@nuxtjs/i18n",
-      "@pinia/nuxt",
+        "@nuxt/eslint",
+        "@nuxt/icon",
+        "@nuxt/ui",
+        "@nuxt/scripts",
+        "@nuxt/fonts",
+        "@nuxtjs/i18n",
+        "@pinia/nuxt",
     ],
     i18n: {
         strategy: "no_prefix",
@@ -42,13 +42,11 @@ export default defineNuxtConfig({
         build: {
             minify: true,
         },
-        plugins: [
-            tailwindcss(),
-        ]
+        plugins: [tailwindcss()],
     },
     runtimeConfig: {
         public: {
             apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
         },
-    }
+    },
 });

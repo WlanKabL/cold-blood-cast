@@ -13,9 +13,7 @@ import { SensorConfig } from "../types/sensor.js";
 export function isNight(appConfig: AppConfig): boolean {
     const now = DateTime.now().setZone(appConfig.general.timezone);
     const hour = now.hour;
-    return (
-        hour < appConfig.general.dayStartHour || hour >= appConfig.general.nightStartHour
-    );
+    return hour < appConfig.general.dayStartHour || hour >= appConfig.general.nightStartHour;
 }
 
 export function getEffectiveRange(

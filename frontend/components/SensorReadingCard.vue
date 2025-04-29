@@ -9,10 +9,7 @@
             <h2 class="text-lg font-semibold text-white truncate">
                 {{ sensor.name || sensor.id }}
             </h2>
-            <span
-                class="text-xs font-medium px-2 py-0.5 rounded-full"
-                :class="bgColor"
-            >
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full" :class="bgColor">
                 {{ sensor.status.toUpperCase() }}
             </span>
         </div>
@@ -74,7 +71,7 @@ import { format } from "~/utils/date";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 
 // Props definition
-const props = defineProps<{ sensor: PublicSensorResponse; }>();
+const props = defineProps<{ sensor: PublicSensorResponse }>();
 
 const { icon: iconComponent, bgColor, isDay } = useSensorHelpers(props.sensor);
 
