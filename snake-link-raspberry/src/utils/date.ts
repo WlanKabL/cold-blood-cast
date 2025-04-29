@@ -20,7 +20,8 @@ export function getEffectiveRange(
     sensor: SensorConfig,
     appConfig: AppConfig,
 ): { min?: number; max?: number } {
-    if (sensor.limitsType === "general") return { min: sensor.readingLimits.min, max: sensor.readingLimits.max };
+    if (sensor.limitsType === "general")
+        return { min: sensor.readingLimits.min, max: sensor.readingLimits.max };
 
     const night = isNight(appConfig);
     const range = night ? sensor.readingLimits.night : sensor.readingLimits.day;
