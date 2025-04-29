@@ -1,727 +1,133 @@
 [
     {
-        "timestamp": 1744998985041,
+        "timestamp": 1745951899501,
         "readings": {
             "warm_zone_temp": {
-                "name": "Warm Zone",
+                "name": "Warme Zone",
+                "type": "temperature",
+                "value": 32.8,
+                "unit": "°C",
+                "timestamp": 1745951898509
+            },
+            "cold_zone_temp": {
+                "name": "Kalte Zone",
+                "type": "temperature",
+                "value": 25.1,
+                "unit": "°C",
+                "timestamp": 1745951898509
+            },
+            "humidity_sensor": {
+                "name": "Feuchtigkeitssensor",
+                "type": "humidity",
+                "value": 35.3,
+                "unit": "%",
+                "timestamp": 1745951898509
+            },
+            "water_sensor": {
+                "name": "Trinkschale",
+                "type": "water",
+                "value": 1,
+                "unit": "present",
+                "timestamp": 1745951898509
+            }
+        }
+    },
+    {
+        "timestamp": 1745951901502,
+        "readings": {
+            "warm_zone_temp": {
+                "name": "Warme Zone",
                 "type": "temperature",
                 "value": 26.2,
                 "unit": "°C",
-                "timestamp": 1744998982173
-            },
-            "cold_zone_temp": {
-                "name": "Cold Zone",
-                "type": "temperature",
-                "value": 26.1,
-                "unit": "°C",
-                "timestamp": 1744998982173
-            },
-            "humidity_sensor": {
-                "name": "Humidity Sensor",
-                "type": "humidity",
-                "value": 50,
-                "unit": "%",
-                "timestamp": 1744998982173
-            },
-            "water_sensor": {
-                "name": "Drinking Bowl",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1744998982173
-            }
-        }
-    },
-    {
-        "timestamp": 1744999045044,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warm Zone",
-                "type": "temperature",
-                "value": 31.2,
-                "unit": "°C",
-                "timestamp": 1744999042317
-            },
-            "cold_zone_temp": {
-                "name": "Cold Zone",
-                "type": "temperature",
-                "value": 23,
-                "unit": "°C",
-                "timestamp": 1744999042317
-            },
-            "humidity_sensor": {
-                "name": "Humidity Sensor",
-                "type": "humidity",
-                "value": 35.4,
-                "unit": "%",
-                "timestamp": 1744999042317
-            },
-            "water_sensor": {
-                "name": "Drinking Bowl",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1744999042317
-            }
-        }
-    },
-    {
-        "timestamp": 1744999105051,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 27.6,
-                "unit": "°C",
-                "timestamp": 1744999102462
+                "timestamp": 1745951900524
             },
             "cold_zone_temp": {
                 "name": "Kalte Zone",
                 "type": "temperature",
-                "value": 31.5,
+                "value": 32.6,
                 "unit": "°C",
-                "timestamp": 1744999102462
+                "timestamp": 1745951900525
             },
             "humidity_sensor": {
                 "name": "Feuchtigkeitssensor",
                 "type": "humidity",
-                "value": 45.7,
+                "value": 41.7,
                 "unit": "%",
-                "timestamp": 1744999102462
+                "timestamp": 1745951900525
             },
             "water_sensor": {
                 "name": "Trinkschale",
                 "type": "water",
                 "value": 0,
                 "unit": "present",
-                "timestamp": 1744999102462
+                "timestamp": 1745951900525
             }
         }
     },
     {
-        "timestamp": 1744999270637,
+        "timestamp": 1745951903514,
         "readings": {
             "warm_zone_temp": {
                 "name": "Warme Zone",
                 "type": "temperature",
-                "value": 25.9,
+                "value": 24.9,
                 "unit": "°C",
-                "timestamp": 1744999267769
+                "timestamp": 1745951902538
             },
             "cold_zone_temp": {
                 "name": "Kalte Zone",
                 "type": "temperature",
-                "value": 28.7,
+                "value": 22.3,
                 "unit": "°C",
-                "timestamp": 1744999267769
+                "timestamp": 1745951902539
             },
             "humidity_sensor": {
                 "name": "Feuchtigkeitssensor",
                 "type": "humidity",
-                "value": 36.6,
+                "value": 38.6,
                 "unit": "%",
-                "timestamp": 1744999267769
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1744999267769
-            }
-        }
-    },
-    {
-        "timestamp": 1744999330645,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 28.2,
-                "unit": "°C",
-                "timestamp": 1744999327917
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 31.4,
-                "unit": "°C",
-                "timestamp": 1744999327917
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 51.3,
-                "unit": "%",
-                "timestamp": 1744999327917
+                "timestamp": 1745951902539
             },
             "water_sensor": {
                 "name": "Trinkschale",
                 "type": "water",
                 "value": 1,
                 "unit": "present",
-                "timestamp": 1744999327917
+                "timestamp": 1745951902539
             }
         }
     },
     {
-        "timestamp": 1744999390654,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 28.1,
-                "unit": "°C",
-                "timestamp": 1744999388066
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 25.5,
-                "unit": "°C",
-                "timestamp": 1744999388066
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 54.6,
-                "unit": "%",
-                "timestamp": 1744999388066
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1744999388066
-            }
-        }
-    },
-    {
-        "timestamp": 1744999505850,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 22.2,
-                "unit": "°C",
-                "timestamp": 1744999502982
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 22.8,
-                "unit": "°C",
-                "timestamp": 1744999502982
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 57,
-                "unit": "%",
-                "timestamp": 1744999502982
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1744999502982
-            }
-        }
-    },
-    {
-        "timestamp": 1744999611001,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 23,
-                "unit": "°C",
-                "timestamp": 1744999608133
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 33.8,
-                "unit": "°C",
-                "timestamp": 1744999608133
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 58.6,
-                "unit": "%",
-                "timestamp": 1744999608133
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1744999608133
-            }
-        }
-    },
-    {
-        "timestamp": 1744999671009,
+        "timestamp": 1745951905529,
         "readings": {
             "warm_zone_temp": {
                 "name": "Warme Zone",
                 "type": "temperature",
                 "value": 32,
                 "unit": "°C",
-                "timestamp": 1744999668280
+                "timestamp": 1745951904552
             },
             "cold_zone_temp": {
                 "name": "Kalte Zone",
                 "type": "temperature",
-                "value": 31.7,
+                "value": 31.6,
                 "unit": "°C",
-                "timestamp": 1744999668280
+                "timestamp": 1745951904552
             },
             "humidity_sensor": {
                 "name": "Feuchtigkeitssensor",
                 "type": "humidity",
-                "value": 50.5,
+                "value": 54.3,
                 "unit": "%",
-                "timestamp": 1744999668280
+                "timestamp": 1745951904552
             },
             "water_sensor": {
                 "name": "Trinkschale",
                 "type": "water",
                 "value": 1,
                 "unit": "present",
-                "timestamp": 1744999668280
-            }
-        }
-    },
-    {
-        "timestamp": 1744999739492,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 29.9,
-                "unit": "°C",
-                "timestamp": 1744999736638
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 23.8,
-                "unit": "°C",
-                "timestamp": 1744999736638
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 41,
-                "unit": "%",
-                "timestamp": 1744999736638
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1744999736638
-            }
-        }
-    },
-    {
-        "timestamp": 1744999799500,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 28.7,
-                "unit": "°C",
-                "timestamp": 1744999796786
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 23.1,
-                "unit": "°C",
-                "timestamp": 1744999796786
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 61.7,
-                "unit": "%",
-                "timestamp": 1744999796786
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1744999796786
-            }
-        }
-    },
-    {
-        "timestamp": 1744999974371,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 24.6,
-                "unit": "°C",
-                "timestamp": 1744999971547
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 25.3,
-                "unit": "°C",
-                "timestamp": 1744999971547
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 53.4,
-                "unit": "%",
-                "timestamp": 1744999971547
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1744999971547
-            }
-        }
-    },
-    {
-        "timestamp": 1745000034375,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 23.2,
-                "unit": "°C",
-                "timestamp": 1745000031737
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 32.7,
-                "unit": "°C",
-                "timestamp": 1745000031737
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 43.4,
-                "unit": "%",
-                "timestamp": 1745000031737
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1745000031737
-            }
-        }
-    },
-    {
-        "timestamp": 1745000106929,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 24.4,
-                "unit": "°C",
-                "timestamp": 1745000104104
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 33,
-                "unit": "°C",
-                "timestamp": 1745000104104
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 58.2,
-                "unit": "%",
-                "timestamp": 1745000104104
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1745000104104
-            }
-        }
-    },
-    {
-        "timestamp": 1745000166933,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 32.4,
-                "unit": "°C",
-                "timestamp": 1745000164296
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 33,
-                "unit": "°C",
-                "timestamp": 1745000164296
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 37.5,
-                "unit": "%",
-                "timestamp": 1745000164296
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1745000164296
-            }
-        }
-    },
-    {
-        "timestamp": 1745000226941,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 27.5,
-                "unit": "°C",
-                "timestamp": 1745000224487
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 30.6,
-                "unit": "°C",
-                "timestamp": 1745000224487
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 50.1,
-                "unit": "%",
-                "timestamp": 1745000224487
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1745000224487
-            }
-        }
-    },
-    {
-        "timestamp": 1745000286944,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 30.5,
-                "unit": "°C",
-                "timestamp": 1745000284679
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 23.8,
-                "unit": "°C",
-                "timestamp": 1745000284679
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 35.1,
-                "unit": "%",
-                "timestamp": 1745000284679
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1745000284679
-            }
-        }
-    },
-    {
-        "timestamp": 1745000346950,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 24.5,
-                "unit": "°C",
-                "timestamp": 1745000344871
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 32.2,
-                "unit": "°C",
-                "timestamp": 1745000344871
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 41.4,
-                "unit": "%",
-                "timestamp": 1745000344871
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1745000344871
-            }
-        }
-    },
-    {
-        "timestamp": 1745000406955,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 23.9,
-                "unit": "°C",
-                "timestamp": 1745000405060
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 31.5,
-                "unit": "°C",
-                "timestamp": 1745000405060
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 45.3,
-                "unit": "%",
-                "timestamp": 1745000405060
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 1,
-                "unit": "present",
-                "timestamp": 1745000405060
-            }
-        }
-    },
-    {
-        "timestamp": 1745000466959,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 26.2,
-                "unit": "°C",
-                "timestamp": 1745000465252
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 27.3,
-                "unit": "°C",
-                "timestamp": 1745000465252
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 38.1,
-                "unit": "%",
-                "timestamp": 1745000465252
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1745000465252
-            }
-        }
-    },
-    {
-        "timestamp": 1745000526963,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 30,
-                "unit": "°C",
-                "timestamp": 1745000525443
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 23.5,
-                "unit": "°C",
-                "timestamp": 1745000525443
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 62.3,
-                "unit": "%",
-                "timestamp": 1745000525443
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1745000525443
-            }
-        }
-    },
-    {
-        "timestamp": 1745000634393,
-        "readings": {
-            "warm_zone_temp": {
-                "name": "Warme Zone",
-                "type": "temperature",
-                "value": 29.5,
-                "unit": "°C",
-                "timestamp": 1745000624417
-            },
-            "cold_zone_temp": {
-                "name": "Kalte Zone",
-                "type": "temperature",
-                "value": 24.8,
-                "unit": "°C",
-                "timestamp": 1745000624417
-            },
-            "humidity_sensor": {
-                "name": "Feuchtigkeitssensor",
-                "type": "humidity",
-                "value": 37.9,
-                "unit": "%",
-                "timestamp": 1745000624417
-            },
-            "water_sensor": {
-                "name": "Trinkschale",
-                "type": "water",
-                "value": 0,
-                "unit": "present",
-                "timestamp": 1745000624417
+                "timestamp": 1745951904552
             }
         }
     }

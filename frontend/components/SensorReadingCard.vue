@@ -11,11 +11,7 @@
             </h2>
             <span
                 class="text-xs font-medium px-2 py-0.5 rounded-full"
-                :class="{
-                    'bg-green-600 text-white': sensor.status === 'ok',
-                    'bg-yellow-600 text-white': sensor.status === 'warning',
-                    'bg-red-600 text-white': sensor.status === 'unknown',
-                }"
+                :class="bgColor"
             >
                 {{ sensor.status.toUpperCase() }}
             </span>
@@ -27,10 +23,44 @@
             </span>
         </div>
         <div class="mt-4 text-sm text-gray-400 space-y-1">
-            <p v-if="sensor.min !== undefined || sensor.max !== undefined">
-                <strong>Range:</strong>
-                {{ sensor.min ?? "–∞" }} – {{ sensor.max ?? "+∞" }} {{ sensor.unit }}
-            </p>
+            <div v-if="isGeneral">
+                <p v-if="generalLimits.min !== undefined || generalLimits.max !== undefined">
+                    <strong>Range:</strong>
+                    {{ generalLimits.min ?? "–∞" }} – {{ generalLimits.max ?? "+∞" }}
+                    {{ sensor.unit }}
+                </p>
+            </div>
+            <div v-else class="space-y-2">
+                <div class="flex items-center space-x-2">
+                    <span
+                        class="px-2 py-0.5 rounded-full text-sm font-semibold"
+                        :class="
+                            isDay ? 'bg-yellow-200 text-yellow-800' : 'bg-zinc-700 text-zinc-400'
+                        "
+                    >
+                        Day
+                    </span>
+                    <span class="text-gray-200">
+                        {{ timeBasedLimits.day.min ?? "–∞" }} –
+                        {{ timeBasedLimits.day.max ?? "+∞" }} {{ sensor.unit }}
+                    </span>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <span
+                        class="px-2 py-0.5 rounded-full text-sm font-semibold"
+                        :class="
+                            !isDay ? 'bg-indigo-200 text-indigo-800' : 'bg-zinc-700 text-zinc-400'
+                        "
+                    >
+                        Night
+                    </span>
+                    <span class="text-gray-200">
+                        {{ timeBasedLimits.night.min ?? "–∞" }} –
+                        {{ timeBasedLimits.night.max ?? "+∞" }} {{ sensor.unit }}
+                    </span>
+                </div>
+            </div>
             <p v-if="sensor.reading?.timestamp">
                 <strong>Last updated:</strong> {{ format(sensor.reading.timestamp) }}
             </p>
@@ -39,21 +69,28 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { format } from "~/utils/date";
-import { ThermometerSun, Droplet, Waves, GaugeCircle } from "lucide-vue-next";
-
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 
-const props = defineProps<{ sensor: PublicSensorResponse }>();
+// Props definition
+const props = defineProps<{ sensor: PublicSensorResponse; }>();
 
-const iconMap = {
-    ThermometerSun,
-    Droplet,
-    Waves,
-    GaugeCircle,
-};
+const { icon: iconComponent, bgColor, isDay } = useSensorHelpers(props.sensor);
 
-const iconComponent = computed(() => {
-    return iconMap[getSensorIcon(props.sensor.type)] ?? GaugeCircle;
-});
+// Narrowing on limitsType
+const isGeneral = computed(() => props.sensor.limitsType === "general");
+const generalLimits = computed(() =>
+    isGeneral.value
+        ? (props.sensor.readingLimits as { min?: number; max?: number })
+        : { min: undefined, max: undefined },
+);
+const timeBasedLimits = computed(() =>
+    !isGeneral.value
+        ? (props.sensor.readingLimits as {
+              day: { min?: number; max?: number };
+              night: { min?: number; max?: number };
+          })
+        : { day: { min: undefined, max: undefined }, night: { min: undefined, max: undefined } },
+);
 </script>

@@ -63,6 +63,7 @@ export class SensorPollingService {
                     const result = await reader.read(config);
                     if (result) {
                         readings[sensor.id] = result;
+                        readings[sensor.id].timestamp = Date.now();
                     } else {
                         console.warn(chalk.yellow(`⚠️ No reading from sensor ${sensor.id}`));
                     }

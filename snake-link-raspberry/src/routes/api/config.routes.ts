@@ -39,7 +39,7 @@ const appConfigStore = store.getAppConfigStore();
  *       500:
  *         description: Internal server error.
  */
-router.get("/sensors", authMiddleware, (req: Request, res: Response, next: NextFunction) => {
+router.get("/sensors", (req: Request, res: Response, next: NextFunction) => {
     try {
         const config = sensorConfigStore.load();
         res.json(config.sensors);
@@ -211,15 +211,8 @@ router.put("/sensor/:id", authMiddleware, (req: Request, res: any, next: NextFun
  *             schema:
  *               $ref: '#/components/schemas/AppConfig'
  */
-router.get("/app", authMiddleware, (req: Request, res: any, next: NextFunction) => {
+router.get("/app", (req: Request, res: any, next: NextFunction) => {
     try {
-        const user = req.user!;
-        const allowed = hasPermission(user, "manageAppConfig");
-
-        if (!allowed) {
-            return res.status(403).json({ error: "Forbidden" });
-        }
-
         const config = appConfigStore.load();
         res.json(config);
     } catch (err) {

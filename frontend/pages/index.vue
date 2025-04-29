@@ -30,11 +30,7 @@
             <DashboardStatCard
                 v-for="sensor in highlightSensors"
                 :key="sensor.id"
-                :title="sensor.name"
-                :value="sensor.reading?.value ?? '—'"
-                :unit="sensor.unit"
-                :icon="getSensorIcon(sensor.type)"
-                :color="getSensorColor(sensor.status)"
+                :sensor
                 class="min-w-[80%] snap-center md:min-w-0 md:h-auto"
             />
             <div class="block md:hidden shrink-0 w-[10vw]" aria-hidden="true" />
@@ -51,13 +47,11 @@
 import { AlertTriangle } from "lucide-vue-next";
 import { useQuery } from "@tanstack/vue-query";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
-
+import { liveService } from "~/services/liveService";
 // Fetch sensors
 const fetchLiveData = async () => {
-    const { data } = await useNuxtApp().$axios.get("/api/live", {
-        withCredentials: true,
-    });
-    return (data as PublicSensorResponse[]) ?? [];
+    const liveData = await liveService.getLiveData();
+    return (liveData as PublicSensorResponse[]) ?? [];
 };
 
 const { data } = await useQuery({
