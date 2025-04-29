@@ -6,7 +6,7 @@ import { ThermometerSun, Droplet, Waves, Gauge } from "lucide-vue-next";
  * Composable that returns reactive icon component and color class
  * for a given sensor, based on type, status, and day/night from appConfig.
  */
-export function useSensorHelpers(sensor: PublicSensorResponse) {
+export function useSensorHelpers(sensor: Ref<PublicSensorResponse>) {
     const app = useAppConfigStore();
 
     // Compute current hour in configured timezone
@@ -33,7 +33,7 @@ export function useSensorHelpers(sensor: PublicSensorResponse) {
 
     // Icon selection
     const icon = computed(() => {
-        switch (sensor.type) {
+        switch (sensor.value.type) {
             case "temperature":
                 return ThermometerSun;
             case "humidity":
@@ -48,7 +48,7 @@ export function useSensorHelpers(sensor: PublicSensorResponse) {
     });
 
     const textColor = computed(() => {
-        switch (sensor.status) {
+        switch (sensor.value.status) {
             case "ok":
                 return "text-green-400";
             case "warning":
@@ -61,7 +61,7 @@ export function useSensorHelpers(sensor: PublicSensorResponse) {
     });
 
     const bgColor = computed(() => {
-        switch (sensor.status) {
+        switch (sensor.value.status) {
             case "ok":
                 return "bg-green-600 text-white";
             case "warning":

@@ -1,93 +1,97 @@
 <template>
     <div
-        class="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-6 shadow-lg border border-zinc-700 relative overflow-hidden"
+        class="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-4 sm:p-6 shadow-lg border border-zinc-700 relative overflow-hidden"
     >
-        <div class="absolute bottom-5 right-5 text-3xl text-indigo-400 opacity-80">
+        <div class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 text-xl sm:text-2xl text-indigo-400 opacity-80">
             <component :is="iconComponent" />
         </div>
-        <div class="flex justify-between items-center mb-1">
-            <h2 class="text-lg font-semibold text-white truncate">
+        <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base sm:text-lg font-semibold text-white truncate">
                 {{ sensor.name || sensor.id }}
             </h2>
-            <span class="text-xs font-medium px-2 py-0.5 rounded-full" :class="bgColor">
+            <span
+                class="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
+                :class="bgColor"
+            >
                 {{ sensor.status.toUpperCase() }}
             </span>
         </div>
-        <div class="text-4xl font-bold text-indigo-400">
-            {{ sensor.reading?.value ?? "—" }}
-            <span class="text-xl font-normal text-indigo-300">
+        <div class="flex items-baseline space-x-1">
+            <p class="text-2xl sm:text-4xl font-bold text-indigo-400 leading-none">
+                {{ sensor.reading?.value ?? "—" }}
+            </p>
+            <span class="text-sm sm:text-base text-indigo-300">
                 {{ sensor.reading?.unit }}
             </span>
         </div>
-        <div class="mt-4 text-sm text-gray-400 space-y-1">
-            <div v-if="isGeneral">
-                <p v-if="generalLimits.min !== undefined || generalLimits.max !== undefined">
-                    <strong>Range:</strong>
-                    {{ generalLimits.min ?? "–∞" }} – {{ generalLimits.max ?? "+∞" }}
-                    {{ sensor.unit }}
-                </p>
-            </div>
-            <div v-else class="space-y-2">
-                <div class="flex items-center space-x-2">
-                    <span
-                        class="px-2 py-0.5 rounded-full text-sm font-semibold"
-                        :class="
-                            isDay ? 'bg-yellow-200 text-yellow-800' : 'bg-zinc-700 text-zinc-400'
-                        "
-                    >
-                        Day
-                    </span>
-                    <span class="text-gray-200">
-                        {{ timeBasedLimits.day.min ?? "–∞" }} –
-                        {{ timeBasedLimits.day.max ?? "+∞" }} {{ sensor.unit }}
+        <div class="mt-3 text-sm text-gray-400 flex flex-col sm:block space-y-2">
+            <template v-if="isGeneral">
+                <div class="flex items-center space-x-1">
+                    <component
+                        :is="ChevronsRightLeft"
+                        class="w-4 h-4"
+                        :class="isDay ? 'text-yellow-300' : 'text-indigo-300'"
+                    />
+                    <span class="truncate">
+                        {{ generalLimits.min ?? "–∞" }}–{{ generalLimits.max ?? "+∞" }}
+                        {{ sensor.unit }}
                     </span>
                 </div>
-
-                <div class="flex items-center space-x-2">
-                    <span
-                        class="px-2 py-0.5 rounded-full text-sm font-semibold"
-                        :class="
-                            !isDay ? 'bg-indigo-200 text-indigo-800' : 'bg-zinc-700 text-zinc-400'
-                        "
-                    >
-                        Night
-                    </span>
-                    <span class="text-gray-200">
-                        {{ timeBasedLimits.night.min ?? "–∞" }} –
-                        {{ timeBasedLimits.night.max ?? "+∞" }} {{ sensor.unit }}
+            </template>
+            <template v-else>
+                <div class="flex items-center space-x-1">
+                    <component
+                        :is="isDay ? SunIcon : MoonIcon"
+                        class="w-4 h-4"
+                        :class="isDay ? 'text-yellow-300' : 'text-indigo-300'"
+                    />
+                    <span class="truncate">
+                        {{ (isDay ? timeBasedLimits.day.min : timeBasedLimits.night.min) ?? "–∞" }}
+                        –
+                        {{ (isDay ? timeBasedLimits.day.max : timeBasedLimits.night.max) ?? "+∞" }}
+                        {{ sensor.unit }}
                     </span>
                 </div>
-            </div>
-            <p v-if="sensor.reading?.timestamp">
-                <strong>Last updated:</strong> {{ format(sensor.reading.timestamp) }}
-            </p>
+            </template>
         </div>
+        <p class="mt-2 text-xs text-gray-500 block">
+            Last updated: {{ format(sensor.reading?.timestamp ?? 0) }}
+        </p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { toRef, computed } from "vue";
+import { Sun, Moon, ChevronsRightLeft } from "lucide-vue-next";
+import { useSensorHelpers } from "~/composables/useSensorHelpers";
 import { format } from "~/utils/date";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 
-// Props definition
 const props = defineProps<{ sensor: PublicSensorResponse }>();
+const sensorRef = toRef(props, "sensor");
 
-const { icon: iconComponent, bgColor, isDay } = useSensorHelpers(props.sensor);
+const SunIcon = Sun;
+const MoonIcon = Moon;
 
-// Narrowing on limitsType
+const { icon: iconComponent, bgColor, isDay } = useSensorHelpers(sensorRef);
+
 const isGeneral = computed(() => props.sensor.limitsType === "general");
+
 const generalLimits = computed(() =>
     isGeneral.value
         ? (props.sensor.readingLimits as { min?: number; max?: number })
         : { min: undefined, max: undefined },
 );
+
 const timeBasedLimits = computed(() =>
     !isGeneral.value
         ? (props.sensor.readingLimits as {
               day: { min?: number; max?: number };
               night: { min?: number; max?: number };
           })
-        : { day: { min: undefined, max: undefined }, night: { min: undefined, max: undefined } },
+        : {
+              day: { min: undefined, max: undefined },
+              night: { min: undefined, max: undefined },
+          },
 );
 </script>
