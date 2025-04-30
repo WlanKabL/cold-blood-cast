@@ -1,50 +1,71 @@
 #!/usr/bin/env bash
 #
-# build.sh - Download a specific build from GitHub and restart with pm2
+# deploy.sh — Download a specific release (or tag/branch) from GitHub
+#             and start/restart Frontend & Backend with PM2.
 #
 # Usage:
-#   ./build.sh [ref]
+#   ./deploy.sh [<ref>]
 #     ref = release tag (e.g. v1.2.3), branch name, or commit SHA
 #     default = latest release tag
 #
-# Requires: curl, tar (or unzip), pm2
+# Requires: bash, curl or wget, tar (for .tar.gz), unrar or 7z (for .rar), pm2
+
+IFS=$'\n\t'
 
 REPO_OWNER="WlanKabL"
 REPO_NAME="cold-blood-cast"
 ASSET_NAME="build.rar"
-TMPDIR=$(mktemp -d)
+DEFAULT_REF="latest"
 
-cleanup() {
-  rm -rf "$TMPDIR"
-}
+REF="${1:-$DEFAULT_REF}"
+TMPDIR="$(mktemp -d)"
+cleanup() { rm -rf "$TMPDIR"; }
 trap cleanup EXIT
 
-REF="${1:-latest}"
+echo "📦 Deploying ref: $REF"
 
-echo "📦 Installing ref: $REF"
+# helper to fetch JSON and parse with grep
+fetch_json() {
+  if command -v curl &>/dev/null; then
+    curl -s "$1"
+  elif command -v wget &>/dev/null; then
+    wget -qO- "$1"
+  else
+    echo "❌ Please install curl or wget" >&2
+    exit 1
+  fi
+}
 
-if [[ "$REF" == "latest" ]]; then
-  # Fetch latest release tag name
-  TAG=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" \
-    | grep -Po '"tag_name":\s*"\K[^"]+')
+# resolve "latest" → actual tag
+if [[ "$REF" == "$DEFAULT_REF" ]]; then
+  TAG="$(fetch_json https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest \
+    | grep -Po '"tag_name":\s*"\K[^"]+' )"
+  if [[ -z "$TAG" ]]; then
+    echo "❌ Could not determine latest release tag" >&2
+    exit 1
+  fi
   echo "→ latest release is $TAG"
   REF="$TAG"
 fi
 
-# Try to fetch a release asset for this tag
-echo "🔍 Checking for release asset '$ASSET_NAME' under tag '$REF'..."
-DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF" \
+# 1) Try to download build.rar asset
+echo "🔍 Checking for asset '${ASSET_NAME}' in release '$REF'..."
+DOWNLOAD_URL="$(fetch_json https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF \
   | grep '"browser_download_url"' \
   | grep "$ASSET_NAME" \
   | head -n1 \
-  | cut -d '"' -f4 || true)
+  | cut -d '"' -f4 || true)"
 
 if [[ -n "$DOWNLOAD_URL" ]]; then
-  echo "✅ Found release asset: $DOWNLOAD_URL"
-  echo "⬇️ Downloading $ASSET_NAME..."
-  curl -L "$DOWNLOAD_URL" -o "$TMPDIR/$ASSET_NAME"
-  
-  echo "📂 Extracting $ASSET_NAME..."
+  echo "✅ Found asset: $DOWNLOAD_URL"
+  echo "⬇️ Downloading ${ASSET_NAME}..."
+  if command -v curl &>/dev/null; then
+    curl -L "$DOWNLOAD_URL" -o "$TMPDIR/$ASSET_NAME"
+  else
+    wget -O "$TMPDIR/$ASSET_NAME" "$DOWNLOAD_URL"
+  fi
+
+  echo "📂 Extracting ${ASSET_NAME}..."
   if command -v unrar &>/dev/null; then
     unrar x -o+ "$TMPDIR/$ASSET_NAME" "$TMPDIR"
   elif command -v 7z &>/dev/null; then
@@ -54,22 +75,24 @@ if [[ -n "$DOWNLOAD_URL" ]]; then
     exit 1
   fi
 else
-  echo "⚠️ No $ASSET_NAME asset found for release '$REF'. Falling back to archive download..."
+  # 2) Fallback: download Git archive
   ARCHIVE_URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/$REF.tar.gz"
-  
-  echo "⬇️ Downloading archive $ARCHIVE_URL..."
-  curl -L "$ARCHIVE_URL" -o "$TMPDIR/archive.tar.gz"
-  
+  echo "⚠️ Asset not found, falling back to archive: $ARCHIVE_URL"
+  echo "⬇️ Downloading archive..."
+  if command -v curl &>/dev/null; then
+    curl -L "$ARCHIVE_URL" -o "$TMPDIR/archive.tar.gz"
+  else
+    wget -O "$TMPDIR/archive.tar.gz" "$ARCHIVE_URL"
+  fi
+
   echo "📂 Extracting archive..."
   tar -xzf "$TMPDIR/archive.tar.gz" -C "$TMPDIR"
 fi
 
-# Locate build artifacts
-# If release asset was used, assume it dropped things into $TMPDIR/{frontend,snake-link-raspberry}
-# If archive was used, it'll be in $TMPDIR/$REPO_NAME-$REF/{frontend,snake-link-raspberry}
+# determine base dir
 if [[ -d "$TMPDIR/$REPO_NAME-$REF" ]]; then
   BASE="$TMPDIR/$REPO_NAME-$REF"
-elif ls "$TMPDIR" | grep -q "^$REPO_NAME"; then
+elif compgen -G "$TMPDIR/$REPO_NAME"* >/dev/null; then
   BASE="$TMPDIR/$(ls "$TMPDIR" | grep "^$REPO_NAME")"
 else
   BASE="$TMPDIR"
@@ -78,7 +101,7 @@ fi
 FRONTEND_PATH="$BASE/frontend/.output/server/index.mjs"
 BACKEND_PATH="$BASE/snake-link-raspberry/dist/index.js"
 
-echo "🚀 Starting/updating with pm2..."
+echo "🚀 Starting/updating with PM2..."
 
 # Frontend
 if pm2 list | grep -q "frontend"; then
@@ -95,4 +118,4 @@ else
 fi
 
 pm2 save
-echo "✅ Deployment of '$REF' complete!"
+echo "✅ Deployment of '$REF' completed!"
