@@ -13,111 +13,236 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# --- Configuration ---
 REPO_OWNER="WlanKabL"
 REPO_NAME="cold-blood-cast"
 ASSET_NAME="build.zip"
 DEFAULT_REF="latest"
+PM2_FRONTEND_NAME="frontend"
+PM2_BACKEND_NAME="snake-link-raspberry"
 
 # Base directory where releases are deployed
-DEPLOY_BASE="$HOME/cold-blood-cast-prod/deploy/releases"
-REF="${1:-$DEFAULT_REF}"
-DEPLOY_DIR="$DEPLOY_BASE/$REF"
-mkdir -p "$DEPLOY_DIR"
+DEPLOY_BASE="${HOME}/cold-blood-cast-prod/deploy/releases"
 
-echo "📦 Deploying ref: $REF into $DEPLOY_DIR"
-
-# helper: fetch JSON from GitHub API
-fetch_json() {
+# --- Dependency Checks ---
+check_dependencies() {
+  # Ensure required commands are available
+  local deps=(bash pm2 tar unzip)
+  local downloader=""
   if command -v curl &>/dev/null; then
-    curl -s "$1"
+    downloader="curl"
   elif command -v wget &>/dev/null; then
-    wget -qO- "$1"
+    downloader="wget"
   else
-    echo "❌ Please install curl or wget" >&2
+    echo "❌ Please install curl or wget to download files." >&2
+    exit 1
+  fi
+  deps+=("$downloader")
+
+  for cmd in "${deps[@]}"; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo "❌ Required command '$cmd' not found." >&2
+      exit 1
+    fi
+  done
+}
+
+# fetch_json: Fetch JSON from a URL using curl or wget
+# Globals:
+#   None
+# Arguments:
+#   $1 - URL to fetch
+# Outputs:
+#   JSON to stdout
+fetch_json() {
+  local url="$1"
+  if command -v curl &>/dev/null; then
+    curl -sSL --retry 3 "$url"
+  else
+    wget -qO- "$url"
+  fi
+}
+
+# get_latest_tag: Retrieve the latest release tag from GitHub API
+# Globals:
+#   REPO_OWNER, REPO_NAME
+# Outputs:
+#   Latest release tag
+get_latest_tag() {
+  echo "🔍 Fetching latest release tag..."
+  local api_url="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
+  local tag
+  if command -v jq &>/dev/null; then
+    tag=$(fetch_json "$api_url" | jq -r '.tag_name // empty')
+  else
+    tag=$(fetch_json "$api_url" \
+      | grep -Po '"tag_name":\s*"\K[^"]+' || true)
+  fi
+  if [[ -z "$tag" ]]; then
+    echo "❌ Could not determine latest release tag." >&2
+    exit 1
+  fi
+  echo "→ latest release is $tag"
+  printf '%s' "$tag"
+}
+
+# get_asset_download_url: Find the download URL for a named asset in a given ref
+# Globals:
+#   REPO_OWNER, REPO_NAME, ASSET_NAME
+# Arguments:
+#   $1 - ref (tag, branch, or SHA)
+# Outputs:
+#   URL string or empty if not found
+get_asset_download_url() {
+  local ref="$1"
+  local api_url="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/${ref}"
+  local url=""
+  if command -v jq &>/dev/null; then
+    url=$(fetch_json "$api_url" \
+      | jq -r --arg name "$ASSET_NAME" '
+          .assets[]? | select(.name == $name) | .browser_download_url
+        // empty')
+  else
+    url=$(fetch_json "$api_url" \
+      | grep '"browser_download_url"' \
+      | grep "$ASSET_NAME" \
+      | head -n1 \
+      | cut -d '"' -f4 \
+      || true)
+  fi
+  printf '%s' "$url"
+}
+
+# download_file: Download a file from a URL to a destination path
+# Globals:
+#   None
+# Arguments:
+#   $1 - URL
+#   $2 - output file path
+download_file() {
+  local url="$1"
+  local dest="$2"
+  echo "⬇️ Downloading $(basename "$dest")..."
+  if command -v curl &>/dev/null; then
+    curl -L "$url" -o "$dest"
+  else
+    wget -O "$dest" "$url"
+  fi
+}
+
+# extract_zip: Unzip a ZIP archive
+# Globals:
+#   None
+# Arguments:
+#   $1 - zip file
+#   $2 - target directory
+extract_zip() {
+  local zipfile="$1"
+  local target="$2"
+  echo "📂 Extracting $(basename "$zipfile")..."
+  unzip -o "$zipfile" -d "$target"
+}
+
+# extract_tar_gz: Extract a .tar.gz archive
+# Globals:
+#   None
+# Arguments:
+#   $1 - tar.gz file
+#   $2 - target directory
+extract_tar_gz() {
+  local archive="$1"
+  local target="$2"
+  echo "📂 Extracting $(basename "$archive")..."
+  tar -xzf "$archive" -C "$target"
+}
+
+# find_entrypoints: Locate frontend and backend entrypoint files
+# Globals:
+#   DEPLOY_DIR, REPO_NAME
+# Sets:
+#   FRONTEND_PATH, BACKEND_PATH
+find_entrypoints() {
+  # Find frontend index.mjs
+  FRONTEND_PATH=$(find "$DEPLOY_DIR" -type f -path "*/frontend/.output/server/index.mjs" | head -n1 || true)
+  if [[ -z "$FRONTEND_PATH" ]]; then
+    echo "❌ Could not find frontend entrypoint." >&2
+    exit 1
+  fi
+
+  # Find backend index.js
+  BACKEND_PATH=$(find "$DEPLOY_DIR" -type f -path "*/snake-link-raspberry/dist/index.js" | head -n1 || true)
+  if [[ -z "$BACKEND_PATH" ]]; then
+    echo "❌ Could not find backend entrypoint." >&2
     exit 1
   fi
 }
 
-# resolve "latest" → actual tag
-if [[ "$REF" == "$DEFAULT_REF" ]]; then
-  TAG=$(fetch_json "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" \
-    | grep -Po '"tag_name":\s*"\K[^"]+' )
-  if [[ -z "$TAG" ]]; then
-    echo "❌ Could not determine latest release tag" >&2
-    exit 1
-  fi
-  echo "→ latest release is $TAG"
-  REF="$TAG"
-  DEPLOY_DIR="$DEPLOY_BASE/$REF"
-  mkdir -p "$DEPLOY_DIR"
-fi
-
-# 1) Try to download build.zip asset
-echo "🔍 Checking for asset '$ASSET_NAME' in release '$REF'..."
-DOWNLOAD_URL=$(fetch_json "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF" \
-  | grep '"browser_download_url"' \
-  | grep "$ASSET_NAME" \
-  | head -n1 \
-  | cut -d '"' -f4 || true)
-
-if [[ -n "$DOWNLOAD_URL" ]]; then
-  echo "✅ Found asset: $DOWNLOAD_URL"
-  echo "⬇️ Downloading $ASSET_NAME..."
-  if command -v curl &>/dev/null; then
-    curl -L "$DOWNLOAD_URL" -o "$DEPLOY_DIR/$ASSET_NAME"
+# start_or_restart: Start or restart a PM2 process
+# Globals:
+#   None
+# Arguments:
+#   $1 - process name
+#   $2 - script path
+start_or_restart() {
+  local name="$1"
+  local script="$2"
+  if pm2 describe "$name" &>/dev/null; then
+    echo "🔄 Restarting PM2 process '$name'..."
+    pm2 restart "$name" --update-env
   else
-    wget -O "$DEPLOY_DIR/$ASSET_NAME" "$DOWNLOAD_URL"
+    echo "🚀 Starting PM2 process '$name'..."
+    pm2 start "$script" --name "$name" --update-env
+  fi
+}
+
+# deploy_ref: Main deployment logic for a given ref
+# Globals:
+#   DEFAULT_REF, DEPLOY_BASE, REPO_OWNER, REPO_NAME, ASSET_NAME
+# Arguments:
+#   $1 - ref to deploy
+deploy_ref() {
+  local ref="$1"
+  mkdir -p "$DEPLOY_BASE"
+
+  # Resolve "latest" to actual tag
+  if [[ "$ref" == "$DEFAULT_REF" ]]; then
+    ref=$(get_latest_tag)
   fi
 
-  echo "📂 Extracting $ASSET_NAME..."
-  if command -v unzip &>/dev/null; then
-    unzip -o "$DEPLOY_DIR/$ASSET_NAME" -d "$DEPLOY_DIR"
+  local deploy_dir="${DEPLOY_BASE}/${ref}"
+  mkdir -p "$deploy_dir"
+  DEPLOY_DIR="$deploy_dir"
+  echo "📦 Deploying ref: $ref into $DEPLOY_DIR"
+
+  # Try to download asset
+  local download_url
+  download_url=$(get_asset_download_url "$ref")
+  if [[ -n "$download_url" ]]; then
+    echo "✅ Found asset: $download_url"
+    download_file "$download_url" "${DEPLOY_DIR}/${ASSET_NAME}"
+    extract_zip "${DEPLOY_DIR}/${ASSET_NAME}" "$DEPLOY_DIR"
   else
-    echo "❌ Please install 'unzip' to extract ZIP files." >&2
-    exit 1
-  fi
-else
-  # 2) Fallback: download Git archive
-  ARCHIVE_URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/$REF.tar.gz"
-  echo "⚠️ Asset not found, falling back to archive: $ARCHIVE_URL"
-  echo "⬇️ Downloading archive..."
-  if command -v curl &>/dev/null; then
-    curl -L "$ARCHIVE_URL" -o "$DEPLOY_DIR/archive.tar.gz"
-  else
-    wget -O "$DEPLOY_DIR/archive.tar.gz" "$ARCHIVE_URL"
+    # Fallback to Git archive
+    local archive_url="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/${ref}.tar.gz"
+    echo "⚠️ Asset not found, falling back to archive: $archive_url"
+    download_file "$archive_url" "${DEPLOY_DIR}/archive.tar.gz"
+    extract_tar_gz "${DEPLOY_DIR}/archive.tar.gz" "$DEPLOY_DIR"
   fi
 
-  echo "📂 Extracting archive..."
-  tar -xzf "$DEPLOY_DIR/archive.tar.gz" -C "$DEPLOY_DIR"
-fi
+  # Locate entrypoints and start/restart
+  find_entrypoints
+  start_or_restart "$PM2_FRONTEND_NAME" "$FRONTEND_PATH"
+  start_or_restart "$PM2_BACKEND_NAME"  "$BACKEND_PATH"
 
-# determine the base folder that contains 'frontend' and 'snake-link-raspberry'
-if [[ -d "$DEPLOY_DIR/$REPO_NAME-$REF" ]]; then
-  BASE="$DEPLOY_DIR/$REPO_NAME-$REF"
-elif compgen -G "$DEPLOY_DIR/$REPO_NAME"* >/dev/null; then
-  BASE="$DEPLOY_DIR/$(ls "$DEPLOY_DIR" | grep "^$REPO_NAME")"
-else
-  BASE="$DEPLOY_DIR"
-fi
+  pm2 save
+  echo "✅ Deployment of '$ref' completed!"
+}
 
-FRONTEND_PATH="$BASE/frontend/.output/server/index.mjs"
-BACKEND_PATH="$BASE/snake-link-raspberry/dist/index.js"
+# --- Script Entry Point ---
+main() {
+  check_dependencies
+  local ref="${1:-$DEFAULT_REF}"
+  deploy_ref "$ref"
+}
 
-echo "🚀 Starting/updating with PM2..."
-
-# Frontend
-if pm2 list | grep -q "frontend"; then
-  pm2 restart frontend --update-env
-else
-  pm2 start "$FRONTEND_PATH" --name frontend --update-env
-fi
-
-# Backend
-if pm2 list | grep -q "snake-link-raspberry"; then
-  pm2 restart snake-link-raspberry --update-env
-else
-  pm2 start "$BACKEND_PATH" --name snake-link-raspberry --update-env
-fi
-
-pm2 save
-echo "✅ Deployment of '$REF' completed!"
+main "$@"
