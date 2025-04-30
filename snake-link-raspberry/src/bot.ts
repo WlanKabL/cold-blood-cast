@@ -15,8 +15,7 @@ export const bot = new Telegraf(BOT_TOKEN);
 // /start erklärt das Abo-Prinzip
 bot.start((ctx: any) =>
     ctx.reply(
-        `Welcome to Cold Blood Cast Alert Bot!\n` +
-            `To subscribe, send /subscribe <SECRET>.`,
+        `Welcome to Cold Blood Cast Alert Bot!\n` + `To subscribe, send /subscribe <SECRET>.`,
     ),
 );
 
@@ -38,8 +37,12 @@ bot.command("unsubscribe", (ctx) => {
     return ctx.reply("ℹ️ You were not subscribed.");
 });
 
+bot.command("ping", (ctx) => {
+    ctx.reply("🏓 Pong!");
+});
+
 export const initializeBot = async () => {
     // Start the bot
     await bot.launch();
     console.log("Telegram bot started.");
-}
+};

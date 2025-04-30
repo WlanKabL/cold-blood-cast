@@ -30,6 +30,7 @@ import { servicesStore } from "./stores/servicesStore.js";
 import alertsRoutes from "./routes/api/alerts.routes.js";
 import { initializeBot } from "./bot.js";
 import { SensorWatchingService } from "./services/sensorWatching.js";
+import { broadcastStartup } from "./services/alert.service.js";
 
 /**
  * Bootstraps the application:
@@ -82,6 +83,7 @@ async function bootstrap(): Promise<void> {
 
     // Initialize telegram bot
     initializeBot();
+    broadcastStartup();
 
     // 5) Initialize data stores
     const dataStore = new DataStorageService(env.DATA_DIR);

@@ -8,6 +8,43 @@ import { enqueueAlert } from "../alerts/notificationQueue.js";
 import { Markup } from "telegraf";
 import { escapeHtml } from "../utils/html.js";
 
+export async function broadcastStartup() {
+    const env = validateEnv(process.env);
+    const chatIds = subscriberService.getSubscribers();
+    if (!chatIds.length) return;
+
+    // reload up-to-date config
+    const appConfig = new DataStorageService(env.DATA_DIR).getAppConfigStore().load();
+
+    // assemble HTML message
+    const html = `
+<b>🚀 Snake Link started</b>
+<i>(${appConfig.general.name})</i>
+<b></b>
+<b>Time:</b> <code>${new Date().toLocaleString("de-DE", {
+        timeZone: appConfig.general.timezone,
+        hour: "2-digit",
+        minute: "2-digit",
+    })}</code>
+<b></b>
+<b>Timezone:</b> <code>${appConfig.general.timezone}</code>
+<b></b>
+<b>Node:</b> <code>${process.version}</code>
+<b></b>
+<b>OS:</b> <code>${process.platform}</code>
+<b></b>
+<b>Arch:</b> <code>${process.arch}</code>
+<b></b>
+<b>CPU:</b> <code>${process.cpuUsage().user / 1e6} %</code>
+<b></b>
+<b>Memory:</b> <code>${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB</code>
+<b></b>
+<b>Uptime:</b> <code>${Math.round(process.uptime())} s</code>
+`.trim();
+
+    // enqueue each chat
+    chatIds.forEach((chatId) => enqueueAlert(chatId, html));
+}
 /**
  * Send a formatted alert message to all registered Telegram chats,
  * using HTML parse mode.
