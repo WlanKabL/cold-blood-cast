@@ -1,118 +1,121 @@
 #!/usr/bin/env bash
 #
-# deploy.sh — Zero-downtime deployment mit Symlinks
-# und automatischem PM2-Restart (falls ecosystem.config.js vorhanden).
+# deploy.sh — Download a specific release (or tag/branch) from GitHub
+#             and start/restart Frontend & Backend with PM2.
 #
 # Usage:
-#   ./deploy.sh <version> [--keep <n>] 
+#   ./deploy.sh [<ref>]
+#     ref = release tag (e.g. v1.2.3), branch name, or commit SHA
+#     default = latest release tag
 #
-# Env-Overrides:
-#   GITHUB_OWNER   GitHub-Org oder User (Default: WlanKabL)
-#   GITHUB_REPO    Repo-Name           (Default: cold-blood-cast)
-#   DEPLOY_BASE    Basis-Pfad           (Default: ${HOME}/${GITHUB_REPO}-prod/deploy)
-#   KEEP_RELEASES  Anzahl alte Releases (Default: 5)
-#   ENVIRONMENT    PM2-Environment      (Default: production)
-# 
+# Requires: bash, curl or wget, tar (for .tar.gz), unrar or 7z (for .rar), pm2
 
-set -euo pipefail
-IFS=$'\n\t'
+REPO_OWNER="WlanKabL"
+REPO_NAME="cold-blood-cast"
+ASSET_NAME="build.rar"
+DEFAULT_REF="latest"
 
-#### Cleanup Tempfiles on exit
-TMP_ARCHIVE=""
-cleanup() {
-  [[ -n "$TMP_ARCHIVE" && -f "$TMP_ARCHIVE" ]] && rm -f "$TMP_ARCHIVE"
-}
-trap cleanup EXIT
+REF="${1:-$DEFAULT_REF}"
+# Use a fixed deploy directory inside the project
+DEPLOY_DIR="~/cold-blood./deploy/releases/${REF}"
+mkdir -p "$DEPLOY_DIR"
 
-#### Prevent running as root
-if [ "$(id -u)" -eq 0 ]; then
-  echo "❌ Bitte nicht als root ausführen — nutze deinen Nutzer!"
-  exit 1
-fi
+echo "📦 Deploying ref: $REF into $DEPLOY_DIR"
 
-#### Check dependencies
-for cmd in curl unzip pm2 sort; do
-  if ! command -v "$cmd" &>/dev/null; then
-    echo "❌ Benötigt: '$cmd' ist nicht installiert."
-    exit 2
+# helper to fetch JSON and parse with grep
+fetch_json() {
+  if command -v curl &>/dev/null; then
+    curl -s "$1"
+  elif command -v wget &>/dev/null; then
+    wget -qO- "$1"
+  else
+    echo "❌ Please install curl or wget" >&2
+    exit 1
   fi
-done
-
-#### Defaults (kann via ENV überschrieben werden)
-GITHUB_OWNER="${GITHUB_OWNER:-WlanKabL}"
-GITHUB_REPO="${GITHUB_REPO:-cold-blood-cast}"
-DEPLOY_BASE="${DEPLOY_BASE:-${HOME}/${GITHUB_REPO}-prod/deploy}"
-KEEP_RELEASES="${KEEP_RELEASES:-5}"
-ENVIRONMENT="${ENVIRONMENT:-production}"
-
-#### Usage
-usage() {
-  echo "Usage: $0 <version> [--keep <n>]"
-  exit 3
 }
 
-#### Parse args
-[ $# -ge 1 ] || usage
-VERSION="$1"; shift
-
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --keep) KEEP_RELEASES="$2"; shift 2 ;;
-    *) echo "❌ Unknown option: $1"; usage ;;
-  esac
-done
-
-#### Paths
-RELEASES_DIR="${DEPLOY_BASE}/releases"
-RELEASE_DIR="${RELEASES_DIR}/${VERSION}"
-CURRENT_LINK="${DEPLOY_BASE}/current"
-
-echo
-echo "📦 Deploying ${GITHUB_REPO} — version: ${VERSION}"
-echo "📂 Base:    ${DEPLOY_BASE}"
-echo "⏳ Releases:${RELEASES_DIR}"
-echo "🔗 Current: ${CURRENT_LINK}"
-echo "🗑️  Keep:    ${KEEP_RELEASES} releases"
-echo
-
-#### Prepare
-mkdir -p "${RELEASES_DIR}" "${DEPLOY_BASE}/shared"
-if [ -d "${RELEASE_DIR}" ]; then
-  echo "⚠️  Release exists, removing old: ${RELEASE_DIR}"
-  rm -rf "${RELEASE_DIR}"
+# resolve "latest" → actual tag
+if [[ "$REF" == "$DEFAULT_REF" ]]; then
+  TAG="$(fetch_json https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest \
+    | grep -Po '"tag_name":\s*"\K[^"]+' )"
+  if [[ -z "$TAG" ]]; then
+    echo "❌ Could not determine latest release tag" >&2
+    exit 1
+  fi
+  echo "→ latest release is $TAG"
+  REF="$TAG"
+  DEPLOY_DIR="./deploy/releases/${REF}"
+  mkdir -p "$DEPLOY_DIR"
 fi
 
-#### Download artifact
-TMP_ARCHIVE="$(mktemp -p /tmp "${GITHUB_REPO}-${VERSION}-XXXXXX.zip")"
-DOWNLOAD_URL="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${VERSION}/build.zip"
-echo "⬇️  Downloading ${DOWNLOAD_URL}"
-curl -fSL "${DOWNLOAD_URL}" -o "${TMP_ARCHIVE}"
+# 1) Try to download build.rar asset
+echo "🔍 Checking for asset '${ASSET_NAME}' in release '$REF'..."
+DOWNLOAD_URL="$(fetch_json https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF \
+  | grep '"browser_download_url"' \
+  | grep "$ASSET_NAME" \
+  | head -n1 \
+  | cut -d '"' -f4 || true)"
 
-#### Extract
-echo "📂 Extracting to ${RELEASE_DIR}"
-mkdir -p "${RELEASE_DIR}"
-unzip -o -q "${TMP_ARCHIVE}" -d "${RELEASE_DIR}"
+if [[ -n "$DOWNLOAD_URL" ]]; then
+  echo "✅ Found asset: $DOWNLOAD_URL"
+  echo "⬇️ Downloading ${ASSET_NAME}..."
+  if command -v curl &>/dev/null; then
+    curl -L "$DOWNLOAD_URL" -o "$DEPLOY_DIR/$ASSET_NAME"
+  else
+    wget -O "$DEPLOY_DIR/$ASSET_NAME" "$DOWNLOAD_URL"
+  fi
 
-#### (optional) Link shared dirs
-# ln -nfs "${DEPLOY_BASE}/shared/uploads" "${RELEASE_DIR}/uploads"
-
-#### Switch symlink
-echo "🔀 Updating symlink ${CURRENT_LINK} → ${RELEASE_DIR}"
-ln -nfs "${RELEASE_DIR}" "${CURRENT_LINK}"
-
-#### Cleanup old releases
-echo "🧹 Cleaning up old releases"
-cd "${RELEASES_DIR}"
-# sortiere semver (v1.2.3 ..), behalte die ersten $KEEP_RELEASES, rest löschen
-ls -1d */ | sort -rV | tail -n +$((KEEP_RELEASES+1)) | xargs -r rm -rf --
-
-#### PM2 Restart
-echo "🔄 PM2 deployment (${ENVIRONMENT} environment)"
-if [ -f "${CURRENT_LINK}/ecosystem.config.js" ]; then
-  pm2 startOrRestart "${CURRENT_LINK}/ecosystem.config.js" --env "${ENVIRONMENT}"
+  echo "📂 Extracting ${ASSET_NAME}..."
+  if command -v unrar &>/dev/null; then
+    unrar x -o+ "$DEPLOY_DIR/$ASSET_NAME" "$DEPLOY_DIR"
+  elif command -v 7z &>/dev/null; then
+    7z x "$DEPLOY_DIR/$ASSET_NAME" -o"$DEPLOY_DIR"
+  else
+    echo "❌ Please install 'unrar' or '7z' to extract RAR files." >&2
+    exit 1
+  fi
 else
-  pm2 reload all || pm2 restart all
+  # 2) Fallback: download Git archive
+  ARCHIVE_URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/$REF.tar.gz"
+  echo "⚠️ Asset not found, falling back to archive: $ARCHIVE_URL"
+  echo "⬇️ Downloading archive..."
+  if command -v curl &>/dev/null; then
+    curl -L "$ARCHIVE_URL" -o "$DEPLOY_DIR/archive.tar.gz"
+  else
+    wget -O "$DEPLOY_DIR/archive.tar.gz" "$ARCHIVE_URL"
+  fi
+
+  echo "📂 Extracting archive..."
+  tar -xzf "$DEPLOY_DIR/archive.tar.gz" -C "$DEPLOY_DIR"
 fi
 
-echo
-echo "✅ Deploy of ${VERSION} complete!"
+# determine base dir
+if [[ -d "$DEPLOY_DIR/$REPO_NAME-$REF" ]]; then
+  BASE="$DEPLOY_DIR/$REPO_NAME-$REF"
+elif compgen -G "$DEPLOY_DIR/$REPO_NAME*" >/dev/null; then
+  BASE="$DEPLOY_DIR/$(ls "$DEPLOY_DIR" | grep "^$REPO_NAME")"
+else
+  BASE="$DEPLOY_DIR"
+fi
+
+FRONTEND_PATH="$BASE/frontend/.output/server/index.mjs"
+BACKEND_PATH="$BASE/snake-link-raspberry/dist/index.js"
+
+echo "🚀 Starting/updating with PM2..."
+
+# Frontend
+if pm2 list | grep -q "frontend"; then
+  pm2 restart frontend --update-env
+else
+  pm2 start "$FRONTEND_PATH" --name frontend --update-env
+fi
+
+# Backend
+if pm2 list | grep -q "snake-link-raspberry"; then
+  pm2 restart snake-link-raspberry --update-env
+else
+  pm2 start "$BACKEND_PATH" --name snake-link-raspberry --update-env
+fi
+
+pm2 save
+echo "✅ Deployment of '$REF' completed!"
