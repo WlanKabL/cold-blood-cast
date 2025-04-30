@@ -1,248 +1,118 @@
 #!/usr/bin/env bash
 #
-# deploy.sh — Download a specific release (or tag/branch) from GitHub
-#             and start/restart Frontend & Backend with PM2.
+# deploy.sh — Zero-downtime deployment mit Symlinks
+# und automatischem PM2-Restart (falls ecosystem.config.js vorhanden).
 #
 # Usage:
-#   ./deploy.sh [<ref>]
-#     ref = release tag (e.g. v1.2.3), branch name, or commit SHA
-#     default = latest release tag
+#   ./deploy.sh <version> [--keep <n>] 
 #
-# Requires: bash, curl or wget, unzip (for .zip), tar (for .tar.gz), pm2
+# Env-Overrides:
+#   GITHUB_OWNER   GitHub-Org oder User (Default: WlanKabL)
+#   GITHUB_REPO    Repo-Name           (Default: cold-blood-cast)
+#   DEPLOY_BASE    Basis-Pfad           (Default: ${HOME}/${GITHUB_REPO}-prod/deploy)
+#   KEEP_RELEASES  Anzahl alte Releases (Default: 5)
+#   ENVIRONMENT    PM2-Environment      (Default: production)
+# 
 
 set -euo pipefail
 IFS=$'\n\t'
 
-# --- Configuration ---
-REPO_OWNER="WlanKabL"
-REPO_NAME="cold-blood-cast"
-ASSET_NAME="build.zip"
-DEFAULT_REF="latest"
-PM2_FRONTEND_NAME="frontend"
-PM2_BACKEND_NAME="snake-link-raspberry"
+#### Cleanup Tempfiles on exit
+TMP_ARCHIVE=""
+cleanup() {
+  [[ -n "$TMP_ARCHIVE" && -f "$TMP_ARCHIVE" ]] && rm -f "$TMP_ARCHIVE"
+}
+trap cleanup EXIT
 
-# Base directory where releases are deployed
-DEPLOY_BASE="${HOME}/cold-blood-cast-prod/deploy/releases"
+#### Prevent running as root
+if [ "$(id -u)" -eq 0 ]; then
+  echo "❌ Bitte nicht als root ausführen — nutze deinen Nutzer!"
+  exit 1
+fi
 
-# --- Dependency Checks ---
-check_dependencies() {
-  # Ensure required commands are available
-  local deps=(bash pm2 tar unzip)
-  local downloader=""
-  if command -v curl &>/dev/null; then
-    downloader="curl"
-  elif command -v wget &>/dev/null; then
-    downloader="wget"
-  else
-    echo "❌ Please install curl or wget to download files." >&2
-    exit 1
+#### Check dependencies
+for cmd in curl unzip pm2 sort; do
+  if ! command -v "$cmd" &>/dev/null; then
+    echo "❌ Benötigt: '$cmd' ist nicht installiert."
+    exit 2
   fi
-  deps+=("$downloader")
+done
 
-  for cmd in "${deps[@]}"; do
-    if ! command -v "$cmd" &>/dev/null; then
-      echo "❌ Required command '$cmd' not found." >&2
-      exit 1
-    fi
-  done
+#### Defaults (kann via ENV überschrieben werden)
+GITHUB_OWNER="${GITHUB_OWNER:-WlanKabL}"
+GITHUB_REPO="${GITHUB_REPO:-cold-blood-cast}"
+DEPLOY_BASE="${DEPLOY_BASE:-${HOME}/${GITHUB_REPO}-prod/deploy}"
+KEEP_RELEASES="${KEEP_RELEASES:-5}"
+ENVIRONMENT="${ENVIRONMENT:-production}"
+
+#### Usage
+usage() {
+  echo "Usage: $0 <version> [--keep <n>]"
+  exit 3
 }
 
-# fetch_json: Fetch JSON from a URL using curl or wget
-# Globals:
-#   None
-# Arguments:
-#   $1 - URL to fetch
-# Outputs:
-#   JSON to stdout
-fetch_json() {
-  local url="$1"
-  if command -v curl &>/dev/null; then
-    curl -sSL --retry 3 "$url"
-  else
-    wget -qO- "$url"
-  fi
-}
+#### Parse args
+[ $# -ge 1 ] || usage
+VERSION="$1"; shift
 
-# get_latest_tag: Retrieve the latest release tag from GitHub API
-# Globals:
-#   REPO_OWNER, REPO_NAME
-# Outputs:
-#   Latest release tag
-get_latest_tag() {
-  echo "🔍 Fetching latest release tag..."
-  local api_url="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
-  local tag
-  if command -v jq &>/dev/null; then
-    tag=$(fetch_json "$api_url" | jq -r '.tag_name // empty')
-  else
-    tag=$(fetch_json "$api_url" \
-      | grep -Po '"tag_name":\s*"\K[^"]+' || true)
-  fi
-  if [[ -z "$tag" ]]; then
-    echo "❌ Could not determine latest release tag." >&2
-    exit 1
-  fi
-  echo "→ latest release is $tag"
-  printf '%s' "$tag"
-}
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --keep) KEEP_RELEASES="$2"; shift 2 ;;
+    *) echo "❌ Unknown option: $1"; usage ;;
+  esac
+done
 
-# get_asset_download_url: Find the download URL for a named asset in a given ref
-# Globals:
-#   REPO_OWNER, REPO_NAME, ASSET_NAME
-# Arguments:
-#   $1 - ref (tag, branch, or SHA)
-# Outputs:
-#   URL string or empty if not found
-get_asset_download_url() {
-  local ref="$1"
-  local api_url="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/${ref}"
-  local url=""
-  if command -v jq &>/dev/null; then
-    url=$(fetch_json "$api_url" \
-      | jq -r --arg name "$ASSET_NAME" '
-          .assets[]? | select(.name == $name) | .browser_download_url
-        // empty')
-  else
-    url=$(fetch_json "$api_url" \
-      | grep '"browser_download_url"' \
-      | grep "$ASSET_NAME" \
-      | head -n1 \
-      | cut -d '"' -f4 \
-      || true)
-  fi
-  printf '%s' "$url"
-}
+#### Paths
+RELEASES_DIR="${DEPLOY_BASE}/releases"
+RELEASE_DIR="${RELEASES_DIR}/${VERSION}"
+CURRENT_LINK="${DEPLOY_BASE}/current"
 
-# download_file: Download a file from a URL to a destination path
-# Globals:
-#   None
-# Arguments:
-#   $1 - URL
-#   $2 - output file path
-download_file() {
-  local url="$1"
-  local dest="$2"
-  echo "⬇️ Downloading $(basename "$dest")..."
-  if command -v curl &>/dev/null; then
-    curl -L "$url" -o "$dest"
-  else
-    wget -O "$dest" "$url"
-  fi
-}
+echo
+echo "📦 Deploying ${GITHUB_REPO} — version: ${VERSION}"
+echo "📂 Base:    ${DEPLOY_BASE}"
+echo "⏳ Releases:${RELEASES_DIR}"
+echo "🔗 Current: ${CURRENT_LINK}"
+echo "🗑️  Keep:    ${KEEP_RELEASES} releases"
+echo
 
-# extract_zip: Unzip a ZIP archive
-# Globals:
-#   None
-# Arguments:
-#   $1 - zip file
-#   $2 - target directory
-extract_zip() {
-  local zipfile="$1"
-  local target="$2"
-  echo "📂 Extracting $(basename "$zipfile")..."
-  unzip -o "$zipfile" -d "$target"
-}
+#### Prepare
+mkdir -p "${RELEASES_DIR}" "${DEPLOY_BASE}/shared"
+if [ -d "${RELEASE_DIR}" ]; then
+  echo "⚠️  Release exists, removing old: ${RELEASE_DIR}"
+  rm -rf "${RELEASE_DIR}"
+fi
 
-# extract_tar_gz: Extract a .tar.gz archive
-# Globals:
-#   None
-# Arguments:
-#   $1 - tar.gz file
-#   $2 - target directory
-extract_tar_gz() {
-  local archive="$1"
-  local target="$2"
-  echo "📂 Extracting $(basename "$archive")..."
-  tar -xzf "$archive" -C "$target"
-}
+#### Download artifact
+TMP_ARCHIVE="$(mktemp -p /tmp "${GITHUB_REPO}-${VERSION}-XXXXXX.zip")"
+DOWNLOAD_URL="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${VERSION}/build.zip"
+echo "⬇️  Downloading ${DOWNLOAD_URL}"
+curl -fSL "${DOWNLOAD_URL}" -o "${TMP_ARCHIVE}"
 
-# find_entrypoints: Locate frontend and backend entrypoint files
-# Globals:
-#   DEPLOY_DIR, REPO_NAME
-# Sets:
-#   FRONTEND_PATH, BACKEND_PATH
-find_entrypoints() {
-  # Find frontend index.mjs
-  FRONTEND_PATH=$(find "$DEPLOY_DIR" -type f -path "*/frontend/.output/server/index.mjs" | head -n1 || true)
-  if [[ -z "$FRONTEND_PATH" ]]; then
-    echo "❌ Could not find frontend entrypoint." >&2
-    exit 1
-  fi
+#### Extract
+echo "📂 Extracting to ${RELEASE_DIR}"
+mkdir -p "${RELEASE_DIR}"
+unzip -o -q "${TMP_ARCHIVE}" -d "${RELEASE_DIR}"
 
-  # Find backend index.js
-  BACKEND_PATH=$(find "$DEPLOY_DIR" -type f -path "*/snake-link-raspberry/dist/index.js" | head -n1 || true)
-  if [[ -z "$BACKEND_PATH" ]]; then
-    echo "❌ Could not find backend entrypoint." >&2
-    exit 1
-  fi
-}
+#### (optional) Link shared dirs
+# ln -nfs "${DEPLOY_BASE}/shared/uploads" "${RELEASE_DIR}/uploads"
 
-# start_or_restart: Start or restart a PM2 process
-# Globals:
-#   None
-# Arguments:
-#   $1 - process name
-#   $2 - script path
-start_or_restart() {
-  local name="$1"
-  local script="$2"
-  if pm2 describe "$name" &>/dev/null; then
-    echo "🔄 Restarting PM2 process '$name'..."
-    pm2 restart "$name" --update-env
-  else
-    echo "🚀 Starting PM2 process '$name'..."
-    pm2 start "$script" --name "$name" --update-env
-  fi
-}
+#### Switch symlink
+echo "🔀 Updating symlink ${CURRENT_LINK} → ${RELEASE_DIR}"
+ln -nfs "${RELEASE_DIR}" "${CURRENT_LINK}"
 
-# deploy_ref: Main deployment logic for a given ref
-# Globals:
-#   DEFAULT_REF, DEPLOY_BASE, REPO_OWNER, REPO_NAME, ASSET_NAME
-# Arguments:
-#   $1 - ref to deploy
-deploy_ref() {
-  local ref="$1"
-  mkdir -p "$DEPLOY_BASE"
+#### Cleanup old releases
+echo "🧹 Cleaning up old releases"
+cd "${RELEASES_DIR}"
+# sortiere semver (v1.2.3 ..), behalte die ersten $KEEP_RELEASES, rest löschen
+ls -1d */ | sort -rV | tail -n +$((KEEP_RELEASES+1)) | xargs -r rm -rf --
 
-  # Resolve "latest" to actual tag
-  if [[ "$ref" == "$DEFAULT_REF" ]]; then
-    ref=$(get_latest_tag)
-  fi
+#### PM2 Restart
+echo "🔄 PM2 deployment (${ENVIRONMENT} environment)"
+if [ -f "${CURRENT_LINK}/ecosystem.config.js" ]; then
+  pm2 startOrRestart "${CURRENT_LINK}/ecosystem.config.js" --env "${ENVIRONMENT}"
+else
+  pm2 reload all || pm2 restart all
+fi
 
-  local deploy_dir="${DEPLOY_BASE}/${ref}"
-  mkdir -p "$deploy_dir"
-  DEPLOY_DIR="$deploy_dir"
-  echo "📦 Deploying ref: $ref into $DEPLOY_DIR"
-
-  # Try to download asset
-  local download_url
-  download_url=$(get_asset_download_url "$ref")
-  if [[ -n "$download_url" ]]; then
-    echo "✅ Found asset: $download_url"
-    download_file "$download_url" "${DEPLOY_DIR}/${ASSET_NAME}"
-    extract_zip "${DEPLOY_DIR}/${ASSET_NAME}" "$DEPLOY_DIR"
-  else
-    # Fallback to Git archive
-    local archive_url="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/${ref}.tar.gz"
-    echo "⚠️ Asset not found, falling back to archive: $archive_url"
-    download_file "$archive_url" "${DEPLOY_DIR}/archive.tar.gz"
-    extract_tar_gz "${DEPLOY_DIR}/archive.tar.gz" "$DEPLOY_DIR"
-  fi
-
-  # Locate entrypoints and start/restart
-  find_entrypoints
-  start_or_restart "$PM2_FRONTEND_NAME" "$FRONTEND_PATH"
-  start_or_restart "$PM2_BACKEND_NAME"  "$BACKEND_PATH"
-
-  pm2 save
-  echo "✅ Deployment of '$ref' completed!"
-}
-
-# --- Script Entry Point ---
-main() {
-  check_dependencies
-  local ref="${1:-$DEFAULT_REF}"
-  deploy_ref "$ref"
-}
-
-main "$@"
+echo
+echo "✅ Deploy of ${VERSION} complete!"
