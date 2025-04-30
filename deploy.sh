@@ -17,7 +17,7 @@ DEFAULT_REF="latest"
 
 REF="${1:-$DEFAULT_REF}"
 # Use a fixed deploy directory inside the project
-DEPLOY_DIR="./deploy/releases/${REF}"
+DEPLOY_DIR="~/cold-blood-cast-prod/deploy/releases/${REF}"
 mkdir -p "$DEPLOY_DIR"
 
 echo "📦 Deploying ref: $REF into $DEPLOY_DIR"
