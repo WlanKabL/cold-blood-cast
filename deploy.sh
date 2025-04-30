@@ -8,14 +8,17 @@
 #     ref = release tag (e.g. v1.2.3), branch name, or commit SHA
 #     default = latest release tag
 #
-# Requires: bash, curl or wget, tar (for .tar.gz), unrar or 7z (for .rar), pm2
+# Requires: bash, curl or wget, unzip (for .zip), tar (for .tar.gz), pm2
+
+set -euo pipefail
+IFS=$'\n\t'
 
 REPO_OWNER="WlanKabL"
 REPO_NAME="cold-blood-cast"
 ASSET_NAME="build.zip"
 DEFAULT_REF="latest"
 
-# Use HOME for absolute path
+# Base directory where releases are deployed
 DEPLOY_BASE="$HOME/cold-blood-cast-prod/deploy/releases"
 REF="${1:-$DEFAULT_REF}"
 DEPLOY_DIR="$DEPLOY_BASE/$REF"
@@ -23,7 +26,7 @@ mkdir -p "$DEPLOY_DIR"
 
 echo "📦 Deploying ref: $REF into $DEPLOY_DIR"
 
-# helper to fetch JSON
+# helper: fetch JSON from GitHub API
 fetch_json() {
   if command -v curl &>/dev/null; then
     curl -s "$1"
@@ -49,7 +52,7 @@ if [[ "$REF" == "$DEFAULT_REF" ]]; then
   mkdir -p "$DEPLOY_DIR"
 fi
 
-# 1) Try to download build.rar asset
+# 1) Try to download build.zip asset
 echo "🔍 Checking for asset '$ASSET_NAME' in release '$REF'..."
 DOWNLOAD_URL=$(fetch_json "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF" \
   | grep '"browser_download_url"' \
@@ -67,12 +70,10 @@ if [[ -n "$DOWNLOAD_URL" ]]; then
   fi
 
   echo "📂 Extracting $ASSET_NAME..."
-  if command -v unrar &>/dev/null; then
-    unrar x -o+ "$DEPLOY_DIR/$ASSET_NAME" "$DEPLOY_DIR"
-  elif command -v 7z &>/dev/null; then
-    7z x "$DEPLOY_DIR/$ASSET_NAME" -o"$DEPLOY_DIR"
+  if command -v unzip &>/dev/null; then
+    unzip -o "$DEPLOY_DIR/$ASSET_NAME" -d "$DEPLOY_DIR"
   else
-    echo "❌ Please install 'unrar' or '7z' to extract RAR files." >&2
+    echo "❌ Please install 'unzip' to extract ZIP files." >&2
     exit 1
   fi
 else
@@ -90,10 +91,10 @@ else
   tar -xzf "$DEPLOY_DIR/archive.tar.gz" -C "$DEPLOY_DIR"
 fi
 
-# determine base dir
+# determine the base folder that contains 'frontend' and 'snake-link-raspberry'
 if [[ -d "$DEPLOY_DIR/$REPO_NAME-$REF" ]]; then
   BASE="$DEPLOY_DIR/$REPO_NAME-$REF"
-elif compgen -G "$DEPLOY_DIR/$REPO_NAME*" >/dev/null; then
+elif compgen -G "$DEPLOY_DIR/$REPO_NAME"* >/dev/null; then
   BASE="$DEPLOY_DIR/$(ls "$DEPLOY_DIR" | grep "^$REPO_NAME")"
 else
   BASE="$DEPLOY_DIR"
