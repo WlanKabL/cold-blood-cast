@@ -12,7 +12,7 @@
 
 REPO_OWNER="WlanKabL"
 REPO_NAME="cold-blood-cast"
-ASSET_NAME="build.rar"
+ASSET_NAME="build.zip"
 DEFAULT_REF="latest"
 
 # Use HOME for absolute path
