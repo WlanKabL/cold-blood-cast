@@ -139,6 +139,7 @@ export class DataStorageService {
                 autoLogIntervalMs: 60_000,
                 logFileLimit: 100,
                 remoteSyncEnabled: false,
+                alertCooldownMs: 1000,
             },
         });
     }
@@ -156,5 +157,13 @@ export class DataStorageService {
 
     getUserStore(): FileStore<User[]> {
         return new FileStore(path.join(this.basePath, "users.json"), []);
+    }
+
+    getTelegramRegistrationKeysStore(): FileStore<string[]> {
+        return new FileStore(path.join(this.basePath, "telegram.registration.keys.json"), []);
+    }
+
+    getSubscriberStore(): FileStore<number[]> {
+        return new FileStore(path.join(this.basePath, "subscribers.json"), []);
     }
 }

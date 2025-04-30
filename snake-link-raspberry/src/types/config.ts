@@ -12,6 +12,7 @@ const SensorSystemConfigSchema = z.object({
     autoLogIntervalMs: z.number().int(),
     logFileLimit: z.number().int(),
     remoteSyncEnabled: z.boolean(),
+    alertCooldownMs: z.number().int(),
 });
 
 export const AppConfigSchema = z.object({
