@@ -9,7 +9,7 @@
 
             <div class="text-zinc-600 hover:text-indigo-400 transition-colors">
                 <a
-                    href="https://github.com/WlanKabL/cold-blood-stream"
+                    href="https://github.com/WlanKabL/cold-blood-cast"
                     target="_blank"
                     rel="noopener"
                 >
