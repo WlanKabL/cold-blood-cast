@@ -27,6 +27,10 @@ import { swaggerDocsHandler, swaggerSpec, swaggerUiHandler } from "./docs/swagge
 import { SensorPollingService } from "./services/sensorPolling.js";
 import { SensorLoggingService } from "./services/sensorLogging.js";
 import { servicesStore } from "./stores/servicesStore.js";
+import alertsRoutes from "./routes/api/alerts.routes.js";
+import { initializeBot } from "./bot.js";
+import { SensorWatchingService } from "./services/sensorWatching.js";
+import { broadcastStartup } from "./services/alert.service.js";
 
 /**
  * Bootstraps the application:
@@ -65,6 +69,7 @@ async function bootstrap(): Promise<void> {
     apiRouter.use("/logs", logRoutes);
     apiRouter.use("/live", liveRoutes);
     apiRouter.use("/auth", authRoutes);
+    apiRouter.use("/alerts", alertsRoutes);
     apiRouter.use("/docs", swaggerUiHandler, swaggerDocsHandler);
     app.get("/api/docs.json", (req, res) => {
         res.json(swaggerSpec);
@@ -75,6 +80,10 @@ async function bootstrap(): Promise<void> {
 
     // 4) Global error handler
     app.use(errorMiddleware);
+
+    // Initialize telegram bot
+    initializeBot();
+    broadcastStartup();
 
     // 5) Initialize data stores
     const dataStore = new DataStorageService(env.DATA_DIR);
@@ -108,8 +117,12 @@ async function bootstrap(): Promise<void> {
         const sensorLoggingService = new SensorLoggingService(liveStore, logStore, appConfigStore);
         sensorLoggingService.start();
 
+        const watchingService = new SensorWatchingService(configStore, liveStore, appConfigStore);
+        watchingService.start();
+
         servicesStore.register("sensorLoggingService", sensorLoggingService);
         servicesStore.register("sensorPollingService", sensorPollingService);
+        servicesStore.register("sensorWatchingService", watchingService);
     });
 
     // 8) Graceful shutdown logic
@@ -118,6 +131,7 @@ async function bootstrap(): Promise<void> {
 
         servicesStore.get<SensorPollingService>("sensorPollingService").stop();
         servicesStore.get<SensorLoggingService>("sensorLoggingService").stop();
+        servicesStore.get<SensorWatchingService>("sensorWatchingService").stop();
 
         wss.close();
         httpServer.close(() => {
