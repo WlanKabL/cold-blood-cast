@@ -5,7 +5,7 @@
 import { DataStorageService } from "../storage/dataStorageService.js";
 
 const store = new DataStorageService("./data");
-const regKeysStore = store.getTelegramRegistrationKeysStore(); // deine vorab vergebenen Codes
+const regKeysStore = store.getTelegramRegistrationKeysStore(); // your pre-assigned codes
 const subscriberStore = store.getSubscriberStore(); // speichert chatIds
 
 export class SubscriberService {

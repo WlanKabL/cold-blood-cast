@@ -20,13 +20,13 @@ router.post("/", async (req: Request, res: any) => {
     const config = configStore.load();
 
     try {
-        await config.sensors.forEach(async (sensor) => {
+        for (const sensor of config.sensors) {
             const sensorReading = live[sensor.id] ?? null;
             await broadcastAlert(
                 sensor,
                 calculateSensorStatus(sensor, sensorReading, appConfigStore.load().general),
             );
-        });
+        }
 
         return res.status(200).json({ message: "Alert sent" });
     } catch (err) {
