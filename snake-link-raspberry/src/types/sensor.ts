@@ -39,6 +39,8 @@ const TimeBasedLimitsSchema = z.object({
     night: GeneralLimitsSchema,
 });
 
+export type TimeBasedLimits = z.infer<typeof TimeBasedLimitsSchema>;
+
 /**
  * Now the SensorConfig is a discriminated union on `limitsType`.
  */

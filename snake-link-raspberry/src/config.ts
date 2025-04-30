@@ -22,6 +22,7 @@ export const EnvSchema = z.object({
         .default("false"),
     JWT_SECRET: z.string().min(1, "JWT_SECRET must be set"),
     PEPPER: z.string().min(1, "PEPPER must be set"),
+    TELEGRAM_BOT_TOKEN: z.string().min(1, "TELEGRAM_BOT_TOKEN must be set"),
 });
 
 /**
@@ -46,6 +47,8 @@ export interface AppEnv {
 
     JWT_SECRET: string;
     PEPPER: string;
+
+    TELEGRAM_BOT_TOKEN: string;
 }
 
 /**
@@ -79,5 +82,6 @@ export function validateEnv(env: NodeJS.ProcessEnv): AppEnv {
         CORS_OPTIONS: corsOptions,
         JWT_SECRET: parsed.JWT_SECRET,
         PEPPER: parsed.PEPPER,
+        TELEGRAM_BOT_TOKEN: parsed.TELEGRAM_BOT_TOKEN,
     };
 }
