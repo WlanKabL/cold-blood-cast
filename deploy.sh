@@ -15,14 +15,15 @@ REPO_NAME="cold-blood-cast"
 ASSET_NAME="build.rar"
 DEFAULT_REF="latest"
 
+# Use HOME for absolute path
+DEPLOY_BASE="$HOME/cold-blood-cast-prod/deploy/releases"
 REF="${1:-$DEFAULT_REF}"
-# Use a fixed deploy directory inside the project
-DEPLOY_DIR="~/cold-blood-cast-prod/deploy/releases/${REF}"
+DEPLOY_DIR="$DEPLOY_BASE/$REF"
 mkdir -p "$DEPLOY_DIR"
 
 echo "📦 Deploying ref: $REF into $DEPLOY_DIR"
 
-# helper to fetch JSON and parse with grep
+# helper to fetch JSON
 fetch_json() {
   if command -v curl &>/dev/null; then
     curl -s "$1"
@@ -36,36 +37,36 @@ fetch_json() {
 
 # resolve "latest" → actual tag
 if [[ "$REF" == "$DEFAULT_REF" ]]; then
-  TAG="$(fetch_json https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest \
-    | grep -Po '"tag_name":\s*"\K[^"]+' )"
+  TAG=$(fetch_json "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" \
+    | grep -Po '"tag_name":\s*"\K[^"]+' )
   if [[ -z "$TAG" ]]; then
     echo "❌ Could not determine latest release tag" >&2
     exit 1
   fi
   echo "→ latest release is $TAG"
   REF="$TAG"
-  DEPLOY_DIR="./deploy/releases/${REF}"
+  DEPLOY_DIR="$DEPLOY_BASE/$REF"
   mkdir -p "$DEPLOY_DIR"
 fi
 
 # 1) Try to download build.rar asset
-echo "🔍 Checking for asset '${ASSET_NAME}' in release '$REF'..."
-DOWNLOAD_URL="$(fetch_json https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF \
+echo "🔍 Checking for asset '$ASSET_NAME' in release '$REF'..."
+DOWNLOAD_URL=$(fetch_json "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$REF" \
   | grep '"browser_download_url"' \
   | grep "$ASSET_NAME" \
   | head -n1 \
-  | cut -d '"' -f4 || true)"
+  | cut -d '"' -f4 || true)
 
 if [[ -n "$DOWNLOAD_URL" ]]; then
   echo "✅ Found asset: $DOWNLOAD_URL"
-  echo "⬇️ Downloading ${ASSET_NAME}..."
+  echo "⬇️ Downloading $ASSET_NAME..."
   if command -v curl &>/dev/null; then
     curl -L "$DOWNLOAD_URL" -o "$DEPLOY_DIR/$ASSET_NAME"
   else
     wget -O "$DEPLOY_DIR/$ASSET_NAME" "$DOWNLOAD_URL"
   fi
 
-  echo "📂 Extracting ${ASSET_NAME}..."
+  echo "📂 Extracting $ASSET_NAME..."
   if command -v unrar &>/dev/null; then
     unrar x -o+ "$DEPLOY_DIR/$ASSET_NAME" "$DEPLOY_DIR"
   elif command -v 7z &>/dev/null; then
