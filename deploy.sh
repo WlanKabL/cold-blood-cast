@@ -9,8 +9,6 @@
 #
 # Requires: curl, tar (or unzip), pm2
 
-set -euo pipefail
-
 REPO_OWNER="WlanKabL"
 REPO_NAME="cold-blood-cast"
 ASSET_NAME="build.rar"
