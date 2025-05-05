@@ -23,6 +23,8 @@ export const EnvSchema = z.object({
     JWT_SECRET: z.string().min(1, "JWT_SECRET must be set"),
     PEPPER: z.string().min(1, "PEPPER must be set"),
     TELEGRAM_BOT_TOKEN: z.string().min(1, "TELEGRAM_BOT_TOKEN must be set"),
+    TAPO_EMAIL: z.string().min(1, "TAPO_EMAIL must be set"),
+    TAPO_PASSWORD: z.string().min(1, "TAPO_PASSWORD must be set"),
 });
 
 /**
@@ -49,6 +51,9 @@ export interface AppEnv {
     PEPPER: string;
 
     TELEGRAM_BOT_TOKEN: string;
+
+    TAPO_EMAIL: string;
+    TAPO_PASSWORD: string;
 }
 
 /**
@@ -83,5 +88,7 @@ export function validateEnv(env: NodeJS.ProcessEnv): AppEnv {
         JWT_SECRET: parsed.JWT_SECRET,
         PEPPER: parsed.PEPPER,
         TELEGRAM_BOT_TOKEN: parsed.TELEGRAM_BOT_TOKEN,
+        TAPO_EMAIL: parsed.TAPO_EMAIL,
+        TAPO_PASSWORD: parsed.TAPO_PASSWORD,
     };
 }

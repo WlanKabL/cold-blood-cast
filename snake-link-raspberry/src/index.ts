@@ -15,6 +15,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { DataStorageService } from "./storage/dataStorageService.js";
 import configRoutes from "./routes/api/config.routes.js";
 import sensorRoutes from "./routes/api/sensors.routes.js";
+import smartdevicesRoutes from "./routes/api/smartdevices.routes.js";
 import presetRoutes from "./routes/api/presets.routes.js";
 import logRoutes from "./routes/api/logs.routes.js";
 import liveRoutes from "./routes/api/live.routes.js";
@@ -31,6 +32,9 @@ import alertsRoutes from "./routes/api/alerts.routes.js";
 import { initializeBot } from "./bot.js";
 import { SensorWatchingService } from "./services/sensorWatching.js";
 import { broadcastStartup } from "./services/alert.service.js";
+import { PluginManager } from "./services/plugin.service.js";
+import path from "path";
+import { TapoCloudService } from "./services/tapoCloud.service.js";
 
 /**
  * Bootstraps the application:
@@ -70,6 +74,7 @@ async function bootstrap(): Promise<void> {
     apiRouter.use("/live", liveRoutes);
     apiRouter.use("/auth", authRoutes);
     apiRouter.use("/alerts", alertsRoutes);
+    apiRouter.use("/smartdevices", smartdevicesRoutes);
     apiRouter.use("/docs", swaggerUiHandler, swaggerDocsHandler);
     app.get("/api/docs.json", (req, res) => {
         res.json(swaggerSpec);
@@ -91,7 +96,8 @@ async function bootstrap(): Promise<void> {
     const liveStore = dataStore.getLiveDataStore();
     const logStore = dataStore.getSensorLogStore();
     const appConfigStore = dataStore.getAppConfigStore();
-    const appConfig = appConfigStore.load();
+    const tapoConfigStore = dataStore.getTapoCloudConfigStore();
+    const tapoSmartDeviceStore = dataStore.getTapoSmartDevicesStore();
 
     // 6) Create HTTP + WebSocket servers
     const httpServer: HttpServer = createHttpServer(app);
@@ -103,7 +109,7 @@ async function bootstrap(): Promise<void> {
     });
 
     // 7) Start listening and background services
-    httpServer.listen(port, () => {
+    httpServer.listen(port, async () => {
         console.log(chalk.green(`🌿 Backend listening on port ${port}`));
 
         const sensorPollingService = new SensorPollingService(
@@ -120,9 +126,26 @@ async function bootstrap(): Promise<void> {
         const watchingService = new SensorWatchingService(configStore, liveStore, appConfigStore);
         watchingService.start();
 
+        const tapoCloudService = new TapoCloudService(
+            env.TAPO_EMAIL,
+            env.TAPO_PASSWORD,
+            tapoConfigStore,
+            tapoSmartDeviceStore,
+        );
+
+        // const pluginsService = new PluginManager(__dirname, {
+        //     configPath: path.resolve(__dirname, "../config"),
+        //     logger: console,
+        //     broadcast,
+        //     servicesStore,
+        // });
+        // await pluginsService.loadPlugins();
+
         servicesStore.register("sensorLoggingService", sensorLoggingService);
         servicesStore.register("sensorPollingService", sensorPollingService);
         servicesStore.register("sensorWatchingService", watchingService);
+        servicesStore.register("tapoCloudService", tapoCloudService);
+        // servicesStore.register('pluginsService', pluginsService);
     });
 
     // 8) Graceful shutdown logic
