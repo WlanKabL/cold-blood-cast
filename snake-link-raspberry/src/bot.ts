@@ -5,7 +5,6 @@
 import { Telegraf } from "telegraf";
 import * as dotenv from "dotenv";
 import { subscriberService } from "./services/subscriber.service.js";
-import { parseEnv } from "util";
 import { validateEnv } from "./config.js";
 
 dotenv.config();
