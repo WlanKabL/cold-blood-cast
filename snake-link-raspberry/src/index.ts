@@ -87,8 +87,8 @@ async function bootstrap(): Promise<void> {
 
     // 5) Initialize data stores
     const dataStore = new DataStorageService(env.DATA_DIR);
-    const configStore = dataStore.getSensorConfigStore();
     const liveStore = dataStore.getLiveDataStore();
+    const configStore = dataStore.getSensorConfigStore();
     const logStore = dataStore.getSensorLogStore();
     const appConfigStore = dataStore.getAppConfigStore();
     const appConfig = appConfigStore.load();

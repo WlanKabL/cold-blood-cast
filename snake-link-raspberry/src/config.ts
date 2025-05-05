@@ -23,6 +23,7 @@ export const EnvSchema = z.object({
     JWT_SECRET: z.string().min(1, "JWT_SECRET must be set"),
     PEPPER: z.string().min(1, "PEPPER must be set"),
     TELEGRAM_BOT_TOKEN: z.string().min(1, "TELEGRAM_BOT_TOKEN must be set"),
+    DISABLE_TELEGRAM_BOT: z.string().default("false"),
 });
 
 /**
@@ -49,6 +50,7 @@ export interface AppEnv {
     PEPPER: string;
 
     TELEGRAM_BOT_TOKEN: string;
+    DISABLE_TELEGRAM_BOT: boolean;
 }
 
 /**
@@ -72,6 +74,7 @@ export function validateEnv(env: NodeJS.ProcessEnv): AppEnv {
     const corsOptions: CorsOptions = { origin: origins };
 
     const useMock = process.env.USE_MOCK === "true";
+    const disableTelegramBot = process.env.DISABLE_TELEGRAM_BOT === "true";
 
     // 4) Return final config
     return {
@@ -83,5 +86,6 @@ export function validateEnv(env: NodeJS.ProcessEnv): AppEnv {
         JWT_SECRET: parsed.JWT_SECRET,
         PEPPER: parsed.PEPPER,
         TELEGRAM_BOT_TOKEN: parsed.TELEGRAM_BOT_TOKEN,
+        DISABLE_TELEGRAM_BOT: disableTelegramBot,
     };
 }
