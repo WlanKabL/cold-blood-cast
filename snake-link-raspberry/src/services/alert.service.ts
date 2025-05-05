@@ -128,3 +128,32 @@ ${limitsHtml}
     // enqueue each chat
     chatIds.forEach((chatId) => enqueueAlert(chatId, html));
 }
+
+/**
+ * Send a simple test message to all subscribed Telegram chats.
+ */
+export async function broadcastTestMessage(): Promise<void> {
+    const env = validateEnv(process.env);
+    const chatIds = subscriberService.getSubscribers();
+    if (!chatIds.length) return;
+
+    // reload config for timezone etc.
+    const appConfig = new DataStorageService(env.DATA_DIR).getAppConfigStore().load();
+
+    const now = new Date().toLocaleString("de-DE", {
+        timeZone: appConfig.general.timezone,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+
+    const html = `
+📢 <b>Test Alert</b>
+<b>Time:</b> <code>${now}</code>
+<b>Project:</b> <i>${escapeHtml(appConfig.general.name)}</i>
+
+<code>This is a test notification.</code>
+`.trim();
+
+    chatIds.forEach((chatId) => enqueueAlert(chatId, html));
+}

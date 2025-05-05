@@ -19,6 +19,9 @@ export class SubscriberService {
         const validKeys = regKeysStore.load();
         if (!validKeys.includes(code)) return false;
 
+        validKeys.splice(validKeys.indexOf(code), 1);
+        regKeysStore.save(validKeys);
+
         const subs = subscriberStore.load();
         if (subs.includes(chatId)) return false;
 
