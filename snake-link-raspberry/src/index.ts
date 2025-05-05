@@ -27,7 +27,7 @@ import { swaggerDocsHandler, swaggerSpec, swaggerUiHandler } from "./docs/swagge
 import { SensorPollingService } from "./services/sensorPolling.js";
 import { SensorLoggingService } from "./services/sensorLogging.js";
 import { servicesStore } from "./stores/servicesStore.js";
-import alertsRoutes from "./routes/api/alerts.routes.js";
+import telegramRoutes from "./routes/api/telegram.routes.js";
 import { initializeBot } from "./bot.js";
 import { SensorWatchingService } from "./services/sensorWatching.js";
 import { broadcastStartup } from "./services/alert.service.js";
@@ -69,7 +69,7 @@ async function bootstrap(): Promise<void> {
     apiRouter.use("/logs", logRoutes);
     apiRouter.use("/live", liveRoutes);
     apiRouter.use("/auth", authRoutes);
-    apiRouter.use("/alerts", alertsRoutes);
+    apiRouter.use("/telegram", telegramRoutes);
     apiRouter.use("/docs", swaggerUiHandler, swaggerDocsHandler);
     app.get("/api/docs.json", (req, res) => {
         res.json(swaggerSpec);
