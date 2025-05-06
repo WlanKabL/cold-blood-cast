@@ -15,6 +15,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { DataStorageService } from "./storage/dataStorageService.js";
 import configRoutes from "./routes/api/config.routes.js";
 import sensorRoutes from "./routes/api/sensors.routes.js";
+import homeAssistantRoutes from "./routes/api/homeAssistant.routes.js";
 import presetRoutes from "./routes/api/presets.routes.js";
 import logRoutes from "./routes/api/logs.routes.js";
 import liveRoutes from "./routes/api/live.routes.js";
@@ -31,6 +32,7 @@ import telegramRoutes from "./routes/api/telegram.routes.js";
 import { initializeBot } from "./bot.js";
 import { SensorWatchingService } from "./services/sensorWatching.js";
 import { broadcastStartup } from "./services/alert.service.js";
+import { HomeAssistantService } from "./services/homeAssistant.service.js";
 
 /**
  * Bootstraps the application:
@@ -70,6 +72,7 @@ async function bootstrap(): Promise<void> {
     apiRouter.use("/live", liveRoutes);
     apiRouter.use("/auth", authRoutes);
     apiRouter.use("/telegram", telegramRoutes);
+    apiRouter.use("/home-assistant", homeAssistantRoutes);
     apiRouter.use("/docs", swaggerUiHandler, swaggerDocsHandler);
     app.get("/api/docs.json", (req, res) => {
         res.json(swaggerSpec);
@@ -91,7 +94,7 @@ async function bootstrap(): Promise<void> {
     const configStore = dataStore.getSensorConfigStore();
     const logStore = dataStore.getSensorLogStore();
     const appConfigStore = dataStore.getAppConfigStore();
-    const appConfig = appConfigStore.load();
+    const homeAssistantStore = dataStore.getHomeAssistantStore();
 
     // 6) Create HTTP + WebSocket servers
     const httpServer: HttpServer = createHttpServer(app);
@@ -103,7 +106,7 @@ async function bootstrap(): Promise<void> {
     });
 
     // 7) Start listening and background services
-    httpServer.listen(port, () => {
+    httpServer.listen(port, async () => {
         console.log(chalk.green(`🌿 Backend listening on port ${port}`));
 
         const sensorPollingService = new SensorPollingService(
@@ -120,9 +123,13 @@ async function bootstrap(): Promise<void> {
         const watchingService = new SensorWatchingService(configStore, liveStore, appConfigStore);
         watchingService.start();
 
+
+        const homeAssistantService = new HomeAssistantService(homeAssistantStore);
+
         servicesStore.register("sensorLoggingService", sensorLoggingService);
         servicesStore.register("sensorPollingService", sensorPollingService);
         servicesStore.register("sensorWatchingService", watchingService);
+        servicesStore.register("homeAssistantService", homeAssistantService);
     });
 
     // 8) Graceful shutdown logic

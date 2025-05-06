@@ -11,6 +11,7 @@ import type { PresetDefinition } from "../types/presets.js";
 import type { AppConfig } from "../types/config.js";
 import type { LogEntry } from "../types/logs.js";
 import { User } from "../types/users.js";
+import { HassDevice } from "../types/hass.js";
 
 /**
  * Generic JSON file store.
@@ -165,5 +166,9 @@ export class DataStorageService {
 
     getSubscriberStore(): FileStore<number[]> {
         return new FileStore(path.join(this.basePath, "subscribers.json"), []);
+    }
+
+    getHomeAssistantStore(): FileStore<HassDevice[]> {
+        return new FileStore(path.join(this.basePath, "homeassistant.json"), []);
     }
 }
