@@ -11,8 +11,10 @@ const getService = (): HomeAssistantService =>
 
 /**
  * @openapi
- * /api/smartdevices:
+ * /api/home-assistant:
  *   get:
+ *      tags:
+ *       - Home Assistant
  *     summary: Get cached smart devices
  *     description: Retrieve a list of cached smart devices from the Home Assistant service.
  *     responses:
@@ -41,8 +43,10 @@ router.get("/", async (_req, res, next) => {
 
 /**
  * @openapi
- * /api/smartdevices/fetch:
+ * /api/home-assistant/fetch:
  *   post:
+ *      tags:
+ *       - Home Assistant
  *     summary: Fetch smart devices
  *     description: Fetch the latest list of smart devices from the Home Assistant service.
  *     responses:
@@ -71,8 +75,10 @@ router.post("/fetch", async (_req, res, next) => {
 
 /**
  * @openapi
- * /api/smartdevices/{entityId}/on:
+ * /api/home-assistant/{entityId}/on:
  *   post:
+ *      tags:
+ *       - Home Assistant
  *     summary: Turn on a smart device
  *     description: Turn on a specific smart device by its entity ID.
  *     parameters:
@@ -109,8 +115,10 @@ router.post("/:entityId/on", async (req, res, next) => {
 
 /**
  * @openapi
- * /api/smartdevices/{entityId}/off:
+ * /api/home-assistant/{entityId}/off:
  *   post:
+ *      tags:
+ *       - Home Assistant
  *     summary: Turn off a smart device
  *     description: Turn off a specific smart device by its entity ID.
  *     parameters:
@@ -147,8 +155,10 @@ router.post("/:entityId/off", async (req, res, next) => {
 
 /**
  * @openapi
- * /api/smartdevices/{entityId}/status:
+ * /api/home-assistant/{entityId}/status:
  *   get:
+ *      tags:
+ *       - Home Assistant
  *     summary: Get the status of a smart device
  *     description: Retrieve the full status of a specific smart device by its entity ID.
  *     parameters:
@@ -183,8 +193,10 @@ router.get("/:entityId/status", async (req, res, next) => {
 
 /**
  * @openapi
- * /api/smartdevices/_meta/domains:
+ * /api/home-assistant/_meta/domains:
  *   get:
+ *      tags:
+ *       - Home Assistant
  *     summary: Get all available domains
  *     description: Retrieve a list of all available domains for smart devices.
  *     responses:
@@ -213,8 +225,10 @@ router.get("/_meta/domains", async (_req, res, next) => {
 
 /**
  * @openapi
- * /api/smartdevices/_meta/services:
+ * /api/home-assistant/_meta/services:
  *   get:
+ *     tags:
+ *      - Home Assistant
  *     summary: Get all available services
  *     description: Retrieve a list of all available services for smart devices.
  *     responses:
