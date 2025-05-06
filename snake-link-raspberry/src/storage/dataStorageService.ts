@@ -11,7 +11,7 @@ import type { PresetDefinition } from "../types/presets.js";
 import type { AppConfig } from "../types/config.js";
 import type { LogEntry } from "../types/logs.js";
 import { User } from "../types/users.js";
-import { TapoLoginConfig, TapoSmartDevice } from "../types/tapo.js";
+import { HassDevice } from "../types/hass.js";
 
 /**
  * Generic JSON file store.
@@ -168,11 +168,7 @@ export class DataStorageService {
         return new FileStore(path.join(this.basePath, "subscribers.json"), []);
     }
 
-    getTapoCloudConfigStore(): FileStore<TapoLoginConfig | {}> {
-        return new FileStore(path.join(this.basePath, "tapo.cloud.json"), {});
-    }
-
-    getTapoSmartDevicesStore(): FileStore<Array<TapoSmartDevice>> {
-        return new FileStore(path.join(this.basePath, "tapo.smart.devices.json"), []);
+    getHomeAssistantStore(): FileStore<HassDevice[]> {
+        return new FileStore(path.join(this.basePath, "homeassistant.json"), []);
     }
 }

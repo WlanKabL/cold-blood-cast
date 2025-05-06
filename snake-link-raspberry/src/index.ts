@@ -32,9 +32,7 @@ import alertsRoutes from "./routes/api/alerts.routes.js";
 import { initializeBot } from "./bot.js";
 import { SensorWatchingService } from "./services/sensorWatching.js";
 import { broadcastStartup } from "./services/alert.service.js";
-import { PluginManager } from "./services/plugin.service.js";
-import path from "path";
-import { TapoCloudService } from "./services/tapoCloud.service.js";
+import { HomeAssistantService } from "./services/homeAssistant.service.js";
 
 /**
  * Bootstraps the application:
@@ -96,8 +94,7 @@ async function bootstrap(): Promise<void> {
     const liveStore = dataStore.getLiveDataStore();
     const logStore = dataStore.getSensorLogStore();
     const appConfigStore = dataStore.getAppConfigStore();
-    const tapoConfigStore = dataStore.getTapoCloudConfigStore();
-    const tapoSmartDeviceStore = dataStore.getTapoSmartDevicesStore();
+    const homeAssistantStore = dataStore.getHomeAssistantStore();
 
     // 6) Create HTTP + WebSocket servers
     const httpServer: HttpServer = createHttpServer(app);
@@ -126,12 +123,8 @@ async function bootstrap(): Promise<void> {
         const watchingService = new SensorWatchingService(configStore, liveStore, appConfigStore);
         watchingService.start();
 
-        const tapoCloudService = new TapoCloudService(
-            env.TAPO_EMAIL,
-            env.TAPO_PASSWORD,
-            tapoConfigStore,
-            tapoSmartDeviceStore,
-        );
+
+        const homeAssistantService = new HomeAssistantService(homeAssistantStore);
 
         // const pluginsService = new PluginManager(__dirname, {
         //     configPath: path.resolve(__dirname, "../config"),
@@ -144,7 +137,7 @@ async function bootstrap(): Promise<void> {
         servicesStore.register("sensorLoggingService", sensorLoggingService);
         servicesStore.register("sensorPollingService", sensorPollingService);
         servicesStore.register("sensorWatchingService", watchingService);
-        servicesStore.register("tapoCloudService", tapoCloudService);
+        servicesStore.register("homeAssistantService", homeAssistantService);
         // servicesStore.register('pluginsService', pluginsService);
     });
 
