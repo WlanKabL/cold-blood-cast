@@ -126,19 +126,10 @@ async function bootstrap(): Promise<void> {
 
         const homeAssistantService = new HomeAssistantService(homeAssistantStore);
 
-        // const pluginsService = new PluginManager(__dirname, {
-        //     configPath: path.resolve(__dirname, "../config"),
-        //     logger: console,
-        //     broadcast,
-        //     servicesStore,
-        // });
-        // await pluginsService.loadPlugins();
-
         servicesStore.register("sensorLoggingService", sensorLoggingService);
         servicesStore.register("sensorPollingService", sensorPollingService);
         servicesStore.register("sensorWatchingService", watchingService);
         servicesStore.register("homeAssistantService", homeAssistantService);
-        // servicesStore.register('pluginsService', pluginsService);
     });
 
     // 8) Graceful shutdown logic
