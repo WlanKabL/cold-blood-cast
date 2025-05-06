@@ -15,7 +15,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { DataStorageService } from "./storage/dataStorageService.js";
 import configRoutes from "./routes/api/config.routes.js";
 import sensorRoutes from "./routes/api/sensors.routes.js";
-import smartdevicesRoutes from "./routes/api/smartdevices.routes.js";
+import homeAssistantRoutes from "./routes/api/homeAssistant.routes.js";
 import presetRoutes from "./routes/api/presets.routes.js";
 import logRoutes from "./routes/api/logs.routes.js";
 import liveRoutes from "./routes/api/live.routes.js";
@@ -72,7 +72,7 @@ async function bootstrap(): Promise<void> {
     apiRouter.use("/live", liveRoutes);
     apiRouter.use("/auth", authRoutes);
     apiRouter.use("/telegram", telegramRoutes);
-    apiRouter.use("/smartdevices", smartdevicesRoutes);
+    apiRouter.use("/home-assistant", homeAssistantRoutes);
     apiRouter.use("/docs", swaggerUiHandler, swaggerDocsHandler);
     app.get("/api/docs.json", (req, res) => {
         res.json(swaggerSpec);
