@@ -153,7 +153,7 @@ export class DataStorageService {
     }
 
     getRegistrationKeysStore(): FileStore<string[]> {
-        return new FileStore(path.join(this.basePath, "registration.keys.json"), []);
+        return new FileStore(path.join(this.basePath, "registration.keys.json"), ["cold-blood-cast"]);
     }
 
     getUserStore(): FileStore<User[]> {
@@ -161,7 +161,7 @@ export class DataStorageService {
     }
 
     getTelegramRegistrationKeysStore(): FileStore<string[]> {
-        return new FileStore(path.join(this.basePath, "telegram.registration.keys.json"), []);
+        return new FileStore(path.join(this.basePath, "telegram.registration.keys.json"), ["cold-blood-cast"]);
     }
 
     getSubscriberStore(): FileStore<number[]> {
