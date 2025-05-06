@@ -20,7 +20,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
                 <div>
-                    <h2 class="text-2xl font-semibold mb-4 text-indigo-400">
+                    <h2 class="text-2xl font-semibold mb-4 text-emerald-400">
                         📡 Born from Purpose
                     </h2>
                     <p class="text-gray-300 leading-relaxed">
@@ -32,7 +32,7 @@
                 </div>
 
                 <div>
-                    <h2 class="text-2xl font-semibold mb-4 text-indigo-400">
+                    <h2 class="text-2xl font-semibold mb-4 text-emerald-400">
                         🔥 Built for Reliability
                     </h2>
                     <p class="text-gray-300 leading-relaxed">
@@ -44,7 +44,7 @@
                 </div>
 
                 <div>
-                    <h2 class="text-2xl font-semibold mb-4 text-indigo-400">🛠 Powered by Code</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-emerald-400">🛠 Powered by Code</h2>
                     <p class="text-gray-300 leading-relaxed">
                         Written in TypeScript with Express and Vue 3, Cold-Blood-Cast brings modern
                         dev standards to a world of hobby reptile keeping. Real-time sensor data,
@@ -53,7 +53,7 @@
                 </div>
 
                 <div>
-                    <h2 class="text-2xl font-semibold mb-4 text-indigo-400">🎯 The Vision</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-emerald-400">🎯 The Vision</h2>
                     <p class="text-gray-300 leading-relaxed">
                         I want to make terrarium tech smarter and more affordable. This project
                         isn’t just for me – it’s built for anyone who wants to monitor their animals
@@ -66,14 +66,14 @@
             <div class="mt-12 flex justify-center gap-4 flex-wrap">
                 <NuxtLink
                     to="/projects"
-                    class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+                    class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-3 rounded-lg transition-colors"
                 >
                     🚀 View Project Details
                 </NuxtLink>
 
                 <NuxtLink
                     to="/contact"
-                    class="inline-flex items-center gap-2 border border-indigo-400 text-indigo-300 hover:bg-indigo-700/30 font-medium px-6 py-3 rounded-lg transition-all"
+                    class="inline-flex items-center gap-2 border border-emerald-400 text-emerald-300 hover:bg-emerald-700/30 font-medium px-6 py-3 rounded-lg transition-all"
                 >
                     ✉️ Contact Me
                 </NuxtLink>

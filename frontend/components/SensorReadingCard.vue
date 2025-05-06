@@ -3,7 +3,7 @@
         class="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-4 sm:p-6 shadow-lg border border-zinc-700 relative overflow-hidden"
     >
         <div
-            class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 text-xl sm:text-2xl text-indigo-400 opacity-80"
+            class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 text-xl sm:text-2xl text-emerald-400 opacity-80"
         >
             <component :is="iconComponent" />
         </div>
@@ -19,10 +19,10 @@
             </span>
         </div>
         <div class="flex items-baseline space-x-1">
-            <p class="text-2xl sm:text-4xl font-bold text-indigo-400 leading-none">
+            <p class="text-2xl sm:text-4xl font-bold text-emerald-400 leading-none">
                 {{ sensor.reading?.value ?? "—" }}
             </p>
-            <span class="text-sm sm:text-base text-indigo-300">
+            <span class="text-sm sm:text-base text-emerald-300">
                 {{ sensor.reading?.unit }}
             </span>
         </div>
@@ -32,7 +32,7 @@
                     <component
                         :is="ChevronsRightLeft"
                         class="w-4 h-4"
-                        :class="isDay ? 'text-yellow-300' : 'text-indigo-300'"
+                        :class="isDay ? 'text-yellow-300' : 'text-emerald-300'"
                     />
                     <span class="truncate">
                         {{ generalLimits.min ?? "–∞" }}–{{ generalLimits.max ?? "+∞" }}
@@ -45,7 +45,7 @@
                     <component
                         :is="isDay ? SunIcon : MoonIcon"
                         class="w-4 h-4"
-                        :class="isDay ? 'text-yellow-300' : 'text-indigo-300'"
+                        :class="isDay ? 'text-yellow-300' : 'text-emerald-300'"
                     />
                     <span class="truncate">
                         {{ (isDay ? timeBasedLimits.day.min : timeBasedLimits.night.min) ?? "–∞" }}

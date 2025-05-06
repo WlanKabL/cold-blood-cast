@@ -2,7 +2,7 @@
     <div class="container mx-auto px-4 py-8">
         <div v-if="!hideBackButton" class="mb-0">
             <button
-                class="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+                class="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm transition-colors"
                 @click="goBack"
             >
                 <svg

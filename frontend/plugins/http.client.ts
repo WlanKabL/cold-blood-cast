@@ -9,5 +9,15 @@ export default defineNuxtPlugin((nuxtApp) => {
         headers: { "Content-Type": "application/json" },
     });
 
+    http.interceptors.request.use((req) => {
+        if (process.client) {
+            const token = useCookie("auth_token").value;
+            if (token) {
+                req.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return req;
+    });
+
     nuxtApp.provide("http", http);
 });

@@ -14,7 +14,7 @@
                     href="https://www.linkedin.com/in/philipp-stecher-aab167258/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex items-center gap-2 hover:text-indigo-400 transition-colors"
+                    class="flex items-center gap-2 hover:text-emerald-400 transition-colors"
                 >
                     <IconLinkedin class="w-5 h-5" /> LinkedIn
                 </a>
@@ -23,12 +23,12 @@
                     href="https://github.com/WlanKabL"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex items-center gap-2 hover:text-indigo-400 transition-colors"
+                    class="flex items-center gap-2 hover:text-emerald-400 transition-colors"
                 >
                     <IconGithub class="w-5 h-5" /> GitHub
                 </a>
 
-                <p class="flex items-center gap-2 hover:text-indigo-400 transition-colors">
+                <p class="flex items-center gap-2 hover:text-emerald-400 transition-colors">
                     <img src="/discord.svg" alt="Discord" class="w-5 h-5" />
                     wlankabl
                 </p>

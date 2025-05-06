@@ -92,6 +92,15 @@ router.post("/login", (req: Request, res: any) => {
     if (hash !== user.passwordHash) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = generateToken(user);
+
+    // Set the token as a cookie
+    res.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.json({ token });
 });
 
@@ -163,6 +172,15 @@ router.post("/register", (req: Request, res: any) => {
     userStore.add(newUser);
 
     const token = generateToken(newUser);
+
+    // Set the token as a cookie
+    res.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.status(201).json({ token });
 });
 

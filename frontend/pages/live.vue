@@ -1,6 +1,6 @@
 <template>
     <section class="lg:p-8 p-3">
-        <div v-if="isLoading" class="text-indigo-400 animate-pulse">Loading live data...</div>
+        <div v-if="isLoading" class="text-emerald-400 animate-pulse">Loading live data...</div>
 
         <div v-else-if="data" class="grid lg:gap-6 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <SensorReadingCard v-for="(sensor, id) in data" :key="id" :sensor />

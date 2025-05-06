@@ -7,7 +7,7 @@
                 <span>with care & caffeine</span>
             </div>
 
-            <div class="text-zinc-600 hover:text-indigo-400 transition-colors">
+            <div class="text-zinc-600 hover:text-emerald-400 transition-colors">
                 <a
                     href="https://github.com/WlanKabL/cold-blood-cast"
                     target="_blank"

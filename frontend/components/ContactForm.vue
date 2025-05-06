@@ -22,7 +22,7 @@
                 />
                 <button
                     type="submit"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
                 >
                     {{ loading ? "Sending..." : "Send Message" }}
                 </button>
