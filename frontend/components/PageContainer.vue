@@ -22,7 +22,7 @@
                 Back
             </button>
         </div>
-        <div class="bg-[#0D1117] p-6">
+        <div class="p-6">
             <div class="text-center max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
                 <h2 v-if="title" class="text-3xl sm:text-4xl font-bold text-white mb-4">
                     {{ title }}

@@ -3,6 +3,7 @@
         title="🐍 Welcome to Cold-Blood-Cast"
         subtitle="Real-time monitoring & smart terrarium management. Powered by your Raspberry Pi."
         hide-back-button
+        background-image="url('../public/background.png')"
     >
         <div
             v-if="!highlightSensors.length"
@@ -49,6 +50,11 @@ import { useQuery } from "@tanstack/vue-query";
 import type { PublicSensorResponse } from "~/../snake-link-raspberry/src/types/sensor";
 import { liveService } from "~/services/liveService";
 import { useAppConfigStore } from "~/stores/appConfigStore";
+
+definePageMeta({
+    layout: "background",
+    layoutBackgroundImage: "/background.png",
+});
 
 const app = useAppConfigStore();
 

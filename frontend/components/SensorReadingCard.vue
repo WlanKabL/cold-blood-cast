@@ -45,7 +45,7 @@
                     <component
                         :is="isDay ? SunIcon : MoonIcon"
                         class="w-4 h-4"
-                        :class="isDay ? 'text-yellow-300' : 'text-emerald-300'"
+                        :class="isDay ? 'text-yellow-300' : 'text-indigo-300'"
                     />
                     <span class="truncate">
                         {{ (isDay ? timeBasedLimits.day.min : timeBasedLimits.night.min) ?? "–∞" }}

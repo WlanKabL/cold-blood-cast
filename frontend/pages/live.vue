@@ -19,6 +19,11 @@ import { useAppConfigStore } from "~/stores/appConfigStore";
 
 const app = useAppConfigStore();
 
+definePageMeta({
+    layout: "background",
+    layoutBackgroundImage: "/live-background.png",
+});
+
 onMounted(async () => {
     await app.fetchConfig();
 });

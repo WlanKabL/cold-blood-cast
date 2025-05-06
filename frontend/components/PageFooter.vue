@@ -1,29 +1,33 @@
 <template>
-    <footer class="w-full py-8 px-4 text-center text-sm text-zinc-500">
-        <div class="flex flex-col items-center gap-2">
-            <div class="flex items-center gap-2">
-                <span>Made by hand</span>
-                <span class="animate-pulse">🖤</span>
-                <span>with care & caffeine</span>
+    <footer class="w-full px-4 py-8 text-sm text-zinc-400 border-t border-zinc-700 bg-[#0D1117]">
+        <div class="max-w-4xl mx-auto flex flex-col items-center gap-4 text-center">
+            <div class="flex items-center gap-2 text-zinc-500">
+                <span>🦎</span>
+                <span class="text-zinc-300 font-semibold tracking-wide"> Cold-Blood-Cast </span>
+                <span class="text-emerald-500 animate-pulse">●</span>
+                <span>Live from your terrarium</span>
             </div>
 
-            <div class="text-zinc-600 hover:text-emerald-400 transition-colors">
+            <div class="flex flex-wrap justify-center gap-3 text-zinc-500">
+                <NuxtLink to="/sensors" class="hover:text-emerald-400 transition-colors">
+                    Manage Sensors
+                </NuxtLink>
+                <NuxtLink to="/smartdevices" class="hover:text-emerald-400 transition-colors">
+                    Smart Devices
+                </NuxtLink>
                 <a
                     href="https://github.com/WlanKabL/cold-blood-cast"
                     target="_blank"
                     rel="noopener"
+                    class="hover:text-emerald-400 transition-colors"
                 >
-                    → Check the source on GitHub
+                    GitHub
                 </a>
             </div>
 
-            <div class="mt-1 text-xs text-[#161B22] opacity-40 select-none">
-                {{ easteregg }}
-            </div>
+            <p class="text-xs text-zinc-600 mt-2 opacity-60">
+                Made with 🧪 TypeScript, 🐍 love for reptiles, and ☕ lots of caffeine.
+            </p>
         </div>
     </footer>
 </template>
-
-<script setup lang="ts">
-const easteregg = "console.log('</WlanKabL>')";
-</script>
