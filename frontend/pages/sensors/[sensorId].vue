@@ -116,17 +116,17 @@
             <!-- Actions -->
             <div class="flex justify-end gap-2 pt-4">
                 <button
-                    type="submit"
-                    class="px-5 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
-                >
-                    Save
-                </button>
-                <button
                     type="button"
                     class="px-5 py-2 rounded-md bg-gray-300 dark:bg-gray-700 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600 transition"
                     @click="router.back()"
                 >
                     Cancel
+                </button>
+                <button
+                    type="submit"
+                    class="px-5 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
+                >
+                    Save
                 </button>
             </div>
         </form>

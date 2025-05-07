@@ -53,7 +53,7 @@ import { useAppConfigStore } from "~/stores/appConfigStore";
 
 definePageMeta({
     layout: "background",
-    layoutBackgroundImage: "/background.png",
+    layoutBackgroundImage: "/background.jpg",
 });
 
 const app = useAppConfigStore();
