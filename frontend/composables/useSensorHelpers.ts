@@ -53,9 +53,9 @@ export function useSensorHelpers(sensor: Ref<PublicSensorResponse>) {
             case "ok":
                 return "text-green-400";
             case "warning":
-                return "text-yellow-400";
+                return "text-yellow-400 animate-pulse";
             case "unknown":
-                return "text-red-400";
+                return "text-red-400 animate-pulse";
             default:
                 return "text-gray-400";
         }
@@ -66,9 +66,9 @@ export function useSensorHelpers(sensor: Ref<PublicSensorResponse>) {
             case "ok":
                 return "bg-green-600 text-white";
             case "warning":
-                return "bg-yellow-600 text-white";
+                return "bg-yellow-600 text-white animate-pulse";
             case "unknown":
-                return "bg-red-600 text-white";
+                return "bg-red-600 text-white animate-pulse";
             default:
                 return "bg-gray-600 text-white";
         }
