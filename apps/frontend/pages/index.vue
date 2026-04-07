@@ -5,6 +5,7 @@
         hide-back-button
         background-image="url('../public/background.png')"
     >
+        Fütterungstagebuch!
         <div
             v-if="!highlightSensors.length"
             class="bg-zinc-900 border border-zinc-700 text-gray-400 p-6 rounded-2xl text-center shadow-md space-y-3"
