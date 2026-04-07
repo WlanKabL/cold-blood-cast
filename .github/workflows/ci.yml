@@ -1,0 +1,21 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    quality:
+        name: Code Quality
+        uses: ./.github/workflows/quality.yml
+
+    test:
+        name: Tests
+        needs: quality
+        uses: ./.github/workflows/test.yml

@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  salt         String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  permissions  UserPermissions?
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model UserPermissions {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique @map("user_id")
+  isAdmin                Boolean  @default(false) @map("is_admin")
+  viewSensors            String[] @default([]) @map("view_sensors")
+  manageSensors          String[] @default([]) @map("manage_sensors")
+  viewWebcams            Boolean  @default(false) @map("view_webcams")
+  viewPrivateSensors     Boolean  @default(false) @map("view_private_sensors")
+  detectNewSensors       Boolean  @default(false) @map("detect_new_sensors")
+  manageUsers            Boolean  @default(false) @map("manage_users")
+  manageAppConfig        Boolean  @default(false) @map("manage_app_config")
+  useRemoteAccess        Boolean  @default(false) @map("use_remote_access")
+  manageRegistrationKeys Boolean  @default(false) @map("manage_registration_keys")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_permissions")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenId   String   @unique @map("token_id")
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model RegistrationKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("registration_keys")
+}
+
+model SensorLog {
+  id        String   @id @default(uuid())
+  sensorId  String   @map("sensor_id")
+  value     Float?
+  unit      String
+  timestamp DateTime @default(now())
+
+  @@index([sensorId, timestamp])
+  @@map("sensor_logs")
+}
+
+model TelegramSubscriber {
+  id        String   @id @default(uuid())
+  chatId    BigInt   @unique @map("chat_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("telegram_subscribers")
+}
+
+model TelegramRegistrationKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("telegram_registration_keys")
+}

@@ -1,0 +1,28 @@
+{
+    "name": "cold-blood-cast",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "pnpm --filter @cold-blood-cast/* run dev",
+        "dev:frontend": "pnpm --filter @cold-blood-cast/frontend run dev",
+        "dev:backend": "pnpm --filter @cold-blood-cast/backend run dev",
+        "build": "pnpm --filter @cold-blood-cast/shared run build && pnpm --filter @cold-blood-cast/* run build",
+        "build:frontend": "pnpm --filter @cold-blood-cast/frontend run build",
+        "build:backend": "pnpm --filter @cold-blood-cast/backend run build",
+        "build:shared": "pnpm --filter @cold-blood-cast/shared run build",
+        "lint": "pnpm --filter @cold-blood-cast/* run lint",
+        "format": "prettier --check .",
+        "format:fix": "prettier --write .",
+        "types:check": "pnpm --filter @cold-blood-cast/* run types:check",
+        "test": "pnpm --filter @cold-blood-cast/backend run test && pnpm --filter @cold-blood-cast/frontend run test:run",
+        "test:backend": "pnpm --filter @cold-blood-cast/backend run test",
+        "test:frontend": "pnpm --filter @cold-blood-cast/frontend run test:run",
+        "test:coverage": "pnpm --filter @cold-blood-cast/backend run test:coverage && pnpm --filter @cold-blood-cast/frontend run test:coverage",
+        "clean": "pnpm --filter @cold-blood-cast/* exec rm -rf node_modules dist .nuxt .output && rm -rf node_modules"
+    },
+    "engines": {
+        "node": ">=22.0.0",
+        "pnpm": ">=10.0.0"
+    },
+    "packageManager": "pnpm@10.8.1"
+}

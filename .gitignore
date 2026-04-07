@@ -1,8 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,nuxtjs,node,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,nuxtjs,node,dotenv
 
-snake-link-raspberry/data/*
-
 ### dotenv ###
 .env
 
@@ -176,3 +174,12 @@ node_modules
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,nuxtjs,node,dotenv
+
+# ── Project-specific ──
+apps/backend/data/*
+!apps/backend/data/.gitkeep
+apps/backend/src/generated/
+coverage/
+*.lcov
+.output/
+build/

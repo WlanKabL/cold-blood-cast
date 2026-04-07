@@ -1,0 +1,66 @@
+services:
+    postgres:
+        image: postgres:16-alpine
+        container_name: cbc-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-coldblood}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+            POSTGRES_DB: ${POSTGRES_DB:-coldbloodcast}
+        ports:
+            - "${POSTGRES_PORT:-5432}:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER:-coldblood} -d ${POSTGRES_DB:-coldbloodcast}",
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+    backend:
+        build:
+            context: .
+            dockerfile: apps/backend/Dockerfile
+        container_name: cbc-backend
+        restart: unless-stopped
+        depends_on:
+            postgres:
+                condition: service_healthy
+        ports:
+            - "${PORT:-3000}:3000"
+        environment:
+            PORT: 3000
+            NODE_ENV: production
+            DATABASE_URL: postgresql://${POSTGRES_USER:-coldblood}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-coldbloodcast}
+            DATA_DIR: /app/data
+            CORS_ORIGINS: ${CORS_ORIGINS:-*}
+            JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}
+            JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+            PEPPER: ${PEPPER:?PEPPER is required}
+            TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN is required}
+            DISABLE_TELEGRAM_BOT: ${DISABLE_TELEGRAM_BOT:-false}
+            HOME_ASSISTANT_URL: ${HOME_ASSISTANT_URL:-http://homeassistant.local:8123}
+            HOME_ASSISTANT_TOKEN: ${HOME_ASSISTANT_TOKEN:-placeholder}
+        volumes:
+            - backend_data:/app/data
+
+    frontend:
+        build:
+            context: .
+            dockerfile: apps/frontend/Dockerfile
+        container_name: cbc-frontend
+        restart: unless-stopped
+        depends_on:
+            - backend
+        ports:
+            - "${FRONTEND_PORT:-3001}:3000"
+        environment:
+            NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://localhost:3000}
+
+volumes:
+    postgres_data:
+    backend_data:
