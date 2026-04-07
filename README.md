@@ -1,4 +1,3 @@
-
 # 🌿 Smart Terrarium Monitoring System (Node.js + Nuxt 3)
 
 A lightweight, stable and extendable DIY smart monitoring system for a corn snake terrarium.  
@@ -21,14 +20,14 @@ This project is designed to run on a **Raspberry Pi 4B**, but can also be develo
 
 ## 📦 Tech Stack
 
-| Layer | Tech |
-|-------|------|
-| Backend | Node.js (Express) |
-| Frontend | Nuxt 3 |
-| Data Source | JSON file or SurrealDB |
-| Styling | Tailwind CSS |
-| Charts | Chart.js or ECharts |
-| Deployment | systemd / PM2 (no Docker needed) |
+| Layer       | Tech                             |
+| ----------- | -------------------------------- |
+| Backend     | Node.js (Express)                |
+| Frontend    | Nuxt 3                           |
+| Data Source | JSON file or SurrealDB           |
+| Styling     | Tailwind CSS                     |
+| Charts      | Chart.js or ECharts              |
+| Deployment  | systemd / PM2 (no Docker needed) |
 
 ---
 

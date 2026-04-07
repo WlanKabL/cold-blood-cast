@@ -1,11 +1,11 @@
 packages:
-  - apps/frontend
-  - apps/backend
-  - packages/*
+    - apps/frontend
+    - apps/backend
+    - packages/*
 
 ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - '@scarf/scarf'
-  - esbuild
-  - unrs-resolver
-  - vue-demi
+    - "@parcel/watcher"
+    - "@scarf/scarf"
+    - esbuild
+    - unrs-resolver
+    - vue-demi

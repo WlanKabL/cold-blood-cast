@@ -8,7 +8,6 @@ const router = Router();
 const getService = (): HomeAssistantService =>
     servicesStore.get<HomeAssistantService>("homeAssistantService");
 
-
 /**
  * @openapi
  * /api/home-assistant:

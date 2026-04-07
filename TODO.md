@@ -67,9 +67,9 @@
 
 - ✅ Home Assistant sensor polling (via REST API)
 - 🔲 TP-Link Kasa/Tapo API integration (direct, without Home Assistant)
-  - Control heating mats, lamps, foggers via smart plugs
-  - Schedule-based on/off with override from dashboard
-  - Energy monitoring per device
+    - Control heating mats, lamps, foggers via smart plugs
+    - Schedule-based on/off with override from dashboard
+    - Energy monitoring per device
 - 🔲 Device entity (smart plug, sensor, camera) linked to enclosure
 - 🔲 Automation rules engine (if temp < X for Y minutes → turn on heater)
 
@@ -92,8 +92,8 @@
 - 🔲 Data model: each user owns their enclosures, pets, and sensor configs
 - 🔲 Virtual environments (group enclosures + pets into a logical "setup")
 - 🔲 Meta/organization layer (for breeders, shops, rescue orgs)
-  - Org admin can see all environments under their org
-  - Individual users still own their own data
+    - Org admin can see all environments under their org
+    - Individual users still own their own data
 - 🔲 Sharing: invite another user to view (read-only) your environment
 - 🔲 Data export per user/environment (CSV, JSON)
 
@@ -104,9 +104,9 @@
 - 🔲 Feature flag system (enable/disable features per instance or per user)
 - 🔲 Role-based feature access (free tier vs. premium, if SaaS)
 - 🔲 Decide: SaaS hosted vs. self-hosted Raspberry Pi vs. hybrid
-  - SaaS: central server, multi-tenant, subscription model
-  - Raspberry Pi: local install, single-tenant, free
-  - Hybrid: local Pi sends data to central server for remote access
+    - SaaS: central server, multi-tenant, subscription model
+    - Raspberry Pi: local install, single-tenant, free
+    - Hybrid: local Pi sends data to central server for remote access
 - 🔲 Licensing / activation key system (if self-hosted + paid features)
 
 ---

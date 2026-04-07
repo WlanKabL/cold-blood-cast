@@ -6,7 +6,11 @@ export const authenticationService = {
         });
         return data;
     },
-    register: async (username: string, password: string, onetimePassword: string): Promise<void> => {
+    register: async (
+        username: string,
+        password: string,
+        onetimePassword: string,
+    ): Promise<void> => {
         const { data } = await useHttp().post("/api/auth/register", {
             username,
             password,
@@ -20,4 +24,4 @@ export const authenticationService = {
         const { data } = await useHttp().get("/api/auth/user");
         return data;
     },
-}
+};

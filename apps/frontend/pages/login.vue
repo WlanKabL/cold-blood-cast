@@ -29,13 +29,11 @@
 
 <script setup lang="ts">
 definePageMeta({
-    layout: "default"
-})
+    layout: "default",
+});
 
 const username = ref<string>("");
 const password = ref<string>("");
 
-function handleLogin() {
-    
-}
+function handleLogin() {}
 </script>

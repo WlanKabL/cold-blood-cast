@@ -11,7 +11,7 @@ const env = validateEnv(process.env);
 export function enqueueAlert(chatId: number, text: string) {
     queue.add(() => {
         if (env.DISABLE_TELEGRAM_BOT) return;
-        
+
         bot.telegram.sendMessage(chatId, text, { parse_mode: "HTML" }).catch((err) => {
             console.error(`❌ Telegram send to ${chatId} failed:`, err.description || err);
         });
