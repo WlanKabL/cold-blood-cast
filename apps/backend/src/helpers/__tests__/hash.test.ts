@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { hashPassword, verifyPassword, generateSalt } from "../hash.js";
 
 vi.mock("../../config.js", () => ({
-    validateEnv: () => ({
+    env: () => ({
         PEPPER: "a".repeat(32),
     }),
 }));

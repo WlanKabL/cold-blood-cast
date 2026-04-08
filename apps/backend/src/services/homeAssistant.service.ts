@@ -1,11 +1,11 @@
 import axios from "axios";
-import { FileStore } from "../storage/dataStorageService.js";
+import { type FileStore } from "../storage/dataStorageService.js";
 import type { HassDevice } from "@cold-blood-cast/shared";
-import { validateEnv } from "../config.js";
+import { env } from "../config.js";
 
 function getEnv() {
-    const env = validateEnv(process.env);
-    return { url: env.HOME_ASSISTANT_URL, token: env.HOME_ASSISTANT_TOKEN };
+    const { HOME_ASSISTANT_URL: url, HOME_ASSISTANT_TOKEN: token } = env();
+    return { url, token };
 }
 
 export class HomeAssistantService {

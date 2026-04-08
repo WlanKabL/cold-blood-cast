@@ -2,7 +2,7 @@
  * @file Express route to trigger Telegram alerts.
  */
 
-import { Router, Request, NextFunction } from "express";
+import { Router, type Request, type NextFunction } from "express";
 import crypto from "crypto";
 import { broadcastTestMessage } from "../../services/alert.service.js";
 import { DataStorageService } from "../../storage/dataStorageService.js";
@@ -95,7 +95,7 @@ router.post("/generate", authMiddleware, (req: Request, res: any, next: NextFunc
     }
 
     const current = registrationStore.load();
-    const newToken = crypto.randomBytes(6).toString("hex"); // z. B. 12-stellig
+    const newToken = crypto.randomBytes(6).toString("hex");
 
     if (current.includes(newToken)) {
         return next(conflict("Token already exists"));

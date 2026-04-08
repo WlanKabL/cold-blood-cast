@@ -1,4 +1,4 @@
-import { Router, Request, NextFunction } from "express";
+import { Router, type Request, type NextFunction } from "express";
 import crypto from "crypto";
 import { userStore } from "../../stores/userStore.js";
 import type { User } from "@cold-blood-cast/shared";

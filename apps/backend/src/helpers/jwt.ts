@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { validateEnv } from "../config.js";
+import { env } from "../config.js";
 import type { User } from "@cold-blood-cast/shared";
 
 export interface AccessTokenPayload {
@@ -14,31 +14,31 @@ export interface RefreshTokenPayload {
 }
 
 export function signAccessToken(user: User): string {
-    const env = validateEnv(process.env);
+    const { JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRY } = env();
     const payload: AccessTokenPayload = { userId: user.id, username: user.username };
-    return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
-        expiresIn: env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"],
+    return jwt.sign(payload, JWT_ACCESS_SECRET, {
+        expiresIn: JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"],
     });
 }
 
 export function signRefreshToken(user: User): { token: string; tokenId: string } {
-    const env = validateEnv(process.env);
+    const { JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRY } = env();
     const tokenId = crypto.randomUUID();
     const payload: RefreshTokenPayload = { userId: user.id, tokenId };
-    const token = jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-        expiresIn: env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"],
+    const token = jwt.sign(payload, JWT_REFRESH_SECRET, {
+        expiresIn: JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"],
     });
     return { token, tokenId };
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {
-    const env = validateEnv(process.env);
-    return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
+    const { JWT_ACCESS_SECRET } = env();
+    return jwt.verify(token, JWT_ACCESS_SECRET) as AccessTokenPayload;
 }
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
-    const env = validateEnv(process.env);
-    return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
+    const { JWT_REFRESH_SECRET } = env();
+    return jwt.verify(token, JWT_REFRESH_SECRET) as RefreshTokenPayload;
 }
 
 export const REFRESH_COOKIE_NAME = "cold_blood_cast_refresh";

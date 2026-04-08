@@ -1,14 +1,14 @@
 import { PrismaClient } from "../generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { validateEnv } from "../config.js";
+import { env } from "../config.js";
 
-const env = validateEnv(process.env);
-const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
+const { DATABASE_URL, NODE_ENV } = env();
+const adapter = new PrismaPg({ connectionString: DATABASE_URL });
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
-if (env.NODE_ENV !== "production") {
+if (NODE_ENV !== "production") {
     globalForPrisma.prisma = prisma;
 }

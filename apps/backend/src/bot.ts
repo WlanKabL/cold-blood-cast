@@ -3,14 +3,10 @@
  */
 
 import { Telegraf } from "telegraf";
-import * as dotenv from "dotenv";
 import { subscriberService } from "./services/subscriber.service.js";
-import { validateEnv } from "./config.js";
+import { env } from "./config.js";
 
-dotenv.config();
-
-const env = validateEnv(process.env);
-const BOT_TOKEN = env.TELEGRAM_BOT_TOKEN;
+const { TELEGRAM_BOT_TOKEN: BOT_TOKEN } = env();
 
 export const bot = new Telegraf(BOT_TOKEN);
 

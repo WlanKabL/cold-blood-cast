@@ -1,4 +1,4 @@
-import { Request, NextFunction } from "express";
+import { type Request, type NextFunction } from "express";
 import { userStore } from "../stores/userStore.js";
 import { verifyAccessToken } from "../helpers/jwt.js";
 import { unauthorized } from "../helpers/errors.js";

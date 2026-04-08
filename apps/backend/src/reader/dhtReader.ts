@@ -43,7 +43,7 @@ export class DHTReader implements SensorReader {
         }
 
         try {
-            // @ts-ignore – node-dht-sensor ist optional
+            // @ts-expect-error – node-dht-sensor is an optional native dependency
             const mod = await import("node-dht-sensor");
             this.sensorLib = mod.default ?? mod;
             // Some versions require `.initialize()`, uncomment if needed:

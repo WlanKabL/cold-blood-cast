@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, type Request, Response, type NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
 import { notFound, badRequest } from "../../helpers/errors.js";
 

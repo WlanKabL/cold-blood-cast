@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
 import {
     isValidPartialSensorConfig,
@@ -10,8 +10,8 @@ import type { SensorConfig } from "@cold-blood-cast/shared";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { hasPermission, isAdmin } from "../../utils/permissions.js";
 import { servicesStore } from "../../stores/servicesStore.js";
-import { SensorPollingService } from "../../services/sensorPolling.js";
-import { SensorLoggingService } from "../../services/sensorLogging.js";
+import { type SensorPollingService } from "../../services/sensorPolling.js";
+import { type SensorLoggingService } from "../../services/sensorLogging.js";
 import { forbidden, badRequest, notFound } from "../../helpers/errors.js";
 
 const router = Router();

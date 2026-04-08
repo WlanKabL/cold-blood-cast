@@ -1,4 +1,4 @@
-import { WebSocketServer } from "ws";
+import { type WebSocketServer } from "ws";
 
 let wss: WebSocketServer | null = null;
 

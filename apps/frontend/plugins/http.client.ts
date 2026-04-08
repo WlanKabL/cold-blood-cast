@@ -10,7 +10,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     });
 
     http.interceptors.request.use((req) => {
-        if (process.client) {
+        if (import.meta.client) {
             const token = useCookie("auth_token").value;
             if (token) {
                 req.headers.Authorization = `Bearer ${token}`;

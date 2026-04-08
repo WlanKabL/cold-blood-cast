@@ -3,18 +3,18 @@ import type { SensorConfig, SensorReading, SensorStatus } from "@cold-blood-cast
 import { subscriberService } from "./subscriber.service.js";
 import { DataStorageService } from "../storage/dataStorageService.js";
 import { isNight } from "../utils/date.js";
-import { validateEnv } from "../config.js";
+import { env } from "../config.js";
 import { enqueueAlert } from "../alerts/notificationQueue.js";
 import { Markup } from "telegraf";
 import { escapeHtml } from "../utils/html.js";
 
 export async function broadcastStartup() {
-    const env = validateEnv(process.env);
+    const { DATA_DIR } = env();
     const chatIds = subscriberService.getSubscribers();
     if (!chatIds.length) return;
 
     // reload up-to-date config
-    const appConfig = new DataStorageService(env.DATA_DIR).getAppConfigStore().load();
+    const appConfig = new DataStorageService(DATA_DIR).getAppConfigStore().load();
 
     // assemble HTML message
     const html = `
@@ -54,12 +54,12 @@ export async function broadcastAlert(
     status: SensorStatus,
     reading?: SensorReading | null,
 ): Promise<void> {
-    const env = validateEnv(process.env);
+    const { DATA_DIR: dataDir } = env();
     const chatIds = subscriberService.getSubscribers();
     if (!chatIds.length) return;
 
     // reload up-to-date config
-    const appConfig = new DataStorageService(env.DATA_DIR).getAppConfigStore().load();
+    const appConfig = new DataStorageService(dataDir).getAppConfigStore().load();
 
     // escape dynamic pieces
     const safeName = escapeHtml(sensor.name);
@@ -133,12 +133,12 @@ ${limitsHtml}
  * Send a simple test message to all subscribed Telegram chats.
  */
 export async function broadcastTestMessage(): Promise<void> {
-    const env = validateEnv(process.env);
+    const { DATA_DIR } = env();
     const chatIds = subscriberService.getSubscribers();
     if (!chatIds.length) return;
 
     // reload config for timezone etc.
-    const appConfig = new DataStorageService(env.DATA_DIR).getAppConfigStore().load();
+    const appConfig = new DataStorageService(DATA_DIR).getAppConfigStore().load();
 
     const now = new Date().toLocaleString("de-DE", {
         timeZone: appConfig.general.timezone,

@@ -1,4 +1,4 @@
-import { SensorReader } from "./sensorReader.interface.js";
+import { type SensorReader } from "./sensorReader.interface.js";
 import type { SensorConfig, SensorReading } from "@cold-blood-cast/shared";
 
 export class MockReader implements SensorReader {

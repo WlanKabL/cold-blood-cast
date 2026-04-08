@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Request, NextFunction } from "express";
 
 vi.mock("../../config.js", () => ({
-    validateEnv: () => ({
+    env: () => ({
         JWT_ACCESS_SECRET: "test-access-secret-that-is-at-least-32-chars-long",
         JWT_REFRESH_SECRET: "test-refresh-secret-that-is-at-least-32-chars-long",
         JWT_ACCESS_EXPIRY: "15m",

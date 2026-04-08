@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { type NextFunction, type Request, type Response } from "express";
 import { AppError } from "../helpers/errors.js";
 
 export function errorMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction) {

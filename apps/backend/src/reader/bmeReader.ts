@@ -40,7 +40,7 @@ export class BMEReader implements SensorReader {
         }
 
         try {
-            // @ts-ignore – bme280-sensor ist optional
+            // @ts-expect-error – bme280-sensor is an optional native dependency
             const mod = await import("bme280-sensor");
             const BME280 = mod.default ?? mod;
             this.sensorInstance = new BME280({

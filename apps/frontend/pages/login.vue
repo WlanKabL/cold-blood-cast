@@ -1,7 +1,7 @@
 <template>
     <PageContainer title="Login">
         <div class="flex flex-col items-center justify-center h-screen">
-            <form @submit.prevent="handleLogin" class="w-full max-w-sm">
+            <form class="w-full max-w-sm" @submit.prevent="handleLogin">
                 <BaseInput
                     v-model="username"
                     label="Username"

@@ -24,10 +24,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-    layout: false,
-});
-
 defineProps<{
     error: {
         statusCode?: number;
@@ -35,6 +31,10 @@ defineProps<{
         message?: string;
     };
 }>();
+
+definePageMeta({
+    layout: false,
+});
 
 useSeoMeta({
     title: "404 – Page Not Found",

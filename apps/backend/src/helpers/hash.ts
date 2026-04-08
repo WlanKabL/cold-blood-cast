@@ -1,19 +1,13 @@
 import crypto from "crypto";
-import { validateEnv } from "../config.js";
+import { env } from "../config.js";
 
 const ITERATIONS = 100_000;
 const KEY_LENGTH = 128;
 const DIGEST = "sha512";
 
 export function hashPassword(password: string, salt: string): string {
-    const env = validateEnv(process.env);
-    const derivedKey = crypto.pbkdf2Sync(
-        password + env.PEPPER,
-        salt,
-        ITERATIONS,
-        KEY_LENGTH,
-        DIGEST,
-    );
+    const { PEPPER } = env();
+    const derivedKey = crypto.pbkdf2Sync(password + PEPPER, salt, ITERATIONS, KEY_LENGTH, DIGEST);
     return derivedKey.toString("hex");
 }
 

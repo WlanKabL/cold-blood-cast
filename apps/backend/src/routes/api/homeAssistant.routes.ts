@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { servicesStore } from "../../stores/servicesStore.js";
-import { HomeAssistantService } from "../../services/homeAssistant.service.js";
+import { type HomeAssistantService } from "../../services/homeAssistant.service.js";
 
 const router = Router();
 

@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, type Request, Response, type NextFunction } from "express";
 import { DataStorageService } from "../../storage/dataStorageService.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { hasPermission } from "../../utils/permissions.js";

@@ -1,18 +1,17 @@
 /**
  * @file index.ts
- * @description Entry point for the SnakeLink Raspberry backend.
+ * @description Entry point for the Cold Blood Cast backend.
  *              Sets up Express app, WebSocket server, sensor polling,
  *              logging, routes, and graceful shutdown.
  */
 
-import "dotenv/config";
-import express, { Application, Router } from "express";
-import { createServer as createHttpServer, Server as HttpServer } from "http";
+import express, { type Application, Router } from "express";
+import { createServer as createHttpServer, type Server as HttpServer } from "http";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import chalk from "chalk";
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer, type WebSocket } from "ws";
 import { DataStorageService } from "./storage/dataStorageService.js";
 import { prisma } from "./db/client.js";
 import configRoutes from "./routes/api/config.routes.js";
@@ -24,7 +23,7 @@ import liveRoutes from "./routes/api/live.routes.js";
 import healthRoutes from "./routes/health.routes.js";
 import { broadcast } from "./utils/broadcast.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
-import { validateEnv } from "./config.js";
+import { loadEnv } from "./config.js";
 import authRoutes from "./routes/api/auth.routes.js";
 import { swaggerDocsHandler, swaggerSpec, swaggerUiHandler } from "./docs/swagger.js";
 import { SensorPollingService } from "./services/sensorPolling.js";
@@ -47,7 +46,7 @@ import { HomeAssistantService } from "./services/homeAssistant.service.js";
  */
 async function bootstrap(): Promise<void> {
     // 1) Validate and load environment settings
-    const env = validateEnv(process.env);
+    const env = loadEnv();
     const port = env.PORT;
 
     // 2) Create Express app

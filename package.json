@@ -3,17 +3,31 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "pnpm --filter @cold-blood-cast/* run dev",
+        "dev": "docker compose up -d postgres && pnpm --filter @cold-blood-cast/shared run build && pnpm db:generate && pnpm db:push && pnpm --filter @cold-blood-cast/* run dev",
+        "dev:start": "docker compose up -d postgres && pnpm --filter @cold-blood-cast/shared run build && pnpm --filter @cold-blood-cast/* run dev",
+        "dev:apps": "pnpm --filter @cold-blood-cast/* run dev",
         "dev:frontend": "pnpm --filter @cold-blood-cast/frontend run dev",
         "dev:backend": "pnpm --filter @cold-blood-cast/backend run dev",
+        "dev:db": "docker compose up -d postgres",
         "build": "pnpm --filter @cold-blood-cast/shared run build && pnpm --filter @cold-blood-cast/* run build",
         "build:frontend": "pnpm --filter @cold-blood-cast/frontend run build",
         "build:backend": "pnpm --filter @cold-blood-cast/backend run build",
         "build:shared": "pnpm --filter @cold-blood-cast/shared run build",
         "lint": "pnpm --filter @cold-blood-cast/* run lint",
+        "lint:fix": "pnpm --filter @cold-blood-cast/* run lint:fix",
         "format": "prettier --check .",
         "format:fix": "prettier --write .",
         "types:check": "pnpm --filter @cold-blood-cast/* run types:check",
+        "db:generate": "pnpm --filter @cold-blood-cast/backend run db:generate",
+        "db:migrate": "pnpm --filter @cold-blood-cast/backend run db:migrate",
+        "db:migrate:deploy": "pnpm --filter @cold-blood-cast/backend run db:migrate:deploy",
+        "db:push": "pnpm --filter @cold-blood-cast/backend run db:push",
+        "db:seed": "pnpm --filter @cold-blood-cast/backend run db:seed",
+        "db:studio": "pnpm --filter @cold-blood-cast/backend run db:studio",
+        "db:reset": "pnpm --filter @cold-blood-cast/backend run db:reset",
+        "db:setup": "pnpm --filter @cold-blood-cast/backend run db:setup",
+        "docker:up": "docker compose up -d",
+        "docker:down": "docker compose down",
         "test": "pnpm --filter @cold-blood-cast/backend run test && pnpm --filter @cold-blood-cast/frontend run test:run",
         "test:backend": "pnpm --filter @cold-blood-cast/backend run test",
         "test:frontend": "pnpm --filter @cold-blood-cast/frontend run test:run",
@@ -25,6 +39,16 @@
         "pnpm": ">=10.0.0"
     },
     "packageManager": "pnpm@10.8.1",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@parcel/watcher",
+            "@prisma/client",
+            "@prisma/engines",
+            "esbuild",
+            "prisma",
+            "unrs-resolver"
+        ]
+    },
     "devDependencies": {
         "prettier": "^3.8.1"
     }

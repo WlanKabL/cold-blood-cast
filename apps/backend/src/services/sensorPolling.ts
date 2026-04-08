@@ -1,6 +1,6 @@
 // src/services/SensorPollingService.ts
 import chalk from "chalk";
-import { FileStore } from "../storage/dataStorageService.js";
+import { type FileStore } from "../storage/dataStorageService.js";
 import { getReaderForSensor } from "../reader/readerFactory.js";
 import type { SensorConfig, SensorReading, AppConfig } from "@cold-blood-cast/shared";
 

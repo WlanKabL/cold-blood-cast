@@ -2,7 +2,7 @@
  * @file Express route to trigger Telegram alerts.
  */
 
-import { Router, Request, NextFunction } from "express";
+import { Router, type Request, type NextFunction } from "express";
 import { broadcastAlert } from "../../services/alert.service.js";
 import type { SensorConfig } from "@cold-blood-cast/shared";
 import { DataStorageService } from "../../storage/dataStorageService.js";

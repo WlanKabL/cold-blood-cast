@@ -25,7 +25,8 @@ const KNOWN_I2C_SENSORS: Record<number, { name: string; id: string; type: string
  * @returns {Promise<DetectedSensor[]>}
  */
 export async function detectI2CSensors(): Promise<DetectedSensor[]> {
-    // @ts-ignore – i2c-bus ist optional
+    // @ts-expect-error – i2c-bus is an optional native dependency
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const i2c = require("i2c-bus");
 
     try {
