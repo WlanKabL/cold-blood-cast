@@ -5,7 +5,7 @@ services:
         restart: unless-stopped
         environment:
             POSTGRES_USER: ${POSTGRES_USER:-coldblood}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coldblood}
             POSTGRES_DB: ${POSTGRES_DB:-coldbloodcast}
         ports:
             - "${POSTGRES_PORT:-5432}:5432"
@@ -22,6 +22,7 @@ services:
             retries: 5
 
     backend:
+        profiles: [deploy]
         build:
             context: .
             dockerfile: apps/backend/Dockerfile
@@ -35,13 +36,13 @@ services:
         environment:
             PORT: 3000
             NODE_ENV: production
-            DATABASE_URL: postgresql://${POSTGRES_USER:-coldblood}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-coldbloodcast}
+            DATABASE_URL: postgresql://${POSTGRES_USER:-coldblood}:${POSTGRES_PASSWORD:-coldblood}@postgres:5432/${POSTGRES_DB:-coldbloodcast}
             DATA_DIR: /app/data
             CORS_ORIGINS: ${CORS_ORIGINS:-*}
-            JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}
-            JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
-            PEPPER: ${PEPPER:?PEPPER is required}
-            TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN is required}
+            JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+            JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+            PEPPER: ${PEPPER}
+            TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
             DISABLE_TELEGRAM_BOT: ${DISABLE_TELEGRAM_BOT:-false}
             HOME_ASSISTANT_URL: ${HOME_ASSISTANT_URL:-http://homeassistant.local:8123}
             HOME_ASSISTANT_TOKEN: ${HOME_ASSISTANT_TOKEN:-placeholder}
@@ -49,6 +50,7 @@ services:
             - backend_data:/app/data
 
     frontend:
+        profiles: [deploy]
         build:
             context: .
             dockerfile: apps/frontend/Dockerfile
