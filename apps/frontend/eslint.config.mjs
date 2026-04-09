@@ -3,11 +3,14 @@ import withNuxt from "./.nuxt/eslint.config.mjs";
 
 export default withNuxt(
     {
-        ignores: ["coverage/**"],
+        ignores: ["e2e-coverage/**", "playwright-report/**", "test-results/**", "coverage/**"],
     },
     {
         rules: {
+            // Vue 3 supports multiple template roots (fragments) — this is a Vue 2 rule
             "vue/no-multiple-template-root": "off",
+
+            // Enforce code quality
             eqeqeq: ["error", "always", { null: "ignore" }],
             "no-var": "error",
             "prefer-const": "error",
@@ -19,6 +22,8 @@ export default withNuxt(
                 "warn",
                 { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
             ],
+
+            // Vue best practices
             "vue/component-name-in-template-casing": ["error", "PascalCase"],
             "vue/define-macros-order": [
                 "warn",

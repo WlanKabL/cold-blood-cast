@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* ─── Light Mode (default) ────────────────────────────────── */
+:root {
+    --cbc-base: #fafafa;
+    --cbc-surface: #ffffff;
+    --cbc-surface-alt: #f4f4f5;
+    --cbc-line: #e4e4e7;
+    --cbc-fg: #18181b;
+    --cbc-fg-muted: #71717a;
+    --cbc-fg-soft: #a1a1aa;
+    --cbc-overlay: rgba(0, 0, 0, 0.5);
+    --cbc-sidebar-bg: rgba(255, 255, 255, 0.9);
+    --cbc-sidebar-border: #e4e4e7;
+    --cbc-topbar-bg: rgba(255, 255, 255, 0.7);
+    --cbc-card-bg: #ffffff;
+    --cbc-card-border: #e4e4e7;
+    --cbc-input-bg: #f4f4f5;
+    --cbc-input-border: #d4d4d8;
+    --cbc-input-focus: #10b981;
+    --cbc-hover: rgba(0, 0, 0, 0.04);
+    --cbc-active: rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Dark Mode ───────────────────────────────────────────── */
+.dark {
+    --cbc-base: #0a0a0a;
+    --cbc-surface: #111111;
+    --cbc-surface-alt: #1a1a1a;
+    --cbc-line: rgba(255, 255, 255, 0.1);
+    --cbc-fg: #fafafa;
+    --cbc-fg-muted: #a1a1aa;
+    --cbc-fg-soft: #71717a;
+    --cbc-overlay: rgba(0, 0, 0, 0.7);
+    --cbc-sidebar-bg: rgba(0, 0, 0, 0.8);
+    --cbc-sidebar-border: rgba(255, 255, 255, 0.1);
+    --cbc-topbar-bg: rgba(0, 0, 0, 0.6);
+    --cbc-card-bg: #111111;
+    --cbc-card-border: rgba(255, 255, 255, 0.1);
+    --cbc-input-bg: #1a1a1a;
+    --cbc-input-border: rgba(255, 255, 255, 0.15);
+    --cbc-input-focus: #10b981;
+    --cbc-hover: rgba(255, 255, 255, 0.05);
+    --cbc-active: rgba(255, 255, 255, 0.1);
+}
+
+/* ─── Tailwind v4 Theme Registration ──────────────────────── */
+@theme {
+    /* Brand — Emerald */
+    --color-brand-50: #ecfdf5;
+    --color-brand-100: #d1fae5;
+    --color-brand-200: #a7f3d0;
+    --color-brand-300: #6ee7b7;
+    --color-brand-400: #34d399;
+    --color-brand-500: #10b981;
+    --color-brand-600: #059669;
+    --color-brand-700: #047857;
+    --color-brand-800: #065f46;
+    --color-brand-900: #064e3b;
+    --color-brand-950: #022c22;
+
+    /* Semantic surface tokens */
+    --color-base: var(--cbc-base);
+    --color-surface: var(--cbc-surface);
+    --color-surface-alt: var(--cbc-surface-alt);
+    --color-line: var(--cbc-line);
+    --color-fg: var(--cbc-fg);
+    --color-fg-muted: var(--cbc-fg-muted);
+    --color-fg-soft: var(--cbc-fg-soft);
+    --color-overlay: var(--cbc-overlay);
+
+    /* Component tokens */
+    --color-sidebar-bg: var(--cbc-sidebar-bg);
+    --color-sidebar-border: var(--cbc-sidebar-border);
+    --color-topbar-bg: var(--cbc-topbar-bg);
+    --color-card-bg: var(--cbc-card-bg);
+    --color-card-border: var(--cbc-card-border);
+    --color-input-bg: var(--cbc-input-bg);
+    --color-input-border: var(--cbc-input-border);
+    --color-input-focus: var(--cbc-input-focus);
+    --color-hover: var(--cbc-hover);
+    --color-active: var(--cbc-active);
+
+    /* Status colors */
+    --color-success: #10b981;
+    --color-danger: #ef4444;
+    --color-warning: #f59e0b;
+    --color-info: #3b82f6;
+
+    /* Animations */
+    --animate-fade-in-up: fade-in-up 0.5s ease-out both;
+    --animate-shimmer: shimmer 2s infinite;
+}
+
+/* ─── Keyframes ───────────────────────────────────────────── */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ─── Utilities ───────────────────────────────────────────── */
+@utility glass-card {
+    background: var(--cbc-card-bg);
+    border: 1px solid var(--cbc-card-border);
+    border-radius: 0.75rem;
+    backdrop-filter: blur(12px);
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--cbc-fg-soft);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cbc-fg-muted);
+}
+
+/* ─── Selection ───────────────────────────────────────────── */
+::selection {
+    background: rgba(16, 185, 129, 0.3);
+    color: currentColor;
+}
+
+/* ─── Focus ring for input elements ───────────────────────── */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--cbc-input-focus);
+    outline-offset: -1px;
+}

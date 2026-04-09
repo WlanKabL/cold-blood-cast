@@ -13,6 +13,7 @@
     "proseWrap": "preserve",
     "endOfLine": "lf",
     "embeddedLanguageFormatting": "auto",
+    "plugins": ["prettier-plugin-tailwindcss"],
     "overrides": [
         {
             "files": "*.json",

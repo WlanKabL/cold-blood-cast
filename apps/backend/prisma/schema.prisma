@@ -1,89 +1,831 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
+
+// ==========================================
+// User & Auth
+// ==========================================
 
 model User {
-  id           String   @id @default(uuid())
-  username     String   @unique
-  passwordHash String   @map("password_hash")
-  salt         String
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+    id           String   @id @default(cuid())
+    username     String   @unique
+    email        String   @unique
+    passwordHash String   @map("password_hash")
+    displayName  String?  @map("display_name")
+    avatarUrl    String?  @map("avatar_url")
+    banned       Boolean  @default(false)
+    bannedAt     DateTime? @map("banned_at")
+    bannedBy     String?  @map("banned_by")
+    bannedReason String?  @map("banned_reason")
+    approved     Boolean  @default(true)
+    lastActiveAt DateTime? @map("last_active_at")
 
-  permissions  UserPermissions?
-  refreshTokens RefreshToken[]
+    // ── Email verification ───────────────────────
+    emailVerified              Boolean   @default(false) @map("email_verified")
+    verificationCode           String?   @map("verification_code")
+    verificationCodeExpiresAt  DateTime? @map("verification_code_expires_at")
 
-  @@map("users")
-}
+    // ── Password reset ───────────────────────────
+    resetToken                 String?   @map("reset_token")
+    resetTokenExpiresAt        DateTime? @map("reset_token_expires_at")
 
-model UserPermissions {
-  id                     String   @id @default(uuid())
-  userId                 String   @unique @map("user_id")
-  isAdmin                Boolean  @default(false) @map("is_admin")
-  viewSensors            String[] @default([]) @map("view_sensors")
-  manageSensors          String[] @default([]) @map("manage_sensors")
-  viewWebcams            Boolean  @default(false) @map("view_webcams")
-  viewPrivateSensors     Boolean  @default(false) @map("view_private_sensors")
-  detectNewSensors       Boolean  @default(false) @map("detect_new_sensors")
-  manageUsers            Boolean  @default(false) @map("manage_users")
-  manageAppConfig        Boolean  @default(false) @map("manage_app_config")
-  useRemoteAccess        Boolean  @default(false) @map("use_remote_access")
-  manageRegistrationKeys Boolean  @default(false) @map("manage_registration_keys")
+    // ── Account deletion ─────────────────────────
+    deleteToken                String?   @map("delete_token")
+    deleteTokenExpiresAt       DateTime? @map("delete_token_expires_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // ── Onboarding ───────────────────────────────
+    onboardingCompleted        Boolean   @default(false) @map("onboarding_completed")
 
-  @@map("user_permissions")
+    // ── Email Preferences ────────────────────────
+    weeklyReportEnabled        Boolean   @default(false) @map("weekly_report_enabled")
+    weeklyReportDecidedAt      DateTime? @map("weekly_report_decided_at")
+
+    // ── User Preferences ─────────────────────────
+    locale                     String    @default("de") @db.VarChar(5)
+
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    // ── Relations ────────────────────────────────
+    roles                   UserRole[]
+    featureFlags            UserFeatureFlag[]
+    limitOverrides          UserLimitOverride[]
+    apiKeys                 ApiKey[]
+    refreshTokens           RefreshToken[]
+    subscription            Subscription?
+    emailLogs               EmailLog[]
+    unsubscribeTokens       UnsubscribeToken[]
+    legalDocumentEdits      LegalDocument[]       @relation("LegalDocumentUpdater")
+    dataExports             DataExport[]
+    cookieConsents          CookieConsent[]
+    loginSessions           LoginSession[]
+    uploads                 Upload[]
+
+    // ── CBC Domain Relations ─────────────────────
+    enclosures              Enclosure[]
+    pets                    Pet[]
+    sensors                 Sensor[]
+    homeAssistantConfigs    HomeAssistantConfig[]
+    alertRules              AlertRule[]
+
+    @@map("users")
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  tokenId   String   @unique @map("token_id")
-  userId    String   @map("user_id")
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
+    id        String   @id @default(cuid())
+    userId    String   @map("user_id")
+    revoked   Boolean  @default(false)
+    expiresAt DateTime @map("expires_at")
+    createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@map("refresh_tokens")
+    @@index([userId])
+    @@map("refresh_tokens")
 }
 
-model RegistrationKey {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
+// ==========================================
+// Roles & Permissions
+// ==========================================
 
-  @@map("registration_keys")
+model Role {
+    id          String  @id @default(cuid())
+    name        String  @unique
+    displayName String  @map("display_name")
+    description String?
+    color       String? @default("#6b7280")
+    isSystem    Boolean @default(false) @map("is_system")
+    priority    Int     @default(0)
+    showBadge   Boolean @default(false) @map("show_badge")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    users        UserRole[]
+    featureFlags RoleFeatureFlag[]
+    limits       RoleLimit[]
+
+    @@map("roles")
 }
 
-model SensorLog {
-  id        String   @id @default(uuid())
-  sensorId  String   @map("sensor_id")
-  value     Float?
-  unit      String
-  timestamp DateTime @default(now())
+model UserRole {
+    id        String   @id @default(cuid())
+    userId    String   @map("user_id")
+    roleId    String   @map("role_id")
+    grantedBy String?  @map("granted_by")
+    grantedAt DateTime @default(now()) @map("granted_at")
 
-  @@index([sensorId, timestamp])
-  @@map("sensor_logs")
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, roleId])
+    @@map("user_roles")
 }
+
+// ==========================================
+// Feature Flags
+// ==========================================
+
+model FeatureFlag {
+    id          String  @id @default(cuid())
+    key         String  @unique
+    name        String
+    description String?
+    category    String  @default("general")
+    enabled     Boolean @default(true)
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    roleFlags RoleFeatureFlag[]
+    userFlags UserFeatureFlag[]
+
+    @@map("feature_flags")
+}
+
+model RoleFeatureFlag {
+    id            String  @id @default(cuid())
+    roleId        String  @map("role_id")
+    featureFlagId String  @map("feature_flag_id")
+    enabled       Boolean @default(true)
+
+    role        Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    featureFlag FeatureFlag @relation(fields: [featureFlagId], references: [id], onDelete: Cascade)
+
+    @@unique([roleId, featureFlagId])
+    @@map("role_feature_flags")
+}
+
+model UserFeatureFlag {
+    id            String  @id @default(cuid())
+    userId        String  @map("user_id")
+    featureFlagId String  @map("feature_flag_id")
+    enabled       Boolean @default(true)
+    grantedBy     String? @map("granted_by")
+
+    createdAt DateTime @default(now()) @map("created_at")
+
+    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    featureFlag FeatureFlag @relation(fields: [featureFlagId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, featureFlagId])
+    @@map("user_feature_flags")
+}
+
+// ==========================================
+// Limits (per Role / per User override)
+// ==========================================
+
+model RoleLimit {
+    id     String @id @default(cuid())
+    roleId String @map("role_id")
+    key    String
+    value  Int
+
+    role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@unique([roleId, key])
+    @@map("role_limits")
+}
+
+model UserLimitOverride {
+    id        String  @id @default(cuid())
+    userId    String  @map("user_id")
+    key       String
+    value     Int
+    grantedBy String? @map("granted_by")
+
+    createdAt DateTime @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, key])
+    @@map("user_limit_overrides")
+}
+
+// ==========================================
+// Audit Log
+// ==========================================
+
+model AuditLog {
+    id        String   @id @default(cuid())
+    userId    String?  @map("user_id")
+    action    String
+    entity    String?
+    entityId  String?  @map("entity_id")
+    details   Json?
+    ipAddress String?  @map("ip_address")
+
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@index([userId])
+    @@index([action])
+    @@index([createdAt])
+    @@map("audit_logs")
+}
+
+// ==========================================
+// System Settings (key-value config)
+// ==========================================
+
+model SystemSetting {
+    id    String @id @default(cuid())
+    key   String @unique
+    value String
+
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("system_settings")
+}
+
+// ==========================================
+// Invite Codes
+// ==========================================
+
+model InviteCode {
+    id        String    @id @default(cuid())
+    code      String    @unique
+    createdBy String    @map("created_by")
+    label     String?
+    maxUses   Int       @default(1) @map("max_uses")
+    uses      Int       @default(0)
+    expiresAt DateTime? @map("expires_at")
+    active    Boolean   @default(true)
+
+    createdAt DateTime @default(now()) @map("created_at")
+
+    usages InviteCodeUse[]
+
+    @@index([code])
+    @@index([active])
+    @@map("invite_codes")
+}
+
+model InviteCodeUse {
+    id           String   @id @default(cuid())
+    inviteCodeId String   @map("invite_code_id")
+    userId       String   @map("user_id")
+    usedAt       DateTime @default(now()) @map("used_at")
+
+    inviteCode InviteCode @relation(fields: [inviteCodeId], references: [id], onDelete: Cascade)
+
+    @@index([inviteCodeId])
+    @@map("invite_code_uses")
+}
+
+// ==========================================
+// Access Requests (invite-only mode)
+// ==========================================
+
+model AccessRequest {
+    id         String    @id @default(cuid())
+    email      String
+    reason     String?
+    status     String    @default("pending")
+    reviewedBy String?   @map("reviewed_by")
+    reviewedAt DateTime? @map("reviewed_at")
+    createdAt  DateTime  @default(now()) @map("created_at")
+
+    @@index([status])
+    @@index([email])
+    @@map("access_requests")
+}
+
+// ==========================================
+// Announcements
+// ==========================================
+
+model Announcement {
+    id           String    @id @default(cuid())
+    title        String
+    content      String
+    type         String    @default("info")
+    global       Boolean   @default(true)
+    targetUserId String?   @map("target_user_id")
+    active       Boolean   @default(true)
+    startsAt     DateTime? @map("starts_at")
+    expiresAt    DateTime? @map("expires_at")
+    createdBy    String    @map("created_by")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    readBy AnnouncementRead[]
+
+    @@index([active, global])
+    @@map("announcements")
+}
+
+model AnnouncementRead {
+    id             String   @id @default(cuid())
+    announcementId String   @map("announcement_id")
+    userId         String   @map("user_id")
+    readAt         DateTime @default(now()) @map("read_at")
+
+    announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+    @@unique([announcementId, userId])
+    @@map("announcement_reads")
+}
+
+// ==========================================
+// Subscriptions (optional)
+// ==========================================
+
+model Subscription {
+    id                   String    @id @default(cuid())
+    userId               String    @unique @map("user_id")
+    stripeCustomerId     String?   @unique @map("stripe_customer_id")
+    stripeSubscriptionId String?   @unique @map("stripe_subscription_id")
+    stripePriceId        String?   @map("stripe_price_id")
+    plan                 String    @default("free")
+    status               String    @default("active")
+    currentPeriodStart   DateTime? @map("current_period_start")
+    currentPeriodEnd     DateTime? @map("current_period_end")
+    cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("subscriptions")
+}
+
+// ==========================================
+// API Keys
+// ==========================================
+
+model ApiKey {
+    id        String    @id @default(cuid())
+    userId    String    @map("user_id")
+    name      String
+    keyHash   String    @map("key_hash")
+    prefix    String
+    scopes    String[]  @default(["read"])
+    lastUsedAt DateTime? @map("last_used_at")
+    expiresAt  DateTime? @map("expires_at")
+    revoked   Boolean   @default(false)
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([keyHash])
+    @@map("api_keys")
+}
+
+// ==========================================
+// Email Log
+// ==========================================
+
+model EmailLog {
+    id       String @id @default(cuid())
+    to       String
+    userId   String? @map("user_id")
+    template String
+    subject  String
+    status   String @default("sent")
+    sentBy   String? @map("sent_by")
+    error    String?
+    sentAt   DateTime @default(now()) @map("sent_at")
+
+    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([userId])
+    @@index([template])
+    @@index([sentAt])
+    @@map("email_logs")
+}
+
+// ==========================================
+// Email Unsubscribe Tokens
+// ==========================================
+
+model UnsubscribeToken {
+    id        String   @id @default(cuid())
+    userId    String   @map("user_id")
+    token     String   @unique
+    type      String
+    used      Boolean  @default(false)
+    usedAt    DateTime? @map("used_at")
+    expiresAt DateTime @map("expires_at")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([token])
+    @@map("unsubscribe_tokens")
+}
+
+// ==========================================
+// Legal Documents (admin-managed)
+// ==========================================
+
+model LegalDocument {
+    id          String   @id @default(cuid())
+    key         String   @unique
+    title       String
+    titleDe     String   @map("title_de")
+    content     String   @db.Text
+    contentDe   String   @map("content_de") @db.Text
+    metadata    Json?
+    isPublished Boolean  @default(false) @map("is_published")
+    sortOrder   Int      @default(0) @map("sort_order")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+    updatedBy   String?  @map("updated_by")
+
+    updater User? @relation("LegalDocumentUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+    @@map("legal_documents")
+}
+
+// ==========================================
+// GDPR Data Exports (Art. 15/20)
+// ==========================================
+
+model DataExport {
+    id        String   @id @default(cuid())
+    userId    String   @map("user_id")
+    status    String   @default("pending")
+    filePath  String?  @map("file_path")
+    token     String?  @unique
+    expiresAt DateTime? @map("expires_at")
+    error     String?
+    createdAt DateTime @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([token])
+    @@map("data_exports")
+}
+
+// ==========================================
+// Login Sessions (device tracking)
+// ==========================================
+
+model LoginSession {
+    id          String   @id @default(cuid())
+    userId      String   @map("user_id")
+    ipAddress   String   @map("ip_address")
+    userAgent   String   @map("user_agent")
+    fingerprint String
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, fingerprint])
+    @@map("login_sessions")
+}
+
+// ==========================================
+// Cookie Consent (GDPR audit trail)
+// ==========================================
+
+model CookieConsent {
+    id        String   @id @default(cuid())
+    userId    String   @map("user_id")
+    analytics Boolean  @default(false)
+    version   Int
+    createdAt DateTime @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@map("cookie_consents")
+}
+
+// ==========================================
+// Cron Job Logs
+// ==========================================
+
+model CronJobLog {
+    id        String   @id @default(cuid())
+    jobName   String   @map("job_name")
+    status    String
+    attempts  Int      @default(1)
+    details   Json?
+    error     String?
+
+    startedAt DateTime  @map("started_at")
+    endedAt   DateTime? @map("ended_at")
+
+    @@index([jobName, startedAt])
+    @@map("cron_job_logs")
+}
+
+// ==========================================
+// CBC Domain: Enums
+// ==========================================
+
+enum EnclosureType {
+    TERRARIUM
+    VIVARIUM
+    AQUARIUM
+    PALUDARIUM
+    RACK
+    OTHER
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    UNKNOWN
+}
+
+enum SensorType {
+    TEMPERATURE
+    HUMIDITY
+    PRESSURE
+    WATER
+}
+
+enum AlertCondition {
+    ABOVE
+    BELOW
+    OUTSIDE_RANGE
+}
+
+// ==========================================
+// Uploads
+// ==========================================
+
+model Upload {
+    id              String   @id @default(cuid())
+    userId          String   @map("user_id")
+    url             String
+    caption         String?
+    allowedUserIds  String[] @map("allowed_user_ids")
+
+    createdAt       DateTime @default(now()) @map("created_at")
+    updatedAt       DateTime @updatedAt @map("updated_at")
+
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("uploads")
+}
+
+// ==========================================
+// CBC Domain: Enclosures (Terrarien)
+// ==========================================
+
+model Enclosure {
+    id          String        @id @default(cuid())
+    userId      String        @map("user_id")
+    name        String
+    type        EnclosureType @default(TERRARIUM)
+    species     String?
+    description String?
+    imageUrl    String?       @map("image_url")
+    lengthCm    Int?          @map("length_cm")
+    widthCm     Int?          @map("width_cm")
+    heightCm    Int?          @map("height_cm")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    pets    Pet[]
+    sensors Sensor[]
+
+    @@index([userId])
+    @@map("enclosures")
+}
+
+// ==========================================
+// CBC Domain: Pets (Tiere)
+// ==========================================
+
+model Pet {
+    id              String    @id @default(cuid())
+    userId          String    @map("user_id")
+    enclosureId     String?   @map("enclosure_id")
+    name            String
+    species         String
+    morph           String?
+    gender          Gender    @default(UNKNOWN)
+    birthDate       DateTime? @map("birth_date")
+    acquisitionDate DateTime? @map("acquisition_date")
+    notes           String?
+    imageUrl        String?   @map("image_url")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    enclosure     Enclosure?      @relation(fields: [enclosureId], references: [id], onDelete: SetNull)
+    feedings      Feeding[]
+    sheddings     Shedding[]
+    weightRecords WeightRecord[]
+    husbandryNotes HusbandryNote[] @relation("PetNotes")
+
+    @@index([userId])
+    @@index([enclosureId])
+    @@map("pets")
+}
+
+// ==========================================
+// CBC Domain: Feeding Log
+// ==========================================
+
+model Feeding {
+    id        String   @id @default(cuid())
+    petId     String   @map("pet_id")
+    fedAt     DateTime @map("fed_at")
+    foodType  String   @map("food_type")
+    foodSize  String?  @map("food_size")
+    quantity  Int      @default(1)
+    accepted  Boolean  @default(true)
+    notes     String?
+    createdAt DateTime @default(now()) @map("created_at")
+
+    pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+    @@index([petId, fedAt])
+    @@map("feedings")
+}
+
+// ==========================================
+// CBC Domain: Shedding Log
+// ==========================================
+
+model Shedding {
+    id          String    @id @default(cuid())
+    petId       String    @map("pet_id")
+    startedAt   DateTime  @map("started_at")
+    completedAt DateTime? @map("completed_at")
+    complete    Boolean   @default(false)
+    quality     String?
+    notes       String?
+    createdAt   DateTime  @default(now()) @map("created_at")
+
+    pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+    @@index([petId, startedAt])
+    @@map("sheddings")
+}
+
+// ==========================================
+// CBC Domain: Weight Tracking
+// ==========================================
+
+model WeightRecord {
+    id          String   @id @default(cuid())
+    petId       String   @map("pet_id")
+    measuredAt  DateTime @map("measured_at")
+    weightGrams Float    @map("weight_grams")
+    notes       String?
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+    @@index([petId, measuredAt])
+    @@map("weight_records")
+}
+
+// ==========================================
+// CBC Domain: Husbandry Notes
+// ==========================================
+
+model HusbandryNote {
+    id          String   @id @default(cuid())
+    petId       String?  @map("pet_id")
+    type        String
+    title       String
+    content     String?
+    occurredAt  DateTime @map("occurred_at")
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    pet Pet? @relation("PetNotes", fields: [petId], references: [id], onDelete: Cascade)
+
+    @@index([petId])
+    @@map("husbandry_notes")
+}
+
+// ==========================================
+// CBC Domain: Sensors & Readings
+// ==========================================
+
+model Sensor {
+    id                    String     @id @default(cuid())
+    userId                String     @map("user_id")
+    enclosureId           String?    @map("enclosure_id")
+    name                  String
+    type                  SensorType
+    unit                  String
+    homeAssistantEntityId String?    @map("ha_entity_id")
+    limitsJson            Json?      @map("limits_json")
+    active                Boolean    @default(true)
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    enclosure Enclosure? @relation(fields: [enclosureId], references: [id], onDelete: SetNull)
+    readings  SensorReading[]
+    alerts    AlertRule[]
+
+    @@index([userId])
+    @@index([enclosureId])
+    @@map("sensors")
+}
+
+model SensorReading {
+    id         String   @id @default(cuid())
+    sensorId   String   @map("sensor_id")
+    value      Float?
+    recordedAt DateTime @map("recorded_at")
+
+    sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+    @@index([sensorId, recordedAt])
+    @@map("sensor_readings")
+}
+
+// ==========================================
+// CBC Domain: Home Assistant Config
+// ==========================================
+
+model HomeAssistantConfig {
+    id        String  @id @default(cuid())
+    userId    String  @map("user_id")
+    url       String
+    token     String
+    active    Boolean @default(true)
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@map("home_assistant_configs")
+}
+
+// ==========================================
+// CBC Domain: Alert Rules
+// ==========================================
+
+model AlertRule {
+    id              String         @id @default(cuid())
+    userId          String         @map("user_id")
+    sensorId        String         @map("sensor_id")
+    condition       AlertCondition
+    threshold       Float?
+    thresholdLow    Float?         @map("threshold_low")
+    thresholdHigh   Float?         @map("threshold_high")
+    cooldownMinutes Int            @default(30) @map("cooldown_minutes")
+    enabled         Boolean        @default(true)
+    lastTriggeredAt DateTime?      @map("last_triggered_at")
+    createdAt       DateTime       @default(now()) @map("created_at")
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+    @@index([sensorId])
+    @@map("alert_rules")
+}
+
+// ==========================================
+// CBC Domain: Presets (system-wide)
+// ==========================================
+
+model Preset {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    species     String
+    description String?
+    sensorsJson Json     @map("sensors_json")
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    @@map("presets")
+}
+
+// ==========================================
+// CBC Domain: Telegram
+// ==========================================
 
 model TelegramSubscriber {
-  id        String   @id @default(uuid())
-  chatId    BigInt   @unique @map("chat_id")
-  createdAt DateTime @default(now()) @map("created_at")
+    id        String   @id @default(cuid())
+    chatId    BigInt   @unique @map("chat_id")
+    userId    String?  @map("user_id")
+    createdAt DateTime @default(now()) @map("created_at")
 
-  @@map("telegram_subscribers")
+    @@map("telegram_subscribers")
 }
 
 model TelegramRegistrationKey {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
+    id        String   @id @default(cuid())
+    key       String   @unique
+    createdAt DateTime @default(now()) @map("created_at")
 
-  @@map("telegram_registration_keys")
+    @@map("telegram_registration_keys")
 }

@@ -1,47 +1,77 @@
-// Sensor types & schemas
+// ─── @cold-blood-cast/shared ─────────────────────────────────────────
+// Shared types, enums, and utilities across all Cold Blood Cast apps.
+
 export {
-    SensorConfigSchema,
-    PartialSensorConfigSchema,
-    SensorReadingSchema,
-    SensorHardwareSchema,
-    isValidSensorConfig,
-    isValidPartialSensorConfig,
-} from "./sensor.js";
+    LIMIT_KEYS,
+    REGISTRATION_MODES,
+    SYSTEM_SETTING_KEYS,
+    NOTIFICATION_SETTING_KEYS,
+    WEEKLY_REPORT_SETTING_KEYS,
+    LEGAL_DOCUMENT_KEYS,
+} from "./constants.js";
+
 export type {
-    SensorConfig,
-    PartialSensorConfig,
-    SensorReading,
-    SensorStatus,
-    SensorType,
-    TimeBasedLimits,
-    PublicSensorResponse,
-} from "./sensor.js";
+    LimitKey,
+    RegistrationModeValue,
+    SystemSettingKey,
+    NotificationSettingKey,
+    WeeklyReportSettingKey,
+    LegalDocumentKeyConst,
+} from "./constants.js";
 
-// Config types & schemas
-export {
-    AppConfigSchema,
-    PartialAppConfigSchema,
-    isValidPartialAppConfig,
-    isValidAppConfig,
-} from "./config.js";
-export type { AppConfig } from "./config.js";
+export type {
+    ApiSuccessResponse,
+    ApiErrorDetail,
+    ApiErrorResponse,
+    ApiResponse,
+    PaginationMeta,
+    PaginatedResponse,
+} from "./api.js";
 
-// Log types
-export type { LogEntry } from "./logs.js";
+export type {
+    SystemRoleName,
+    SuggestionStatus,
+    AnnouncementType,
+    RegistrationMode,
+    EmailTemplate,
+    EmailStatus,
+    AccessRequestStatus,
+    LegalDocumentKey,
+} from "./enums.js";
 
-// User types & schemas
-export {
-    UserPermissionsSchema,
-    UserSchema,
-    isValidPartialUser,
-    isValidPartialUserPermissions,
-    isValidUser,
-    isValidUserPermissions,
-} from "./users.js";
-export type { UserPermissions, User } from "./users.js";
-
-// Preset types
-export type { PresetDefinition } from "./presets.js";
-
-// Home Assistant types
-export type { HassDevice } from "./hass.js";
+export type {
+    AuthUser,
+    AuthTokens,
+    LoginPayload,
+    RegisterPayload,
+    AuthMeResponse,
+    FeatureTierInfo,
+    Role,
+    RoleDetail,
+    FeatureFlag,
+    Tag,
+    Announcement,
+    ApiKey,
+    ApiKeyWithSecret,
+    CreateApiKeyPayload,
+    AdminUser,
+    AdminUserDetail,
+    PlatformStats,
+    UserGrowthPoint,
+    AuditLogEntry,
+    SystemSettingEntry,
+    InviteCode,
+    InviteCodeUse,
+    CreateInviteCodePayload,
+    EmailLogEntry,
+    SendEmailPayload,
+    AccessRequest,
+    ImpressumMetadata,
+    LegalDocument,
+    AdminLegalDocument,
+    UpdateLegalDocumentPayload,
+    PublicLegalDocument,
+    LegalDocumentLink,
+    DataExportStatus,
+    DataExportInfo,
+} from "./models.js";

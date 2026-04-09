@@ -1,6 +1,6 @@
 {
     "name": "@cold-blood-cast/shared",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "private": true,
     "type": "module",
     "main": "./dist/index.js",
@@ -17,14 +17,9 @@
         "lint:fix": "echo 'no lint configured'",
         "format": "echo 'no format configured'",
         "format:fix": "echo 'no format configured'",
-        "types:check": "tsc --noEmit",
-        "test": "vitest run"
-    },
-    "dependencies": {
-        "zod": "^3.24.3"
+        "types:check": "tsc --noEmit"
     },
     "devDependencies": {
-        "typescript": "^5.8.3",
-        "vitest": "^4.1.3"
+        "typescript": "^5.9.3"
     }
 }

@@ -1,1 +1,286 @@
 @import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+/* ─── Semantic Color Tokens (Light) ─── */
+:root {
+    --z-base: #fafafa;
+    --z-base-t: rgba(250, 250, 250, 0.8);
+    --z-surface: rgba(0, 0, 0, 0.03);
+    --z-surface-hover: rgba(0, 0, 0, 0.06);
+    --z-surface-active: rgba(0, 0, 0, 0.08);
+    --z-surface-raised: rgba(0, 0, 0, 0.04);
+    --z-line: rgba(0, 0, 0, 0.12);
+    --z-line-faint: rgba(0, 0, 0, 0.06);
+    --z-fg: #111827;
+    --z-fg-soft: rgba(0, 0, 0, 0.7);
+    --z-fg-dim: rgba(0, 0, 0, 0.6);
+    --z-fg-muted: rgba(0, 0, 0, 0.55);
+    --z-fg-faint: rgba(0, 0, 0, 0.4);
+    --z-fg-ghost: rgba(0, 0, 0, 0.25);
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-hover: rgba(255, 255, 255, 0.85);
+    --glass-border-hover: rgba(0, 0, 0, 0.15);
+    --surface-elevated: rgba(0, 0, 0, 0.04);
+
+    /* Brand: auto-switching semantic tokens (light) */
+    --z-brand: #6f7e38;
+    --z-brand-soft: rgba(111, 126, 56, 0.1);
+    --z-brand-hover: #566129;
+    --z-brand-text: #ffffff;
+    --z-accent: #a3481d;
+    --z-accent-soft: rgba(163, 72, 29, 0.1);
+    --z-success: #059669;
+    --z-success-soft: rgba(16, 185, 129, 0.1);
+    --z-danger: #dc2626;
+    --z-danger-soft: rgba(239, 68, 68, 0.1);
+    --z-warning: #d97706;
+    --z-warning-soft: rgba(245, 158, 11, 0.1);
+
+    color-scheme: light;
+}
+
+/* ─── Semantic Color Tokens (Dark) ─── */
+.dark {
+    --z-base: #000000;
+    --z-base-t: rgba(0, 0, 0, 0.8);
+    --z-surface: rgba(255, 255, 255, 0.03);
+    --z-surface-hover: rgba(255, 255, 255, 0.06);
+    --z-surface-active: rgba(255, 255, 255, 0.08);
+    --z-surface-raised: rgba(255, 255, 255, 0.04);
+    --z-line: rgba(255, 255, 255, 0.06);
+    --z-line-faint: rgba(255, 255, 255, 0.04);
+    --z-fg: #ffffff;
+    --z-fg-soft: rgba(255, 255, 255, 0.7);
+    --z-fg-dim: rgba(255, 255, 255, 0.6);
+    --z-fg-muted: rgba(255, 255, 255, 0.4);
+    --z-fg-faint: rgba(255, 255, 255, 0.3);
+    --z-fg-ghost: rgba(255, 255, 255, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-hover: rgba(255, 255, 255, 0.06);
+    --glass-border-hover: rgba(255, 255, 255, 0.1);
+    --surface-elevated: rgba(255, 255, 255, 0.04);
+
+    /* Brand: auto-switching semantic tokens (dark) */
+    --z-brand: #a6b76a;
+    --z-brand-soft: rgba(166, 183, 106, 0.12);
+    --z-brand-hover: #c4d094;
+    --z-brand-text: #202510;
+    --z-accent: #ecb27c;
+    --z-accent-soft: rgba(236, 178, 124, 0.12);
+    --z-success: #34d399;
+    --z-success-soft: rgba(52, 211, 153, 0.1);
+    --z-danger: #f87171;
+    --z-danger-soft: rgba(248, 113, 113, 0.1);
+    --z-warning: #fbbf24;
+    --z-warning-soft: rgba(251, 191, 36, 0.1);
+
+    color-scheme: dark;
+}
+
+/* ─── Native Select / Option fix for dark mode ─── */
+.dark select option {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+/* ─── Theme Registration (Tailwind v4) ─── */
+@theme {
+    /* Neutral semantic tokens (auto-switch light/dark) */
+    --color-base: var(--z-base);
+    --color-base-translucent: var(--z-base-t);
+    --color-surface: var(--z-surface);
+    --color-surface-hover: var(--z-surface-hover);
+    --color-surface-active: var(--z-surface-active);
+    --color-surface-raised: var(--z-surface-raised);
+    --color-line: var(--z-line);
+    --color-line-faint: var(--z-line-faint);
+    --color-fg: var(--z-fg);
+    --color-fg-soft: var(--z-fg-soft);
+    --color-fg-dim: var(--z-fg-dim);
+    --color-fg-muted: var(--z-fg-muted);
+    --color-fg-faint: var(--z-fg-faint);
+    --color-fg-ghost: var(--z-fg-ghost);
+
+    /* ─── Brand: Primary Olive Scale (Refactoring UI: 10 shades) ─── */
+    --color-primary-50: #f8f9f2;
+    --color-primary-100: #eff2e0;
+    --color-primary-200: #dee4bf;
+    --color-primary-300: #c4d094;
+    --color-primary-400: #a6b76a;
+    --color-primary-500: #8a9c4a;
+    --color-primary-600: #6f7e38;
+    --color-primary-700: #566129;
+    --color-primary-800: #454e23;
+    --color-primary-900: #3a421f;
+    --color-primary-950: #202510;
+
+    /* ─── Brand: Accent Warm Copper Scale ─── */
+    --color-accent-50: #fdf6f0;
+    --color-accent-100: #faead8;
+    --color-accent-200: #f4d1ae;
+    --color-accent-300: #ecb27c;
+    --color-accent-400: #e29151;
+    --color-accent-500: #d87533;
+    --color-accent-600: #c45e23;
+    --color-accent-700: #a3481d;
+    --color-accent-800: #843b1c;
+    --color-accent-900: #6d321a;
+    --color-accent-950: #3a180b;
+
+    /* ─── Semantic: auto-switching tokens (use in classes: bg-brand, text-brand) ─── */
+    --color-brand: var(--z-brand);
+    --color-brand-soft: var(--z-brand-soft);
+    --color-brand-hover: var(--z-brand-hover);
+    --color-brand-text: var(--z-brand-text);
+    --color-gold: var(--z-accent);
+    --color-gold-soft: var(--z-accent-soft);
+    --color-success: var(--z-success);
+    --color-success-soft: var(--z-success-soft);
+    --color-danger: var(--z-danger);
+    --color-danger-soft: var(--z-danger-soft);
+    --color-warning: var(--z-warning);
+    --color-warning-soft: var(--z-warning-soft);
+}
+
+/* ─── Custom Animations ─── */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradient {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes blob {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-gradient {
+    animation: gradient 3s ease infinite;
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background-size: 200% 100%;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* ─── Glass Card Base ─── */
+.glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.2s ease;
+}
+
+.glass-card:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+}
+
+/* ─── Smooth transitions ─── */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* ─── Scrollbar Styling ─── */
+.dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Input Focus Styles ─── */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    box-shadow:
+        0 0 0 1px rgba(59, 130, 246, 0.3),
+        0 0 20px rgba(59, 130, 246, 0.05);
+}
+
+/* ─── Selection Color ─── */
+::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: var(--z-fg);
+}

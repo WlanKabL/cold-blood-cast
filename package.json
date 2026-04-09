@@ -1,5 +1,6 @@
 {
     "name": "cold-blood-cast",
+    "version": "0.0.0",
     "private": true,
     "type": "module",
     "scripts": {
@@ -9,47 +10,59 @@
         "dev:frontend": "pnpm --filter @cold-blood-cast/frontend run dev",
         "dev:backend": "pnpm --filter @cold-blood-cast/backend run dev",
         "dev:db": "docker compose up -d postgres",
-        "build": "pnpm --filter @cold-blood-cast/shared run build && pnpm --filter @cold-blood-cast/* run build",
+        "build": "pnpm --filter @cold-blood-cast/* run build",
         "build:frontend": "pnpm --filter @cold-blood-cast/frontend run build",
         "build:backend": "pnpm --filter @cold-blood-cast/backend run build",
-        "build:shared": "pnpm --filter @cold-blood-cast/shared run build",
         "lint": "pnpm --filter @cold-blood-cast/* run lint",
         "lint:fix": "pnpm --filter @cold-blood-cast/* run lint:fix",
         "format": "prettier --check .",
         "format:fix": "prettier --write .",
         "types:check": "pnpm --filter @cold-blood-cast/* run types:check",
-        "db:generate": "pnpm --filter @cold-blood-cast/backend run db:generate",
         "db:migrate": "pnpm --filter @cold-blood-cast/backend run db:migrate",
         "db:migrate:deploy": "pnpm --filter @cold-blood-cast/backend run db:migrate:deploy",
+        "db:migrate:status": "pnpm --filter @cold-blood-cast/backend run db:migrate:status",
+        "db:migrate:reset": "pnpm --filter @cold-blood-cast/backend run db:migrate:reset",
         "db:push": "pnpm --filter @cold-blood-cast/backend run db:push",
         "db:seed": "pnpm --filter @cold-blood-cast/backend run db:seed",
+        "db:reseed": "pnpm --filter @cold-blood-cast/backend run db:reseed",
+        "db:seed-demo": "pnpm --filter @cold-blood-cast/backend run db:seed-demo",
         "db:studio": "pnpm --filter @cold-blood-cast/backend run db:studio",
-        "db:reset": "pnpm --filter @cold-blood-cast/backend run db:reset",
+        "db:generate": "pnpm --filter @cold-blood-cast/backend run db:generate",
         "db:setup": "pnpm --filter @cold-blood-cast/backend run db:setup",
-        "docker:up": "docker compose --profile deploy --env-file apps/backend/.env up -d",
-        "docker:down": "docker compose --profile deploy --env-file apps/backend/.env down",
+        "docker:up": "docker compose up -d",
+        "docker:down": "docker compose down",
         "test": "pnpm --filter @cold-blood-cast/backend run test && pnpm --filter @cold-blood-cast/frontend run test:run",
         "test:backend": "pnpm --filter @cold-blood-cast/backend run test",
         "test:frontend": "pnpm --filter @cold-blood-cast/frontend run test:run",
         "test:coverage": "pnpm --filter @cold-blood-cast/backend run test:coverage && pnpm --filter @cold-blood-cast/frontend run test:coverage",
+        "test:coverage:backend": "pnpm --filter @cold-blood-cast/backend run test:coverage",
+        "test:coverage:frontend": "pnpm --filter @cold-blood-cast/frontend run test:coverage",
+        "test:e2e": "pnpm --filter @cold-blood-cast/frontend run test:e2e",
+        "test:e2e:ui": "pnpm --filter @cold-blood-cast/frontend run test:e2e:ui",
+        "test:e2e:headed": "pnpm --filter @cold-blood-cast/frontend run test:e2e:headed",
+        "test:e2e:coverage": "pnpm --filter @cold-blood-cast/frontend run test:e2e:coverage",
+        "test:all": "pnpm test && pnpm test:e2e",
         "clean": "pnpm --filter @cold-blood-cast/* exec rm -rf node_modules dist .nuxt .output && rm -rf node_modules"
     },
     "engines": {
         "node": ">=22.0.0",
         "pnpm": ">=10.0.0"
     },
-    "packageManager": "pnpm@10.8.1",
+    "packageManager": "pnpm@10.30.3",
     "pnpm": {
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@prisma/client",
             "@prisma/engines",
+            "better-sqlite3",
             "esbuild",
             "prisma",
+            "sharp",
             "unrs-resolver"
         ]
     },
     "devDependencies": {
-        "prettier": "^3.8.1"
+        "prettier": "^3.8.1",
+        "prettier-plugin-tailwindcss": "^0.7.2"
     }
 }

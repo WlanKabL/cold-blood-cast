@@ -1,0 +1,86 @@
+import { prisma } from "@/config/database.js";
+import { ErrorCodes, notFound } from "@/helpers/errors.js";
+
+export async function listSheddings(
+    userId: string,
+    options: { petId?: string; from?: Date; to?: Date; limit: number },
+) {
+    return prisma.shedding.findMany({
+        where: {
+            pet: { userId },
+            ...(options.petId ? { petId: options.petId } : {}),
+            ...(options.from || options.to
+                ? {
+                      startedAt: {
+                          ...(options.from ? { gte: options.from } : {}),
+                          ...(options.to ? { lte: options.to } : {}),
+                      },
+                  }
+                : {}),
+        },
+        include: { pet: { select: { id: true, name: true } } },
+        orderBy: { startedAt: "desc" },
+        take: options.limit,
+    });
+}
+
+export async function getShedding(id: string, userId: string) {
+    const shedding = await prisma.shedding.findUnique({
+        where: { id },
+        include: { pet: { select: { id: true, name: true, userId: true } } },
+    });
+    if (!shedding || shedding.pet.userId !== userId) {
+        throw notFound(ErrorCodes.E_SHEDDING_NOT_FOUND, "Shedding not found");
+    }
+    return shedding;
+}
+
+export async function createShedding(
+    userId: string,
+    data: {
+        petId: string;
+        startedAt: Date;
+        completedAt?: Date;
+        complete?: boolean;
+        quality?: string;
+        notes?: string;
+    },
+) {
+    const pet = await prisma.pet.findUnique({ where: { id: data.petId } });
+    if (!pet || pet.userId !== userId) {
+        throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
+    }
+    return prisma.shedding.create({ data });
+}
+
+export async function updateShedding(
+    id: string,
+    userId: string,
+    data: Partial<{
+        startedAt: Date;
+        completedAt: Date;
+        complete: boolean;
+        quality: string;
+        notes: string;
+    }>,
+) {
+    const existing = await prisma.shedding.findUnique({
+        where: { id },
+        include: { pet: { select: { userId: true } } },
+    });
+    if (!existing || existing.pet.userId !== userId) {
+        throw notFound(ErrorCodes.E_SHEDDING_NOT_FOUND, "Shedding not found");
+    }
+    return prisma.shedding.update({ where: { id }, data });
+}
+
+export async function deleteShedding(id: string, userId: string) {
+    const existing = await prisma.shedding.findUnique({
+        where: { id },
+        include: { pet: { select: { userId: true } } },
+    });
+    if (!existing || existing.pet.userId !== userId) {
+        throw notFound(ErrorCodes.E_SHEDDING_NOT_FOUND, "Shedding not found");
+    }
+    await prisma.shedding.delete({ where: { id } });
+}

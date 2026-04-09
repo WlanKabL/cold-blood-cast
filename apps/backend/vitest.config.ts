@@ -1,15 +1,21 @@
 import { defineConfig } from "vitest/config";
+import { resolve } from "node:path";
 
 export default defineConfig({
     test: {
         globals: true,
         environment: "node",
-        include: ["src/**/__tests__/**/*.test.ts"],
+        exclude: ["dist/**", "node_modules/**"],
         coverage: {
             provider: "v8",
-            reporter: ["text", "lcov"],
-            include: ["src/**/*.ts"],
-            exclude: ["src/**/__tests__/**", "src/types/**", "src/docs/**"],
+            reporter: ["text", "text-summary"],
+            include: ["src/modules/**/*.ts", "src/helpers/**/*.ts", "src/middleware/**/*.ts"],
+            exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.d.ts", "src/modules/**/index.ts"],
+        },
+    },
+    resolve: {
+        alias: {
+            "@": resolve(__dirname, "src"),
         },
     },
 });

@@ -1,0 +1,1 @@
+pm2 start 'npm run build && node .output/server/index.mjs' --name 'cold-blood-cast-frontend' --no-daemon

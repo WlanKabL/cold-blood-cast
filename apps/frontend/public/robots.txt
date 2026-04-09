@@ -1,1 +1,14 @@
+User-Agent: *
+Disallow: /admin/
+Disallow: /settings
+Disallow: /dashboard/
+Disallow: /enclosures/
+Disallow: /pets/
+Disallow: /sensors/
+Disallow: /feedings/
+Disallow: /sheddings/
+Disallow: /weights/
+Disallow: /tags/
+Disallow: /api-keys/
 
+Sitemap: https://cold-blood-cast.app/sitemap.xml

@@ -137,6 +137,7 @@
 - 🔲 **Sensor data retention policy** — auto-archive or prune old sensor logs to prevent DB bloat on Pi
 - 🔲 **PWA support** — installable on phone for quick terrarium checks (Nuxt PWA module)
 - 🔲 **Dark/light theme toggle** — the UI currently has one theme, reptile keepers often check at night
+- 🔲 **Species per Pet** — define the exact species per animal and birthday, everything important for reselling or other things
 
 ---
 

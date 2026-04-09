@@ -1,0 +1,1 @@
+pm2 start 'npm run build && node dist/index.js' --name 'cold-blood-cast-backend' --no-daemon

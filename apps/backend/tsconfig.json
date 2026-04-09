@@ -11,13 +11,20 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
-        "declaration": false,
-        "declarationMap": false,
+        "declaration": true,
+        "declarationMap": true,
         "sourceMap": true,
-        "types": ["node"],
-        "typeRoots": ["./src/types", "./node_modules/@types"]
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "baseUrl": "."
     },
-    "references": [{ "path": "../../packages/shared" }],
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "dist", "prisma", "src/generated"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist", "prisma"],
+    "references": [
+        // Build shared first so declaration files (.d.ts) are available during
+        // the backend tsc compilation. Works in all environments (local + Docker)
+        // because tsc --build handles the full dependency chain.
+        { "path": "../../packages/shared" }
+    ]
 }

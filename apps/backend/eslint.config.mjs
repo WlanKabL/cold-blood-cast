@@ -12,12 +12,15 @@ export default tsPlugin.config(
             sourceType: "module",
         },
         rules: {
+            // Relax rules that fight Fastify/Prisma patterns
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
             ],
             "@typescript-eslint/no-explicit-any": "warn",
             "no-console": ["warn", { allow: ["warn", "error"] }],
+
+            // Enforce code quality
             eqeqeq: ["error", "always", { null: "ignore" }],
             "no-var": "error",
             "prefer-const": "error",
@@ -29,11 +32,14 @@ export default tsPlugin.config(
             ],
         },
     },
+    // Seed/CLI scripts: console.log is the intended output channel
     {
-        files: ["prisma/seed*.ts"],
-        rules: { "no-console": "off" },
+        files: ["src/config/seed*.ts", "src/scripts/**/*.ts"],
+        rules: {
+            "no-console": "off",
+        },
     },
     {
-        ignores: ["dist/**", "node_modules/**", "prisma/**", "src/generated/**"],
+        ignores: ["dist/**", "node_modules/**", "prisma/**"],
     },
 );

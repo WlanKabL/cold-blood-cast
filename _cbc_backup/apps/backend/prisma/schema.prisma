@@ -1,0 +1,712 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth & Users ────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String   @unique
+  displayName  String?  @map("display_name")
+  passwordHash String   @map("password_hash")
+  salt         String
+  locale       String   @default("de")
+  timezone     String   @default("Europe/Berlin")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // ── Admin (legacy, kept for seed compat) ───────
+  isAdmin       Boolean @default(false) @map("is_admin")
+
+  // ── Account status ─────────────────────────────
+  banned       Boolean  @default(false)
+  bannedAt     DateTime? @map("banned_at")
+  bannedBy     String?  @map("banned_by")
+  bannedReason String?  @map("banned_reason")
+  approved     Boolean  @default(true)
+  lastActiveAt DateTime? @map("last_active_at")
+
+  // ── Email verification ─────────────────────────
+  emailVerified             Boolean   @default(false) @map("email_verified")
+  verificationCode          String?   @map("verification_code")
+  verificationCodeExpiresAt DateTime? @map("verification_code_expires_at")
+
+  // ── Password reset ─────────────────────────────
+  resetToken          String?   @map("reset_token")
+  resetTokenExpiresAt DateTime? @map("reset_token_expires_at")
+
+  // ── Account deletion ───────────────────────────
+  deleteToken          String?   @map("delete_token")
+  deleteTokenExpiresAt DateTime? @map("delete_token_expires_at")
+
+  // ── Relations ──────────────────────────────────
+  refreshTokens RefreshToken[]
+
+  enclosures           Enclosure[]
+  pets                 Pet[]
+  sensors              Sensor[]
+  homeAssistantConfigs HomeAssistantConfig[]
+  alertRules           AlertRule[]
+
+  // ── RBAC & permissions ─────────────────────────
+  roles          UserRole[]
+  featureFlags   UserFeatureFlag[]
+  limitOverrides UserLimitOverride[]
+
+  // ── Audit & compliance ─────────────────────────
+  cookieConsents CookieConsent[]
+  loginSessions  LoginSession[]
+  dataExports    DataExport[]
+  legalDocumentEdits LegalDocument[] @relation("LegalDocumentUpdater")
+  apiKeys        ApiKey[]
+  emailLogs      EmailLog[]
+  uploads        Upload[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenId   String   @unique @map("token_id")
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model RegistrationKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  usedById  String?  @map("used_by_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  usedAt    DateTime? @map("used_at")
+
+  @@map("registration_keys")
+}
+
+// ─── Enclosures & Pets ───────────────────────────────────────
+
+enum EnclosureType {
+  TERRARIUM
+  VIVARIUM
+  AQUARIUM
+  PALUDARIUM
+  RACK
+  OTHER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+model Enclosure {
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  name        String
+  type        EnclosureType @default(TERRARIUM)
+  species     String?
+  description String?
+  imageUrl    String?       @map("image_url")
+  lengthCm    Int?          @map("length_cm")
+  widthCm     Int?          @map("width_cm")
+  heightCm    Int?          @map("height_cm")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pets    Pet[]
+  sensors Sensor[]
+
+  @@index([userId])
+  @@map("enclosures")
+}
+
+model Pet {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  enclosureId     String?   @map("enclosure_id")
+  name            String
+  species         String
+  morph           String?
+  gender          Gender    @default(UNKNOWN)
+  birthDate       DateTime? @map("birth_date")
+  acquisitionDate DateTime? @map("acquisition_date")
+  notes           String?
+  imageUrl        String?   @map("image_url")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enclosure Enclosure? @relation(fields: [enclosureId], references: [id], onDelete: SetNull)
+
+  feedings      Feeding[]
+  sheddings     Shedding[]
+  weightRecords WeightRecord[]
+  notes_        HusbandryNote[] @relation("PetNotes")
+
+  @@index([userId])
+  @@index([enclosureId])
+  @@map("pets")
+}
+
+// ─── Tracking: Feeding, Shedding, Weight ─────────────────────
+
+model Feeding {
+  id        String   @id @default(uuid())
+  petId     String   @map("pet_id")
+  fedAt     DateTime @map("fed_at")
+  foodType  String   @map("food_type")
+  foodSize  String?  @map("food_size")
+  quantity  Int      @default(1)
+  accepted  Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId, fedAt])
+  @@map("feedings")
+}
+
+model Shedding {
+  id          String    @id @default(uuid())
+  petId       String    @map("pet_id")
+  startedAt   DateTime  @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  complete    Boolean   @default(false)
+  quality     String?
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId, startedAt])
+  @@map("sheddings")
+}
+
+model WeightRecord {
+  id          String   @id @default(uuid())
+  petId       String   @map("pet_id")
+  measuredAt  DateTime @map("measured_at")
+  weightGrams Float    @map("weight_grams")
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId, measuredAt])
+  @@map("weight_records")
+}
+
+model HusbandryNote {
+  id          String   @id @default(uuid())
+  petId       String?  @map("pet_id")
+  enclosureId String?  @map("enclosure_id")
+  type        String
+  title       String
+  content     String?
+  occurredAt  DateTime @map("occurred_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  pet Pet? @relation("PetNotes", fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("husbandry_notes")
+}
+
+// ─── Sensors & Readings ──────────────────────────────────────
+
+enum SensorType {
+  TEMPERATURE
+  HUMIDITY
+  PRESSURE
+  WATER
+}
+
+model Sensor {
+  id                    String     @id @default(uuid())
+  userId                String     @map("user_id")
+  enclosureId           String?    @map("enclosure_id")
+  name                  String
+  type                  SensorType
+  unit                  String
+  homeAssistantEntityId String?    @map("ha_entity_id")
+  limitsJson            Json?      @map("limits_json")
+  active                Boolean    @default(true)
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enclosure Enclosure? @relation(fields: [enclosureId], references: [id], onDelete: SetNull)
+  readings  SensorReading[]
+  alerts    AlertRule[]
+
+  @@index([userId])
+  @@index([enclosureId])
+  @@map("sensors")
+}
+
+model SensorReading {
+  id         String   @id @default(uuid())
+  sensorId   String   @map("sensor_id")
+  value      Float?
+  recordedAt DateTime @map("recorded_at")
+
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+  @@index([sensorId, recordedAt])
+  @@map("sensor_readings")
+}
+
+// ─── Home Assistant ──────────────────────────────────────────
+
+model HomeAssistantConfig {
+  id     String  @id @default(uuid())
+  userId String  @map("user_id")
+  url    String
+  token  String
+  active Boolean @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("home_assistant_configs")
+}
+
+// ─── Alerts ──────────────────────────────────────────────────
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+  OUTSIDE_RANGE
+}
+
+model AlertRule {
+  id              String         @id @default(uuid())
+  userId          String         @map("user_id")
+  sensorId        String         @map("sensor_id")
+  condition       AlertCondition
+  threshold       Float?
+  thresholdLow    Float?         @map("threshold_low")
+  thresholdHigh   Float?         @map("threshold_high")
+  cooldownMinutes Int            @default(30) @map("cooldown_minutes")
+  enabled         Boolean        @default(true)
+  lastTriggeredAt DateTime?      @map("last_triggered_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+  @@index([sensorId])
+  @@map("alert_rules")
+}
+
+// ─── Presets (system-wide, no user scope) ────────────────────
+
+model Preset {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  species     String
+  description String?
+  sensorsJson Json     @map("sensors_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("presets")
+}
+
+// ─── Telegram ────────────────────────────────────────────────
+
+model TelegramSubscriber {
+  id        String   @id @default(uuid())
+  chatId    BigInt   @unique @map("chat_id")
+  userId    String?  @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("telegram_subscribers")
+}
+
+model TelegramRegistrationKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("telegram_registration_keys")
+}
+
+// ─── Roles & RBAC ────────────────────────────────────────────
+
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  displayName String  @map("display_name")
+  description String?
+  color       String? @default("#6b7280")
+  isSystem    Boolean @default(false) @map("is_system")
+  priority    Int     @default(0)
+  showBadge   Boolean @default(false) @map("show_badge")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users        UserRole[]
+  featureFlags RoleFeatureFlag[]
+  limits       RoleLimit[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  grantedBy String?  @map("granted_by")
+  grantedAt DateTime @default(now()) @map("granted_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+// ─── Feature Flags ───────────────────────────────────────────
+
+model FeatureFlag {
+  id          String  @id @default(uuid())
+  key         String  @unique
+  name        String
+  description String?
+  category    String  @default("general")
+  enabled     Boolean @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  roleFlags RoleFeatureFlag[]
+  userFlags UserFeatureFlag[]
+
+  @@map("feature_flags")
+}
+
+model RoleFeatureFlag {
+  id            String  @id @default(uuid())
+  roleId        String  @map("role_id")
+  featureFlagId String  @map("feature_flag_id")
+  enabled       Boolean @default(true)
+
+  role        Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  featureFlag FeatureFlag @relation(fields: [featureFlagId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, featureFlagId])
+  @@map("role_feature_flags")
+}
+
+model UserFeatureFlag {
+  id            String  @id @default(uuid())
+  userId        String  @map("user_id")
+  featureFlagId String  @map("feature_flag_id")
+  enabled       Boolean @default(true)
+  grantedBy     String? @map("granted_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  featureFlag FeatureFlag @relation(fields: [featureFlagId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, featureFlagId])
+  @@map("user_feature_flags")
+}
+
+// ─── Limits ──────────────────────────────────────────────────
+
+model RoleLimit {
+  id     String @id @default(uuid())
+  roleId String @map("role_id")
+  key    String
+  value  Int
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, key])
+  @@map("role_limits")
+}
+
+model UserLimitOverride {
+  id        String  @id @default(uuid())
+  userId    String  @map("user_id")
+  key       String
+  value     Int
+  grantedBy String? @map("granted_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@map("user_limit_overrides")
+}
+
+// ─── Audit Log ───────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  entity    String?
+  entityId  String?  @map("entity_id")
+  details   Json?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─── System Settings ─────────────────────────────────────────
+
+model SystemSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+// ─── Invite Codes ────────────────────────────────────────────
+
+model InviteCode {
+  id        String    @id @default(uuid())
+  code      String    @unique
+  createdBy String    @map("created_by")
+  label     String?
+  maxUses   Int       @default(1) @map("max_uses")
+  uses      Int       @default(0)
+  expiresAt DateTime? @map("expires_at")
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  usages InviteCodeUse[]
+
+  @@index([code])
+  @@index([active])
+  @@map("invite_codes")
+}
+
+model InviteCodeUse {
+  id           String   @id @default(uuid())
+  inviteCodeId String   @map("invite_code_id")
+  userId       String   @map("user_id")
+  usedAt       DateTime @default(now()) @map("used_at")
+
+  inviteCode InviteCode @relation(fields: [inviteCodeId], references: [id], onDelete: Cascade)
+
+  @@index([inviteCodeId])
+  @@map("invite_code_uses")
+}
+
+// ─── Access Requests ─────────────────────────────────────────
+
+model AccessRequest {
+  id         String    @id @default(uuid())
+  email      String
+  reason     String?
+  status     String    @default("pending")
+  reviewedBy String?   @map("reviewed_by")
+  reviewedAt DateTime? @map("reviewed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([email])
+  @@map("access_requests")
+}
+
+// ─── Announcements ───────────────────────────────────────────
+
+model Announcement {
+  id           String    @id @default(uuid())
+  title        String
+  content      String
+  type         String    @default("info")
+  global       Boolean   @default(true)
+  targetUserId String?   @map("target_user_id")
+  active       Boolean   @default(true)
+  startsAt     DateTime? @map("starts_at")
+  expiresAt    DateTime? @map("expires_at")
+  createdBy    String    @map("created_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  readBy AnnouncementRead[]
+
+  @@index([active, global])
+  @@map("announcements")
+}
+
+model AnnouncementRead {
+  id             String   @id @default(uuid())
+  announcementId String   @map("announcement_id")
+  userId         String   @map("user_id")
+  readAt         DateTime @default(now()) @map("read_at")
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@map("announcement_reads")
+}
+
+// ─── Legal Documents ─────────────────────────────────────────
+
+model LegalDocument {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  title       String
+  titleDe     String   @map("title_de")
+  content     String
+  contentDe   String   @map("content_de")
+  metadata    Json?
+  isPublished Boolean  @default(false) @map("is_published")
+  sortOrder   Int      @default(0) @map("sort_order")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedBy   String?  @map("updated_by")
+
+  updater User? @relation("LegalDocumentUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("legal_documents")
+}
+
+// ─── GDPR Data Exports ───────────────────────────────────────
+
+model DataExport {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  status    String    @default("pending")
+  filePath  String?   @map("file_path")
+  token     String?   @unique
+  expiresAt DateTime? @map("expires_at")
+  error     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("data_exports")
+}
+
+// ─── Login Sessions ──────────────────────────────────────────
+
+model LoginSession {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  ipAddress   String   @map("ip_address")
+  userAgent   String   @map("user_agent")
+  fingerprint String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, fingerprint])
+  @@map("login_sessions")
+}
+
+// ─── Cookie Consent (GDPR) ───────────────────────────────────
+
+model CookieConsent {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  analytics Boolean  @default(false)
+  version   Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("cookie_consents")
+}
+
+// ─── API Keys ────────────────────────────────────────────────
+
+model ApiKey {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  name      String
+  prefix    String
+  hash      String
+  scopes    String[]  @default([])
+  revoked   Boolean   @default(false)
+  lastUsedAt DateTime? @map("last_used_at")
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([hash])
+  @@index([userId])
+  @@map("api_keys")
+}
+
+// ─── Email Logs ──────────────────────────────────────────────
+
+model EmailLog {
+  id       String   @id @default(uuid())
+  userId   String?  @map("user_id")
+  to       String
+  subject  String
+  template String?
+  status   String   @default("sent")
+  error    String?
+  sentAt   DateTime @default(now()) @map("sent_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([sentAt])
+  @@map("email_logs")
+}
+
+// ─── File Uploads ────────────────────────────────────────────
+
+model Upload {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  filename   String
+  mimetype   String
+  path       String
+  encrypted  Boolean  @default(false)
+  caption    String?
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@map("uploads")
+}
+
+// ─── Maintenance Logs ────────────────────────────────────────
+
+model MaintenanceLog {
+  id          String   @id @default(uuid())
+  type        String
+  result      Json?
+  startedAt   DateTime @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  @@index([startedAt])
+  @@map("maintenance_logs")
+}
