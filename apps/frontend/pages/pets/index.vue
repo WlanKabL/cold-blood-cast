@@ -224,7 +224,7 @@ const queryClient = useQueryClient();
 const toast = useAppToast();
 const resolveUrl = useResolveUrl();
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "pets" });
 useHead({ title: () => t("pages.pets.title") });
 
 const genderOptions = ["MALE", "FEMALE", "UNKNOWN"];

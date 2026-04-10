@@ -179,7 +179,7 @@ const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "feedings" });
 useHead({ title: () => t("pages.feedings.title") });
 
 const selectedPet = ref("ALL");

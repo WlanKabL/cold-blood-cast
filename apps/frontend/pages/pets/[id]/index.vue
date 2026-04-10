@@ -92,7 +92,7 @@
             </div>
 
             <!-- Photos Preview -->
-            <div class="glass-card rounded-xl p-6">
+            <div v-if="authStore.hasFeature('photos')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">
                         {{ $t("pages.pets.photos.title") }}
@@ -144,7 +144,7 @@
             </div>
 
             <!-- Recent Feedings -->
-            <div class="glass-card rounded-xl p-6">
+            <div v-if="authStore.hasFeature('feedings')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentFeedings") }}</h2>
                     <NuxtLink to="/feedings" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
@@ -167,7 +167,7 @@
             </div>
 
             <!-- Weight History -->
-            <div class="glass-card rounded-xl p-6">
+            <div v-if="authStore.hasFeature('weights')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.weightHistory") }}</h2>
                     <div class="flex items-center gap-3">
@@ -214,7 +214,7 @@
             </div>
 
             <!-- Shedding Cycle Analysis -->
-            <div class="glass-card rounded-xl p-6">
+            <div v-if="authStore.hasFeature('sheddings')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">
                         {{ $t("pages.pets.sheddingCycle") }}
@@ -268,7 +268,7 @@
             </div>
 
             <!-- Recent Vet Visits -->
-            <div class="glass-card rounded-xl p-6">
+            <div v-if="authStore.hasFeature('vet_visits')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentVetVisits") }}</h2>
                     <NuxtLink to="/vet-visits" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
@@ -294,7 +294,7 @@
             </div>
 
             <!-- Recent Activity / Timeline -->
-            <div class="glass-card rounded-xl p-6">
+            <div v-if="authStore.hasFeature('timeline')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.timeline.recentActivity") }}</h2>
                     <NuxtLink :to="`/pets/${petId}/timeline`" class="text-primary-400 text-sm font-medium">
@@ -498,12 +498,13 @@ const { t } = useI18n();
 const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
+const authStore = useAuthStore();
 const resolveUrl = useResolveUrl();
 
 const petId = route.params.id as string;
 const genderOptions = ["MALE", "FEMALE", "UNKNOWN"];
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "pets" });
 
 // ── Data ─────────────────────────────────────────────────
 const {

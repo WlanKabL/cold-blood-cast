@@ -421,7 +421,7 @@ interface UpcomingSheddingItem {
 const { t } = useI18n();
 const api = useApi();
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "dashboard" });
 useHead({ title: () => t("pages.dashboard.title") });
 
 const { data: enclosures, isLoading: enclosureLoading } = useQuery({

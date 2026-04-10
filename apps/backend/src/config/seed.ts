@@ -19,7 +19,7 @@ import { resolve } from "node:path";
 //  2. Bump CURRENT_SEED_VERSION to match the new entry's version.
 //  3. Deploy — it applies once, then never again until the next bump.
 
-const CURRENT_SEED_VERSION = 2;
+const CURRENT_SEED_VERSION = 3;
 
 // ─── Shared Data ─────────────────────────────────────────────────────────────
 
@@ -124,6 +124,18 @@ const DEFAULT_FEATURE_FLAGS = [
         name: "Vet Visits",
         category: "care",
         description: "Track veterinary visits, appointments, and health checks",
+    },
+    {
+        key: "photos",
+        name: "Photos",
+        category: "care",
+        description: "Pet photo gallery with tags, lightbox, and profile pictures",
+    },
+    {
+        key: "timeline",
+        name: "Activity Timeline",
+        category: "care",
+        description: "Unified activity timeline across all pet events",
     },
     // Alerts & monitoring
     {
@@ -448,6 +460,42 @@ const MIGRATIONS: Migration[] = [
                 "create-only",
             );
             console.log("  → vet_visits flag assigned to all roles");
+        },
+    },
+
+    // ─────────────────────────────────────── v3: photos + timeline feature flags
+    {
+        version: 3,
+        description: "Add photos and timeline feature flags to all roles",
+        apply: async (ctx) => {
+            // Ensure the new flags exist in the DB (they were added to DEFAULT_FEATURE_FLAGS
+            // but existing installations may not have them yet)
+            for (const flag of DEFAULT_FEATURE_FLAGS.filter((f) =>
+                ["photos", "timeline"].includes(f.key),
+            )) {
+                await ctx.prisma.featureFlag.upsert({
+                    where: { key: flag.key },
+                    update: {},
+                    create: { ...flag, enabled: true },
+                });
+            }
+
+            // Refresh flags in context
+            ctx.flags = await ctx.prisma.featureFlag.findMany();
+
+            await applyRoleFlagMapping(
+                ctx,
+                {
+                    FREE: { photos: true, timeline: true },
+                    BETA_TESTER: { photos: true, timeline: true },
+                    PREMIUM: { photos: true, timeline: true },
+                    PRO: { photos: true, timeline: true },
+                    MODERATOR: { photos: true, timeline: true },
+                    ADMIN: { photos: true, timeline: true },
+                },
+                "create-only",
+            );
+            console.log("  → photos + timeline flags assigned to all roles");
         },
     },
 

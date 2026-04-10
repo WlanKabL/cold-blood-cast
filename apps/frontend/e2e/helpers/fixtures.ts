@@ -16,6 +16,8 @@ const ALL_FEATURES: Record<string, boolean> = {
     sheddings: true,
     weights: true,
     vet_visits: true,
+    photos: true,
+    timeline: true,
     api_access: true,
 };
 

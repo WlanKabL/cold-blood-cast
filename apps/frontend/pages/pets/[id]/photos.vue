@@ -307,7 +307,7 @@ const resolveUrl = useResolveUrl();
 
 const petId = route.params.id as string;
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "photos" });
 
 const { data: pet } = useQuery({
     queryKey: ["pets", petId],

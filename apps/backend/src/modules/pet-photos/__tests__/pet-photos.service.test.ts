@@ -379,7 +379,7 @@ describe("setProfilePicture", () => {
 // ─── deletePetPhoto ────────────────────────────────────
 
 describe("deletePetPhoto", () => {
-    it("deletes upload and photo record", async () => {
+    it("deletes photo record first, then upload (avoids cascade conflict)", async () => {
         mockPrisma.petPhoto.findUnique.mockResolvedValue({
             id: PHOTO_ID,
             uploadId: UPLOAD_ID,
@@ -391,10 +391,16 @@ describe("deletePetPhoto", () => {
 
         await deletePetPhoto(PHOTO_ID, USER_ID);
 
-        expect(mockDeleteUpload).toHaveBeenCalledWith(USER_ID, UPLOAD_ID);
+        // PetPhoto must be deleted BEFORE Upload to avoid onDelete:Cascade conflict
         expect(mockPrisma.petPhoto.delete).toHaveBeenCalledWith({
             where: { id: PHOTO_ID },
         });
+        expect(mockDeleteUpload).toHaveBeenCalledWith(USER_ID, UPLOAD_ID);
+
+        // Verify order: petPhoto.delete called first
+        const deleteOrder = mockPrisma.petPhoto.delete.mock.invocationCallOrder[0];
+        const uploadOrder = mockDeleteUpload.mock.invocationCallOrder[0];
+        expect(deleteOrder).toBeLessThan(uploadOrder);
     });
 
     it("throws for non-owned photo", async () => {

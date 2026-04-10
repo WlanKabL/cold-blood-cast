@@ -128,7 +128,7 @@ const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "vet_visits" });
 useHead({ title: () => t("pages.veterinarians.title") });
 
 // ── Data ─────────────────────────────────────────────────

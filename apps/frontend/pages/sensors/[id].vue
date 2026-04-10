@@ -186,7 +186,7 @@ const timeRangeOptions = [
     { label: "30d", value: "30d" },
 ];
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "sensors" });
 
 const fromDate = computed(() => {
     const now = new Date();

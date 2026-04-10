@@ -155,7 +155,7 @@ const queryClient = useQueryClient();
 
 const petId = route.params.id as string;
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "timeline" });
 
 // ── Pet Data ─────────────────────────────────────────────
 const { data: pet } = useQuery({

@@ -379,7 +379,7 @@ const resolveUrl = useResolveUrl();
 
 const visitId = route.params.id as string;
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "vet_visits" });
 
 // ── Data ─────────────────────────────────────────────────
 const {

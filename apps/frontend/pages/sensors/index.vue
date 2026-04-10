@@ -150,7 +150,7 @@ const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "sensors" });
 useHead({ title: () => t("pages.sensors.title") });
 
 const sensorTypes = ["TEMPERATURE", "HUMIDITY", "PRESSURE", "WATER"];

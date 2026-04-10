@@ -147,4 +147,41 @@ test.describe("Pet Photos — Actions", () => {
         // Confirm dialog should appear
         await expect(page.getByRole("button", { name: /delete|löschen/i }).last()).toBeVisible({ timeout: 10_000 });
     });
+
+    test("confirming delete calls API and shows success toast", async ({ page }) => {
+        await mockDelete(page, `/api/pets/${petId}/photos/photo_001`);
+        await page.goto(`/pets/${petId}/photos`);
+
+        const firstPhotoCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        await firstPhotoCard.hover();
+
+        // Click delete (last button in hover overlay)
+        const deleteBtn = firstPhotoCard.locator("button").last();
+        await deleteBtn.click();
+
+        // Confirm the dialog
+        const confirmBtn = page.getByRole("button", { name: /delete|löschen/i }).last();
+        await confirmBtn.click();
+
+        // Success toast should appear
+        await expect(page.getByText(/deleted|gelöscht/i).first()).toBeVisible({ timeout: 10_000 });
+    });
+
+    test("cancelling delete keeps photo in gallery", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+
+        const firstPhotoCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        await firstPhotoCard.hover();
+
+        const deleteBtn = firstPhotoCard.locator("button").last();
+        await deleteBtn.click();
+
+        // Click cancel
+        const cancelBtn = page.getByRole("button", { name: /cancel|abbrechen/i });
+        await cancelBtn.click();
+
+        // Photos should still be visible
+        const images = page.locator("img[loading='lazy']");
+        await expect(images).toHaveCount(2, { timeout: 10_000 });
+    });
 });

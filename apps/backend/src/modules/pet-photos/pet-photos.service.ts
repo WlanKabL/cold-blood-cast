@@ -128,8 +128,11 @@ export async function setProfilePicture(photoId: string, userId: string) {
 export async function deletePetPhoto(photoId: string, userId: string) {
     const photo = await getPhotoWithOwnershipCheck(photoId, userId);
 
-    await deleteUpload(userId, photo.uploadId);
+    // Delete PetPhoto first to remove the FK reference, then delete the Upload.
+    // Reversing this order causes a 500: the Upload's onDelete: Cascade would
+    // cascade-delete the PetPhoto, making the subsequent petPhoto.delete() fail.
     await prisma.petPhoto.delete({ where: { id: photo.id } });
+    await deleteUpload(userId, photo.uploadId);
 }
 
 // ─── Get Profile Picture for Pet ─────────────────────────────

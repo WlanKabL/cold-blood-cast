@@ -132,7 +132,7 @@ interface GrowthRateResult {
 const { t } = useI18n();
 const api = useApi();
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "weights" });
 useHead({ title: () => t("pages.weights.chart.comparison") });
 
 const selectedPetIds = ref<string[]>([]);
