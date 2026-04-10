@@ -53,6 +53,7 @@ const pageTitle = computed(() => {
         "/pets": t("nav.pets"),
         "/sensors": t("nav.sensors"),
         "/feedings": t("nav.feedings"),
+        "/feed-items": t("nav.feedItems"),
         "/sheddings": t("nav.sheddings"),
         "/weights": t("nav.weights"),
         "/settings": t("nav.settings"),

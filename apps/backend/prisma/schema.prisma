@@ -70,6 +70,7 @@ model User {
     enclosures              Enclosure[]
     pets                    Pet[]
     sensors                 Sensor[]
+    feedItems               FeedItem[]
     homeAssistantConfigs    HomeAssistantConfig[]
     alertRules              AlertRule[]
 
@@ -629,6 +630,7 @@ model Pet {
     sheddings     Shedding[]
     weightRecords WeightRecord[]
     husbandryNotes HusbandryNote[] @relation("PetNotes")
+    feedItems     FeedItem[]      @relation("PetFeedItems")
 
     @@index([userId])
     @@index([enclosureId])
@@ -640,20 +642,46 @@ model Pet {
 // ==========================================
 
 model Feeding {
-    id        String   @id @default(cuid())
-    petId     String   @map("pet_id")
-    fedAt     DateTime @map("fed_at")
-    foodType  String   @map("food_type")
-    foodSize  String?  @map("food_size")
-    quantity  Int      @default(1)
-    accepted  Boolean  @default(true)
-    notes     String?
-    createdAt DateTime @default(now()) @map("created_at")
+    id         String    @id @default(cuid())
+    petId      String    @map("pet_id")
+    feedItemId String?   @map("feed_item_id")
+    fedAt      DateTime  @map("fed_at")
+    foodType   String    @map("food_type")
+    foodSize   String?   @map("food_size")
+    quantity   Int       @default(1)
+    accepted   Boolean   @default(true)
+    notes      String?
+    createdAt  DateTime  @default(now()) @map("created_at")
 
-    pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+    pet      Pet       @relation(fields: [petId], references: [id], onDelete: Cascade)
+    feedItem FeedItem? @relation(fields: [feedItemId], references: [id], onDelete: SetNull)
 
     @@index([petId, fedAt])
+    @@index([feedItemId])
     @@map("feedings")
+}
+
+// ==========================================
+// CBC Domain: Feed Items (Futtertiere)
+// ==========================================
+
+model FeedItem {
+    id          String  @id @default(cuid())
+    userId      String  @map("user_id")
+    name        String
+    size        String?
+    weightGrams Float?  @map("weight_grams")
+    notes       String?
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    suitablePets Pet[]    @relation("PetFeedItems")
+    feedings    Feeding[]
+
+    @@index([userId])
+    @@map("feed_items")
 }
 
 // ==========================================

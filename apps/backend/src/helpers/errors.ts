@@ -32,6 +32,9 @@ export const ErrorCodes = {
     // ── Sensors ──────────────────────────────────
     E_SENSOR_NOT_FOUND: "E_SENSOR_NOT_FOUND",
 
+    // ── Feed Items ──────────────────────────────
+    E_FEED_ITEM_NOT_FOUND: "E_FEED_ITEM_NOT_FOUND",
+
     // ── Feedings ─────────────────────────────────
     E_FEEDING_NOT_FOUND: "E_FEEDING_NOT_FOUND",
 

@@ -207,6 +207,12 @@ const careLogNavItems = [
         feature: "feedings",
     },
     {
+        to: "/feed-items",
+        icon: "lucide:rat",
+        label: "nav.feedItems",
+        feature: "feedings",
+    },
+    {
         to: "/sheddings",
         icon: "lucide:layers",
         label: "nav.sheddings",

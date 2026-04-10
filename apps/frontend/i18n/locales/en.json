@@ -257,6 +257,7 @@
         "pets": "Pets",
         "sensors": "Sensors",
         "feedings": "Feedings",
+        "feedItems": "Feed Items",
         "sheddings": "Sheddings",
         "weights": "Weights",
         "settings": "Settings",
@@ -879,6 +880,34 @@
                 "accepted": "Accepted",
                 "acceptedLabel": "Food was accepted",
                 "fedAt": "Fed At",
+                "feedItem": "Feed Item",
+                "feedItemNone": "Manual entry",
+                "notes": "Notes"
+            }
+        },
+        "feedItems": {
+            "title": "Feed Items",
+            "subtitle": "Manage your feeder animal catalog",
+            "add": "Add Feed Item",
+            "addFirst": "Add your first feed item",
+            "create": "New Feed Item",
+            "edit": "Edit Feed Item",
+            "empty": "No feed items yet",
+            "emptyHint": "Create feed items to quickly log feedings without typing the same food details every time.",
+            "noDetails": "No size or weight specified",
+            "noPetsYet": "Create pets first to assign suitable feed items",
+            "confirmDelete": "Delete this feed item? Existing feeding records will keep their data.",
+            "saved": "Feed item saved",
+            "created": "Feed item created",
+            "deleted": "Feed item deleted",
+            "usedCount": "Used {count} time | Used {count} times",
+            "fields": {
+                "name": "Name",
+                "namePlaceholder": "e.g. Fuzzy Mouse, Adult Rat",
+                "size": "Size",
+                "sizePlaceholder": "e.g. Small, Medium, Large",
+                "weight": "Weight (g)",
+                "suitablePets": "Suitable for",
                 "notes": "Notes"
             }
         },

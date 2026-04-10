@@ -18,7 +18,10 @@ export async function listFeedings(
                   }
                 : {}),
         },
-        include: { pet: { select: { id: true, name: true } } },
+        include: {
+            pet: { select: { id: true, name: true } },
+            feedItem: { select: { id: true, name: true, size: true } },
+        },
         orderBy: { fedAt: "desc" },
         take: options.limit,
     });
@@ -27,7 +30,10 @@ export async function listFeedings(
 export async function getFeeding(id: string, userId: string) {
     const feeding = await prisma.feeding.findUnique({
         where: { id },
-        include: { pet: { select: { id: true, name: true, userId: true } } },
+        include: {
+            pet: { select: { id: true, name: true, userId: true } },
+            feedItem: { select: { id: true, name: true, size: true } },
+        },
     });
     if (!feeding || feeding.pet.userId !== userId) {
         throw notFound(ErrorCodes.E_FEEDING_NOT_FOUND, "Feeding not found");
@@ -39,6 +45,7 @@ export async function createFeeding(
     userId: string,
     data: {
         petId: string;
+        feedItemId?: string;
         fedAt: Date;
         foodType: string;
         foodSize?: string;
@@ -58,6 +65,7 @@ export async function updateFeeding(
     id: string,
     userId: string,
     data: Partial<{
+        feedItemId: string;
         fedAt: Date;
         foodType: string;
         foodSize: string;

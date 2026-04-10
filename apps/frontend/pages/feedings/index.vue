@@ -80,6 +80,12 @@
                     <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </UiSelect>
                 <UiTextInput v-model="form.fedAt" :label="$t('pages.feedings.fields.fedAt')" type="datetime-local" required />
+                <UiSelect v-model="form.feedItemId" :label="$t('pages.feedings.fields.feedItem')" @update:model-value="onFeedItemSelected">
+                    <option value="">{{ $t("pages.feedings.fields.feedItemNone") }}</option>
+                    <option v-for="fi in petFeedItems" :key="fi.id" :value="fi.id">
+                        {{ fi.name }}<template v-if="fi.size"> ({{ fi.size }})</template>
+                    </option>
+                </UiSelect>
                 <UiTextInput v-model="form.foodType" :label="$t('pages.feedings.fields.foodType')" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
                 <div class="grid grid-cols-2 gap-3">
                     <UiTextInput v-model="form.foodSize" :label="$t('pages.feedings.fields.foodSize')" />
@@ -101,6 +107,12 @@
         <UiModal :show="showEdit" :title="$t('pages.feedings.edit')" width="lg" @close="showEdit = false">
             <form class="space-y-4" @submit.prevent="handleUpdate">
                 <UiTextInput v-model="editForm.fedAt" :label="$t('pages.feedings.fields.fedAt')" type="datetime-local" required />
+                <UiSelect v-model="editForm.feedItemId" :label="$t('pages.feedings.fields.feedItem')" @update:model-value="onEditFeedItemSelected">
+                    <option value="">{{ $t("pages.feedings.fields.feedItemNone") }}</option>
+                    <option v-for="fi in feedItemsList" :key="fi.id" :value="fi.id">
+                        {{ fi.name }}<template v-if="fi.size"> ({{ fi.size }})</template>
+                    </option>
+                </UiSelect>
                 <UiTextInput v-model="editForm.foodType" :label="$t('pages.feedings.fields.foodType')" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
                 <div class="grid grid-cols-2 gap-3">
                     <UiTextInput v-model="editForm.foodSize" :label="$t('pages.feedings.fields.foodSize')" />
@@ -138,6 +150,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface Feeding {
     id: string;
+    feedItemId: string | null;
     foodType: string;
     foodSize: string | null;
     quantity: number;
@@ -145,11 +158,20 @@ interface Feeding {
     fedAt: string;
     notes: string | null;
     pet?: { name: string };
+    feedItem?: { id: string; name: string; size: string | null } | null;
 }
 
 interface Pet {
     id: string;
     name: string;
+}
+
+interface FeedItem {
+    id: string;
+    name: string;
+    size: string | null;
+    weightGrams: number | null;
+    suitablePets?: Array<{ id: string }>;
 }
 
 const { t } = useI18n();
@@ -184,10 +206,23 @@ const { data: pets } = useQuery({
     queryFn: () => api.get<Pet[]>("/api/pets"),
 });
 
+const { data: feedItemsList } = useQuery({
+    queryKey: ["feed-items"],
+    queryFn: () => api.get<FeedItem[]>("/api/feed-items"),
+});
+
+const petFeedItems = computed(() => {
+    if (!feedItemsList.value || !form.petId) return feedItemsList.value ?? [];
+    return feedItemsList.value.filter(
+        (fi) => !fi.suitablePets?.length || fi.suitablePets.some((p) => p.id === form.petId),
+    );
+});
+
 // ── Create ───────────────────────────────────────────────
 const showCreate = ref(false);
 const form = reactive({
     petId: "",
+    feedItemId: "",
     fedAt: "",
     foodType: "",
     foodSize: "",
@@ -197,7 +232,7 @@ const form = reactive({
 });
 
 function resetForm() {
-    Object.assign(form, { petId: "", fedAt: "", foodType: "", foodSize: "", quantity: 1, accepted: true, notes: "" });
+    Object.assign(form, { petId: "", feedItemId: "", fedAt: "", foodType: "", foodSize: "", quantity: 1, accepted: true, notes: "" });
 }
 
 function openCreateModal() {
@@ -206,10 +241,19 @@ function openCreateModal() {
     showCreate.value = true;
 }
 
+function onFeedItemSelected(feedItemId: string) {
+    const fi = feedItemsList.value?.find((f) => f.id === feedItemId);
+    if (fi) {
+        form.foodType = fi.name;
+        form.foodSize = fi.size ?? "";
+    }
+}
+
 const { mutate: createMutation, isPending: creating } = useMutation({
     mutationFn: () =>
         api.post("/api/feedings", {
             petId: form.petId,
+            feedItemId: form.feedItemId || undefined,
             fedAt: form.fedAt,
             foodType: form.foodType,
             foodSize: form.foodSize || undefined,
@@ -236,6 +280,7 @@ function handleCreate() {
 const showEdit = ref(false);
 const editingId = ref("");
 const editForm = reactive({
+    feedItemId: "",
     fedAt: "",
     foodType: "",
     foodSize: "",
@@ -247,6 +292,7 @@ const editForm = reactive({
 function openEditModal(feeding: Feeding) {
     editingId.value = feeding.id;
     Object.assign(editForm, {
+        feedItemId: feeding.feedItemId ?? "",
         fedAt: feeding.fedAt.slice(0, 16),
         foodType: feeding.foodType,
         foodSize: feeding.foodSize ?? "",
@@ -257,9 +303,18 @@ function openEditModal(feeding: Feeding) {
     showEdit.value = true;
 }
 
+function onEditFeedItemSelected(feedItemId: string) {
+    const fi = feedItemsList.value?.find((f) => f.id === feedItemId);
+    if (fi) {
+        editForm.foodType = fi.name;
+        editForm.foodSize = fi.size ?? "";
+    }
+}
+
 const { mutate: updateMutation, isPending: updating } = useMutation({
     mutationFn: () =>
         api.put(`/api/feedings/${editingId.value}`, {
+            feedItemId: editForm.feedItemId || undefined,
             fedAt: editForm.fedAt,
             foodType: editForm.foodType,
             foodSize: editForm.foodSize || undefined,

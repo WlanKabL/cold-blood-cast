@@ -257,6 +257,7 @@
         "pets": "Tiere",
         "sensors": "Sensoren",
         "feedings": "Fütterungen",
+        "feedItems": "Futtertiere",
         "sheddings": "Häutungen",
         "weights": "Gewichte",
         "settings": "Einstellungen",
@@ -879,6 +880,34 @@
                 "accepted": "Angenommen",
                 "acceptedLabel": "Futter wurde angenommen",
                 "fedAt": "Gefüttert am",
+                "feedItem": "Futtertier",
+                "feedItemNone": "Manuell eingeben",
+                "notes": "Notizen"
+            }
+        },
+        "feedItems": {
+            "title": "Futtertiere",
+            "subtitle": "Verwalte deinen Futtertier-Katalog",
+            "add": "Futtertier hinzufügen",
+            "addFirst": "Füge dein erstes Futtertier hinzu",
+            "create": "Neues Futtertier",
+            "edit": "Futtertier bearbeiten",
+            "empty": "Noch keine Futtertiere",
+            "emptyHint": "Lege Futtertiere an, um Fütterungen schnell zu erfassen ohne jedes Mal die Futterdetails einzutippen.",
+            "noDetails": "Keine Größe oder Gewicht angegeben",
+            "noPetsYet": "Erstelle zuerst Tiere, um passende Futtertiere zuzuweisen",
+            "confirmDelete": "Dieses Futtertier löschen? Bestehende Fütterungseinträge behalten ihre Daten.",
+            "saved": "Futtertier gespeichert",
+            "created": "Futtertier erstellt",
+            "deleted": "Futtertier gelöscht",
+            "usedCount": "{count} Mal verwendet",
+            "fields": {
+                "name": "Name",
+                "namePlaceholder": "z.B. Fuzzy Maus, Adulte Ratte",
+                "size": "Größe",
+                "sizePlaceholder": "z.B. Klein, Mittel, Groß",
+                "weight": "Gewicht (g)",
+                "suitablePets": "Geeignet für",
                 "notes": "Notizen"
             }
         },

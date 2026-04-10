@@ -12,6 +12,7 @@ import {
 
 const CreateFeedingSchema = z.object({
     petId: z.string().cuid(),
+    feedItemId: z.string().cuid().optional(),
     fedAt: z.coerce.date(),
     foodType: z.string().min(1).max(100),
     foodSize: z.string().max(50).optional(),

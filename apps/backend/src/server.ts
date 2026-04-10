@@ -27,6 +27,7 @@ import { enclosureRoutes } from "@/modules/enclosures/index.js";
 import { petRoutes } from "@/modules/pets/index.js";
 import { sensorRoutes } from "@/modules/sensors/index.js";
 import { feedingRoutes } from "@/modules/feedings/index.js";
+import { feedItemRoutes } from "@/modules/feed-items/index.js";
 import { sheddingRoutes } from "@/modules/sheddings/index.js";
 import { weightRoutes } from "@/modules/weights/index.js";
 import {
@@ -254,6 +255,7 @@ async function main() {
     await app.register(petRoutes, { prefix: "/api/pets" });
     await app.register(sensorRoutes, { prefix: "/api/sensors" });
     await app.register(feedingRoutes, { prefix: "/api/feedings" });
+    await app.register(feedItemRoutes, { prefix: "/api/feed-items" });
     await app.register(sheddingRoutes, { prefix: "/api/sheddings" });
     await app.register(weightRoutes, { prefix: "/api/weights" });
 
