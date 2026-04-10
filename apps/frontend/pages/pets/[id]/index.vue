@@ -208,7 +208,7 @@
                 </div>
 
                 <div v-if="chartSeries?.length">
-                    <WeightLineChart :series="chartSeries" :height="250" :show-legend="false" />
+                    <ChartsWeightLineChart :series="chartSeries" :height="250" :show-legend="false" />
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
             </div>

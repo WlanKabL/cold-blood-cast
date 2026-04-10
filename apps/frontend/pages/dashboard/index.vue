@@ -159,7 +159,7 @@
                             {{ series.points[series.points.length - 1].weightGrams }} g
                         </span>
                     </div>
-                    <WeightLineChart
+                    <ChartsWeightLineChart
                         :series="[series]"
                         :height="60"
                         :sparkline="true"

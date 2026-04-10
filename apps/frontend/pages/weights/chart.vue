@@ -52,7 +52,7 @@
             <div v-if="chartLoading" class="flex h-[350px] items-center justify-center">
                 <div class="glass-card h-8 w-8 animate-pulse rounded-full" />
             </div>
-            <WeightLineChart v-else-if="chartSeries?.length" :series="chartSeries" :height="350" />
+            <ChartsWeightLineChart v-else-if="chartSeries?.length" :series="chartSeries" :height="350" />
             <div v-else class="flex h-[350px] items-center justify-center">
                 <p class="text-fg-muted text-sm">{{ $t("pages.weights.chart.noData") }}</p>
             </div>
