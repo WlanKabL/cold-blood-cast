@@ -12,6 +12,7 @@ import {
     mockGrowthRates,
     mockWeightRecords,
     mockVetVisits,
+    mockTimelinePreview,
 } from "./helpers/fixtures";
 
 // ─── Pet Detail — Weight Chart Section ─────────────────────
@@ -26,6 +27,7 @@ test.describe("Pet Detail — Weight Chart", () => {
         await mockGet(page, "/api/weights/growth-rate*", [mockGrowthRates[0]]);
         await mockGet(page, "/api/vet-visits*", mockVetVisits.filter((v) => v.petId === "pet_001"));
         await mockGet(page, "/api/enclosures", mockEnclosures);
+        await mockGet(page, "/api/pets/pet_001/timeline*", mockTimelinePreview);
     });
 
     test("shows weight chart section", async ({ page }) => {

@@ -34,6 +34,7 @@ import { sheddingRoutes, sheddingAnalysisRoutes } from "@/modules/sheddings/inde
 import { weightRoutes } from "@/modules/weights/index.js";
 import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
 import { vetVisitRoutes, vetVisitDocumentRoutes } from "@/modules/vet-visits/index.js";
+import { activityTimelineRoutes } from "@/modules/activity-timeline/index.js";
 import { startVetReminderScheduler, stopVetReminderScheduler } from "@/modules/vet-reminders/index.js";
 import {
     startMaintenanceScheduler,
@@ -269,6 +270,7 @@ async function main() {
     await app.register(veterinarianRoutes, { prefix: "/api/veterinarians" });
     await app.register(vetVisitRoutes, { prefix: "/api/vet-visits" });
     await app.register(vetVisitDocumentRoutes, { prefix: "/api/vet-visits" });
+    await app.register(activityTimelineRoutes, { prefix: "/api/pets" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {

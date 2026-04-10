@@ -872,7 +872,23 @@
             "recentVetVisits": "Recent Vet Visits",
             "noVetVisits": "No vet visits recorded yet",
             "sheddingCycle": "Shedding Cycle",
-            "noSheddingData": "Not enough data for shedding analysis"
+            "noSheddingData": "Not enough data for shedding analysis",
+            "timeline": {
+                "title": "Activity Timeline",
+                "subtitle": "Chronological diary of all events",
+                "viewTimeline": "View Timeline",
+                "loadMore": "Load more",
+                "empty": "No events recorded yet",
+                "noMore": "No more events",
+                "filterAll": "All",
+                "filterFeeding": "Feedings",
+                "filterShedding": "Sheddings",
+                "filterWeight": "Weights",
+                "filterVetVisit": "Vet Visits",
+                "filterPhoto": "Photos",
+                "recentActivity": "Recent Activity",
+                "eventCount": "{count} event | {count} events"
+            }
         },
         "sensors": {
             "title": "Sensors",

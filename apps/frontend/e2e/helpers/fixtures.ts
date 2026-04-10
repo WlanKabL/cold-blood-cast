@@ -528,3 +528,94 @@ export const mockUpcomingSheddings = [
         averageIntervalDays: 30,
     },
 ];
+
+// ── Activity Timeline ────────────────────────────────────
+
+export const mockTimelineEvents = {
+    events: [
+        {
+            id: "f_001",
+            type: "feeding",
+            date: "2024-06-15T10:00:00.000Z",
+            title: "Mouse (Small)",
+            detail: null,
+            icon: "lucide:utensils",
+            meta: { quantity: 1, accepted: true, foodSize: "Small" },
+        },
+        {
+            id: "s_001",
+            type: "shedding",
+            date: "2024-06-10T00:00:00.000Z",
+            title: "Shedding (complete — good)",
+            detail: "Clean one-piece shed",
+            icon: "lucide:sparkles",
+            meta: { complete: true, quality: "good", completedAt: "2024-06-12T00:00:00.000Z" },
+        },
+        {
+            id: "w_001",
+            type: "weight",
+            date: "2024-06-05T12:00:00.000Z",
+            title: "350g",
+            detail: null,
+            icon: "lucide:scale",
+            meta: { weightGrams: 350 },
+        },
+        {
+            id: "v_001",
+            type: "vet_visit",
+            date: "2024-06-01T09:00:00.000Z",
+            title: "Annual checkup",
+            detail: "Healthy",
+            icon: "lucide:stethoscope",
+            meta: { visitType: "CHECKUP", costCents: 5000, treatment: null, vetName: "Dr. Schmidt" },
+        },
+        {
+            id: "p_001",
+            type: "photo",
+            date: "2024-06-20T14:00:00.000Z",
+            title: "Basking",
+            detail: "portrait, enclosure",
+            icon: "lucide:camera",
+            meta: { tags: ["portrait", "enclosure"], url: "/uploads/abc.jpg" },
+        },
+    ],
+    total: 5,
+    page: 1,
+    limit: 50,
+    hasMore: false,
+};
+
+export const mockTimelineEmpty = {
+    events: [],
+    total: 0,
+    page: 1,
+    limit: 50,
+    hasMore: false,
+};
+
+export const mockTimelinePreview = {
+    events: [
+        {
+            id: "f_001",
+            type: "feeding",
+            date: "2024-06-15T10:00:00.000Z",
+            title: "Mouse (Small)",
+            detail: null,
+            icon: "lucide:utensils",
+            meta: { quantity: 1, accepted: true, foodSize: "Small" },
+        },
+        {
+            id: "s_001",
+            type: "shedding",
+            date: "2024-06-10T00:00:00.000Z",
+            title: "Shedding (complete)",
+            detail: null,
+            icon: "lucide:sparkles",
+            meta: { complete: true, quality: null, completedAt: null },
+        },
+    ],
+    total: 15,
+    page: 1,
+    limit: 5,
+    hasMore: true,
+};

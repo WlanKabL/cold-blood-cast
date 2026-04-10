@@ -872,7 +872,23 @@
             "recentVetVisits": "Letzte Tierarztbesuche",
             "noVetVisits": "Noch keine Tierarztbesuche erfasst",
             "sheddingCycle": "Häutungszyklus",
-            "noSheddingData": "Nicht genügend Daten für Häutungsanalyse"
+            "noSheddingData": "Nicht genügend Daten für Häutungsanalyse",
+            "timeline": {
+                "title": "Aktivitäts-Chronik",
+                "subtitle": "Chronologisches Tagebuch aller Ereignisse",
+                "viewTimeline": "Chronik ansehen",
+                "loadMore": "Mehr laden",
+                "empty": "Noch keine Ereignisse erfasst",
+                "noMore": "Keine weiteren Ereignisse",
+                "filterAll": "Alle",
+                "filterFeeding": "Fütterungen",
+                "filterShedding": "Häutungen",
+                "filterWeight": "Gewicht",
+                "filterVetVisit": "Tierarztbesuche",
+                "filterPhoto": "Fotos",
+                "recentActivity": "Letzte Aktivität",
+                "eventCount": "{count} Ereignis | {count} Ereignisse"
+            }
         },
         "sensors": {
             "title": "Sensoren",

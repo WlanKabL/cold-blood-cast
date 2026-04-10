@@ -292,6 +292,28 @@
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noVetVisits") }}</p>
             </div>
+
+            <!-- Recent Activity / Timeline -->
+            <div class="glass-card rounded-xl p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.timeline.recentActivity") }}</h2>
+                    <NuxtLink :to="`/pets/${petId}/timeline`" class="text-primary-400 text-sm font-medium">
+                        {{ $t("pages.pets.timeline.viewTimeline") }}
+                    </NuxtLink>
+                </div>
+                <div v-if="recentActivity?.length" class="space-y-2">
+                    <div
+                        v-for="event in recentActivity"
+                        :key="event.id"
+                        class="bg-surface-raised flex items-center gap-3 rounded-lg p-3"
+                    >
+                        <Icon :name="event.icon" :class="timelineIconClass(event.type)" class="h-4 w-4" />
+                        <span class="text-fg min-w-0 flex-1 truncate text-sm">{{ event.title }}</span>
+                        <span class="text-fg-faint flex-shrink-0 text-xs">{{ new Date(event.date).toLocaleDateString() }}</span>
+                    </div>
+                </div>
+                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.timeline.empty") }}</p>
+            </div>
         </template>
 
         <!-- Edit Modal -->
@@ -452,6 +474,24 @@ interface SheddingAnalysisResult {
     anomalyMessage: string | null;
 }
 
+interface TimelineEvent {
+    id: string;
+    type: "feeding" | "shedding" | "weight" | "vet_visit" | "photo";
+    date: string;
+    title: string;
+    detail: string | null;
+    icon: string;
+    meta: Record<string, unknown>;
+}
+
+interface TimelineResult {
+    events: TimelineEvent[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+}
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -519,6 +559,30 @@ const { data: sheddingAnalysisData } = useQuery({
 });
 
 const sheddingAnalysis = computed(() => sheddingAnalysisData.value ?? null);
+
+const { data: timelineData } = useQuery({
+    queryKey: ["timeline", petId, "preview"],
+    queryFn: () => api.get<TimelineResult>(`/api/pets/${petId}/timeline?page=1&limit=5`),
+});
+
+const recentActivity = computed(() => timelineData.value?.events ?? []);
+
+function timelineIconClass(type: string): string {
+    switch (type) {
+        case "feeding":
+            return "text-orange-400";
+        case "shedding":
+            return "text-purple-400";
+        case "weight":
+            return "text-blue-400";
+        case "vet_visit":
+            return "text-teal-400";
+        case "photo":
+            return "text-pink-400";
+        default:
+            return "text-fg-faint";
+    }
+}
 
 function formatVetCost(cents: number): string {
     return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);

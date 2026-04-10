@@ -13,6 +13,7 @@ import {
     mockSheddingAnalysis,
     mockSheddingAnalysisEmpty,
     mockUpcomingSheddings,
+    mockTimelinePreview,
 } from "./helpers/fixtures";
 
 test.describe("Shedding Analysis — Pet Detail", () => {
@@ -27,6 +28,7 @@ test.describe("Shedding Analysis — Pet Detail", () => {
         await mockGet(page, "/api/weights/growth-rate*", mockGrowthRates);
         await mockGet(page, "/api/vet-visits*", []);
         await mockGet(page, "/api/sheddings/analysis/pet_001", mockSheddingAnalysis);
+        await mockGet(page, "/api/pets/pet_001/timeline*", mockTimelinePreview);
     });
 
     test("shows shedding cycle analysis card", async ({ page }) => {
@@ -139,6 +141,7 @@ test.describe("Shedding Analysis — Anomaly Warning", () => {
         await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
         await mockGet(page, "/api/weights/growth-rate*", mockGrowthRates);
         await mockGet(page, "/api/vet-visits*", []);
+        await mockGet(page, "/api/pets/pet_001/timeline*", mockTimelinePreview);
         await mockGet(page, "/api/sheddings/analysis/pet_001", {
             ...mockSheddingAnalysis,
             isAnomaly: true,

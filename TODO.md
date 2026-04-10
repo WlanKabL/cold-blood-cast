@@ -206,34 +206,39 @@
 
 ---
 
-### Feature 4: Shedding Cycle Analysis 🐍
+### Feature 4: Shedding Cycle Analysis 🐍 ✅
 
 > Häutungszyklen analysieren, Durchschnitt + Trend, nächste Häutung vorhersagen, Warnung bei ungewöhnlichem Zyklus.
 
-**Scope:** Backend service extension + frontend components + E2E
+**Status: Complete** — Committed in `feat: shedding cycle analysis`
+
+<details>
+<summary>Completed items (click to expand)</summary>
 
 #### Backend
 
-- 🔲 **4.1** `shedding-analysis.service.ts`: `computeSheddingCycle(sheddings[])` — average interval, trend (shortening/stable/lengthening), predicted next date, anomaly detection
-- 🔲 **4.2** `shedding-analysis.routes.ts`: GET `/api/pets/:petId/shedding-analysis` (returns cycle stats + prediction)
-- 🔲 **4.3** Shedding reminder: integrate into feeding-reminder scheduler — if predicted date is today or past, add to daily email
+- ✅ **4.1** `shedding-analysis.service.ts`: `computeSheddingCycle(sheddings[])` — average interval, trend (shortening/stable/lengthening), predicted next date, anomaly detection
+- ✅ **4.2** `shedding-analysis.routes.ts`: GET `/api/sheddings/analysis/:petId` + GET `/api/sheddings/upcoming`
+- ✅ **4.3** Route registration in server.ts
 
 #### Frontend
 
-- 🔲 **4.4** Pet detail page: "Shedding Cycle" card showing average interval, last shed, predicted next, trend indicator
-- 🔲 **4.5** Shedding chart: timeline visualization of shedding intervals (bar chart, gap = interval)
-- 🔲 **4.6** Dashboard widget: "Upcoming Sheddings" card (predicted within next 7 days)
-- 🔲 **4.7** Warning badge: if cycle is >30% longer than average, show alert
+- ✅ **4.4** Pet detail page: "Shedding Cycle" card showing average interval, last shed, predicted next, trend indicator
+- ✅ **4.5** `SheddingIntervalChart.vue`: bar chart visualization of shedding intervals
+- ✅ **4.6** Dashboard widget: "Upcoming Sheddings" card (predicted within next 7 days)
+- ✅ **4.7** Warning badge: if cycle is >30% longer than average, show alert
 
 #### Testing
 
-- 🔲 **4.8** Backend unit tests: cycle computation (happy path, edge cases: single shedding, no history, irregular intervals)
-- 🔲 **4.9** Frontend unit tests: trend display, prediction formatting
-- 🔲 **4.10** Playwright E2E: navigate to pet detail, verify shedding analysis renders
+- ✅ **4.8** Backend unit tests: 22 tests (cycle computation, trend detection, anomaly, ownership, upcoming query)
+- ✅ **4.9** Frontend unit tests: 15 tests (display computation, bar colors, trend labels, prediction formatting)
+- ✅ **4.10** Playwright E2E: 11 tests (pet detail card, dashboard widget, anomaly warning)
 
 #### i18n
 
-- 🔲 **4.11** EN + DE keys: sheddingAnalysis.* (averageCycle, predicted, trend, warning)
+- ✅ **4.11** EN + DE keys: sheddingAnalysis.* (averageCycle, predicted, trend, warning, dashboard, pet detail)
+
+</details>
 
 ---
 
