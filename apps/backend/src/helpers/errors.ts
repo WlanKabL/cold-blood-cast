@@ -29,6 +29,7 @@ export const ErrorCodes = {
     // ── Pets ─────────────────────────────────────
     E_PET_NOT_FOUND: "E_PET_NOT_FOUND",
     E_PET_PHOTO_NOT_FOUND: "E_PET_PHOTO_NOT_FOUND",
+    E_PET_DOCUMENT_NOT_FOUND: "E_PET_DOCUMENT_NOT_FOUND",
 
     // ── Veterinarians ────────────────────────────
     E_VETERINARIAN_NOT_FOUND: "E_VETERINARIAN_NOT_FOUND",

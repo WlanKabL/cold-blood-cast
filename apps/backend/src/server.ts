@@ -34,6 +34,7 @@ import { sheddingRoutes, sheddingAnalysisRoutes } from "@/modules/sheddings/inde
 import { weightRoutes } from "@/modules/weights/index.js";
 import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
 import { vetVisitRoutes, vetVisitDocumentRoutes } from "@/modules/vet-visits/index.js";
+import { petDocumentRoutes } from "@/modules/pet-documents/index.js";
 import { activityTimelineRoutes } from "@/modules/activity-timeline/index.js";
 import { startVetReminderScheduler, stopVetReminderScheduler } from "@/modules/vet-reminders/index.js";
 import {
@@ -260,6 +261,7 @@ async function main() {
     await app.register(enclosureRoutes, { prefix: "/api/enclosures" });
     await app.register(petRoutes, { prefix: "/api/pets" });
     await app.register(petPhotoRoutes, { prefix: "/api/pets" });
+    await app.register(petDocumentRoutes, { prefix: "/api/pets" });
     await app.register(sensorRoutes, { prefix: "/api/sensors" });
     await app.register(feedingRoutes, { prefix: "/api/feedings" });
     await app.register(feedItemRoutes, { prefix: "/api/feed-items" });

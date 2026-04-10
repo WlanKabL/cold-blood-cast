@@ -277,7 +277,7 @@
 
 ---
 
-### Feature 6: Pet Documents 📄
+### Feature 6: Pet Documents 📄 ✅
 
 > Eigener Dokumente-Bereich pro Tier: Kaufbeleg, CITES, Herkunftsnachweis, Befunde als PDF/Bild.
 
@@ -285,28 +285,28 @@
 
 #### Backend
 
-- 🔲 **6.1** Prisma schema: `PetDocument` model (id, petId, userId, uploadId, category, label, notes, documentDate, createdAt)
-- 🔲 **6.2** Categories enum: `PURCHASE_RECEIPT`, `CITES`, `ORIGIN_CERTIFICATE`, `VET_REPORT`, `INSURANCE`, `OTHER`
-- 🔲 **6.3** Migration: `add_pet_documents`
-- 🔲 **6.4** `pet-documents.service.ts`: CRUD with ownership checks, category filter, encrypted file handling
-- 🔲 **6.5** `pet-documents.routes.ts`: REST with multipart upload
+- ✅ **6.1** Prisma schema: `PetDocument` model (id, petId, userId, uploadId, category, label, notes, documentDate, createdAt)
+- ✅ **6.2** Categories enum: `PURCHASE_RECEIPT`, `CITES`, `ORIGIN_CERTIFICATE`, `VET_REPORT`, `INSURANCE`, `OTHER`
+- ✅ **6.3** Migration: `add_pet_documents`
+- ✅ **6.4** `pet-documents.service.ts`: CRUD with ownership checks, category filter, encrypted file handling
+- ✅ **6.5** `pet-documents.routes.ts`: REST with multipart upload
 
 #### Frontend
 
-- 🔲 **6.6** `pages/pets/[id]/documents.vue`: document list grouped by category, upload button, download/view actions
-- 🔲 **6.7** Upload modal: file picker (PDF/image), category selector, label, date, notes
+- ✅ **6.6** `pages/pets/[id]/documents.vue`: document list grouped by category, upload button, download/view actions
+- ✅ **6.7** Upload modal: file picker (PDF/image), category selector, label, date, notes
 - 🔲 **6.8** PDF viewer: inline preview for PDFs (or link to download)
-- 🔲 **6.9** Pet detail page: "Documents" section with count + link
+- ✅ **6.9** Pet detail page: "Documents" section with count + link
 
 #### Testing
 
-- 🔲 **6.10** Backend unit tests: CRUD, ownership, category filter
-- 🔲 **6.11** Frontend unit tests: category grouping, upload form validation
-- 🔲 **6.12** Playwright E2E: upload document, view by category, delete
+- ✅ **6.10** Backend unit tests: CRUD, ownership, category filter
+- ✅ **6.11** Frontend unit tests: category grouping, upload form validation
+- ✅ **6.12** Playwright E2E: upload document, view by category, delete
 
 #### i18n
 
-- 🔲 **6.13** EN + DE keys: pages.pets.documents.* (title, categories, upload, empty)
+- ✅ **6.13** EN + DE keys: pages.pets.documents.* (title, categories, upload, empty)
 
 ---
 

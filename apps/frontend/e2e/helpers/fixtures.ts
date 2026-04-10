@@ -18,6 +18,7 @@ const ALL_FEATURES: Record<string, boolean> = {
     vet_visits: true,
     photos: true,
     timeline: true,
+    pet_documents: true,
     api_access: true,
 };
 
@@ -621,3 +622,44 @@ export const mockTimelinePreview = {
     limit: 5,
     hasMore: true,
 };
+
+// ─── Pet Document Fixtures ─────────────────────────────────
+
+export const mockPetDocuments = [
+    {
+        id: "doc_001",
+        petId: "pet_001",
+        userId: "usr_test_001",
+        uploadId: "upl_doc_001",
+        upload: { id: "upl_doc_001", url: "/uploads/uploads/cites-cert.pdf" },
+        category: "CITES",
+        label: "CITES Certificate 2024",
+        notes: "Official CITES certificate for Monty",
+        documentDate: "2024-03-15T00:00:00.000Z",
+        createdAt: "2025-01-20T10:00:00.000Z",
+    },
+    {
+        id: "doc_002",
+        petId: "pet_001",
+        userId: "usr_test_001",
+        uploadId: "upl_doc_002",
+        upload: { id: "upl_doc_002", url: "/uploads/uploads/vet-report.pdf" },
+        category: "VET_REPORT",
+        label: "Annual Checkup",
+        notes: null,
+        documentDate: "2025-02-10T00:00:00.000Z",
+        createdAt: "2025-02-10T12:00:00.000Z",
+    },
+    {
+        id: "doc_003",
+        petId: "pet_001",
+        userId: "usr_test_001",
+        uploadId: "upl_doc_003",
+        upload: { id: "upl_doc_003", url: "/uploads/uploads/receipt.pdf" },
+        category: "PURCHASE_RECEIPT",
+        label: null,
+        notes: null,
+        documentDate: null,
+        createdAt: "2025-03-01T08:00:00.000Z",
+    },
+];

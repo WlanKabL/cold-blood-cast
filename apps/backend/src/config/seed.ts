@@ -19,7 +19,7 @@ import { resolve } from "node:path";
 //  2. Bump CURRENT_SEED_VERSION to match the new entry's version.
 //  3. Deploy — it applies once, then never again until the next bump.
 
-const CURRENT_SEED_VERSION = 3;
+const CURRENT_SEED_VERSION = 4;
 
 // ─── Shared Data ─────────────────────────────────────────────────────────────
 
@@ -136,6 +136,12 @@ const DEFAULT_FEATURE_FLAGS = [
         name: "Activity Timeline",
         category: "care",
         description: "Unified activity timeline across all pet events",
+    },
+    {
+        key: "pet_documents",
+        name: "Pet Documents",
+        category: "care",
+        description: "Upload and organize pet documents (CITES, receipts, vet reports)",
     },
     // Alerts & monitoring
     {
@@ -496,6 +502,39 @@ const MIGRATIONS: Migration[] = [
                 "create-only",
             );
             console.log("  → photos + timeline flags assigned to all roles");
+        },
+    },
+
+    // ─────────────────────────────────────── v4: pet_documents feature flag
+    {
+        version: 4,
+        description: "Add pet_documents feature flag to all roles",
+        apply: async (ctx) => {
+            for (const flag of DEFAULT_FEATURE_FLAGS.filter((f) =>
+                ["pet_documents"].includes(f.key),
+            )) {
+                await ctx.prisma.featureFlag.upsert({
+                    where: { key: flag.key },
+                    update: {},
+                    create: { ...flag, enabled: true },
+                });
+            }
+
+            ctx.flags = await ctx.prisma.featureFlag.findMany();
+
+            await applyRoleFlagMapping(
+                ctx,
+                {
+                    FREE: { pet_documents: true },
+                    BETA_TESTER: { pet_documents: true },
+                    PREMIUM: { pet_documents: true },
+                    PRO: { pet_documents: true },
+                    MODERATOR: { pet_documents: true },
+                    ADMIN: { pet_documents: true },
+                },
+                "create-only",
+            );
+            console.log("  → pet_documents flag assigned to all roles");
         },
     },
 

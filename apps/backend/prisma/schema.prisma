@@ -75,6 +75,7 @@ model User {
     alertRules              AlertRule[]
     veterinarians           Veterinarian[]
     vetVisits               VetVisit[]
+    petDocuments            PetDocument[]
 
     @@map("users")
 }
@@ -668,6 +669,7 @@ model Upload {
     user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     petPhotos       PetPhoto[]
     vetVisitDocuments VetVisitDocument[]
+    petDocuments    PetDocument[]
 
     @@map("uploads")
 }
@@ -733,6 +735,7 @@ model Pet {
     feedItems     FeedItem[]      @relation("PetFeedItems")
     photos        PetPhoto[]
     vetVisits     VetVisit[]
+    documents     PetDocument[]
 
     @@index([userId])
     @@index([enclosureId])
@@ -761,6 +764,40 @@ model PetPhoto {
     @@index([petId])
     @@index([petId, isProfilePicture])
     @@map("pet_photos")
+}
+
+// ==========================================
+// CBC Domain: Pet Documents
+// ==========================================
+
+enum PetDocumentCategory {
+    PURCHASE_RECEIPT
+    CITES
+    ORIGIN_CERTIFICATE
+    VET_REPORT
+    INSURANCE
+    OTHER
+}
+
+model PetDocument {
+    id           String              @id @default(cuid())
+    petId        String              @map("pet_id")
+    userId       String              @map("user_id")
+    uploadId     String              @map("upload_id")
+    category     PetDocumentCategory @default(OTHER)
+    label        String?
+    notes        String?
+    documentDate DateTime?           @map("document_date")
+
+    createdAt    DateTime            @default(now()) @map("created_at")
+
+    pet          Pet                 @relation(fields: [petId], references: [id], onDelete: Cascade)
+    user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    upload       Upload              @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+
+    @@index([petId])
+    @@index([petId, category])
+    @@map("pet_documents")
 }
 
 // ==========================================

@@ -143,6 +143,56 @@
                 </div>
             </div>
 
+            <!-- Documents -->
+            <div v-if="authStore.hasFeature('pet_documents')" class="glass-card rounded-xl p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-fg font-semibold">
+                        {{ $t("pages.pets.documents.title") }}
+                        <span v-if="pet._count.documents" class="text-fg-faint ml-1 text-sm font-normal">
+                            ({{ pet._count.documents }})
+                        </span>
+                    </h2>
+                    <NuxtLink
+                        :to="`/pets/${petId}/documents`"
+                        class="text-primary-400 text-sm font-medium"
+                    >
+                        {{ $t("pages.pets.documents.viewDocuments") }}
+                    </NuxtLink>
+                </div>
+                <div v-if="pet._count.documents" class="flex items-center gap-3">
+                    <div class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl">
+                        <Icon name="lucide:file-text" class="text-primary-400 h-5 w-5" />
+                    </div>
+                    <div>
+                        <p class="text-fg text-sm">
+                            {{ $t("pages.pets.documents.documentCount", { count: pet._count.documents }) }}
+                        </p>
+                        <NuxtLink
+                            :to="`/pets/${petId}/documents`"
+                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                        >
+                            <Icon name="lucide:folder-open" class="h-3.5 w-3.5" />
+                            {{ $t("pages.pets.documents.viewDocuments") }}
+                        </NuxtLink>
+                    </div>
+                </div>
+                <div v-else class="flex items-center gap-3">
+                    <div class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl">
+                        <Icon name="lucide:file-text" class="text-fg-faint h-5 w-5" />
+                    </div>
+                    <div>
+                        <p class="text-fg-muted text-sm">{{ $t("pages.pets.documents.empty") }}</p>
+                        <NuxtLink
+                            :to="`/pets/${petId}/documents`"
+                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                        >
+                            <Icon name="lucide:upload" class="h-3.5 w-3.5" />
+                            {{ $t("pages.pets.documents.upload") }}
+                        </NuxtLink>
+                    </div>
+                </div>
+            </div>
+
             <!-- Recent Feedings -->
             <div v-if="authStore.hasFeature('feedings')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
@@ -392,7 +442,7 @@ interface Pet {
     feedingIntervalMinDays: number | null;
     feedingIntervalMaxDays: number | null;
     photos: { id: string; uploadId: string; upload: { url: string } }[];
-    _count: { photos: number };
+    _count: { photos: number; documents: number };
 }
 
 interface Feeding {
