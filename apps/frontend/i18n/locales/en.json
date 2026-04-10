@@ -758,7 +758,12 @@
             "noUpcomingVetVisits": "No upcoming vet appointments",
             "noVet": "No vet assigned",
             "weightTrends": "Weight Trends",
-            "noWeightData": "No weight data available"
+            "noWeightData": "No weight data available",
+            "upcomingSheddings": "Upcoming Sheddings",
+            "noUpcomingSheddings": "No sheddings predicted within 7 days",
+            "predictedIn": "in {days}d",
+            "predictedOverdue": "{days}d overdue",
+            "avgCycle": "avg. {days}d cycle"
         },
         "enclosures": {
             "title": "Enclosures",
@@ -865,7 +870,9 @@
                 "takenAtHint": "When was this photo taken?"
             },
             "recentVetVisits": "Recent Vet Visits",
-            "noVetVisits": "No vet visits recorded yet"
+            "noVetVisits": "No vet visits recorded yet",
+            "sheddingCycle": "Shedding Cycle",
+            "noSheddingData": "Not enough data for shedding analysis"
         },
         "sensors": {
             "title": "Sensors",
@@ -988,6 +995,23 @@
                 "quality": "Quality",
                 "qualityPlaceholder": "e.g. clean, stuck, partial",
                 "notes": "Notes"
+            },
+            "analysis": {
+                "title": "Shedding Cycle Analysis",
+                "averageCycle": "Avg. Cycle",
+                "averageCycleDays": "{days} days",
+                "predicted": "Predicted Next",
+                "lastShed": "Last Shed",
+                "trend": "Trend",
+                "trendShortening": "Shortening",
+                "trendStable": "Stable",
+                "trendLengthening": "Lengthening",
+                "warning": "Shedding Overdue",
+                "warningMessage": "Current gap exceeds average by more than 30%",
+                "noData": "Not enough shedding data for analysis",
+                "intervals": "Shedding Intervals",
+                "intervalDays": "{days}d",
+                "records": "{count} sheddings recorded"
             }
         },
         "weights": {

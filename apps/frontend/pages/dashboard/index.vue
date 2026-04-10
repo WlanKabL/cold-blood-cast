@@ -174,6 +174,58 @@
             </div>
         </div>
 
+        <!-- Upcoming Sheddings -->
+        <div>
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-fg text-lg font-semibold">
+                    {{ $t("pages.dashboard.upcomingSheddings") }}
+                </h2>
+                <NuxtLink
+                    to="/sheddings"
+                    class="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                >
+                    {{ $t("pages.dashboard.viewAll") }}
+                </NuxtLink>
+            </div>
+            <div
+                v-if="upcomingSheddings?.length"
+                class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            >
+                <NuxtLink
+                    v-for="item in upcomingSheddings"
+                    :key="item.petId"
+                    :to="`/pets/${item.petId}`"
+                    class="glass-card group rounded-xl p-4 transition-all hover:ring-1 hover:ring-white/10"
+                >
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-fg group-hover:text-primary-400 font-semibold transition-colors">{{ item.petName }}</p>
+                            <p class="text-fg-faint text-xs">
+                                {{ $t("pages.dashboard.avgCycle", { days: item.averageIntervalDays }) }}
+                            </p>
+                        </div>
+                        <span
+                            :class="item.daysUntil <= 0 ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-400'"
+                            class="shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
+                        >
+                            {{
+                                item.daysUntil <= 0
+                                    ? $t("pages.dashboard.predictedOverdue", { days: Math.abs(item.daysUntil) })
+                                    : $t("pages.dashboard.predictedIn", { days: item.daysUntil })
+                            }}
+                        </span>
+                    </div>
+                    <p class="text-fg-faint mt-2 text-xs">
+                        {{ new Date(item.predictedDate).toLocaleDateString() }}
+                    </p>
+                </NuxtLink>
+            </div>
+            <div v-else class="glass-card flex flex-col items-center rounded-xl py-8">
+                <Icon name="lucide:sparkles" class="text-fg-faint mb-2 h-8 w-8" />
+                <p class="text-fg-muted text-sm">{{ $t("pages.dashboard.noUpcomingSheddings") }}</p>
+            </div>
+        </div>
+
         <!-- Enclosures Overview -->
         <div>
             <div class="mb-4 flex items-center justify-between">
@@ -358,6 +410,14 @@ interface WeightChartSeries {
     points: { date: string; weightGrams: number }[];
 }
 
+interface UpcomingSheddingItem {
+    petId: string;
+    petName: string;
+    predictedDate: string;
+    daysUntil: number;
+    averageIntervalDays: number;
+}
+
 const { t } = useI18n();
 const api = useApi();
 
@@ -406,6 +466,11 @@ const { data: weightChartSeries } = useQuery({
     queryKey: ["weights-chart-dashboard", allPetIds],
     queryFn: () => api.get<WeightChartSeries[]>(`/api/weights/chart?petIds=${allPetIds.value}`),
     enabled: () => (pets.value ?? []).length > 0,
+});
+
+const { data: upcomingSheddings } = useQuery({
+    queryKey: ["sheddings", "upcoming"],
+    queryFn: () => api.get<UpcomingSheddingItem[]>("/api/sheddings/upcoming"),
 });
 
 function feedingStatusBadgeClass(status: string): string {

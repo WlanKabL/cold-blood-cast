@@ -9,6 +9,7 @@ import {
     mockFeedingReminders,
     mockUpcomingAppointments,
     mockWeightChartSeries,
+    mockUpcomingSheddings,
 } from "./helpers/fixtures";
 
 test.describe("Dashboard", () => {
@@ -21,6 +22,7 @@ test.describe("Dashboard", () => {
         await mockGet(page, "/api/feeding-reminders", mockFeedingReminders);
         await mockGet(page, "/api/vet-visits/upcoming", mockUpcomingAppointments);
         await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", mockUpcomingSheddings);
     });
 
     test("loads dashboard page", async ({ page }) => {
@@ -99,6 +101,7 @@ test.describe("Dashboard — Empty State", () => {
         await mockGet(page, "/api/feeding-reminders", []);
         await mockGet(page, "/api/vet-visits/upcoming", []);
         await mockGet(page, "/api/weights/chart*", []);
+        await mockGet(page, "/api/sheddings/upcoming", []);
 
         await page.goto("/dashboard");
 
@@ -115,6 +118,7 @@ test.describe("Dashboard — Empty State", () => {
         await mockGet(page, "/api/feeding-reminders", mockFeedingReminders);
         await mockGet(page, "/api/vet-visits/upcoming", []);
         await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", mockUpcomingSheddings);
 
         await page.goto("/dashboard");
 
@@ -131,6 +135,7 @@ test.describe("Dashboard — Empty State", () => {
         await mockGet(page, "/api/feeding-reminders", []);
         await mockGet(page, "/api/vet-visits/upcoming", []);
         await mockGet(page, "/api/weights/chart*", []);
+        await mockGet(page, "/api/sheddings/upcoming", []);
 
         await page.goto("/dashboard");
 
@@ -171,6 +176,7 @@ test.describe("Dashboard — Feeding Reminders", () => {
         ]);
         await mockGet(page, "/api/vet-visits/upcoming", mockUpcomingAppointments);
         await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", mockUpcomingSheddings);
 
         await page.goto("/dashboard");
 

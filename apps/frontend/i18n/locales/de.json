@@ -758,7 +758,12 @@
             "noUpcomingVetVisits": "Keine anstehenden Tierarzttermine",
             "noVet": "Kein Tierarzt zugewiesen",
             "weightTrends": "Gewichtstrends",
-            "noWeightData": "Keine Gewichtsdaten verfügbar"
+            "noWeightData": "Keine Gewichtsdaten verfügbar",
+            "upcomingSheddings": "Anstehende Häutungen",
+            "noUpcomingSheddings": "Keine Häutungen innerhalb von 7 Tagen erwartet",
+            "predictedIn": "in {days}T",
+            "predictedOverdue": "{days}T überfällig",
+            "avgCycle": "Ø {days}T Zyklus"
         },
         "enclosures": {
             "title": "Terrarien",
@@ -865,7 +870,9 @@
                 "takenAtHint": "Wann wurde das Foto aufgenommen?"
             },
             "recentVetVisits": "Letzte Tierarztbesuche",
-            "noVetVisits": "Noch keine Tierarztbesuche erfasst"
+            "noVetVisits": "Noch keine Tierarztbesuche erfasst",
+            "sheddingCycle": "Häutungszyklus",
+            "noSheddingData": "Nicht genügend Daten für Häutungsanalyse"
         },
         "sensors": {
             "title": "Sensoren",
@@ -988,6 +995,23 @@
                 "quality": "Qualität",
                 "qualityPlaceholder": "z.B. sauber, festsitzend, teilweise",
                 "notes": "Notizen"
+            },
+            "analysis": {
+                "title": "Häutungszyklus-Analyse",
+                "averageCycle": "Ø Zyklus",
+                "averageCycleDays": "{days} Tage",
+                "predicted": "Nächste Häutung",
+                "lastShed": "Letzte Häutung",
+                "trend": "Trend",
+                "trendShortening": "Verkürzt sich",
+                "trendStable": "Stabil",
+                "trendLengthening": "Verlängert sich",
+                "warning": "Häutung überfällig",
+                "warningMessage": "Aktuelle Lücke übersteigt den Durchschnitt um mehr als 30%",
+                "noData": "Nicht genügend Häutungsdaten für Analyse",
+                "intervals": "Häutungsintervalle",
+                "intervalDays": "{days}T",
+                "records": "{count} Häutungen erfasst"
             }
         },
         "weights": {

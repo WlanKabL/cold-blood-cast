@@ -474,3 +474,57 @@ export const mockWeightRecords = [
         pet: { id: "pet_002", name: "Slither" },
     },
 ];
+
+// ─── Shedding Analysis Fixtures ────────────────────────────
+
+export const mockSheddingAnalysis = {
+    petId: "pet_001",
+    petName: "Monty",
+    sheddingCount: 4,
+    averageIntervalDays: 30,
+    trend: "stable" as const,
+    predictedNextDate: new Date(Date.now() + 5 * 86400000).toISOString(),
+    lastShedDate: new Date(Date.now() - 25 * 86400000).toISOString(),
+    intervals: [
+        {
+            fromDate: "2024-06-01T00:00:00.000Z",
+            toDate: "2024-07-01T00:00:00.000Z",
+            days: 30,
+        },
+        {
+            fromDate: "2024-07-01T00:00:00.000Z",
+            toDate: "2024-08-01T00:00:00.000Z",
+            days: 31,
+        },
+        {
+            fromDate: "2024-08-01T00:00:00.000Z",
+            toDate: "2024-08-30T00:00:00.000Z",
+            days: 29,
+        },
+    ],
+    isAnomaly: false,
+    anomalyMessage: null,
+};
+
+export const mockSheddingAnalysisEmpty = {
+    petId: "pet_002",
+    petName: "Slither",
+    sheddingCount: 1,
+    averageIntervalDays: 0,
+    trend: "stable" as const,
+    predictedNextDate: null,
+    lastShedDate: "2024-09-01T00:00:00.000Z",
+    intervals: [],
+    isAnomaly: false,
+    anomalyMessage: null,
+};
+
+export const mockUpcomingSheddings = [
+    {
+        petId: "pet_001",
+        petName: "Monty",
+        predictedDate: new Date(Date.now() + 5 * 86400000).toISOString(),
+        daysUntil: 5,
+        averageIntervalDays: 30,
+    },
+];

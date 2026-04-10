@@ -213,6 +213,60 @@
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
             </div>
 
+            <!-- Shedding Cycle Analysis -->
+            <div class="glass-card rounded-xl p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-fg font-semibold">
+                        {{ $t("pages.pets.sheddingCycle") }}
+                        <span
+                            v-if="sheddingAnalysis?.isAnomaly"
+                            class="ml-2 inline-flex items-center gap-1 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                        >
+                            <Icon name="lucide:alert-triangle" class="h-3 w-3" />
+                            {{ $t("pages.sheddings.analysis.warning") }}
+                        </span>
+                    </h2>
+                    <NuxtLink to="/sheddings" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
+                </div>
+                <template v-if="sheddingAnalysis && sheddingAnalysis.sheddingCount >= 2">
+                    <div class="mb-4 flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <Icon name="lucide:calendar-clock" class="text-primary-400 h-4 w-4" />
+                            <span class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.sheddings.analysis.averageCycle") }}</span>
+                            <span class="text-fg text-sm font-semibold">{{ $t("pages.sheddings.analysis.averageCycleDays", { days: sheddingAnalysis.averageIntervalDays }) }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Icon
+                                :name="sheddingAnalysis.trend === 'shortening' ? 'lucide:trending-down' : sheddingAnalysis.trend === 'lengthening' ? 'lucide:trending-up' : 'lucide:minus'"
+                                :class="sheddingAnalysis.trend === 'shortening' ? 'text-green-400' : sheddingAnalysis.trend === 'lengthening' ? 'text-amber-400' : 'text-fg-faint'"
+                                class="h-4 w-4"
+                            />
+                            <span
+                                :class="sheddingAnalysis.trend === 'shortening' ? 'text-green-400' : sheddingAnalysis.trend === 'lengthening' ? 'text-amber-400' : 'text-fg-faint'"
+                                class="text-xs font-medium"
+                            >
+                                {{ $t(`pages.sheddings.analysis.trend${sheddingAnalysis.trend.charAt(0).toUpperCase() + sheddingAnalysis.trend.slice(1)}`) }}
+                            </span>
+                        </div>
+                        <span v-if="sheddingAnalysis.lastShedDate" class="text-fg-faint text-xs">
+                            {{ $t("pages.sheddings.analysis.lastShed") }}: {{ new Date(sheddingAnalysis.lastShedDate).toLocaleDateString() }}
+                        </span>
+                        <span v-if="sheddingAnalysis.predictedNextDate" class="text-fg-faint text-xs">
+                            {{ $t("pages.sheddings.analysis.predicted") }}: {{ new Date(sheddingAnalysis.predictedNextDate).toLocaleDateString() }}
+                        </span>
+                        <span class="text-fg-faint text-xs">
+                            {{ $t("pages.sheddings.analysis.records", { count: sheddingAnalysis.sheddingCount }) }}
+                        </span>
+                    </div>
+                    <ChartsSheddingIntervalChart
+                        :intervals="sheddingAnalysis.intervals"
+                        :average-days="sheddingAnalysis.averageIntervalDays"
+                        :height="200"
+                    />
+                </template>
+                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noSheddingData") }}</p>
+            </div>
+
             <!-- Recent Vet Visits -->
             <div class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
@@ -379,6 +433,25 @@ interface PetVetVisit {
     veterinarian: { id: string; name: string; clinicName: string | null } | null;
 }
 
+interface SheddingInterval {
+    fromDate: string;
+    toDate: string;
+    days: number;
+}
+
+interface SheddingAnalysisResult {
+    petId: string;
+    petName: string;
+    sheddingCount: number;
+    averageIntervalDays: number;
+    trend: "shortening" | "stable" | "lengthening";
+    predictedNextDate: string | null;
+    lastShedDate: string | null;
+    intervals: SheddingInterval[];
+    isAnomaly: boolean;
+    anomalyMessage: string | null;
+}
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -439,6 +512,13 @@ const { data: vetVisits } = useQuery({
     queryKey: ["vet-visits", { petId }],
     queryFn: () => api.get<PetVetVisit[]>(`/api/vet-visits?petId=${petId}`),
 });
+
+const { data: sheddingAnalysisData } = useQuery({
+    queryKey: ["shedding-analysis", petId],
+    queryFn: () => api.get<SheddingAnalysisResult>(`/api/sheddings/analysis/${petId}`),
+});
+
+const sheddingAnalysis = computed(() => sheddingAnalysisData.value ?? null);
 
 function formatVetCost(cents: number): string {
     return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);

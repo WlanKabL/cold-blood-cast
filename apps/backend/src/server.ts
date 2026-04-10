@@ -30,7 +30,7 @@ import { sensorRoutes } from "@/modules/sensors/index.js";
 import { feedingRoutes } from "@/modules/feedings/index.js";
 import { feedItemRoutes } from "@/modules/feed-items/index.js";
 import { feedingReminderRoutes, startFeedingReminderScheduler, stopFeedingReminderScheduler } from "@/modules/feeding-reminders/index.js";
-import { sheddingRoutes } from "@/modules/sheddings/index.js";
+import { sheddingRoutes, sheddingAnalysisRoutes } from "@/modules/sheddings/index.js";
 import { weightRoutes } from "@/modules/weights/index.js";
 import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
 import { vetVisitRoutes, vetVisitDocumentRoutes } from "@/modules/vet-visits/index.js";
@@ -264,6 +264,7 @@ async function main() {
     await app.register(feedItemRoutes, { prefix: "/api/feed-items" });
     await app.register(feedingReminderRoutes, { prefix: "/api/feeding-reminders" });
     await app.register(sheddingRoutes, { prefix: "/api/sheddings" });
+    await app.register(sheddingAnalysisRoutes, { prefix: "/api/sheddings" });
     await app.register(weightRoutes, { prefix: "/api/weights" });
     await app.register(veterinarianRoutes, { prefix: "/api/veterinarians" });
     await app.register(vetVisitRoutes, { prefix: "/api/vet-visits" });
