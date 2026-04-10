@@ -560,8 +560,10 @@ model VetVisit {
     petId           String       @map("pet_id")
     veterinarianId  String?      @map("veterinarian_id")
     userId          String       @map("user_id")
+    sourceVisitId   String?      @map("source_visit_id")
     visitDate       DateTime     @map("visit_date")
     visitType       VetVisitType @default(OTHER) @map("visit_type")
+    isAppointment   Boolean      @default(false) @map("is_appointment")
     reason          String?
     diagnosis       String?
     treatment       String?
@@ -576,11 +578,14 @@ model VetVisit {
     pet          Pet              @relation(fields: [petId], references: [id], onDelete: Cascade)
     veterinarian Veterinarian?    @relation(fields: [veterinarianId], references: [id], onDelete: SetNull)
     user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    sourceVisit  VetVisit?        @relation("FollowUp", fields: [sourceVisitId], references: [id], onDelete: SetNull)
+    followUps    VetVisit[]       @relation("FollowUp")
     documents    VetVisitDocument[]
 
     @@index([petId])
     @@index([userId])
     @@index([veterinarianId])
+    @@index([sourceVisitId])
     @@index([userId, nextAppointment])
     @@map("vet_visits")
 }

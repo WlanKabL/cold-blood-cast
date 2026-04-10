@@ -32,6 +32,7 @@ const {
     deleteVetVisit,
     getUpcomingAppointments,
     getVetCosts,
+    convertAppointment,
 } = await import("../vet-visits.service.js");
 
 const USER_ID = "user_123";
@@ -42,7 +43,16 @@ const VISIT_ID = "visit_abc";
 const VISIT_INCLUDE = {
     pet: { select: { id: true, name: true, species: true } },
     veterinarian: { select: { id: true, name: true, clinicName: true } },
-    documents: { include: { upload: { select: { url: true } } } },
+    sourceVisit: { select: { id: true, visitDate: true, visitType: true, reason: true } },
+    documents: { include: { upload: { select: { id: true, url: true } } } },
+};
+
+const VISIT_DETAIL_INCLUDE = {
+    ...VISIT_INCLUDE,
+    followUps: {
+        select: { id: true, visitDate: true, visitType: true, isAppointment: true, reason: true },
+        orderBy: { visitDate: "asc" },
+    },
 };
 
 function makeVisit(overrides = {}) {
@@ -51,8 +61,10 @@ function makeVisit(overrides = {}) {
         userId: USER_ID,
         petId: PET_ID,
         veterinarianId: VET_ID,
+        sourceVisitId: null,
         visitDate: new Date("2024-06-15"),
         visitType: "CHECKUP",
+        isAppointment: false,
         reason: "Annual checkup",
         diagnosis: "Healthy",
         treatment: null,
@@ -64,6 +76,7 @@ function makeVisit(overrides = {}) {
         updatedAt: new Date("2024-06-15"),
         pet: { id: PET_ID, name: "Monty", species: "corn_snake" },
         veterinarian: { id: VET_ID, name: "Dr. Schmidt", clinicName: "Reptile Clinic" },
+        sourceVisit: null,
         documents: [],
         ...overrides,
     };
@@ -144,6 +157,18 @@ describe("listVetVisits", () => {
         });
     });
 
+    it("filters by isAppointment", async () => {
+        mockPrisma.vetVisit.findMany.mockResolvedValue([]);
+
+        await listVetVisits(USER_ID, { isAppointment: true });
+
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith({
+            where: { userId: USER_ID, isAppointment: true },
+            include: VISIT_INCLUDE,
+            orderBy: { visitDate: "desc" },
+        });
+    });
+
     it("combines multiple filters", async () => {
         mockPrisma.vetVisit.findMany.mockResolvedValue([]);
 
@@ -168,7 +193,7 @@ describe("getVetVisit", () => {
 
         expect(mockPrisma.vetVisit.findUnique).toHaveBeenCalledWith({
             where: { id: VISIT_ID },
-            include: VISIT_INCLUDE,
+            include: VISIT_DETAIL_INCLUDE,
         });
         expect(result).toEqual(visit);
     });
@@ -224,6 +249,8 @@ describe("createVetVisit", () => {
                 veterinarianId: VET_ID,
                 visitDate: expect.any(Date),
                 visitType: "CHECKUP",
+                isAppointment: false,
+                sourceVisitId: null,
                 reason: "Annual checkup",
                 diagnosis: "Healthy",
                 treatment: null,
@@ -235,6 +262,60 @@ describe("createVetVisit", () => {
             include: VISIT_INCLUDE,
         });
         expect(result).toEqual(created);
+    });
+
+    it("creates an appointment with isAppointment=true", async () => {
+        mockPrisma.pet.findUnique.mockResolvedValue({ userId: USER_ID });
+        const created = makeVisit({ isAppointment: true });
+        mockPrisma.vetVisit.create.mockResolvedValue(created);
+
+        await createVetVisit(USER_ID, {
+            petId: PET_ID,
+            visitDate: "2025-06-15",
+            isAppointment: true,
+        });
+
+        expect(mockPrisma.vetVisit.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({
+                isAppointment: true,
+            }),
+            include: VISIT_INCLUDE,
+        });
+        // Should NOT log weight for appointments
+        expect(mockPrisma.weightRecord.create).not.toHaveBeenCalled();
+    });
+
+    it("does not log weight for appointments even if weightGrams provided", async () => {
+        mockPrisma.pet.findUnique.mockResolvedValue({ userId: USER_ID });
+        mockPrisma.vetVisit.create.mockResolvedValue(makeVisit({ isAppointment: true }));
+
+        await createVetVisit(USER_ID, {
+            petId: PET_ID,
+            visitDate: "2025-06-15",
+            isAppointment: true,
+            weightGrams: 350,
+        });
+
+        expect(mockPrisma.weightRecord.create).not.toHaveBeenCalled();
+    });
+
+    it("stores sourceVisitId when provided", async () => {
+        mockPrisma.pet.findUnique.mockResolvedValue({ userId: USER_ID });
+        mockPrisma.vetVisit.create.mockResolvedValue(makeVisit({ sourceVisitId: "visit_source" }));
+
+        await createVetVisit(USER_ID, {
+            petId: PET_ID,
+            visitDate: "2025-06-15",
+            isAppointment: true,
+            sourceVisitId: "visit_source",
+        });
+
+        expect(mockPrisma.vetVisit.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({
+                sourceVisitId: "visit_source",
+            }),
+            include: VISIT_INCLUDE,
+        });
     });
 
     it("auto-logs weight to weightRecord when weightGrams provided", async () => {
@@ -282,6 +363,8 @@ describe("createVetVisit", () => {
                 petId: PET_ID,
                 veterinarianId: null,
                 visitType: "OTHER",
+                isAppointment: false,
+                sourceVisitId: null,
                 reason: null,
                 diagnosis: null,
                 treatment: null,
@@ -420,35 +503,106 @@ describe("deleteVetVisit", () => {
 // ─── getUpcomingAppointments ───────────────────────────
 
 describe("getUpcomingAppointments", () => {
-    it("returns upcoming appointments ordered by date asc", async () => {
-        const upcoming = [
-            makeVisit({ nextAppointment: new Date("2025-01-15") }),
-            makeVisit({ id: "visit_2", nextAppointment: new Date("2025-03-20") }),
-        ];
-        mockPrisma.vetVisit.findMany.mockResolvedValue(upcoming);
+    it("returns merged scheduled appointments and follow-ups sorted by date", async () => {
+        const scheduled = [makeVisit({ id: "v1", isAppointment: true, visitDate: new Date("2025-02-01") })];
+        const followUps = [makeVisit({ id: "v2", isAppointment: false, nextAppointment: new Date("2025-01-15") })];
+        mockPrisma.vetVisit.findMany
+            .mockResolvedValueOnce(scheduled)
+            .mockResolvedValueOnce(followUps);
 
         const result = await getUpcomingAppointments(USER_ID);
 
-        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith({
-            where: {
-                userId: USER_ID,
-                nextAppointment: { gte: expect.any(Date) },
-            },
-            include: VISIT_INCLUDE,
-            orderBy: { nextAppointment: "asc" },
-            take: 10,
-        });
-        expect(result).toEqual(upcoming);
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledTimes(2);
+        // First call: scheduled appointments
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({ isAppointment: true }),
+            }),
+        );
+        // Second call: follow-ups
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({ isAppointment: false }),
+            }),
+        );
+        // Follow-up (Jan 15) should come before scheduled (Feb 1)
+        expect(result[0].id).toBe("v2");
+        expect(result[1].id).toBe("v1");
     });
 
     it("respects custom limit", async () => {
-        mockPrisma.vetVisit.findMany.mockResolvedValue([]);
+        mockPrisma.vetVisit.findMany
+            .mockResolvedValueOnce([])
+            .mockResolvedValueOnce([]);
 
         await getUpcomingAppointments(USER_ID, 5);
 
         expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith(
             expect.objectContaining({ take: 5 }),
         );
+    });
+});
+
+// ─── convertAppointment ───────────────────────────────
+
+describe("convertAppointment", () => {
+    it("converts a scheduled appointment to a completed visit", async () => {
+        const appointment = makeVisit({ isAppointment: true });
+        mockPrisma.vetVisit.findUnique.mockResolvedValue(appointment);
+        const converted = makeVisit({ isAppointment: false, diagnosis: "All clear" });
+        mockPrisma.vetVisit.update.mockResolvedValue(converted);
+
+        const result = await convertAppointment(VISIT_ID, USER_ID, {
+            visitDate: "2024-06-15",
+            diagnosis: "All clear",
+        });
+
+        expect(mockPrisma.vetVisit.update).toHaveBeenCalledWith({
+            where: { id: VISIT_ID },
+            data: expect.objectContaining({
+                isAppointment: false,
+                diagnosis: "All clear",
+            }),
+            include: VISIT_INCLUDE,
+        });
+        expect(result).toEqual(converted);
+    });
+
+    it("auto-logs weight when converting with weightGrams", async () => {
+        const appointment = makeVisit({ isAppointment: true });
+        mockPrisma.vetVisit.findUnique.mockResolvedValue(appointment);
+        mockPrisma.vetVisit.update.mockResolvedValue(makeVisit({ isAppointment: false }));
+        mockPrisma.weightRecord.create.mockResolvedValue({});
+
+        await convertAppointment(VISIT_ID, USER_ID, {
+            visitDate: "2024-06-15",
+            weightGrams: 400,
+        });
+
+        expect(mockPrisma.weightRecord.create).toHaveBeenCalledWith({
+            data: {
+                petId: PET_ID,
+                measuredAt: expect.any(Date),
+                weightGrams: 400,
+                notes: "Vet visit weight",
+            },
+        });
+    });
+
+    it("throws when visit is not an appointment", async () => {
+        mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit({ isAppointment: false }));
+
+        await expect(
+            convertAppointment(VISIT_ID, USER_ID, {}),
+        ).rejects.toThrow("Visit is not an appointment");
+    });
+
+    it("throws notFound for non-owned visit", async () => {
+        mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit({ userId: "other_user" }));
+
+        await expect(
+            convertAppointment(VISIT_ID, USER_ID, {}),
+        ).rejects.toThrow("Vet visit not found");
     });
 });
 

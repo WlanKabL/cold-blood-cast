@@ -137,36 +137,36 @@
 
 #### Backend
 
-- 🔲 **2.1** Prisma schema: `Veterinarian` model (id, userId, name, clinicName, address, phone, email, notes, createdAt)
-- 🔲 **2.2** Prisma schema: `VetVisit` model (id, petId, veterinarianId, userId, visitDate, reason, diagnosis, treatment, costCents, nextAppointment, notes, documents[], createdAt)
-- 🔲 **2.3** `VetVisitDocument` model (id, vetVisitId, uploadId, label) — for PDF/image attachments
-- 🔲 **2.4** Migration: `add_vet_visits`
-- 🔲 **2.5** `veterinarians.service.ts`: CRUD with ownership checks
-- 🔲 **2.6** `veterinarians.routes.ts`: standard REST (GET, POST, PUT, DELETE)
-- 🔲 **2.7** `vet-visits.service.ts`: CRUD, cost aggregation per pet, cost aggregation per vet, upcoming appointments query
-- 🔲 **2.8** `vet-visits.routes.ts`: REST + GET `/api/vet-visits/upcoming` + GET `/api/vet-visits/costs?petId=X`
-- 🔲 **2.9** Vet visit reminder scheduler: daily check at 08:00, email when nextAppointment is tomorrow or today
-- 🔲 **2.10** Email template: `vet-appointment-reminder.ts` (localized DE/EN)
+- ✅ **2.1** Prisma schema: `Veterinarian` model (id, userId, name, clinicName, address, phone, email, notes, createdAt)
+- ✅ **2.2** Prisma schema: `VetVisit` model (id, petId, veterinarianId, userId, visitDate, reason, diagnosis, treatment, costCents, nextAppointment, notes, documents[], createdAt)
+- ✅ **2.3** `VetVisitDocument` model (id, vetVisitId, uploadId, label) — for PDF/image attachments
+- ✅ **2.4** Migration: `add_vet_visits`
+- ✅ **2.5** `veterinarians.service.ts`: CRUD with ownership checks
+- ✅ **2.6** `veterinarians.routes.ts`: standard REST (GET, POST, PUT, DELETE)
+- ✅ **2.7** `vet-visits.service.ts`: CRUD, cost aggregation per pet, cost aggregation per vet, upcoming appointments query
+- ✅ **2.8** `vet-visits.routes.ts`: REST + GET `/api/vet-visits/upcoming` + GET `/api/vet-visits/costs?petId=X`
+- ✅ **2.9** Vet visit reminder scheduler: daily check at 08:00, email when nextAppointment is tomorrow or today
+- ✅ **2.10** Email template: `vet-appointment-reminder.ts` (localized DE/EN)
 
 #### Frontend
 
-- 🔲 **2.11** `pages/veterinarians/index.vue`: Vet CRUD page (list, create, edit, delete)
-- 🔲 **2.12** `pages/vet-visits/index.vue`: Visit list with pet filter, vet filter, date range
-- 🔲 **2.13** Create/edit modal: date, vet selector, reason, diagnosis, treatment, cost, next appointment, document upload
-- 🔲 **2.14** Cost overview: summary card showing total costs per pet, per vet, per year
-- 🔲 **2.15** Pet detail page: section showing recent vet visits + total cost
-- 🔲 **2.16** Dashboard widget: "Upcoming Vet Appointments" card
-- 🔲 **2.17** Sidebar + topbar navigation entries
+- ✅ **2.11** `pages/veterinarians/index.vue`: Vet CRUD page (list, create, edit, delete)
+- ✅ **2.12** `pages/vet-visits/index.vue`: Visit list with pet filter, vet filter, date range
+- ✅ **2.13** Create/edit modal: date, vet selector, reason, diagnosis, treatment, cost, next appointment, document upload
+- ✅ **2.14** Cost overview: summary card showing total costs per pet, per vet, per year
+- ✅ **2.15** Pet detail page: section showing recent vet visits + total cost
+- ✅ **2.16** Dashboard widget: "Upcoming Vet Appointments" card
+- ✅ **2.17** Sidebar + topbar navigation entries
 
 #### Testing
 
-- 🔲 **2.18** Backend unit tests: veterinarians.service.ts, vet-visits.service.ts (CRUD, ownership, cost aggregation, upcoming query)
-- 🔲 **2.19** Frontend unit tests: cost calculations, date formatting
-- 🔲 **2.20** Playwright E2E: create vet, create visit, check cost summary, upcoming appointments
+- ✅ **2.18** Backend unit tests: veterinarians.service.ts, vet-visits.service.ts (CRUD, ownership, cost aggregation, upcoming query)
+- ✅ **2.19** Frontend unit tests: cost calculations, date formatting
+- ✅ **2.20** Playwright E2E: create vet, create visit, check cost summary, upcoming appointments
 
 #### i18n
 
-- 🔲 **2.21** EN + DE keys: pages.veterinarians.*, pages.vetVisits.*, dashboard vet widget
+- ✅ **2.21** EN + DE keys: pages.veterinarians.*, pages.vetVisits.*, dashboard vet widget
 
 ---
 

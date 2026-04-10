@@ -35,6 +35,7 @@ export const ErrorCodes = {
 
     // ── Vet Visits ───────────────────────────────
     E_VET_VISIT_NOT_FOUND: "E_VET_VISIT_NOT_FOUND",
+    E_VET_VISIT_DOCUMENT_NOT_FOUND: "E_VET_VISIT_DOCUMENT_NOT_FOUND",
 
     // ── Sensors ──────────────────────────────────
     E_SENSOR_NOT_FOUND: "E_SENSOR_NOT_FOUND",

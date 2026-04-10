@@ -5,7 +5,16 @@ import { ErrorCodes, notFound } from "@/helpers/errors.js";
 const VISIT_INCLUDE = {
     pet: { select: { id: true, name: true, species: true } },
     veterinarian: { select: { id: true, name: true, clinicName: true } },
-    documents: { include: { upload: { select: { url: true } } } },
+    sourceVisit: { select: { id: true, visitDate: true, visitType: true, reason: true } },
+    documents: { include: { upload: { select: { id: true, url: true } } } },
+} as const;
+
+const VISIT_DETAIL_INCLUDE = {
+    ...VISIT_INCLUDE,
+    followUps: {
+        select: { id: true, visitDate: true, visitType: true, isAppointment: true, reason: true },
+        orderBy: { visitDate: "asc" as const },
+    },
 } as const;
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -39,6 +48,7 @@ export async function listVetVisits(
         petId?: string;
         veterinarianId?: string;
         visitType?: VetVisitType;
+        isAppointment?: boolean;
         from?: string;
         to?: string;
     },
@@ -48,6 +58,7 @@ export async function listVetVisits(
     if (opts?.petId) where.petId = opts.petId;
     if (opts?.veterinarianId) where.veterinarianId = opts.veterinarianId;
     if (opts?.visitType) where.visitType = opts.visitType;
+    if (opts?.isAppointment !== undefined) where.isAppointment = opts.isAppointment;
     if (opts?.from || opts?.to) {
         where.visitDate = {
             ...(opts?.from ? { gte: new Date(opts.from) } : {}),
@@ -65,7 +76,14 @@ export async function listVetVisits(
 // ─── Get Single Visit ────────────────────────────────────────
 
 export async function getVetVisit(visitId: string, userId: string) {
-    return getVisitWithOwnershipCheck(visitId, userId);
+    const visit = await prisma.vetVisit.findUnique({
+        where: { id: visitId },
+        include: VISIT_DETAIL_INCLUDE,
+    });
+    if (!visit || visit.userId !== userId) {
+        throw notFound(ErrorCodes.E_VET_VISIT_NOT_FOUND, "Vet visit not found");
+    }
+    return visit;
 }
 
 // ─── Create Vet Visit ────────────────────────────────────────
@@ -77,6 +95,8 @@ export async function createVetVisit(
         veterinarianId?: string;
         visitDate: string;
         visitType?: VetVisitType;
+        isAppointment?: boolean;
+        sourceVisitId?: string;
         reason?: string;
         diagnosis?: string;
         treatment?: string;
@@ -105,6 +125,8 @@ export async function createVetVisit(
             veterinarianId: data.veterinarianId ?? null,
             visitDate: new Date(data.visitDate),
             visitType: data.visitType ?? "OTHER",
+            isAppointment: data.isAppointment ?? false,
+            sourceVisitId: data.sourceVisitId ?? null,
             reason: data.reason ?? null,
             diagnosis: data.diagnosis ?? null,
             treatment: data.treatment ?? null,
@@ -116,8 +138,8 @@ export async function createVetVisit(
         include: VISIT_INCLUDE,
     });
 
-    // Auto-log weight if provided
-    if (data.weightGrams !== undefined && data.weightGrams !== null) {
+    // Auto-log weight if provided (only for completed visits)
+    if (!data.isAppointment && data.weightGrams !== undefined && data.weightGrams !== null) {
         await prisma.weightRecord.create({
             data: {
                 petId: data.petId,
@@ -181,6 +203,58 @@ export async function updateVetVisit(
     });
 }
 
+// ─── Convert Appointment to Completed Visit ──────────────────
+
+export async function convertAppointment(
+    visitId: string,
+    userId: string,
+    data: {
+        visitDate?: string;
+        diagnosis?: string;
+        treatment?: string;
+        costCents?: number;
+        weightGrams?: number;
+        nextAppointment?: string;
+        notes?: string;
+    },
+) {
+    const visit = await getVisitWithOwnershipCheck(visitId, userId);
+
+    if (!visit.isAppointment) {
+        throw notFound(ErrorCodes.E_VET_VISIT_NOT_FOUND, "Visit is not an appointment");
+    }
+
+    const updated = await prisma.vetVisit.update({
+        where: { id: visitId },
+        data: {
+            isAppointment: false,
+            visitDate: data.visitDate ? new Date(data.visitDate) : visit.visitDate,
+            diagnosis: data.diagnosis ?? null,
+            treatment: data.treatment ?? null,
+            costCents: data.costCents ?? null,
+            weightGrams: data.weightGrams ?? null,
+            nextAppointment: data.nextAppointment ? new Date(data.nextAppointment) : null,
+            notes: data.notes ?? visit.notes,
+        },
+        include: VISIT_INCLUDE,
+    });
+
+    // Auto-log weight if provided
+    if (data.weightGrams !== undefined && data.weightGrams !== null) {
+        const actualDate = data.visitDate ? new Date(data.visitDate) : visit.visitDate;
+        await prisma.weightRecord.create({
+            data: {
+                petId: visit.petId,
+                measuredAt: actualDate,
+                weightGrams: data.weightGrams,
+                notes: `Vet visit weight`,
+            },
+        });
+    }
+
+    return updated;
+}
+
 // ─── Delete Vet Visit ────────────────────────────────────────
 
 export async function deleteVetVisit(visitId: string, userId: string) {
@@ -191,15 +265,39 @@ export async function deleteVetVisit(visitId: string, userId: string) {
 // ─── Upcoming Appointments ───────────────────────────────────
 
 export async function getUpcomingAppointments(userId: string, limit = 10) {
-    return prisma.vetVisit.findMany({
-        where: {
-            userId,
-            nextAppointment: { gte: new Date() },
-        },
-        include: VISIT_INCLUDE,
-        orderBy: { nextAppointment: "asc" },
-        take: limit,
-    });
+    const now = new Date();
+
+    // Include both: scheduled appointments (visitDate >= now) and completed visits with upcoming next appointments
+    const [scheduled, followUps] = await Promise.all([
+        prisma.vetVisit.findMany({
+            where: {
+                userId,
+                isAppointment: true,
+                visitDate: { gte: now },
+            },
+            include: VISIT_INCLUDE,
+            orderBy: { visitDate: "asc" },
+            take: limit,
+        }),
+        prisma.vetVisit.findMany({
+            where: {
+                userId,
+                isAppointment: false,
+                nextAppointment: { gte: now },
+            },
+            include: VISIT_INCLUDE,
+            orderBy: { nextAppointment: "asc" },
+            take: limit,
+        }),
+    ]);
+
+    // Merge and sort by the relevant date
+    const merged = [
+        ...scheduled.map((v) => ({ ...v, _sortDate: v.visitDate })),
+        ...followUps.map((v) => ({ ...v, _sortDate: v.nextAppointment! })),
+    ].sort((a, b) => a._sortDate.getTime() - b._sortDate.getTime());
+
+    return merged.slice(0, limit);
 }
 
 // ─── Cost Aggregation ────────────────────────────────────────

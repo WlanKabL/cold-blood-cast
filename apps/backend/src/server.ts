@@ -33,7 +33,7 @@ import { feedingReminderRoutes, startFeedingReminderScheduler, stopFeedingRemind
 import { sheddingRoutes } from "@/modules/sheddings/index.js";
 import { weightRoutes } from "@/modules/weights/index.js";
 import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
-import { vetVisitRoutes } from "@/modules/vet-visits/index.js";
+import { vetVisitRoutes, vetVisitDocumentRoutes } from "@/modules/vet-visits/index.js";
 import { startVetReminderScheduler, stopVetReminderScheduler } from "@/modules/vet-reminders/index.js";
 import {
     startMaintenanceScheduler,
@@ -267,6 +267,7 @@ async function main() {
     await app.register(weightRoutes, { prefix: "/api/weights" });
     await app.register(veterinarianRoutes, { prefix: "/api/veterinarians" });
     await app.register(vetVisitRoutes, { prefix: "/api/vet-visits" });
+    await app.register(vetVisitDocumentRoutes, { prefix: "/api/vet-visits" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {

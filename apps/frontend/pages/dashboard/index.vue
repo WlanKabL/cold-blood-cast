@@ -228,19 +228,24 @@
                     :key="visit.id"
                     class="glass-card rounded-xl p-4"
                 >
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="min-w-0 flex-1">
-                            <p class="text-fg font-semibold">{{ visit.pet?.name }}</p>
-                            <p class="text-fg-faint text-xs">
-                                {{ visit.veterinarian?.name ?? $t("pages.dashboard.noVet") }}
-                                <template v-if="visit.veterinarian?.clinicName"> · {{ visit.veterinarian.clinicName }}</template>
-                            </p>
+                    <NuxtLink :to="`/vet-visits/${visit.id}`" class="block">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-fg font-semibold">{{ visit.pet?.name }}</p>
+                                <p class="text-fg-faint text-xs">
+                                    {{ visit.veterinarian?.name ?? $t("pages.dashboard.noVet") }}
+                                    <template v-if="visit.veterinarian?.clinicName"> · {{ visit.veterinarian.clinicName }}</template>
+                                </p>
+                            </div>
+                            <span
+                                :class="visit.isAppointment ? 'bg-amber-500/10 text-amber-400' : 'bg-teal-500/10 text-teal-400'"
+                                class="shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
+                            >
+                                {{ new Date(visit._sortDate).toLocaleDateString() }}
+                            </span>
                         </div>
-                        <span class="bg-teal-500/10 text-teal-400 shrink-0 rounded-md px-2 py-0.5 text-xs font-medium">
-                            {{ new Date(visit.nextAppointment).toLocaleDateString() }}
-                        </span>
-                    </div>
-                    <p v-if="visit.reason" class="text-fg-faint mt-2 text-xs">{{ visit.reason }}</p>
+                        <p v-if="visit.reason" class="text-fg-faint mt-2 text-xs">{{ visit.reason }}</p>
+                    </NuxtLink>
                 </div>
             </div>
             <div v-else class="glass-card flex flex-col items-center rounded-xl py-8">
@@ -294,7 +299,10 @@ interface FeedingStatusItem {
 interface UpcomingVetVisit {
     id: string;
     reason: string | null;
-    nextAppointment: string;
+    isAppointment: boolean;
+    visitDate: string;
+    nextAppointment: string | null;
+    _sortDate: string;
     pet: { id: string; name: string; species: string } | null;
     veterinarian: { id: string; name: string; clinicName: string | null } | null;
 }

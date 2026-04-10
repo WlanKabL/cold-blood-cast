@@ -46,26 +46,78 @@ async function getUsersWithUpcomingAppointments(): Promise<UserReminderGroup[]> 
     const tomorrowEnd = new Date(todayStart);
     tomorrowEnd.setDate(tomorrowEnd.getDate() + 2);
 
-    const visits = await prisma.vetVisit.findMany({
-        where: {
-            nextAppointment: {
-                gte: todayStart,
-                lt: tomorrowEnd,
+    // Fetch both: completed visits with nextAppointment, and scheduled appointments by visitDate
+    const [followUpVisits, scheduledVisits] = await Promise.all([
+        prisma.vetVisit.findMany({
+            where: {
+                isAppointment: false,
+                nextAppointment: {
+                    gte: todayStart,
+                    lt: tomorrowEnd,
+                },
             },
-        },
-        include: {
-            user: { select: { id: true, email: true, username: true, locale: true, emailVerified: true } },
-            pet: { select: { name: true, species: true } },
-            veterinarian: { select: { name: true, clinicName: true } },
-        },
-    });
+            include: {
+                user: { select: { id: true, email: true, username: true, locale: true, emailVerified: true } },
+                pet: { select: { name: true, species: true } },
+                veterinarian: { select: { name: true, clinicName: true } },
+            },
+        }),
+        prisma.vetVisit.findMany({
+            where: {
+                isAppointment: true,
+                visitDate: {
+                    gte: todayStart,
+                    lt: tomorrowEnd,
+                },
+            },
+            include: {
+                user: { select: { id: true, email: true, username: true, locale: true, emailVerified: true } },
+                pet: { select: { name: true, species: true } },
+                veterinarian: { select: { name: true, clinicName: true } },
+            },
+        }),
+    ]);
 
     const grouped = new Map<string, UserReminderGroup>();
 
-    for (const visit of visits) {
+    for (const visit of followUpVisits) {
         if (!visit.user.emailVerified) continue;
 
         const apptDate = visit.nextAppointment!;
+        const isToday = apptDate.toDateString() === now.toDateString();
+
+        const appointment: VetReminderAppointment = {
+            petName: visit.pet.name,
+            species: visit.pet.species,
+            vetName: visit.veterinarian?.name ?? null,
+            clinicName: visit.veterinarian?.clinicName ?? null,
+            appointmentDate: apptDate.toLocaleDateString(visit.user.locale === "de" ? "de-DE" : "en-US", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            }),
+            isToday,
+        };
+
+        const existing = grouped.get(visit.userId);
+        if (existing) {
+            existing.appointments.push(appointment);
+        } else {
+            grouped.set(visit.userId, {
+                userId: visit.user.id,
+                email: visit.user.email,
+                username: visit.user.username,
+                locale: visit.user.locale,
+                appointments: [appointment],
+            });
+        }
+    }
+
+    for (const visit of scheduledVisits) {
+        if (!visit.user.emailVerified) continue;
+
+        const apptDate = visit.visitDate;
         const isToday = apptDate.toDateString() === now.toDateString();
 
         const appointment: VetReminderAppointment = {

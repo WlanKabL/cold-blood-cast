@@ -19,7 +19,7 @@ import { resolve } from "node:path";
 //  2. Bump CURRENT_SEED_VERSION to match the new entry's version.
 //  3. Deploy — it applies once, then never again until the next bump.
 
-const CURRENT_SEED_VERSION = 1;
+const CURRENT_SEED_VERSION = 2;
 
 // ─── Shared Data ─────────────────────────────────────────────────────────────
 
@@ -118,6 +118,12 @@ const DEFAULT_FEATURE_FLAGS = [
         name: "Weights",
         category: "care",
         description: "Monitor weight over time",
+    },
+    {
+        key: "vet_visits",
+        name: "Vet Visits",
+        category: "care",
+        description: "Track veterinary visits, appointments, and health checks",
     },
     // Alerts & monitoring
     {
@@ -421,6 +427,27 @@ const MIGRATIONS: Migration[] = [
             }
 
             console.log("  → Foundation complete: roles, flags, settings, limits, legal docs");
+        },
+    },
+
+    // ─────────────────────────────────────── v2: Vet Visits feature flag
+    {
+        version: 2,
+        description: "Add vet_visits feature flag to all roles",
+        apply: async (ctx) => {
+            await applyRoleFlagMapping(
+                ctx,
+                {
+                    FREE: { vet_visits: true },
+                    BETA_TESTER: { vet_visits: true },
+                    PREMIUM: { vet_visits: true },
+                    PRO: { vet_visits: true },
+                    MODERATOR: { vet_visits: true },
+                    ADMIN: { vet_visits: true },
+                },
+                "create-only",
+            );
+            console.log("  → vet_visits flag assigned to all roles");
         },
     },
 

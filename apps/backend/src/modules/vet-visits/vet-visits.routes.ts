@@ -9,6 +9,7 @@ import {
     deleteVetVisit,
     getUpcomingAppointments,
     getVetCosts,
+    convertAppointment,
 } from "./vet-visits.service.js";
 
 const VetVisitTypeEnum = z.enum([
@@ -28,6 +29,8 @@ const CreateVisitSchema = z.object({
     veterinarianId: z.string().min(1).optional(),
     visitDate: z.string().datetime({ offset: true }),
     visitType: VetVisitTypeEnum.optional(),
+    isAppointment: z.boolean().optional(),
+    sourceVisitId: z.string().min(1).optional(),
     reason: z.string().max(500).optional(),
     diagnosis: z.string().max(2000).optional(),
     treatment: z.string().max(2000).optional(),
@@ -60,16 +63,20 @@ export async function vetVisitRoutes(app: FastifyInstance) {
             petId?: string;
             veterinarianId?: string;
             visitType?: string;
+            isAppointment?: string;
             from?: string;
             to?: string;
         };
     }>("/", async (request) => {
-        const { petId, veterinarianId, visitType, from, to } = request.query;
+        const { petId, veterinarianId, visitType, isAppointment, from, to } = request.query;
         const parsedType = visitType ? VetVisitTypeEnum.parse(visitType) : undefined;
+        const parsedIsAppointment =
+            isAppointment === "true" ? true : isAppointment === "false" ? false : undefined;
         const data = await listVetVisits(request.userId, {
             petId,
             veterinarianId,
             visitType: parsedType,
+            isAppointment: parsedIsAppointment,
             from,
             to,
         });
@@ -120,5 +127,22 @@ export async function vetVisitRoutes(app: FastifyInstance) {
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deleteVetVisit(request.params.id, request.userId);
         return { success: true, data: null };
+    });
+
+    // ── POST /api/vet-visits/:id/convert ──────────
+    const ConvertSchema = z.object({
+        visitDate: z.string().datetime({ offset: true }).optional(),
+        diagnosis: z.string().max(2000).optional(),
+        treatment: z.string().max(2000).optional(),
+        costCents: z.number().int().min(0).optional(),
+        weightGrams: z.number().min(0).optional(),
+        nextAppointment: z.string().datetime({ offset: true }).optional(),
+        notes: z.string().max(5000).optional(),
+    });
+
+    app.post<{ Params: { id: string } }>("/:id/convert", async (request) => {
+        const body = ConvertSchema.parse(request.body);
+        const data = await convertAppointment(request.params.id, request.userId, body);
+        return { success: true, data };
     });
 }
