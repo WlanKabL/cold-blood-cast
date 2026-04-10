@@ -108,7 +108,7 @@ import { REGISTRATION_MODES, NOTIFICATION_SETTING_KEYS } from "@cold-blood-cast/
 definePageMeta({ layout: "admin" });
 
 const admin = useAdminApi();
-const toast = useToast();
+const toast = useAppToast();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 

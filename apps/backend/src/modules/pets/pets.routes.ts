@@ -23,11 +23,13 @@ export async function petRoutes(app: FastifyInstance) {
     app.addHook("preHandler", emailVerifiedGuard);
 
     app.get("/", async (request) => {
-        return listPets(request.userId);
+        const data = await listPets(request.userId);
+        return { success: true, data };
     });
 
     app.get<{ Params: { id: string } }>("/:id", async (request) => {
-        return getPet(request.params.id, request.userId);
+        const data = await getPet(request.params.id, request.userId);
+        return { success: true, data };
     });
 
     app.post("/", async (request, reply) => {
@@ -36,7 +38,7 @@ export async function petRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid pet data", result.error.flatten());
         }
         const pet = await createPet(request.userId, result.data);
-        return reply.status(201).send(pet);
+        return reply.status(201).send({ success: true, data: pet });
     });
 
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
@@ -44,11 +46,12 @@ export async function petRoutes(app: FastifyInstance) {
         if (!result.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid pet data", result.error.flatten());
         }
-        return updatePet(request.params.id, request.userId, result.data);
+        const data = await updatePet(request.params.id, request.userId, result.data);
+        return { success: true, data };
     });
 
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deletePet(request.params.id, request.userId);
-        return { ok: true };
+        return { success: true, data: { ok: true } };
     });
 }

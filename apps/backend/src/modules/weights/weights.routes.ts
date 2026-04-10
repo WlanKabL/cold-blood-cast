@@ -35,11 +35,13 @@ export async function weightRoutes(app: FastifyInstance) {
         if (!query.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
         }
-        return listWeightRecords(request.userId, query.data);
+        const data = await listWeightRecords(request.userId, query.data);
+        return { success: true, data };
     });
 
     app.get<{ Params: { id: string } }>("/:id", async (request) => {
-        return getWeightRecord(request.params.id, request.userId);
+        const data = await getWeightRecord(request.params.id, request.userId);
+        return { success: true, data };
     });
 
     app.post("/", async (request, reply) => {
@@ -48,7 +50,7 @@ export async function weightRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid weight data", result.error.flatten());
         }
         const record = await createWeightRecord(request.userId, result.data);
-        return reply.status(201).send(record);
+        return reply.status(201).send({ success: true, data: record });
     });
 
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
@@ -56,11 +58,12 @@ export async function weightRoutes(app: FastifyInstance) {
         if (!result.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid weight data", result.error.flatten());
         }
-        return updateWeightRecord(request.params.id, request.userId, result.data);
+        const data = await updateWeightRecord(request.params.id, request.userId, result.data);
+        return { success: true, data };
     });
 
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deleteWeightRecord(request.params.id, request.userId);
-        return { ok: true };
+        return { success: true, data: { ok: true } };
     });
 }

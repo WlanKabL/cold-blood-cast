@@ -23,7 +23,7 @@
                 class="text-fg-muted hover:bg-surface-hover hover:text-fg-soft rounded-xl px-2.5 py-2.5 text-[12px] font-medium transition-all duration-200 sm:py-1.5"
                 @click="toggleLocale"
             >
-                {{ (settings.currentLocale ?? 'en').toUpperCase() }}
+                {{ (settings.currentLocale ?? "en").toUpperCase() }}
             </button>
 
             <!-- Theme Toggle -->

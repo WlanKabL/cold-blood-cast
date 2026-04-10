@@ -3,14 +3,14 @@ import { mount } from "@vue/test-utils";
 import { ref } from "vue";
 import AppToast from "../AppToast.vue";
 
-// ─── Mock useToast ───────────────────────────────────────────
+// ─── Mock useAppToast ───────────────────────────────────────────
 
 const mockRemove = vi.fn();
 const mockToasts = ref<Array<{ id: string; title: string; description?: string; color: string }>>(
     [],
 );
 
-vi.stubGlobal("useToast", () => ({
+vi.stubGlobal("useAppToast", () => ({
     toasts: mockToasts,
     remove: mockRemove,
 }));

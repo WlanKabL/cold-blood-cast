@@ -170,6 +170,7 @@
     "common": {
         "loading": "Loading...",
         "error": "An error occurred",
+        "retry": "Retry",
         "save": "Save",
         "cancel": "Cancel",
         "confirm": "Confirm",
@@ -748,23 +749,40 @@
             "add": "Add Enclosure",
             "addFirst": "Add your first enclosure",
             "create": "New Enclosure",
+            "edit": "Edit Enclosure",
             "empty": "No enclosures yet. Add your first terrarium!",
             "noSpecies": "No species set",
+            "noRoom": "No room set",
             "details": "Enclosure Details",
             "petsInEnclosure": "Pets in this Enclosure",
             "sensorsInEnclosure": "Sensors in this Enclosure",
             "noPets": "No pets in this enclosure",
             "noSensors": "No sensors in this enclosure",
-            "confirmDelete": "Delete this enclosure? This cannot be undone.",
+            "confirmDelete": "Delete this enclosure? All linked sensors will be unlinked. This cannot be undone.",
+            "deleted": "Enclosure deleted",
+            "saved": "Enclosure saved",
+            "created": "Enclosure created",
+            "active": "Active",
+            "inactive": "Inactive",
+            "archived": "Archived",
+            "all": "All",
+            "search": "Search enclosures...",
+            "petCount": "{count} pet | {count} pets",
+            "sensorCount": "{count} sensor | {count} sensors",
+            "limitReached": "You've reached your enclosure limit ({limit}). Upgrade your plan to add more.",
             "fields": {
                 "name": "Name",
                 "type": "Type",
                 "species": "Species",
+                "speciesPlaceholder": "e.g. Corn Snake, Ball Python",
                 "description": "Description",
                 "length": "Length (cm)",
                 "width": "Width (cm)",
                 "height": "Height (cm)",
-                "dimensions": "Dimensions"
+                "dimensions": "Dimensions",
+                "room": "Room",
+                "roomPlaceholder": "e.g. Living Room, Office",
+                "active": "Active"
             }
         },
         "pets": {
@@ -781,6 +799,12 @@
             "noFeedings": "No feedings recorded yet",
             "noWeights": "No weight records yet",
             "confirmDelete": "Delete this pet? This cannot be undone.",
+            "search": "Search pets...",
+            "allEnclosures": "All Enclosures",
+            "edit": "Edit Pet",
+            "saved": "Pet saved",
+            "created": "Pet created",
+            "deleted": "Pet deleted",
             "fields": {
                 "name": "Name",
                 "enclosure": "Enclosure",
@@ -802,6 +826,14 @@
             "readings": "Sensor Readings",
             "noReadings": "No readings recorded yet",
             "confirmDelete": "Delete this sensor? This cannot be undone.",
+            "search": "Search sensors...",
+            "allTypes": "All Types",
+            "edit": "Edit Sensor",
+            "saved": "Sensor saved",
+            "created": "Sensor created",
+            "deleted": "Sensor deleted",
+            "inactive": "Inactive",
+            "activeStatus": "Active",
             "fields": {
                 "name": "Name",
                 "type": "Type",
@@ -809,14 +841,18 @@
                 "location": "Location",
                 "locationPlaceholder": "e.g. warm side, cool side",
                 "enclosure": "Enclosure",
-                "gpioPin": "GPIO Pin"
+                "gpioPin": "GPIO Pin",
+                "unit": "Unit",
+                "unitPlaceholder": "e.g. °C, %, hPa",
+                "active": "Active"
             },
             "readingFields": {
                 "time": "Time",
                 "temperature": "Temp",
                 "humidity": "Humidity",
                 "pressure": "Pressure",
-                "battery": "Battery"
+                "battery": "Battery",
+                "value": "Value"
             }
         },
         "feedings": {
@@ -830,6 +866,10 @@
             "accepted": "Accepted",
             "refused": "Refused",
             "confirmDelete": "Delete this feeding record?",
+            "edit": "Edit Feeding",
+            "saved": "Feeding saved",
+            "created": "Feeding created",
+            "deleted": "Feeding deleted",
             "fields": {
                 "pet": "Pet",
                 "foodType": "Food Type",
@@ -838,6 +878,7 @@
                 "quantity": "Quantity",
                 "accepted": "Accepted",
                 "acceptedLabel": "Food was accepted",
+                "fedAt": "Fed At",
                 "notes": "Notes"
             }
         },
@@ -854,6 +895,10 @@
             "complete": "Complete",
             "inProgress": "In Progress",
             "confirmDelete": "Delete this shedding record?",
+            "edit": "Edit Shedding",
+            "saved": "Shedding saved",
+            "created": "Shedding created",
+            "deleted": "Shedding deleted",
             "fields": {
                 "pet": "Pet",
                 "startedAt": "Started At",
@@ -874,6 +919,10 @@
             "empty": "No weight records yet",
             "allPets": "All Pets",
             "confirmDelete": "Delete this weight record?",
+            "edit": "Edit Weight",
+            "saved": "Weight saved",
+            "created": "Weight created",
+            "deleted": "Weight deleted",
             "fields": {
                 "pet": "Pet",
                 "weight": "Weight (grams)",

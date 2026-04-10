@@ -195,7 +195,7 @@ const { t } = useI18n();
 useHead({ title: () => `${t("admin.nav.notifications")} — Admin` });
 
 const admin = useAdminApi();
-const toast = useToast();
+const toast = useAppToast();
 const queryClient = useQueryClient();
 
 const EVENTS = [

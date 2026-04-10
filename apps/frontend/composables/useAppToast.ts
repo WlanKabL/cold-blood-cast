@@ -1,4 +1,4 @@
-export interface AppToast {
+export interface Toast {
     id: string;
     title: string;
     description?: string;
@@ -6,14 +6,25 @@ export interface AppToast {
     timeout: number;
 }
 
-const toasts = ref<AppToast[]>([]);
+export interface ToastOptions {
+    description?: string;
+    timeout?: number;
+}
+
+const MAX_TOASTS = 5;
+const toasts = ref<Toast[]>([]);
 
 export const useAppToast = () => {
-    function add(toast: Omit<AppToast, "id">) {
-        const id: string = crypto.randomUUID();
-        const newToast: AppToast = { ...toast, id };
+    function add(toast: Omit<Toast, "id">) {
+        const id = crypto.randomUUID();
+        const newToast: Toast = { ...toast, id };
 
         toasts.value.push(newToast);
+
+        // Evict oldest toasts when limit exceeded
+        while (toasts.value.length > MAX_TOASTS) {
+            toasts.value.shift();
+        }
 
         if (toast.timeout > 0) {
             setTimeout(() => {
@@ -29,20 +40,40 @@ export const useAppToast = () => {
         }
     }
 
-    function success(title: string, description?: string) {
-        add({ title, description, color: "green", timeout: 4000 });
+    function success(title: string, opts?: ToastOptions) {
+        add({
+            title,
+            color: "green",
+            timeout: opts?.timeout ?? 3000,
+            description: opts?.description,
+        });
     }
 
-    function error(title: string, description?: string) {
-        add({ title, description, color: "red", timeout: 5000 });
+    function error(title: string, opts?: ToastOptions) {
+        add({
+            title,
+            color: "red",
+            timeout: opts?.timeout ?? 5000,
+            description: opts?.description,
+        });
     }
 
-    function warning(title: string, description?: string) {
-        add({ title, description, color: "amber", timeout: 5000 });
+    function warn(title: string, opts?: ToastOptions) {
+        add({
+            title,
+            color: "amber",
+            timeout: opts?.timeout ?? 4000,
+            description: opts?.description,
+        });
     }
 
-    function info(title: string, description?: string) {
-        add({ title, description, color: "blue", timeout: 4000 });
+    function info(title: string, opts?: ToastOptions) {
+        add({
+            title,
+            color: "blue",
+            timeout: opts?.timeout ?? 3000,
+            description: opts?.description,
+        });
     }
 
     return {
@@ -51,7 +82,7 @@ export const useAppToast = () => {
         remove,
         success,
         error,
-        warning,
+        warn,
         info,
     };
 };

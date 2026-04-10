@@ -170,6 +170,7 @@
     "common": {
         "loading": "Laden...",
         "error": "Ein Fehler ist aufgetreten",
+        "retry": "Erneut versuchen",
         "save": "Speichern",
         "cancel": "Abbrechen",
         "confirm": "Bestätigen",
@@ -748,23 +749,40 @@
             "add": "Terrarium hinzufügen",
             "addFirst": "Füge dein erstes Terrarium hinzu",
             "create": "Neues Terrarium",
+            "edit": "Terrarium bearbeiten",
             "empty": "Noch keine Terrarien. Füge dein erstes hinzu!",
             "noSpecies": "Keine Art festgelegt",
+            "noRoom": "Kein Raum festgelegt",
             "details": "Terrarium-Details",
             "petsInEnclosure": "Tiere in diesem Terrarium",
             "sensorsInEnclosure": "Sensoren in diesem Terrarium",
             "noPets": "Keine Tiere in diesem Terrarium",
             "noSensors": "Keine Sensoren in diesem Terrarium",
-            "confirmDelete": "Dieses Terrarium löschen? Kann nicht rückgängig gemacht werden.",
+            "confirmDelete": "Dieses Terrarium löschen? Alle verknüpften Sensoren werden getrennt. Kann nicht rückgängig gemacht werden.",
+            "deleted": "Terrarium gelöscht",
+            "saved": "Terrarium gespeichert",
+            "created": "Terrarium erstellt",
+            "active": "Aktiv",
+            "inactive": "Inaktiv",
+            "archived": "Archiviert",
+            "all": "Alle",
+            "search": "Terrarien durchsuchen...",
+            "petCount": "{count} Tier | {count} Tiere",
+            "sensorCount": "{count} Sensor | {count} Sensoren",
+            "limitReached": "Du hast dein Terrarium-Limit erreicht ({limit}). Upgrade deinen Plan für mehr.",
             "fields": {
                 "name": "Name",
                 "type": "Typ",
                 "species": "Art",
+                "speciesPlaceholder": "z.B. Kornnatter, Königspython",
                 "description": "Beschreibung",
                 "length": "Länge (cm)",
                 "width": "Breite (cm)",
                 "height": "Höhe (cm)",
-                "dimensions": "Abmessungen"
+                "dimensions": "Abmessungen",
+                "room": "Raum",
+                "roomPlaceholder": "z.B. Wohnzimmer, Büro",
+                "active": "Aktiv"
             }
         },
         "pets": {
@@ -781,6 +799,12 @@
             "noFeedings": "Noch keine Fütterungen erfasst",
             "noWeights": "Noch keine Gewichtsdaten",
             "confirmDelete": "Dieses Tier löschen? Kann nicht rückgängig gemacht werden.",
+            "search": "Tiere durchsuchen...",
+            "allEnclosures": "Alle Terrarien",
+            "edit": "Tier bearbeiten",
+            "saved": "Tier gespeichert",
+            "created": "Tier erstellt",
+            "deleted": "Tier gelöscht",
             "fields": {
                 "name": "Name",
                 "enclosure": "Terrarium",
@@ -802,6 +826,14 @@
             "readings": "Messwerte",
             "noReadings": "Noch keine Messwerte erfasst",
             "confirmDelete": "Diesen Sensor löschen? Kann nicht rückgängig gemacht werden.",
+            "search": "Sensoren durchsuchen...",
+            "allTypes": "Alle Typen",
+            "edit": "Sensor bearbeiten",
+            "saved": "Sensor gespeichert",
+            "created": "Sensor erstellt",
+            "deleted": "Sensor gelöscht",
+            "inactive": "Inaktiv",
+            "activeStatus": "Aktiv",
             "fields": {
                 "name": "Name",
                 "type": "Typ",
@@ -809,14 +841,18 @@
                 "location": "Standort",
                 "locationPlaceholder": "z.B. Warmseite, Kaltseite",
                 "enclosure": "Terrarium",
-                "gpioPin": "GPIO-Pin"
+                "gpioPin": "GPIO-Pin",
+                "unit": "Einheit",
+                "unitPlaceholder": "z.B. °C, %, hPa",
+                "active": "Aktiv"
             },
             "readingFields": {
                 "time": "Zeit",
                 "temperature": "Temp.",
                 "humidity": "Luftfeuchtigkeit",
                 "pressure": "Druck",
-                "battery": "Batterie"
+                "battery": "Batterie",
+                "value": "Wert"
             }
         },
         "feedings": {
@@ -830,6 +866,10 @@
             "accepted": "Angenommen",
             "refused": "Verweigert",
             "confirmDelete": "Diese Fütterung löschen?",
+            "edit": "Fütterung bearbeiten",
+            "saved": "Fütterung gespeichert",
+            "created": "Fütterung erstellt",
+            "deleted": "Fütterung gelöscht",
             "fields": {
                 "pet": "Tier",
                 "foodType": "Futterart",
@@ -838,6 +878,7 @@
                 "quantity": "Menge",
                 "accepted": "Angenommen",
                 "acceptedLabel": "Futter wurde angenommen",
+                "fedAt": "Gefüttert am",
                 "notes": "Notizen"
             }
         },
@@ -854,6 +895,10 @@
             "complete": "Vollständig",
             "inProgress": "In Bearbeitung",
             "confirmDelete": "Diese Häutung löschen?",
+            "edit": "Häutung bearbeiten",
+            "saved": "Häutung gespeichert",
+            "created": "Häutung erstellt",
+            "deleted": "Häutung gelöscht",
             "fields": {
                 "pet": "Tier",
                 "startedAt": "Begonnen am",
@@ -874,6 +919,10 @@
             "empty": "Noch keine Gewichtsdaten",
             "allPets": "Alle Tiere",
             "confirmDelete": "Diesen Gewichtseintrag löschen?",
+            "edit": "Gewicht bearbeiten",
+            "saved": "Gewicht gespeichert",
+            "created": "Gewicht erstellt",
+            "deleted": "Gewicht gelöscht",
             "fields": {
                 "pet": "Tier",
                 "weight": "Gewicht (Gramm)",

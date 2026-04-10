@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 import { isValidTheme, type Theme } from "~/types/settings";
 
 export const useSettingsStore = defineStore("settings", () => {
-    const { locales, setLocale } = useI18n();
+    const i18n = useNuxtApp().$i18n as ReturnType<typeof useI18n>;
+    const { locales, setLocale } = i18n;
 
     // Get available locales from i18n config
     const availableLocales = computed(() => locales.value.map((l) => l.code as string));

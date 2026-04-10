@@ -1,0 +1,117 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e51]:
+      - complementary [ref=e52]:
+        - link "KeeperLog KeeperLog" [ref=e54] [cursor=pointer]:
+          - /url: /
+          - img "KeeperLog" [ref=e55]
+          - generic [ref=e56]: KeeperLog
+        - navigation [ref=e57]:
+          - paragraph [ref=e58]: Overview
+          - list [ref=e59]:
+            - listitem [ref=e60]:
+              - link "Dashboard D" [ref=e61] [cursor=pointer]:
+                - /url: /dashboard
+                - generic [ref=e63]: Dashboard
+                - generic [ref=e64]: D
+          - paragraph [ref=e66]: Terrarium
+          - list [ref=e67]:
+            - listitem [ref=e68]:
+              - link "Enclosures E" [ref=e69] [cursor=pointer]:
+                - /url: /enclosures
+                - generic [ref=e71]: Enclosures
+                - generic [ref=e72]: E
+            - listitem [ref=e73]:
+              - link "Pets P" [ref=e74] [cursor=pointer]:
+                - /url: /pets
+                - generic [ref=e76]: Pets
+                - generic [ref=e77]: P
+            - listitem [ref=e78]:
+              - link "Sensors S" [ref=e79] [cursor=pointer]:
+                - /url: /sensors
+                - generic [ref=e81]: Sensors
+                - generic [ref=e82]: S
+          - paragraph [ref=e84]: Care Log
+          - list [ref=e85]:
+            - listitem [ref=e86]:
+              - link "Feedings" [ref=e87] [cursor=pointer]:
+                - /url: /feedings
+                - generic [ref=e89]: Feedings
+            - listitem [ref=e90]:
+              - link "Sheddings" [ref=e91] [cursor=pointer]:
+                - /url: /sheddings
+                - generic [ref=e93]: Sheddings
+            - listitem [ref=e94]:
+              - link "Weights" [ref=e95] [cursor=pointer]:
+                - /url: /weights
+                - generic [ref=e97]: Weights
+          - paragraph [ref=e99]: General
+          - list [ref=e100]:
+            - listitem [ref=e101]:
+              - link "Settings S" [ref=e102] [cursor=pointer]:
+                - /url: /settings
+                - generic [ref=e104]: Settings
+                - generic [ref=e105]: S
+          - list [ref=e107]:
+            - listitem [ref=e108]:
+              - link "Admin Panel" [ref=e109] [cursor=pointer]:
+                - /url: /admin
+                - generic [ref=e111]: Admin Panel
+        - generic [ref=e113]:
+          - generic [ref=e114]: W
+          - generic [ref=e115]:
+            - paragraph [ref=e116]: WlanKabL
+            - paragraph [ref=e117]: stecher.phi@gmail.com
+          - button "Logout" [ref=e118]
+      - generic [ref=e120]:
+        - banner [ref=e121]:
+          - heading "Dashboard" [level=2] [ref=e122]
+          - generic [ref=e123]:
+            - button "EN" [ref=e124]
+            - button [ref=e125]
+        - main [ref=e127]:
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - heading "Dashboard" [level=1] [ref=e131]
+              - paragraph [ref=e132]: Overview of your terrariums and pets
+            - generic [ref=e133]:
+              - generic [ref=e138]:
+                - paragraph [ref=e139]: Enclosures
+                - paragraph [ref=e140]: "0"
+              - generic [ref=e145]:
+                - paragraph [ref=e146]: Pets
+                - paragraph [ref=e147]: "0"
+              - generic [ref=e152]:
+                - paragraph [ref=e153]: Sensors
+                - paragraph [ref=e154]: "0"
+              - generic [ref=e159]:
+                - paragraph [ref=e160]: Recent Feedings
+                - paragraph [ref=e161]: "0"
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - heading "Your Enclosures" [level=2] [ref=e164]
+                - link "View all" [ref=e165] [cursor=pointer]:
+                  - /url: /enclosures
+              - generic [ref=e166]:
+                - paragraph [ref=e168]: No enclosures yet
+                - link "Add your first enclosure" [ref=e169] [cursor=pointer]:
+                  - /url: /enclosures
+    - generic [ref=e30]:
+      - paragraph [ref=e31]:
+        - text: We use cookies to keep you logged in and improve your experience.
+        - link "Cookie Policy" [ref=e32] [cursor=pointer]:
+          - /url: /legal/cookie_policy
+      - generic [ref=e33]:
+        - button "Settings" [ref=e34]
+        - button "Only necessary" [ref=e35]
+        - button "Accept all" [ref=e36]
+  - generic:
+    - img
+  - generic [ref=e37]:
+    - button "Toggle Nuxt DevTools" [ref=e38] [cursor=pointer]:
+      - img [ref=e39]
+    - generic "Page load time" [ref=e42]:
+      - generic [ref=e43]: "291"
+      - generic [ref=e44]: ms
+    - button "Toggle Component Inspector" [ref=e46] [cursor=pointer]:
+      - img [ref=e47]

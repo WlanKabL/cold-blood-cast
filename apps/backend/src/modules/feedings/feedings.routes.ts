@@ -38,11 +38,13 @@ export async function feedingRoutes(app: FastifyInstance) {
         if (!query.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
         }
-        return listFeedings(request.userId, query.data);
+        const data = await listFeedings(request.userId, query.data);
+        return { success: true, data };
     });
 
     app.get<{ Params: { id: string } }>("/:id", async (request) => {
-        return getFeeding(request.params.id, request.userId);
+        const data = await getFeeding(request.params.id, request.userId);
+        return { success: true, data };
     });
 
     app.post("/", async (request, reply) => {
@@ -51,7 +53,7 @@ export async function feedingRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid feeding data", result.error.flatten());
         }
         const feeding = await createFeeding(request.userId, result.data);
-        return reply.status(201).send(feeding);
+        return reply.status(201).send({ success: true, data: feeding });
     });
 
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
@@ -59,11 +61,12 @@ export async function feedingRoutes(app: FastifyInstance) {
         if (!result.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid feeding data", result.error.flatten());
         }
-        return updateFeeding(request.params.id, request.userId, result.data);
+        const data = await updateFeeding(request.params.id, request.userId, result.data);
+        return { success: true, data };
     });
 
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deleteFeeding(request.params.id, request.userId);
-        return { ok: true };
+        return { success: true, data: { ok: true } };
     });
 }

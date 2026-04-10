@@ -6,9 +6,13 @@ import { useSettingsStore } from "../useSettingsStore";
 // ─── Mock Nuxt auto-imports ──────────────────────────────────
 
 const mockSetLocale = vi.fn();
-vi.stubGlobal("useI18n", () => ({
+const mockI18n = {
     locales: ref([{ code: "en" }, { code: "de" }]),
     setLocale: mockSetLocale,
+};
+
+vi.stubGlobal("useNuxtApp", () => ({
+    $i18n: mockI18n,
 }));
 
 const mockClassList = { add: vi.fn(), remove: vi.fn() };

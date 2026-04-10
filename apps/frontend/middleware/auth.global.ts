@@ -26,9 +26,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
         if (["/login", "/register"].includes(to.path) && !authStore.isAuthenticated) {
             await authStore.init();
         }
-        // Redirect authenticated users away from auth pages to dashboard
+        // Redirect authenticated users away from auth pages to dashboard (or redirect target)
         if (authStore.isAuthenticated && ["/login", "/register"].includes(to.path)) {
-            return navigateTo("/dashboard");
+            const redirect = to.query.redirect as string | undefined;
+            const isSafeRedirect = redirect?.startsWith("/") && !redirect.startsWith("//");
+            return navigateTo(isSafeRedirect ? redirect : "/dashboard");
         }
         return;
     }

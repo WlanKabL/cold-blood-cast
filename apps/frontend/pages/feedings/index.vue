@@ -1,22 +1,32 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.feedings.title") }}</h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.feedings.subtitle") }}</p>
             </div>
-            <UButton icon="i-lucide-plus" :label="$t('pages.feedings.add')" @click="showCreate = true" />
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.feedings.add") }}</UiButton>
         </div>
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3">
-            <USelect v-model="selectedPet" :items="petOptions" :placeholder="$t('pages.feedings.allPets')" class="w-48" />
+            <UiSelect v-model="selectedPet" class="w-48">
+                <option value="ALL">{{ $t("pages.feedings.allPets") }}</option>
+                <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </UiSelect>
         </div>
 
         <!-- Loading -->
         <div v-if="loading" class="space-y-3">
             <div v-for="i in 5" :key="i" class="glass-card h-16 animate-pulse rounded-xl" />
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
+            <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
+            <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
         </div>
 
         <!-- List -->
@@ -35,7 +45,7 @@
                         <p class="text-fg-faint text-xs">
                             {{ feeding.pet?.name ?? "" }}
                             <span v-if="feeding.foodSize"> · {{ feeding.foodSize }}</span>
-                            <span v-if="feeding.quantity"> · ×{{ feeding.quantity }}</span>
+                            <span v-if="feeding.quantity > 1"> · ×{{ feeding.quantity }}</span>
                         </p>
                     </div>
                 </div>
@@ -50,7 +60,8 @@
                     >
                         {{ feeding.accepted ? $t("pages.feedings.accepted") : $t("pages.feedings.refused") }}
                     </span>
-                    <UButton variant="ghost" icon="i-lucide-trash-2" size="xs" color="error" @click="handleDelete(feeding.id)" />
+                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(feeding)" />
+                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(feeding.id)" />
                 </div>
             </div>
         </div>
@@ -59,54 +70,77 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:utensils" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.feedings.empty") }}</p>
-            <UButton class="mt-4" :label="$t('pages.feedings.addFirst')" @click="showCreate = true" />
+            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.feedings.addFirst") }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UModal v-model:open="showCreate">
-            <template #content>
-                <div class="p-6">
-                    <h2 class="text-fg mb-4 text-lg font-semibold">{{ $t("pages.feedings.create") }}</h2>
-                    <form class="space-y-4" @submit.prevent="handleCreate">
-                        <UFormField :label="$t('pages.feedings.fields.pet')">
-                            <USelect v-model="form.petId" :items="petOptions.filter((p) => p.value)" required />
-                        </UFormField>
-                        <UFormField :label="$t('pages.feedings.fields.foodType')">
-                            <UInput v-model="form.foodType" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
-                        </UFormField>
-                        <div class="grid grid-cols-2 gap-3">
-                            <UFormField :label="$t('pages.feedings.fields.foodSize')">
-                                <UInput v-model="form.foodSize" />
-                            </UFormField>
-                            <UFormField :label="$t('pages.feedings.fields.quantity')">
-                                <UInput v-model.number="form.quantity" type="number" min="1" />
-                            </UFormField>
-                        </div>
-                        <UFormField :label="$t('pages.feedings.fields.accepted')">
-                            <UCheckbox v-model="form.accepted" :label="$t('pages.feedings.fields.acceptedLabel')" />
-                        </UFormField>
-                        <UFormField :label="$t('pages.feedings.fields.notes')">
-                            <UTextarea v-model="form.notes" />
-                        </UFormField>
-                        <div class="flex justify-end gap-2 pt-2">
-                            <UButton variant="ghost" :label="$t('common.cancel')" @click="showCreate = false" />
-                            <UButton type="submit" :loading="creating" :label="$t('common.save')" />
-                        </div>
-                    </form>
+        <UiModal :show="showCreate" :title="$t('pages.feedings.create')" width="lg" @close="showCreate = false">
+            <form class="space-y-4" @submit.prevent="handleCreate">
+                <UiSelect v-model="form.petId" :label="$t('pages.feedings.fields.pet')" required>
+                    <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+                </UiSelect>
+                <UiTextInput v-model="form.fedAt" :label="$t('pages.feedings.fields.fedAt')" type="datetime-local" required />
+                <UiTextInput v-model="form.foodType" :label="$t('pages.feedings.fields.foodType')" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
+                <div class="grid grid-cols-2 gap-3">
+                    <UiTextInput v-model="form.foodSize" :label="$t('pages.feedings.fields.foodSize')" />
+                    <UiTextInput v-model.number="form.quantity" :label="$t('pages.feedings.fields.quantity')" type="number" min="1" />
                 </div>
-            </template>
-        </UModal>
+                <div class="flex items-center gap-3">
+                    <UiToggle v-model="form.accepted" />
+                    <label class="text-fg text-sm">{{ $t("pages.feedings.fields.acceptedLabel") }}</label>
+                </div>
+                <UiTextarea v-model="form.notes" :label="$t('pages.feedings.fields.notes')" />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
+                </div>
+            </form>
+        </UiModal>
+
+        <!-- Edit Modal -->
+        <UiModal :show="showEdit" :title="$t('pages.feedings.edit')" width="lg" @close="showEdit = false">
+            <form class="space-y-4" @submit.prevent="handleUpdate">
+                <UiTextInput v-model="editForm.fedAt" :label="$t('pages.feedings.fields.fedAt')" type="datetime-local" required />
+                <UiTextInput v-model="editForm.foodType" :label="$t('pages.feedings.fields.foodType')" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
+                <div class="grid grid-cols-2 gap-3">
+                    <UiTextInput v-model="editForm.foodSize" :label="$t('pages.feedings.fields.foodSize')" />
+                    <UiTextInput v-model.number="editForm.quantity" :label="$t('pages.feedings.fields.quantity')" type="number" min="1" />
+                </div>
+                <div class="flex items-center gap-3">
+                    <UiToggle v-model="editForm.accepted" />
+                    <label class="text-fg text-sm">{{ $t("pages.feedings.fields.acceptedLabel") }}</label>
+                </div>
+                <UiTextarea v-model="editForm.notes" :label="$t('pages.feedings.fields.notes')" />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
+                </div>
+            </form>
+        </UiModal>
+
+        <!-- Delete Confirmation -->
+        <UiConfirmDialog
+            :show="showDeleteConfirm"
+            :title="$t('common.confirmDelete')"
+            :message="$t('pages.feedings.confirmDelete')"
+            variant="danger"
+            :confirm-label="$t('common.delete')"
+            :cancel-label="$t('common.cancel')"
+            :loading="deleting"
+            @confirm="handleDelete"
+            @cancel="showDeleteConfirm = false"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface Feeding {
     id: string;
     foodType: string;
     foodSize: string | null;
-    quantity: number | null;
+    quantity: number;
     accepted: boolean;
     fedAt: string;
     notes: string | null;
@@ -121,30 +155,26 @@ interface Pet {
 const { t } = useI18n();
 const api = useApi();
 const queryClient = useQueryClient();
-const toast = useToast();
+const toast = useAppToast();
 
 definePageMeta({ layout: "default" });
 useHead({ title: () => t("pages.feedings.title") });
 
-const selectedPet = ref("");
-const showCreate = ref(false);
-const creating = ref(false);
-const form = reactive({
-    petId: "",
-    foodType: "",
-    foodSize: "",
-    quantity: 1,
-    accepted: true,
-    notes: "",
-});
+const selectedPet = ref("ALL");
 
 const queryParams = computed(() => {
     const params = new URLSearchParams();
-    if (selectedPet.value) params.set("petId", selectedPet.value);
+    if (selectedPet.value && selectedPet.value !== "ALL") params.set("petId", selectedPet.value);
     return params.toString();
 });
 
-const { data: feedings, isLoading: loading } = useQuery({
+// ── Data ─────────────────────────────────────────────────
+const {
+    data: feedings,
+    isLoading: loading,
+    error,
+    refetch,
+} = useQuery({
     queryKey: ["feedings", selectedPet],
     queryFn: () => api.get<Feeding[]>(`/api/feedings${queryParams.value ? `?${queryParams.value}` : ""}`),
 });
@@ -154,41 +184,125 @@ const { data: pets } = useQuery({
     queryFn: () => api.get<Pet[]>("/api/pets"),
 });
 
-const petOptions = computed(() => [
-    { label: t("pages.feedings.allPets"), value: "" },
-    ...(pets.value ?? []).map((p) => ({ label: p.name, value: p.id })),
-]);
+// ── Create ───────────────────────────────────────────────
+const showCreate = ref(false);
+const form = reactive({
+    petId: "",
+    fedAt: "",
+    foodType: "",
+    foodSize: "",
+    quantity: 1,
+    accepted: true,
+    notes: "",
+});
 
-async function handleCreate() {
-    creating.value = true;
-    try {
-        await api.post("/api/feedings", {
+function resetForm() {
+    Object.assign(form, { petId: "", fedAt: "", foodType: "", foodSize: "", quantity: 1, accepted: true, notes: "" });
+}
+
+function openCreateModal() {
+    resetForm();
+    form.fedAt = new Date().toISOString().slice(0, 16);
+    showCreate.value = true;
+}
+
+const { mutate: createMutation, isPending: creating } = useMutation({
+    mutationFn: () =>
+        api.post("/api/feedings", {
             petId: form.petId,
+            fedAt: form.fedAt,
             foodType: form.foodType,
             foodSize: form.foodSize || undefined,
             quantity: form.quantity,
             accepted: form.accepted,
             notes: form.notes || undefined,
-        });
-        await queryClient.invalidateQueries({ queryKey: ["feedings"] });
-        toast.add({ title: t("common.saved"), color: "green" });
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["feedings"] });
+        toast.success(t("pages.feedings.created"));
         showCreate.value = false;
-        Object.assign(form, { petId: "", foodType: "", foodSize: "", quantity: 1, accepted: true, notes: "" });
-    } catch {
-        toast.add({ title: t("common.error"), color: "red" });
-    } finally {
-        creating.value = false;
-    }
+        resetForm();
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleCreate() {
+    createMutation();
 }
 
-async function handleDelete(id: string) {
-    if (!confirm(t("pages.feedings.confirmDelete"))) return;
-    try {
-        await api.del(`/api/feedings/${id}`);
-        await queryClient.invalidateQueries({ queryKey: ["feedings"] });
-        toast.add({ title: t("common.deleted"), color: "green" });
-    } catch {
-        toast.add({ title: t("common.error"), color: "red" });
-    }
+// ── Edit ─────────────────────────────────────────────────
+const showEdit = ref(false);
+const editingId = ref("");
+const editForm = reactive({
+    fedAt: "",
+    foodType: "",
+    foodSize: "",
+    quantity: 1,
+    accepted: true,
+    notes: "",
+});
+
+function openEditModal(feeding: Feeding) {
+    editingId.value = feeding.id;
+    Object.assign(editForm, {
+        fedAt: feeding.fedAt.slice(0, 16),
+        foodType: feeding.foodType,
+        foodSize: feeding.foodSize ?? "",
+        quantity: feeding.quantity,
+        accepted: feeding.accepted,
+        notes: feeding.notes ?? "",
+    });
+    showEdit.value = true;
+}
+
+const { mutate: updateMutation, isPending: updating } = useMutation({
+    mutationFn: () =>
+        api.put(`/api/feedings/${editingId.value}`, {
+            fedAt: editForm.fedAt,
+            foodType: editForm.foodType,
+            foodSize: editForm.foodSize || undefined,
+            quantity: editForm.quantity,
+            accepted: editForm.accepted,
+            notes: editForm.notes || undefined,
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["feedings"] });
+        toast.success(t("pages.feedings.saved"));
+        showEdit.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleUpdate() {
+    updateMutation();
+}
+
+// ── Delete ───────────────────────────────────────────────
+const showDeleteConfirm = ref(false);
+const deletingId = ref("");
+
+function confirmDelete(id: string) {
+    deletingId.value = id;
+    showDeleteConfirm.value = true;
+}
+
+const { mutate: deleteMutation, isPending: deleting } = useMutation({
+    mutationFn: () => api.del(`/api/feedings/${deletingId.value}`),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["feedings"] });
+        toast.success(t("pages.feedings.deleted"));
+        showDeleteConfirm.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleDelete() {
+    deleteMutation();
 }
 </script>

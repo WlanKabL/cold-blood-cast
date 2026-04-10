@@ -299,7 +299,7 @@ definePageMeta({ layout: "admin" });
 const route = useRoute();
 const router = useRouter();
 const admin = useAdminApi();
-const toast = useToast();
+const toast = useAppToast();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 

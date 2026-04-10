@@ -185,7 +185,7 @@ import type { Announcement } from "~/types/api";
 definePageMeta({ layout: "admin" });
 
 const admin = useAdminApi();
-const toast = useToast();
+const toast = useAppToast();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 

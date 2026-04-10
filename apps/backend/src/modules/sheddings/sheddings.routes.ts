@@ -37,11 +37,13 @@ export async function sheddingRoutes(app: FastifyInstance) {
         if (!query.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
         }
-        return listSheddings(request.userId, query.data);
+        const data = await listSheddings(request.userId, query.data);
+        return { success: true, data };
     });
 
     app.get<{ Params: { id: string } }>("/:id", async (request) => {
-        return getShedding(request.params.id, request.userId);
+        const data = await getShedding(request.params.id, request.userId);
+        return { success: true, data };
     });
 
     app.post("/", async (request, reply) => {
@@ -50,7 +52,7 @@ export async function sheddingRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid shedding data", result.error.flatten());
         }
         const shedding = await createShedding(request.userId, result.data);
-        return reply.status(201).send(shedding);
+        return reply.status(201).send({ success: true, data: shedding });
     });
 
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
@@ -58,11 +60,12 @@ export async function sheddingRoutes(app: FastifyInstance) {
         if (!result.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid shedding data", result.error.flatten());
         }
-        return updateShedding(request.params.id, request.userId, result.data);
+        const data = await updateShedding(request.params.id, request.userId, result.data);
+        return { success: true, data };
     });
 
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deleteShedding(request.params.id, request.userId);
-        return { ok: true };
+        return { success: true, data: { ok: true } };
     });
 }

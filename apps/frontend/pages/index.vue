@@ -27,11 +27,9 @@
                     <span class="text-xl font-bold tracking-tight">KeeperLog</span>
                 </NuxtLink>
                 <div class="hidden items-center gap-8 md:flex">
-                    <a
-                        href="#features"
-                        class="text-sm text-gray-400 transition hover:text-white"
-                        >{{ $t("landing.nav.features") }}</a
-                    >
+                    <a href="#features" class="text-sm text-gray-400 transition hover:text-white">{{
+                        $t("landing.nav.features")
+                    }}</a>
                     <a
                         href="#monitoring"
                         class="text-sm text-gray-400 transition hover:text-white"
@@ -49,7 +47,7 @@
                         class="rounded-xl px-2.5 py-1.5 text-[12px] font-medium text-gray-400 transition-all duration-200 hover:bg-white/10 hover:text-white"
                         @click="toggleLocale"
                     >
-                        {{ (settings.currentLocale ?? 'en').toUpperCase() }}
+                        {{ (settings.currentLocale ?? "en").toUpperCase() }}
                     </button>
                     <button
                         class="rounded-xl p-2 text-gray-400 transition-all duration-200 hover:bg-white/10 hover:text-white"
@@ -424,7 +422,7 @@
                                     $t("landing.preview.alertsBar")
                                 }}</span>
                             </div>
-                            <div class="p-6 space-y-3">
+                            <div class="space-y-3 p-6">
                                 <div
                                     class="flex items-center gap-3 rounded-xl border border-red-500/10 bg-red-500/[0.04] p-4"
                                 >
@@ -436,9 +434,7 @@
                                         <p class="text-sm font-medium text-red-300">
                                             {{ $t("landing.preview.temperature") }} &lt; 22°C
                                         </p>
-                                        <p class="text-xs text-gray-500">
-                                            Telegram → @keeper
-                                        </p>
+                                        <p class="text-xs text-gray-500">Telegram → @keeper</p>
                                     </div>
                                 </div>
                                 <div
@@ -452,9 +448,7 @@
                                         <p class="text-sm font-medium text-amber-300">
                                             {{ $t("landing.preview.humidity") }} &gt; 70%
                                         </p>
-                                        <p class="text-xs text-gray-500">
-                                            Telegram → @keeper
-                                        </p>
+                                        <p class="text-xs text-gray-500">Telegram → @keeper</p>
                                     </div>
                                 </div>
                                 <div
@@ -468,9 +462,7 @@
                                         <p class="text-sm font-medium text-emerald-300">
                                             All sensors OK
                                         </p>
-                                        <p class="text-xs text-gray-500">
-                                            Last check: 2 min ago
-                                        </p>
+                                        <p class="text-xs text-gray-500">Last check: 2 min ago</p>
                                     </div>
                                 </div>
                             </div>
@@ -566,15 +558,12 @@
                         :data-reveal-delay="(i % 4) + 1"
                         class="grid grid-cols-1 gap-4 md:grid-cols-2"
                     >
-                        <div
-                            class="card-base flex items-start gap-4 border-red-500/10 p-6"
-                        >
-                            <Icon
-                                name="lucide:x"
-                                class="mt-0.5 h-5 w-5 shrink-0 text-red-400/60"
-                            />
+                        <div class="card-base flex items-start gap-4 border-red-500/10 p-6">
+                            <Icon name="lucide:x" class="mt-0.5 h-5 w-5 shrink-0 text-red-400/60" />
                             <div>
-                                <p class="text-xs font-semibold tracking-wider text-red-400/60 uppercase">
+                                <p
+                                    class="text-xs font-semibold tracking-wider text-red-400/60 uppercase"
+                                >
                                     {{ $t("landing.comparison.without") }}
                                 </p>
                                 <p class="mt-2 text-sm leading-relaxed text-gray-400">
@@ -582,15 +571,15 @@
                                 </p>
                             </div>
                         </div>
-                        <div
-                            class="card-base flex items-start gap-4 border-emerald-500/10 p-6"
-                        >
+                        <div class="card-base flex items-start gap-4 border-emerald-500/10 p-6">
                             <Icon
                                 name="lucide:check"
                                 class="mt-0.5 h-5 w-5 shrink-0 text-emerald-400"
                             />
                             <div>
-                                <p class="text-xs font-semibold tracking-wider text-emerald-400 uppercase">
+                                <p
+                                    class="text-xs font-semibold tracking-wider text-emerald-400 uppercase"
+                                >
                                     {{ $t("landing.comparison.with") }}
                                 </p>
                                 <p class="mt-2 text-sm leading-relaxed text-gray-300">
@@ -606,13 +595,12 @@
         <!-- ═══ Social Proof ═══ -->
         <section class="relative z-10 border-y border-white/[0.04] py-16">
             <div class="mx-auto max-w-7xl px-6">
-                <div
-                    data-reveal
-                    class="grid grid-cols-2 gap-8 text-center md:grid-cols-4"
-                >
+                <div data-reveal class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
                     <div v-for="stat in socialStats" :key="stat.key">
                         <p class="text-primary-400 text-3xl font-bold">{{ stat.value }}</p>
-                        <p class="mt-1 text-sm text-gray-500">{{ $t(`landing.social.${stat.key}`) }}</p>
+                        <p class="mt-1 text-sm text-gray-500">
+                            {{ $t(`landing.social.${stat.key}`) }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -650,11 +638,7 @@
                 <div class="grid grid-cols-1 gap-12 md:grid-cols-4">
                     <div class="md:col-span-2">
                         <div class="flex items-center gap-3">
-                            <img
-                                src="/cbc.png"
-                                alt="KeeperLog"
-                                class="h-8 w-8 rounded-xl"
-                            />
+                            <img src="/cbc.png" alt="KeeperLog" class="h-8 w-8 rounded-xl" />
                             <span class="text-lg font-bold">KeeperLog</span>
                         </div>
                         <p class="mt-4 max-w-sm text-sm leading-relaxed text-gray-500">
@@ -955,13 +939,25 @@ function revokeCookieConsent() {
     opacity: 0;
     animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.hero-delay-1 { animation-delay: 0.15s; }
-.hero-delay-2 { animation-delay: 0.3s; }
-.hero-delay-3 { animation-delay: 0.45s; }
+.hero-delay-1 {
+    animation-delay: 0.15s;
+}
+.hero-delay-2 {
+    animation-delay: 0.3s;
+}
+.hero-delay-3 {
+    animation-delay: 0.45s;
+}
 
 @keyframes heroFadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .word-slide-enter-active,
@@ -969,10 +965,14 @@ function revokeCookieConsent() {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .word-slide-enter-from {
-    opacity: 0; transform: translateY(50%); filter: blur(4px);
+    opacity: 0;
+    transform: translateY(50%);
+    filter: blur(4px);
 }
 .word-slide-leave-to {
-    opacity: 0; transform: translateY(-50%); filter: blur(4px);
+    opacity: 0;
+    transform: translateY(-50%);
+    filter: blur(4px);
 }
 
 .sensor-bar {
@@ -980,8 +980,12 @@ function revokeCookieConsent() {
     transform-origin: bottom;
 }
 @keyframes barGrow {
-    from { transform: scaleY(0); }
-    to { transform: scaleY(1); }
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
 }
 
 [data-reveal] {
@@ -992,25 +996,54 @@ function revokeCookieConsent() {
         opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
         transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-[data-reveal].revealed { opacity: 1; transform: translateY(0) translateX(0); will-change: auto; }
-[data-reveal="left"] { transform: translateX(-30px); opacity: 0; }
-[data-reveal="right"] { transform: translateX(30px); opacity: 0; }
+[data-reveal].revealed {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+    will-change: auto;
+}
+[data-reveal="left"] {
+    transform: translateX(-30px);
+    opacity: 0;
+}
+[data-reveal="right"] {
+    transform: translateX(30px);
+    opacity: 0;
+}
 
 @media (max-width: 768px) {
     [data-reveal="left"],
-    [data-reveal="right"] { transform: translateY(16px); }
+    [data-reveal="right"] {
+        transform: translateY(16px);
+    }
 }
 
-[data-reveal-delay="1"] { transition-delay: 0.06s; }
-[data-reveal-delay="2"] { transition-delay: 0.12s; }
-[data-reveal-delay="3"] { transition-delay: 0.18s; }
-[data-reveal-delay="4"] { transition-delay: 0.24s; }
+[data-reveal-delay="1"] {
+    transition-delay: 0.06s;
+}
+[data-reveal-delay="2"] {
+    transition-delay: 0.12s;
+}
+[data-reveal-delay="3"] {
+    transition-delay: 0.18s;
+}
+[data-reveal-delay="4"] {
+    transition-delay: 0.24s;
+}
 
 @media (prefers-reduced-motion: reduce) {
     [data-reveal],
     [data-reveal="left"],
-    [data-reveal="right"] { opacity: 1; transform: none; transition: none; }
-    .hero-enter { opacity: 1; animation: none; }
-    .sensor-bar { animation: none; }
+    [data-reveal="right"] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+    .hero-enter {
+        opacity: 1;
+        animation: none;
+    }
+    .sensor-bar {
+        animation: none;
+    }
 }
 </style>

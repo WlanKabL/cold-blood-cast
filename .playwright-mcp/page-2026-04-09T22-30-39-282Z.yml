@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - button "EN" [ref=e5]
+        - button [ref=e6]
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - img "KeeperLog" [ref=e10]
+          - heading "KeeperLog" [level=1] [ref=e11]
+          - paragraph [ref=e12]: Sign in to your terrarium dashboard
+        - generic [ref=e13]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: Username or Email
+            - textbox "Enter username or email" [ref=e18]: WlanKabL
+          - generic [ref=e20]:
+            - generic [ref=e21]: Password
+            - textbox "Enter password" [ref=e23]: Password01!
+          - paragraph [ref=e51]: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+          - link "Forgot password?" [ref=e25] [cursor=pointer]:
+            - /url: /forgot-password
+          - button "Sign In" [ref=e26]
+        - paragraph [ref=e27]:
+          - text: Don't have an account?
+          - link "Create one" [ref=e28] [cursor=pointer]:
+            - /url: /register
+    - generic [ref=e30]:
+      - paragraph [ref=e31]:
+        - text: We use cookies to keep you logged in and improve your experience.
+        - link "Cookie Policy" [ref=e32] [cursor=pointer]:
+          - /url: /legal/cookie_policy
+      - generic [ref=e33]:
+        - button "Settings" [ref=e34]
+        - button "Only necessary" [ref=e35]
+        - button "Accept all" [ref=e36]
+  - generic:
+    - img
+  - generic [ref=e37]:
+    - button "Toggle Nuxt DevTools" [ref=e38] [cursor=pointer]:
+      - img [ref=e39]
+    - generic "Page load time" [ref=e42]:
+      - generic [ref=e43]: "13"
+      - generic [ref=e44]: ms
+    - button "Toggle Component Inspector" [ref=e46] [cursor=pointer]:
+      - img [ref=e47]

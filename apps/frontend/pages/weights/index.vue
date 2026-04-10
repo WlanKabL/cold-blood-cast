@@ -1,22 +1,32 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.weights.title") }}</h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.weights.subtitle") }}</p>
             </div>
-            <UButton icon="i-lucide-plus" :label="$t('pages.weights.add')" @click="showCreate = true" />
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.weights.add") }}</UiButton>
         </div>
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3">
-            <USelect v-model="selectedPet" :items="petOptions" :placeholder="$t('pages.weights.allPets')" class="w-48" />
+            <UiSelect v-model="selectedPet" class="w-48">
+                <option value="ALL">{{ $t("pages.weights.allPets") }}</option>
+                <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </UiSelect>
         </div>
 
         <!-- Loading -->
         <div v-if="loading" class="space-y-3">
             <div v-for="i in 5" :key="i" class="glass-card h-16 animate-pulse rounded-xl" />
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
+            <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
+            <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
         </div>
 
         <!-- List -->
@@ -37,7 +47,8 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-fg-muted text-sm">{{ new Date(w.measuredAt).toLocaleDateString() }}</span>
-                    <UButton variant="ghost" icon="i-lucide-trash-2" size="xs" color="error" @click="handleDelete(w.id)" />
+                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(w)" />
+                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(w.id)" />
                 </div>
             </div>
         </div>
@@ -46,40 +57,55 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:scale" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.weights.empty") }}</p>
-            <UButton class="mt-4" :label="$t('pages.weights.addFirst')" @click="showCreate = true" />
+            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.weights.addFirst") }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UModal v-model:open="showCreate">
-            <template #content>
-                <div class="p-6">
-                    <h2 class="text-fg mb-4 text-lg font-semibold">{{ $t("pages.weights.create") }}</h2>
-                    <form class="space-y-4" @submit.prevent="handleCreate">
-                        <UFormField :label="$t('pages.weights.fields.pet')">
-                            <USelect v-model="form.petId" :items="petOptions.filter((p) => p.value)" required />
-                        </UFormField>
-                        <UFormField :label="$t('pages.weights.fields.weight')">
-                            <UInput v-model.number="form.weightGrams" type="number" min="1" required :placeholder="$t('pages.weights.fields.weightPlaceholder')" />
-                        </UFormField>
-                        <UFormField :label="$t('pages.weights.fields.measuredAt')">
-                            <UInput v-model="form.measuredAt" type="date" required />
-                        </UFormField>
-                        <UFormField :label="$t('pages.weights.fields.notes')">
-                            <UTextarea v-model="form.notes" />
-                        </UFormField>
-                        <div class="flex justify-end gap-2 pt-2">
-                            <UButton variant="ghost" :label="$t('common.cancel')" @click="showCreate = false" />
-                            <UButton type="submit" :loading="creating" :label="$t('common.save')" />
-                        </div>
-                    </form>
+        <UiModal :show="showCreate" :title="$t('pages.weights.create')" width="lg" @close="showCreate = false">
+            <form class="space-y-4" @submit.prevent="handleCreate">
+                <UiSelect v-model="form.petId" :label="$t('pages.weights.fields.pet')" required>
+                    <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+                </UiSelect>
+                <UiTextInput v-model.number="form.weightGrams" :label="$t('pages.weights.fields.weight')" type="number" min="1" required :placeholder="$t('pages.weights.fields.weightPlaceholder')" />
+                <UiTextInput v-model="form.measuredAt" :label="$t('pages.weights.fields.measuredAt')" type="date" required />
+                <UiTextarea v-model="form.notes" :label="$t('pages.weights.fields.notes')" />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
-            </template>
-        </UModal>
+            </form>
+        </UiModal>
+
+        <!-- Edit Modal -->
+        <UiModal :show="showEdit" :title="$t('pages.weights.edit')" width="lg" @close="showEdit = false">
+            <form class="space-y-4" @submit.prevent="handleUpdate">
+                <UiTextInput v-model.number="editForm.weightGrams" :label="$t('pages.weights.fields.weight')" type="number" min="1" required :placeholder="$t('pages.weights.fields.weightPlaceholder')" />
+                <UiTextInput v-model="editForm.measuredAt" :label="$t('pages.weights.fields.measuredAt')" type="date" required />
+                <UiTextarea v-model="editForm.notes" :label="$t('pages.weights.fields.notes')" />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
+                </div>
+            </form>
+        </UiModal>
+
+        <!-- Delete Confirmation -->
+        <UiConfirmDialog
+            :show="showDeleteConfirm"
+            :title="$t('common.confirmDelete')"
+            :message="$t('pages.weights.confirmDelete')"
+            variant="danger"
+            :confirm-label="$t('common.delete')"
+            :cancel-label="$t('common.cancel')"
+            :loading="deleting"
+            @confirm="handleDelete"
+            @cancel="showDeleteConfirm = false"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface WeightRecord {
     id: string;
@@ -97,28 +123,26 @@ interface Pet {
 const { t } = useI18n();
 const api = useApi();
 const queryClient = useQueryClient();
-const toast = useToast();
+const toast = useAppToast();
 
 definePageMeta({ layout: "default" });
 useHead({ title: () => t("pages.weights.title") });
 
-const selectedPet = ref("");
-const showCreate = ref(false);
-const creating = ref(false);
-const form = reactive({
-    petId: "",
-    weightGrams: null as number | null,
-    measuredAt: "",
-    notes: "",
-});
+const selectedPet = ref("ALL");
 
 const queryParams = computed(() => {
     const params = new URLSearchParams();
-    if (selectedPet.value) params.set("petId", selectedPet.value);
+    if (selectedPet.value && selectedPet.value !== "ALL") params.set("petId", selectedPet.value);
     return params.toString();
 });
 
-const { data: weights, isLoading: loading } = useQuery({
+// ── Data ─────────────────────────────────────────────────
+const {
+    data: weights,
+    isLoading: loading,
+    error,
+    refetch,
+} = useQuery({
     queryKey: ["weights", selectedPet],
     queryFn: () => api.get<WeightRecord[]>(`/api/weights${queryParams.value ? `?${queryParams.value}` : ""}`),
 });
@@ -128,39 +152,110 @@ const { data: pets } = useQuery({
     queryFn: () => api.get<Pet[]>("/api/pets"),
 });
 
-const petOptions = computed(() => [
-    { label: t("pages.weights.allPets"), value: "" },
-    ...(pets.value ?? []).map((p) => ({ label: p.name, value: p.id })),
-]);
+// ── Create ───────────────────────────────────────────────
+const showCreate = ref(false);
+const form = reactive({
+    petId: "",
+    weightGrams: null as number | null,
+    measuredAt: "",
+    notes: "",
+});
 
-async function handleCreate() {
-    creating.value = true;
-    try {
-        await api.post("/api/weights", {
+function resetForm() {
+    Object.assign(form, { petId: "", weightGrams: null, measuredAt: "", notes: "" });
+}
+
+function openCreateModal() {
+    resetForm();
+    form.measuredAt = new Date().toISOString().split("T")[0];
+    showCreate.value = true;
+}
+
+const { mutate: createMutation, isPending: creating } = useMutation({
+    mutationFn: () =>
+        api.post("/api/weights", {
             petId: form.petId,
             weightGrams: form.weightGrams,
             measuredAt: form.measuredAt,
             notes: form.notes || undefined,
-        });
-        await queryClient.invalidateQueries({ queryKey: ["weights"] });
-        toast.add({ title: t("common.saved"), color: "green" });
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["weights"] });
+        toast.success(t("pages.weights.created"));
         showCreate.value = false;
-        Object.assign(form, { petId: "", weightGrams: null, measuredAt: "", notes: "" });
-    } catch {
-        toast.add({ title: t("common.error"), color: "red" });
-    } finally {
-        creating.value = false;
-    }
+        resetForm();
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleCreate() {
+    createMutation();
 }
 
-async function handleDelete(id: string) {
-    if (!confirm(t("pages.weights.confirmDelete"))) return;
-    try {
-        await api.del(`/api/weights/${id}`);
-        await queryClient.invalidateQueries({ queryKey: ["weights"] });
-        toast.add({ title: t("common.deleted"), color: "green" });
-    } catch {
-        toast.add({ title: t("common.error"), color: "red" });
-    }
+// ── Edit ─────────────────────────────────────────────────
+const showEdit = ref(false);
+const editingId = ref("");
+const editForm = reactive({
+    weightGrams: null as number | null,
+    measuredAt: "",
+    notes: "",
+});
+
+function openEditModal(w: WeightRecord) {
+    editingId.value = w.id;
+    Object.assign(editForm, {
+        weightGrams: w.weightGrams,
+        measuredAt: w.measuredAt.split("T")[0],
+        notes: w.notes ?? "",
+    });
+    showEdit.value = true;
+}
+
+const { mutate: updateMutation, isPending: updating } = useMutation({
+    mutationFn: () =>
+        api.put(`/api/weights/${editingId.value}`, {
+            weightGrams: editForm.weightGrams,
+            measuredAt: editForm.measuredAt,
+            notes: editForm.notes || undefined,
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["weights"] });
+        toast.success(t("pages.weights.saved"));
+        showEdit.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleUpdate() {
+    updateMutation();
+}
+
+// ── Delete ───────────────────────────────────────────────
+const showDeleteConfirm = ref(false);
+const deletingId = ref("");
+
+function confirmDelete(id: string) {
+    deletingId.value = id;
+    showDeleteConfirm.value = true;
+}
+
+const { mutate: deleteMutation, isPending: deleting } = useMutation({
+    mutationFn: () => api.del(`/api/weights/${deletingId.value}`),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["weights"] });
+        toast.success(t("pages.weights.deleted"));
+        showDeleteConfirm.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleDelete() {
+    deleteMutation();
 }
 </script>

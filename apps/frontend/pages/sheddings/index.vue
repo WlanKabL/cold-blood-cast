@@ -1,22 +1,32 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.sheddings.title") }}</h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.sheddings.subtitle") }}</p>
             </div>
-            <UButton icon="i-lucide-plus" :label="$t('pages.sheddings.add')" @click="showCreate = true" />
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.sheddings.add") }}</UiButton>
         </div>
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3">
-            <USelect v-model="selectedPet" :items="petOptions" :placeholder="$t('pages.sheddings.allPets')" class="w-48" />
+            <UiSelect v-model="selectedPet" class="w-48">
+                <option value="ALL">{{ $t("pages.sheddings.allPets") }}</option>
+                <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </UiSelect>
         </div>
 
         <!-- Loading -->
         <div v-if="loading" class="space-y-3">
             <div v-for="i in 5" :key="i" class="glass-card h-16 animate-pulse rounded-xl" />
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
+            <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
+            <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
         </div>
 
         <!-- List -->
@@ -48,7 +58,8 @@
                         {{ shed.complete ? $t("pages.sheddings.complete") : $t("pages.sheddings.inProgress") }}
                     </span>
                     <span v-if="shed.quality" class="text-fg-faint text-xs">{{ shed.quality }}</span>
-                    <UButton variant="ghost" icon="i-lucide-trash-2" size="xs" color="error" @click="handleDelete(shed.id)" />
+                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(shed)" />
+                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(shed.id)" />
                 </div>
             </div>
         </div>
@@ -57,46 +68,65 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:layers" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.sheddings.empty") }}</p>
-            <UButton class="mt-4" :label="$t('pages.sheddings.addFirst')" @click="showCreate = true" />
+            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.sheddings.addFirst") }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UModal v-model:open="showCreate">
-            <template #content>
-                <div class="p-6">
-                    <h2 class="text-fg mb-4 text-lg font-semibold">{{ $t("pages.sheddings.create") }}</h2>
-                    <form class="space-y-4" @submit.prevent="handleCreate">
-                        <UFormField :label="$t('pages.sheddings.fields.pet')">
-                            <USelect v-model="form.petId" :items="petOptions.filter((p) => p.value)" required />
-                        </UFormField>
-                        <UFormField :label="$t('pages.sheddings.fields.startedAt')">
-                            <UInput v-model="form.startedAt" type="date" required />
-                        </UFormField>
-                        <UFormField :label="$t('pages.sheddings.fields.completedAt')">
-                            <UInput v-model="form.completedAt" type="date" />
-                        </UFormField>
-                        <UFormField :label="$t('pages.sheddings.fields.complete')">
-                            <UCheckbox v-model="form.complete" :label="$t('pages.sheddings.fields.completeLabel')" />
-                        </UFormField>
-                        <UFormField :label="$t('pages.sheddings.fields.quality')">
-                            <UInput v-model="form.quality" :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')" />
-                        </UFormField>
-                        <UFormField :label="$t('pages.sheddings.fields.notes')">
-                            <UTextarea v-model="form.notes" />
-                        </UFormField>
-                        <div class="flex justify-end gap-2 pt-2">
-                            <UButton variant="ghost" :label="$t('common.cancel')" @click="showCreate = false" />
-                            <UButton type="submit" :loading="creating" :label="$t('common.save')" />
-                        </div>
-                    </form>
+        <UiModal :show="showCreate" :title="$t('pages.sheddings.create')" width="lg" @close="showCreate = false">
+            <form class="space-y-4" @submit.prevent="handleCreate">
+                <UiSelect v-model="form.petId" :label="$t('pages.sheddings.fields.pet')" required>
+                    <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+                </UiSelect>
+                <UiTextInput v-model="form.startedAt" :label="$t('pages.sheddings.fields.startedAt')" type="date" required />
+                <UiTextInput v-model="form.completedAt" :label="$t('pages.sheddings.fields.completedAt')" type="date" />
+                <div class="flex items-center gap-3">
+                    <UiToggle v-model="form.complete" />
+                    <label class="text-fg text-sm">{{ $t("pages.sheddings.fields.completeLabel") }}</label>
                 </div>
-            </template>
-        </UModal>
+                <UiTextInput v-model="form.quality" :label="$t('pages.sheddings.fields.quality')" :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')" />
+                <UiTextarea v-model="form.notes" :label="$t('pages.sheddings.fields.notes')" />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
+                </div>
+            </form>
+        </UiModal>
+
+        <!-- Edit Modal -->
+        <UiModal :show="showEdit" :title="$t('pages.sheddings.edit')" width="lg" @close="showEdit = false">
+            <form class="space-y-4" @submit.prevent="handleUpdate">
+                <UiTextInput v-model="editForm.startedAt" :label="$t('pages.sheddings.fields.startedAt')" type="date" required />
+                <UiTextInput v-model="editForm.completedAt" :label="$t('pages.sheddings.fields.completedAt')" type="date" />
+                <div class="flex items-center gap-3">
+                    <UiToggle v-model="editForm.complete" />
+                    <label class="text-fg text-sm">{{ $t("pages.sheddings.fields.completeLabel") }}</label>
+                </div>
+                <UiTextInput v-model="editForm.quality" :label="$t('pages.sheddings.fields.quality')" :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')" />
+                <UiTextarea v-model="editForm.notes" :label="$t('pages.sheddings.fields.notes')" />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
+                </div>
+            </form>
+        </UiModal>
+
+        <!-- Delete Confirmation -->
+        <UiConfirmDialog
+            :show="showDeleteConfirm"
+            :title="$t('common.confirmDelete')"
+            :message="$t('pages.sheddings.confirmDelete')"
+            variant="danger"
+            :confirm-label="$t('common.delete')"
+            :cancel-label="$t('common.cancel')"
+            :loading="deleting"
+            @confirm="handleDelete"
+            @cancel="showDeleteConfirm = false"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface Shedding {
     id: string;
@@ -116,30 +146,26 @@ interface Pet {
 const { t } = useI18n();
 const api = useApi();
 const queryClient = useQueryClient();
-const toast = useToast();
+const toast = useAppToast();
 
 definePageMeta({ layout: "default" });
 useHead({ title: () => t("pages.sheddings.title") });
 
-const selectedPet = ref("");
-const showCreate = ref(false);
-const creating = ref(false);
-const form = reactive({
-    petId: "",
-    startedAt: "",
-    completedAt: "",
-    complete: false,
-    quality: "",
-    notes: "",
-});
+const selectedPet = ref("ALL");
 
 const queryParams = computed(() => {
     const params = new URLSearchParams();
-    if (selectedPet.value) params.set("petId", selectedPet.value);
+    if (selectedPet.value && selectedPet.value !== "ALL") params.set("petId", selectedPet.value);
     return params.toString();
 });
 
-const { data: sheddings, isLoading: loading } = useQuery({
+// ── Data ─────────────────────────────────────────────────
+const {
+    data: sheddings,
+    isLoading: loading,
+    error,
+    refetch,
+} = useQuery({
     queryKey: ["sheddings", selectedPet],
     queryFn: () => api.get<Shedding[]>(`/api/sheddings${queryParams.value ? `?${queryParams.value}` : ""}`),
 });
@@ -149,41 +175,120 @@ const { data: pets } = useQuery({
     queryFn: () => api.get<Pet[]>("/api/pets"),
 });
 
-const petOptions = computed(() => [
-    { label: t("pages.sheddings.allPets"), value: "" },
-    ...(pets.value ?? []).map((p) => ({ label: p.name, value: p.id })),
-]);
+// ── Create ───────────────────────────────────────────────
+const showCreate = ref(false);
+const form = reactive({
+    petId: "",
+    startedAt: "",
+    completedAt: "",
+    complete: false,
+    quality: "",
+    notes: "",
+});
 
-async function handleCreate() {
-    creating.value = true;
-    try {
-        await api.post("/api/sheddings", {
+function resetForm() {
+    Object.assign(form, { petId: "", startedAt: "", completedAt: "", complete: false, quality: "", notes: "" });
+}
+
+function openCreateModal() {
+    resetForm();
+    form.startedAt = new Date().toISOString().split("T")[0];
+    showCreate.value = true;
+}
+
+const { mutate: createMutation, isPending: creating } = useMutation({
+    mutationFn: () =>
+        api.post("/api/sheddings", {
             petId: form.petId,
             startedAt: form.startedAt,
             completedAt: form.completedAt || undefined,
             complete: form.complete,
             quality: form.quality || undefined,
             notes: form.notes || undefined,
-        });
-        await queryClient.invalidateQueries({ queryKey: ["sheddings"] });
-        toast.add({ title: t("common.saved"), color: "green" });
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["sheddings"] });
+        toast.success(t("pages.sheddings.created"));
         showCreate.value = false;
-        Object.assign(form, { petId: "", startedAt: "", completedAt: "", complete: false, quality: "", notes: "" });
-    } catch {
-        toast.add({ title: t("common.error"), color: "red" });
-    } finally {
-        creating.value = false;
-    }
+        resetForm();
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleCreate() {
+    createMutation();
 }
 
-async function handleDelete(id: string) {
-    if (!confirm(t("pages.sheddings.confirmDelete"))) return;
-    try {
-        await api.del(`/api/sheddings/${id}`);
-        await queryClient.invalidateQueries({ queryKey: ["sheddings"] });
-        toast.add({ title: t("common.deleted"), color: "green" });
-    } catch {
-        toast.add({ title: t("common.error"), color: "red" });
-    }
+// ── Edit ─────────────────────────────────────────────────
+const showEdit = ref(false);
+const editingId = ref("");
+const editForm = reactive({
+    startedAt: "",
+    completedAt: "",
+    complete: false,
+    quality: "",
+    notes: "",
+});
+
+function openEditModal(shed: Shedding) {
+    editingId.value = shed.id;
+    Object.assign(editForm, {
+        startedAt: shed.startedAt.split("T")[0],
+        completedAt: shed.completedAt ? shed.completedAt.split("T")[0] : "",
+        complete: shed.complete,
+        quality: shed.quality ?? "",
+        notes: shed.notes ?? "",
+    });
+    showEdit.value = true;
+}
+
+const { mutate: updateMutation, isPending: updating } = useMutation({
+    mutationFn: () =>
+        api.put(`/api/sheddings/${editingId.value}`, {
+            startedAt: editForm.startedAt,
+            completedAt: editForm.completedAt || undefined,
+            complete: editForm.complete,
+            quality: editForm.quality || undefined,
+            notes: editForm.notes || undefined,
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["sheddings"] });
+        toast.success(t("pages.sheddings.saved"));
+        showEdit.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleUpdate() {
+    updateMutation();
+}
+
+// ── Delete ───────────────────────────────────────────────
+const showDeleteConfirm = ref(false);
+const deletingId = ref("");
+
+function confirmDelete(id: string) {
+    deletingId.value = id;
+    showDeleteConfirm.value = true;
+}
+
+const { mutate: deleteMutation, isPending: deleting } = useMutation({
+    mutationFn: () => api.del(`/api/sheddings/${deletingId.value}`),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["sheddings"] });
+        toast.success(t("pages.sheddings.deleted"));
+        showDeleteConfirm.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleDelete() {
+    deleteMutation();
 }
 </script>

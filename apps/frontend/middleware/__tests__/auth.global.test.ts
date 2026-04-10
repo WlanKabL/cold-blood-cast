@@ -21,11 +21,15 @@ const { mockAuthStore, navigateToResult } = vi.hoisted(() => {
     return { mockAuthStore, navigateToResult };
 });
 
-function route(path: string, fullPath?: string) {
-    return { path, fullPath: fullPath ?? path } as { path: string; fullPath: string };
+function route(path: string, fullPath?: string, query?: Record<string, string>) {
+    return { path, fullPath: fullPath ?? path, query: query ?? {} } as {
+        path: string;
+        fullPath: string;
+        query: Record<string, string>;
+    };
 }
 
-type Route = { path: string; fullPath: string };
+type Route = { path: string; fullPath: string; query: Record<string, string> };
 const mw = authMiddleware as unknown as (to: Route) => Promise<unknown>;
 
 describe("auth.global middleware", () => {
@@ -82,6 +86,34 @@ describe("auth.global middleware", () => {
     it("redirects authenticated user from /register to /dashboard", async () => {
         mockAuthStore.isAuthenticated = true;
         await mw(route("/register"));
+        expect(navigateToResult).toHaveBeenCalledWith("/dashboard");
+    });
+
+    it("respects redirect query param on /login for authenticated user", async () => {
+        mockAuthStore.isAuthenticated = true;
+        await mw(route("/login", "/login?redirect=/enclosures", { redirect: "/enclosures" }));
+        expect(navigateToResult).toHaveBeenCalledWith("/enclosures");
+    });
+
+    it("respects redirect query param on /register for authenticated user", async () => {
+        mockAuthStore.isAuthenticated = true;
+        await mw(route("/register", "/register?redirect=/pets", { redirect: "/pets" }));
+        expect(navigateToResult).toHaveBeenCalledWith("/pets");
+    });
+
+    it("ignores absolute URL redirect to prevent open redirect", async () => {
+        mockAuthStore.isAuthenticated = true;
+        await mw(
+            route("/login", "/login?redirect=https://evil.com", {
+                redirect: "https://evil.com",
+            }),
+        );
+        expect(navigateToResult).toHaveBeenCalledWith("/dashboard");
+    });
+
+    it("ignores protocol-relative redirect to prevent open redirect", async () => {
+        mockAuthStore.isAuthenticated = true;
+        await mw(route("/login", "/login?redirect=//evil.com", { redirect: "//evil.com" }));
         expect(navigateToResult).toHaveBeenCalledWith("/dashboard");
     });
 

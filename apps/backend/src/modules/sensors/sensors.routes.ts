@@ -40,11 +40,13 @@ export async function sensorRoutes(app: FastifyInstance) {
     app.addHook("preHandler", emailVerifiedGuard);
 
     app.get("/", async (request) => {
-        return listSensors(request.userId);
+        const data = await listSensors(request.userId);
+        return { success: true, data };
     });
 
     app.get<{ Params: { id: string } }>("/:id", async (request) => {
-        return getSensor(request.params.id, request.userId);
+        const data = await getSensor(request.params.id, request.userId);
+        return { success: true, data };
     });
 
     app.post("/", async (request, reply) => {
@@ -53,7 +55,7 @@ export async function sensorRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid sensor data", result.error.flatten());
         }
         const sensor = await createSensor(request.userId, result.data);
-        return reply.status(201).send(sensor);
+        return reply.status(201).send({ success: true, data: sensor });
     });
 
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
@@ -61,12 +63,13 @@ export async function sensorRoutes(app: FastifyInstance) {
         if (!result.success) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid sensor data", result.error.flatten());
         }
-        return updateSensor(request.params.id, request.userId, result.data);
+        const data = await updateSensor(request.params.id, request.userId, result.data);
+        return { success: true, data };
     });
 
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deleteSensor(request.params.id, request.userId);
-        return { ok: true };
+        return { success: true, data: { ok: true } };
     });
 
     // ── Readings sub-routes ──────────────────────
@@ -78,7 +81,8 @@ export async function sensorRoutes(app: FastifyInstance) {
             if (!query.success) {
                 throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
             }
-            return getSensorReadings(request.params.id, request.userId, query.data);
+            const data = await getSensorReadings(request.params.id, request.userId, query.data);
+            return { success: true, data };
         },
     );
 
@@ -88,6 +92,6 @@ export async function sensorRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid reading data", result.error.flatten());
         }
         const reading = await createSensorReading(request.params.id, request.userId, result.data);
-        return reply.status(201).send(reading);
+        return reply.status(201).send({ success: true, data: reading });
     });
 }

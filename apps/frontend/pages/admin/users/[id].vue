@@ -347,7 +347,7 @@ useHead({ title: () => `${t("admin.users.title")} — Admin` });
 
 const route = useRoute();
 const admin = useAdminApi();
-const toast = useToast();
+const toast = useAppToast();
 const queryClient = useQueryClient();
 
 const userId = route.params.id as string;

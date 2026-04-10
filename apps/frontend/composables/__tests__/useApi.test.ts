@@ -14,7 +14,7 @@ const mockAuthStore = {
 };
 vi.stubGlobal("useAuthStore", () => mockAuthStore);
 
-vi.stubGlobal("useToast", () => ({
+vi.stubGlobal("useAppToast", () => ({
     add: vi.fn(),
 }));
 

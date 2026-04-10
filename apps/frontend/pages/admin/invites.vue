@@ -247,7 +247,7 @@ const { t } = useI18n();
 useHead({ title: () => `${t("admin.nav.invites")} — Admin` });
 
 const admin = useAdminApi();
-const toast = useToast();
+const toast = useAppToast();
 const queryClient = useQueryClient();
 
 const { data: codes, isLoading: loading } = useQuery({

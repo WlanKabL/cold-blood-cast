@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-const { toasts, remove: removeToast } = useToast();
+const { toasts, remove: removeToast } = useAppToast();
 
 function toastClasses(color: string): string {
     const map: Record<string, string> = {

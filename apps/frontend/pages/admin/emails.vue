@@ -644,7 +644,7 @@ useHead({ title: () => `${t("admin.emails.title")} — Admin` });
 
 const { formatDateTime } = useFormatters();
 const api = useApi();
-const toast = useToast();
+const toast = useAppToast();
 
 // ─── Tabs ────────────────────────────────────────────────────
 

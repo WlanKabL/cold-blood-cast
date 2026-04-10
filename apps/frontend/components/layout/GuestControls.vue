@@ -6,7 +6,7 @@
             :class="buttonClass"
             @click="toggleLocale"
         >
-            {{ (settings.currentLocale ?? 'en').toUpperCase() }}
+            {{ (settings.currentLocale ?? "en").toUpperCase() }}
         </button>
 
         <!-- Theme Toggle -->

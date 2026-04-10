@@ -58,7 +58,7 @@ export function useApi() {
 
             // Global ban/suspension handling — verify session and force logout
             if (res.status === 403 && apiError.code === "E_USER_BANNED") {
-                const toast = useToast();
+                const toast = useAppToast();
                 const { $i18n } = useNuxtApp();
                 toast.add({
                     title: apiError.message || $i18n.t("errors.accountSuspended"),
@@ -72,7 +72,7 @@ export function useApi() {
 
             // Global maintenance mode handling — show toast to inform user
             if (res.status === 503 && apiError.code === "E_MAINTENANCE_MODE") {
-                const toast = useToast();
+                const toast = useAppToast();
                 const { $i18n } = useNuxtApp();
                 toast.add({
                     title: apiError.message || $i18n.t("errors.maintenanceMode"),

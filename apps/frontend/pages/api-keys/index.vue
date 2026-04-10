@@ -482,9 +482,9 @@ async function createKey() {
         newKeySecret.value = res.key;
         showModal.value = false;
         await queryClient.invalidateQueries({ queryKey: ["api-keys"] });
-        useToast().add({ title: t("common.saved"), color: "green", timeout: 3000 });
+        useAppToast().add({ title: t("common.saved"), color: "green", timeout: 3000 });
     } catch {
-        useToast().add({ title: t("common.error"), color: "red", timeout: 5000 });
+        useAppToast().add({ title: t("common.error"), color: "red", timeout: 5000 });
     } finally {
         saving.value = false;
     }
@@ -496,9 +496,9 @@ async function handleRevoke() {
         await api.patch(`/api/api-keys/${revokeTarget.value.id}/revoke`, {});
         revokeTarget.value = undefined;
         await queryClient.invalidateQueries({ queryKey: ["api-keys"] });
-        useToast().add({ title: t("pages.apiKeys.revoked"), color: "green", timeout: 3000 });
+        useAppToast().add({ title: t("pages.apiKeys.revoked"), color: "green", timeout: 3000 });
     } catch {
-        useToast().add({ title: t("common.error"), color: "red", timeout: 5000 });
+        useAppToast().add({ title: t("common.error"), color: "red", timeout: 5000 });
     }
 }
 
@@ -508,16 +508,16 @@ async function handleDelete() {
         await api.del(`/api/api-keys/${deleteTarget.value.id}`);
         deleteTarget.value = undefined;
         await queryClient.invalidateQueries({ queryKey: ["api-keys"] });
-        useToast().add({ title: t("common.deleted"), color: "green", timeout: 3000 });
+        useAppToast().add({ title: t("common.deleted"), color: "green", timeout: 3000 });
     } catch {
-        useToast().add({ title: t("common.error"), color: "red", timeout: 5000 });
+        useAppToast().add({ title: t("common.error"), color: "red", timeout: 5000 });
     }
 }
 
 async function copyKey() {
     try {
         await navigator.clipboard.writeText(newKeySecret.value);
-        useToast().add({ title: t("common.copied"), color: "green", timeout: 2000 });
+        useAppToast().add({ title: t("common.copied"), color: "green", timeout: 2000 });
     } catch {
         /* ignore */
     }
