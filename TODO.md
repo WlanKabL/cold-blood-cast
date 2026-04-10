@@ -242,33 +242,38 @@
 
 ---
 
-### Feature 5: Activity Timeline 📅
+### Feature 5: Activity Timeline 📅 ✅
 
 > Chronologisches Tagebuch pro Tier. Alle Events (Fütterung, Häutung, Gewicht, Tierarzt, Medikamente, Fotos) auf einer Seite.
 
-**Scope:** Backend aggregation endpoint + frontend page + E2E
+**Status: Complete** — Committed in `feat: activity timeline`
+
+<details>
+<summary>Completed items (click to expand)</summary>
 
 #### Backend
 
-- 🔲 **5.1** `activity-timeline.service.ts`: query all event types for a pet, normalize into `TimelineEvent` type (id, type, date, title, detail, icon), paginated, sorted desc
-- 🔲 **5.2** `activity-timeline.routes.ts`: GET `/api/pets/:petId/timeline?page=1&limit=50&types=feeding,shedding,weight,vet,medication,photo`
+- ✅ **5.1** `activity-timeline.service.ts`: query all event types for a pet, normalize into `TimelineEvent` type (id, type, date, title, detail, icon), paginated, sorted desc
+- ✅ **5.2** `activity-timeline.routes.ts`: GET `/api/pets/:petId/timeline?page=1&limit=50&types=feeding,shedding,weight,vet_visit,photo`
 
 #### Frontend
 
-- 🔲 **5.3** `pages/pets/[id]/timeline.vue`: infinite-scroll timeline view with type-colored icons, date headers, expandable detail
-- 🔲 **5.4** Type filter: toggle which event types to show
-- 🔲 **5.5** Pet detail page: "View Timeline" link/button
-- 🔲 **5.6** Mini timeline on pet detail: last 5 events preview
+- ✅ **5.3** `pages/pets/[id]/timeline.vue`: timeline view with type-colored icons, date headers, load more pagination
+- ✅ **5.4** Type filter: toggle which event types to show (at least 1 must stay active)
+- ✅ **5.5** Pet detail page: "View Timeline" link + "Recent Activity" card
+- ✅ **5.6** Mini timeline on pet detail: last 5 events preview
 
 #### Testing
 
-- 🔲 **5.7** Backend unit tests: timeline aggregation, pagination, type filtering
-- 🔲 **5.8** Frontend unit tests: timeline rendering, filter toggles
-- 🔲 **5.9** Playwright E2E: navigate to timeline, filter by type, scroll pagination
+- ✅ **5.7** Backend unit tests: 19 tests (normalizeEvents, getTimeline — pagination, type filtering, ownership, sorting)
+- ✅ **5.8** Frontend unit tests: 13 tests (eventColorClass, groupEventsByDate, filterEventsByTypes)
+- ✅ **5.9** Playwright E2E: 10 tests (timeline page, pet detail widget, empty states, filters, navigation)
 
 #### i18n
 
-- 🔲 **5.10** EN + DE keys: pages.pets.timeline.* (title, types, empty, loadMore)
+- ✅ **5.10** EN + DE keys: pages.pets.timeline.* (title, subtitle, viewTimeline, loadMore, empty, noMore, filters, recentActivity, eventCount)
+
+</details>
 
 ---
 
