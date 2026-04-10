@@ -756,7 +756,9 @@
             "today": "Heute",
             "upcomingVetVisits": "Anstehende Tierarzttermine",
             "noUpcomingVetVisits": "Keine anstehenden Tierarzttermine",
-            "noVet": "Kein Tierarzt zugewiesen"
+            "noVet": "Kein Tierarzt zugewiesen",
+            "weightTrends": "Gewichtstrends",
+            "noWeightData": "Keine Gewichtsdaten verfügbar"
         },
         "enclosures": {
             "title": "Terrarien",
@@ -1007,6 +1009,29 @@
                 "weightPlaceholder": "Gewicht in Gramm",
                 "measuredAt": "Gemessen am",
                 "notes": "Notizen"
+            },
+            "chart": {
+                "title": "Gewichtsdiagramm",
+                "subtitle": "Gewichtstrends zwischen Tieren vergleichen",
+                "noData": "Keine Gewichtsdaten verfügbar",
+                "dateRange": "Zeitraum",
+                "last30d": "Letzte 30 Tage",
+                "last90d": "Letzte 90 Tage",
+                "last1y": "Letztes Jahr",
+                "allTime": "Gesamter Zeitraum",
+                "selectPets": "Tiere zum Vergleichen auswählen",
+                "selectAtLeast": "Mindestens ein Tier auswählen",
+                "growth": "Wachstum",
+                "growthRate": "Wachstumsrate",
+                "perMonth": "{rate} g/Monat",
+                "totalGain": "Gesamt: {gain} g",
+                "trendUp": "Zunehmend",
+                "trendStable": "Stabil",
+                "trendDown": "Abnehmend",
+                "records": "{count} Einträge",
+                "viewChart": "Diagramm anzeigen",
+                "comparison": "Gewichtsvergleich",
+                "weightTrends": "Gewichtstrends"
             }
         },
         "settings": {

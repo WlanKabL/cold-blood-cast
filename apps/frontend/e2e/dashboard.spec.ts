@@ -8,6 +8,7 @@ import {
     mockFeedings,
     mockFeedingReminders,
     mockUpcomingAppointments,
+    mockWeightChartSeries,
 } from "./helpers/fixtures";
 
 test.describe("Dashboard", () => {
@@ -19,6 +20,7 @@ test.describe("Dashboard", () => {
         await mockGet(page, "/api/feedings", mockFeedings);
         await mockGet(page, "/api/feeding-reminders", mockFeedingReminders);
         await mockGet(page, "/api/vet-visits/upcoming", mockUpcomingAppointments);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
     });
 
     test("loads dashboard page", async ({ page }) => {
@@ -96,6 +98,7 @@ test.describe("Dashboard — Empty State", () => {
         await mockGet(page, "/api/feedings", []);
         await mockGet(page, "/api/feeding-reminders", []);
         await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", []);
 
         await page.goto("/dashboard");
 
@@ -111,6 +114,7 @@ test.describe("Dashboard — Empty State", () => {
         await mockGet(page, "/api/feedings", mockFeedings);
         await mockGet(page, "/api/feeding-reminders", mockFeedingReminders);
         await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
 
         await page.goto("/dashboard");
 
@@ -126,6 +130,7 @@ test.describe("Dashboard — Empty State", () => {
         await mockGet(page, "/api/feedings", []);
         await mockGet(page, "/api/feeding-reminders", []);
         await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", []);
 
         await page.goto("/dashboard");
 
@@ -165,6 +170,7 @@ test.describe("Dashboard — Feeding Reminders", () => {
             },
         ]);
         await mockGet(page, "/api/vet-visits/upcoming", mockUpcomingAppointments);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
 
         await page.goto("/dashboard");
 

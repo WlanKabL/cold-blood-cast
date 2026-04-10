@@ -170,33 +170,39 @@
 
 ---
 
-### Feature 3: Weight Charts 📈
+### Feature 3: Weight Charts 📈 ✅
 
 > Gewichtsverlauf als Line-Chart pro Tier. Vergleich zwischen Tieren.
 
-**Scope:** Chart library integration + frontend components + E2E
+**Scope:** Chart library integration + frontend components + backend endpoints + E2E
 
 #### Setup
 
-- 🔲 **3.1** Install chart library: `chart.js` + `vue-chartjs` (or `@unovis/vue` — evaluate)
-- 🔲 **3.2** Chart wrapper component: `components/charts/LineChart.vue` (reusable for shedding later)
+- ✅ **3.1** Install chart library: `chart.js` + `vue-chartjs`
+- ✅ **3.2** Chart wrapper component: `components/charts/WeightLineChart.vue` (reusable, sparkline + full mode)
+
+#### Backend
+
+- ✅ **3.B1** `GET /api/weights/chart` — grouped weight data by pet with date range filtering
+- ✅ **3.B2** `GET /api/weights/growth-rate` — growth rate computation per pet (avg g/month, trend)
+- ✅ **3.B3** Backend unit tests: 29 tests (computeGrowthRate, getWeightChartData, getGrowthRates, CRUD)
 
 #### Frontend
 
-- 🔲 **3.3** Pet detail page: weight chart section (line chart, x=date, y=grams)
-- 🔲 **3.4** Date range selector: last 30d, 90d, 1y, all time
-- 🔲 **3.5** `pages/weights/chart.vue`: multi-pet weight comparison page (select 2-5 pets, overlay lines)
-- 🔲 **3.6** Growth rate indicator: show average growth per month, trend arrow (up/stable/down)
-- 🔲 **3.7** Dashboard widget: mini sparkline charts for pets on dashboard (optional)
+- ✅ **3.3** Pet detail page: weight chart section (line chart, x=date, y=grams) + growth rate indicator
+- ✅ **3.4** Date range selector: last 30d, 90d, 1y, all time
+- ✅ **3.5** `pages/weights/chart.vue`: multi-pet weight comparison page (select pets, overlay lines, growth cards)
+- ✅ **3.6** Growth rate indicator: show average growth per month, trend arrow (up/stable/down)
+- ✅ **3.7** Dashboard widget: mini sparkline charts for pets on dashboard
 
 #### Testing
 
-- 🔲 **3.8** Frontend unit tests: chart data transformation, date range filtering, growth rate calculation
-- 🔲 **3.9** Playwright E2E: navigate to pet detail, verify chart renders, change date range, compare pets
+- ✅ **3.8** Frontend unit tests: 19 tests (chart data transformation, date range, growth display, colors)
+- ✅ **3.9** Playwright E2E: 16 tests (pet detail chart, comparison page, dashboard sparklines, weight index)
 
 #### i18n
 
-- 🔲 **3.10** EN + DE keys: charts.*, weight comparison labels
+- ✅ **3.10** EN + DE keys: pages.weights.chart.*, dashboard weight trends
 
 ---
 

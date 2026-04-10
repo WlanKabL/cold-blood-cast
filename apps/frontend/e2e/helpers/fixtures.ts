@@ -397,3 +397,80 @@ export const mockPetPhotos = [
         upload: { url: "/uploads/uploads/monty-feeding.jpg" },
     },
 ];
+
+// ─── Weight Chart Fixtures ─────────────────────────────────
+
+export const mockWeightChartSeries = [
+    {
+        petId: "pet_001",
+        petName: "Monty",
+        points: [
+            { date: "2024-06-01T00:00:00.000Z", weightGrams: 200 },
+            { date: "2024-07-01T00:00:00.000Z", weightGrams: 250 },
+            { date: "2024-08-01T00:00:00.000Z", weightGrams: 300 },
+            { date: "2024-09-01T00:00:00.000Z", weightGrams: 350 },
+            { date: "2024-10-01T00:00:00.000Z", weightGrams: 400 },
+            { date: "2024-11-01T00:00:00.000Z", weightGrams: 450 },
+        ],
+    },
+    {
+        petId: "pet_002",
+        petName: "Slither",
+        points: [
+            { date: "2024-08-01T00:00:00.000Z", weightGrams: 150 },
+            { date: "2024-09-01T00:00:00.000Z", weightGrams: 200 },
+            { date: "2024-10-01T00:00:00.000Z", weightGrams: 250 },
+            { date: "2024-11-01T00:00:00.000Z", weightGrams: 320 },
+        ],
+    },
+];
+
+export const mockGrowthRates = [
+    {
+        petId: "pet_001",
+        petName: "Monty",
+        firstRecord: { date: "2024-06-01T00:00:00.000Z", weightGrams: 200 },
+        latestRecord: { date: "2024-11-01T00:00:00.000Z", weightGrams: 450 },
+        totalGainGrams: 250,
+        avgGramsPerMonth: 50,
+        trend: "up" as const,
+        recordCount: 6,
+    },
+    {
+        petId: "pet_002",
+        petName: "Slither",
+        firstRecord: { date: "2024-08-01T00:00:00.000Z", weightGrams: 150 },
+        latestRecord: { date: "2024-11-01T00:00:00.000Z", weightGrams: 320 },
+        totalGainGrams: 170,
+        avgGramsPerMonth: 56.67,
+        trend: "up" as const,
+        recordCount: 4,
+    },
+];
+
+export const mockWeightRecords = [
+    {
+        id: "wr_001",
+        petId: "pet_001",
+        weightGrams: 450,
+        measuredAt: "2024-11-01T00:00:00.000Z",
+        notes: null,
+        pet: { id: "pet_001", name: "Monty" },
+    },
+    {
+        id: "wr_002",
+        petId: "pet_001",
+        weightGrams: 400,
+        measuredAt: "2024-10-01T00:00:00.000Z",
+        notes: null,
+        pet: { id: "pet_001", name: "Monty" },
+    },
+    {
+        id: "wr_003",
+        petId: "pet_002",
+        weightGrams: 320,
+        measuredAt: "2024-11-01T00:00:00.000Z",
+        notes: "After feeding",
+        pet: { id: "pet_002", name: "Slither" },
+    },
+];

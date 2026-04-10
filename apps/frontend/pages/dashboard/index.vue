@@ -129,6 +129,51 @@
             </div>
         </div>
 
+        <!-- Weight Trends -->
+        <div>
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-fg text-lg font-semibold">
+                    {{ $t("pages.dashboard.weightTrends") }}
+                </h2>
+                <NuxtLink
+                    to="/weights/chart"
+                    class="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                >
+                    {{ $t("pages.dashboard.viewAll") }}
+                </NuxtLink>
+            </div>
+            <div
+                v-if="weightChartSeries?.length"
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
+                <div
+                    v-for="series in weightChartSeries"
+                    :key="series.petId"
+                    class="glass-card rounded-xl p-4"
+                >
+                    <div class="mb-2 flex items-center justify-between">
+                        <NuxtLink :to="`/pets/${series.petId}`" class="text-fg hover:text-primary-400 text-sm font-semibold transition-colors">
+                            {{ series.petName }}
+                        </NuxtLink>
+                        <span v-if="series.points.length" class="text-fg-faint text-xs">
+                            {{ series.points[series.points.length - 1].weightGrams }} g
+                        </span>
+                    </div>
+                    <WeightLineChart
+                        :series="[series]"
+                        :height="60"
+                        :sparkline="true"
+                        :show-legend="false"
+                        :fill="true"
+                    />
+                </div>
+            </div>
+            <div v-else class="glass-card flex flex-col items-center rounded-xl py-8">
+                <Icon name="lucide:scale" class="text-fg-faint mb-2 h-8 w-8" />
+                <p class="text-fg-muted text-sm">{{ $t("pages.dashboard.noWeightData") }}</p>
+            </div>
+        </div>
+
         <!-- Enclosures Overview -->
         <div>
             <div class="mb-4 flex items-center justify-between">
@@ -307,6 +352,12 @@ interface UpcomingVetVisit {
     veterinarian: { id: string; name: string; clinicName: string | null } | null;
 }
 
+interface WeightChartSeries {
+    petId: string;
+    petName: string;
+    points: { date: string; weightGrams: number }[];
+}
+
 const { t } = useI18n();
 const api = useApi();
 
@@ -347,6 +398,14 @@ const feedingStatuses = computed(() =>
 const { data: upcomingVetVisits } = useQuery({
     queryKey: ["vet-visits", "upcoming"],
     queryFn: () => api.get<UpcomingVetVisit[]>("/api/vet-visits/upcoming"),
+});
+
+const allPetIds = computed(() => (pets.value ?? []).map((p) => p.id).join(","));
+
+const { data: weightChartSeries } = useQuery({
+    queryKey: ["weights-chart-dashboard", allPetIds],
+    queryFn: () => api.get<WeightChartSeries[]>(`/api/weights/chart?petIds=${allPetIds.value}`),
+    enabled: () => (pets.value ?? []).length > 0,
 });
 
 function feedingStatusBadgeClass(status: string): string {

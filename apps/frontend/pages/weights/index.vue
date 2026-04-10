@@ -10,11 +10,15 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap items-center gap-3">
             <UiSelect v-model="selectedPet" class="w-48">
                 <option value="ALL">{{ $t("pages.weights.allPets") }}</option>
                 <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
             </UiSelect>
+            <NuxtLink to="/weights/chart" class="text-primary-400 hover:text-primary-300 ml-auto text-sm font-medium">
+                <Icon name="lucide:line-chart" class="mr-1 inline h-4 w-4" />
+                {{ $t("pages.weights.chart.viewChart") }}
+            </NuxtLink>
         </div>
 
         <!-- Loading -->

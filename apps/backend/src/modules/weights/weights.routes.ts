@@ -8,6 +8,8 @@ import {
     createWeightRecord,
     updateWeightRecord,
     deleteWeightRecord,
+    getWeightChartData,
+    getGrowthRates,
 } from "./weights.service.js";
 
 const CreateWeightSchema = z.object({
@@ -26,9 +28,42 @@ const ListQuerySchema = z.object({
     limit: z.coerce.number().int().min(1).max(1000).default(50),
 });
 
+const ChartQuerySchema = z.object({
+    petIds: z
+        .string()
+        .transform((v) => v.split(",").filter(Boolean)),
+    from: z.coerce.date().optional(),
+    to: z.coerce.date().optional(),
+});
+
+const GrowthRateQuerySchema = z.object({
+    petIds: z
+        .string()
+        .transform((v) => v.split(",").filter(Boolean))
+        .optional(),
+});
+
 export async function weightRoutes(app: FastifyInstance) {
     app.addHook("preHandler", authGuard);
     app.addHook("preHandler", emailVerifiedGuard);
+
+    app.get("/chart", async (request) => {
+        const query = ChartQuerySchema.safeParse(request.query);
+        if (!query.success) {
+            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+        }
+        const data = await getWeightChartData(request.userId, query.data);
+        return { success: true, data };
+    });
+
+    app.get("/growth-rate", async (request) => {
+        const query = GrowthRateQuerySchema.safeParse(request.query);
+        if (!query.success) {
+            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+        }
+        const data = await getGrowthRates(request.userId, query.data.petIds);
+        return { success: true, data };
+    });
 
     app.get("/", async (request) => {
         const query = ListQuerySchema.safeParse(request.query);

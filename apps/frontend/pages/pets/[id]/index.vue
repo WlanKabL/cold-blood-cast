@@ -170,20 +170,45 @@
             <div class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.weightHistory") }}</h2>
-                    <NuxtLink to="/weights" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
-                </div>
-                <div v-if="weights?.length" class="space-y-2">
-                    <div
-                        v-for="w in weights"
-                        :key="w.id"
-                        class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
-                    >
-                        <div class="flex items-center gap-3">
-                            <Icon name="lucide:scale" class="text-blue-400 h-4 w-4" />
-                            <span class="text-fg text-sm font-medium">{{ w.weightGrams }} g</span>
-                        </div>
-                        <span class="text-fg-faint text-xs">{{ new Date(w.measuredAt).toLocaleDateString() }}</span>
+                    <div class="flex items-center gap-3">
+                        <select
+                            v-model="weightRange"
+                            class="bg-surface-raised text-fg-muted rounded-md border border-white/10 px-2 py-1 text-xs"
+                        >
+                            <option value="30">{{ $t("pages.weights.chart.last30d") }}</option>
+                            <option value="90">{{ $t("pages.weights.chart.last90d") }}</option>
+                            <option value="365">{{ $t("pages.weights.chart.last1y") }}</option>
+                            <option value="0">{{ $t("pages.weights.chart.allTime") }}</option>
+                        </select>
+                        <NuxtLink to="/weights" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
                     </div>
+                </div>
+
+                <!-- Growth Rate Indicator -->
+                <div v-if="growthRate" class="mb-4 flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <Icon
+                            :name="growthRate.trend === 'up' ? 'lucide:trending-up' : growthRate.trend === 'down' ? 'lucide:trending-down' : 'lucide:minus'"
+                            :class="growthRate.trend === 'up' ? 'text-green-400' : growthRate.trend === 'down' ? 'text-red-400' : 'text-fg-faint'"
+                            class="h-4 w-4"
+                        />
+                        <span :class="growthRate.trend === 'up' ? 'text-green-400' : growthRate.trend === 'down' ? 'text-red-400' : 'text-fg-faint'" class="text-xs font-medium">
+                            {{ $t(`pages.weights.chart.trend${growthRate.trend.charAt(0).toUpperCase() + growthRate.trend.slice(1)}`) }}
+                        </span>
+                    </div>
+                    <span class="text-fg-faint text-xs">
+                        {{ $t("pages.weights.chart.perMonth", { rate: growthRate.avgGramsPerMonth }) }}
+                    </span>
+                    <span class="text-fg-faint text-xs">
+                        {{ $t("pages.weights.chart.totalGain", { gain: growthRate.totalGainGrams }) }}
+                    </span>
+                    <span class="text-fg-faint text-xs">
+                        {{ $t("pages.weights.chart.records", { count: growthRate.recordCount }) }}
+                    </span>
+                </div>
+
+                <div v-if="chartSeries?.length">
+                    <WeightLineChart :series="chartSeries" :height="250" :show-legend="false" />
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
             </div>
@@ -307,6 +332,28 @@ interface WeightRecord {
     measuredAt: string;
 }
 
+interface WeightChartPoint {
+    date: string;
+    weightGrams: number;
+}
+
+interface WeightChartSeries {
+    petId: string;
+    petName: string;
+    points: WeightChartPoint[];
+}
+
+interface GrowthRateResult {
+    petId: string;
+    petName: string;
+    firstRecord: { date: string; weightGrams: number } | null;
+    latestRecord: { date: string; weightGrams: number } | null;
+    totalGainGrams: number;
+    avgGramsPerMonth: number;
+    trend: "up" | "stable" | "down";
+    recordCount: number;
+}
+
 interface Enclosure {
     id: string;
     name: string;
@@ -361,10 +408,27 @@ const { data: feedings } = useQuery({
     queryFn: () => api.get<Feeding[]>(`/api/feedings?petId=${petId}&limit=10`),
 });
 
-const { data: weights } = useQuery({
-    queryKey: ["weights", { petId }],
-    queryFn: () => api.get<WeightRecord[]>(`/api/weights?petId=${petId}&limit=10`),
+const weightRange = ref("0");
+
+const chartFromParam = computed(() => {
+    const days = Number(weightRange.value);
+    if (days <= 0) return "";
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return `&from=${d.toISOString()}`;
 });
+
+const { data: chartSeries } = useQuery({
+    queryKey: ["weights-chart", petId, weightRange],
+    queryFn: () => api.get<WeightChartSeries[]>(`/api/weights/chart?petIds=${petId}${chartFromParam.value}`),
+});
+
+const { data: growthRates } = useQuery({
+    queryKey: ["weights-growth-rate", petId],
+    queryFn: () => api.get<GrowthRateResult[]>(`/api/weights/growth-rate?petIds=${petId}`),
+});
+
+const growthRate = computed(() => growthRates.value?.[0] ?? null);
 
 const { data: feedingStatuses } = useQuery({
     queryKey: ["feeding-reminders"],
