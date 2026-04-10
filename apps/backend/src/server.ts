@@ -32,6 +32,9 @@ import { feedItemRoutes } from "@/modules/feed-items/index.js";
 import { feedingReminderRoutes, startFeedingReminderScheduler, stopFeedingReminderScheduler } from "@/modules/feeding-reminders/index.js";
 import { sheddingRoutes } from "@/modules/sheddings/index.js";
 import { weightRoutes } from "@/modules/weights/index.js";
+import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
+import { vetVisitRoutes } from "@/modules/vet-visits/index.js";
+import { startVetReminderScheduler, stopVetReminderScheduler } from "@/modules/vet-reminders/index.js";
 import {
     startMaintenanceScheduler,
     stopMaintenanceScheduler,
@@ -262,6 +265,8 @@ async function main() {
     await app.register(feedingReminderRoutes, { prefix: "/api/feeding-reminders" });
     await app.register(sheddingRoutes, { prefix: "/api/sheddings" });
     await app.register(weightRoutes, { prefix: "/api/weights" });
+    await app.register(veterinarianRoutes, { prefix: "/api/veterinarians" });
+    await app.register(vetVisitRoutes, { prefix: "/api/vet-visits" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {
@@ -279,11 +284,20 @@ async function main() {
         app.log.warn({ err }, "Failed to start feeding reminder scheduler");
     }
 
+    // ── Start Vet Reminder Scheduler (daily 08:00 Berlin) ──
+    try {
+        startVetReminderScheduler();
+        app.log.info("Vet reminder scheduler started");
+    } catch (err) {
+        app.log.warn({ err }, "Failed to start vet reminder scheduler");
+    }
+
     // ── Graceful Shutdown ────────────────────────
     const shutdown = async (signal: string) => {
         app.log.info(`Received ${signal}, shutting down...`);
         stopMaintenanceScheduler();
         stopFeedingReminderScheduler();
+        stopVetReminderScheduler();
         await app.close();
         await prisma.$disconnect();
         process.exit(0);

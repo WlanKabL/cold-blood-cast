@@ -73,6 +73,8 @@ model User {
     feedItems               FeedItem[]
     homeAssistantConfigs    HomeAssistantConfig[]
     alertRules              AlertRule[]
+    veterinarians           Veterinarian[]
+    vetVisits               VetVisit[]
 
     @@map("users")
 }
@@ -525,8 +527,96 @@ model CronJobLog {
 }
 
 // ==========================================
+// ==========================================
+// CBC Domain: Veterinarians
+// ==========================================
+
+model Veterinarian {
+    id         String  @id @default(cuid())
+    userId     String  @map("user_id")
+    name       String
+    clinicName String? @map("clinic_name")
+    address    String?
+    phone      String?
+    email      String?
+    notes      String?
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    vetVisits VetVisit[]
+
+    @@index([userId])
+    @@map("veterinarians")
+}
+
+// ==========================================
+// CBC Domain: Vet Visits
+// ==========================================
+
+model VetVisit {
+    id              String       @id @default(cuid())
+    petId           String       @map("pet_id")
+    veterinarianId  String?      @map("veterinarian_id")
+    userId          String       @map("user_id")
+    visitDate       DateTime     @map("visit_date")
+    visitType       VetVisitType @default(OTHER) @map("visit_type")
+    reason          String?
+    diagnosis       String?
+    treatment       String?
+    costCents       Int?         @map("cost_cents")
+    weightGrams     Float?       @map("weight_grams")
+    nextAppointment DateTime?    @map("next_appointment")
+    notes           String?
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    pet          Pet              @relation(fields: [petId], references: [id], onDelete: Cascade)
+    veterinarian Veterinarian?    @relation(fields: [veterinarianId], references: [id], onDelete: SetNull)
+    user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    documents    VetVisitDocument[]
+
+    @@index([petId])
+    @@index([userId])
+    @@index([veterinarianId])
+    @@index([userId, nextAppointment])
+    @@map("vet_visits")
+}
+
+model VetVisitDocument {
+    id         String  @id @default(cuid())
+    vetVisitId String  @map("vet_visit_id")
+    uploadId   String  @map("upload_id")
+    label      String?
+
+    createdAt DateTime @default(now()) @map("created_at")
+
+    vetVisit VetVisit @relation(fields: [vetVisitId], references: [id], onDelete: Cascade)
+    upload   Upload   @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+
+    @@index([vetVisitId])
+    @@map("vet_visit_documents")
+}
+
+// ==========================================
 // CBC Domain: Enums
 // ==========================================
+
+enum VetVisitType {
+    CHECKUP
+    EMERGENCY
+    SURGERY
+    VACCINATION
+    DEWORMING
+    FECAL_TEST
+    CONSULTATION
+    FOLLOW_UP
+    OTHER
+
+    @@map("vet_visit_type")
+}
 
 enum EnclosureType {
     TERRARIUM
@@ -572,6 +662,7 @@ model Upload {
 
     user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     petPhotos       PetPhoto[]
+    vetVisitDocuments VetVisitDocument[]
 
     @@map("uploads")
 }
@@ -636,6 +727,7 @@ model Pet {
     husbandryNotes HusbandryNote[] @relation("PetNotes")
     feedItems     FeedItem[]      @relation("PetFeedItems")
     photos        PetPhoto[]
+    vetVisits     VetVisit[]
 
     @@index([userId])
     @@index([enclosureId])

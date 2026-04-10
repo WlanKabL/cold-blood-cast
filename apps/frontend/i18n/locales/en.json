@@ -268,7 +268,9 @@
         "admin": "Admin Panel",
         "overview": "Overview",
         "terrarium": "Terrarium",
-        "careLog": "Care Log"
+        "careLog": "Care Log",
+        "vetVisits": "Vet Visits",
+        "veterinarians": "Veterinarians"
     },
     "admin": {
         "title": "Administration",
@@ -751,7 +753,10 @@
             "feedingNoSchedule": "No schedule",
             "daysAgo": "{n} days ago",
             "neverFed": "Never fed",
-            "today": "Today"
+            "today": "Today",
+            "upcomingVetVisits": "Upcoming Vet Appointments",
+            "noUpcomingVetVisits": "No upcoming vet appointments",
+            "noVet": "No vet assigned"
         },
         "enclosures": {
             "title": "Enclosures",
@@ -856,7 +861,9 @@
                 "maxSize": "Max. {size} MB per file",
                 "takenAt": "Taken on",
                 "takenAtHint": "When was this photo taken?"
-            }
+            },
+            "recentVetVisits": "Recent Vet Visits",
+            "noVetVisits": "No vet visits recorded yet"
         },
         "sensors": {
             "title": "Sensors",
@@ -1094,7 +1101,7 @@
             "emptyHint": "Create tags to categorise your records",
             "globalTags": "Global Tags",
             "global": "Global",
-            "deleteConfirm": "Delete tag \u201c{name}\u201d?",
+            "deleteConfirm": "Delete tag “{name}”?",
             "category": {
                 "sensor": "Sensor",
                 "care": "Care",
@@ -1127,6 +1134,72 @@
             "docsCurlTitle": "cURL Example",
             "docsFetchTitle": "JavaScript (fetch)",
             "docsEndpointsTitle": "Available Endpoints"
+        },
+        "veterinarians": {
+            "title": "Veterinarians",
+            "subtitle": "Manage your veterinary contacts",
+            "add": "Add Vet",
+            "addFirst": "Add your first veterinarian",
+            "create": "New Veterinarian",
+            "edit": "Edit Veterinarian",
+            "empty": "No veterinarians yet",
+            "confirmDelete": "Delete this veterinarian? Visits linked to them will keep their data.",
+            "created": "Veterinarian created",
+            "saved": "Veterinarian saved",
+            "deleted": "Veterinarian deleted",
+            "visitCount": "{n} visits",
+            "fields": {
+                "name": "Name",
+                "clinicName": "Clinic Name",
+                "address": "Address",
+                "phone": "Phone",
+                "email": "Email",
+                "notes": "Notes"
+            }
+        },
+        "vetVisits": {
+            "title": "Vet Visits",
+            "subtitle": "Track veterinary appointments and costs",
+            "add": "Log Visit",
+            "addFirst": "Log your first vet visit",
+            "create": "New Vet Visit",
+            "edit": "Edit Vet Visit",
+            "empty": "No vet visits recorded yet",
+            "confirmDelete": "Delete this vet visit?",
+            "created": "Vet visit created",
+            "saved": "Vet visit saved",
+            "deleted": "Vet visit deleted",
+            "allPets": "All Pets",
+            "allVets": "All Vets",
+            "allTypes": "All Types",
+            "noVet": "No vet",
+            "totalCosts": "Total Vet Costs",
+            "visitCountLabel": "{n} visits",
+            "types": {
+                "CHECKUP": "Checkup",
+                "EMERGENCY": "Emergency",
+                "SURGERY": "Surgery",
+                "VACCINATION": "Vaccination",
+                "DEWORMING": "Deworming",
+                "FECAL_TEST": "Fecal Test",
+                "CONSULTATION": "Consultation",
+                "FOLLOW_UP": "Follow-Up",
+                "OTHER": "Other"
+            },
+            "fields": {
+                "pet": "Pet",
+                "veterinarian": "Veterinarian",
+                "noVet": "No vet selected",
+                "visitDate": "Visit Date",
+                "visitType": "Visit Type",
+                "reason": "Reason",
+                "diagnosis": "Diagnosis",
+                "treatment": "Treatment",
+                "cost": "Cost (EUR)",
+                "weight": "Weight (grams)",
+                "nextAppointment": "Next Appointment",
+                "notes": "Notes"
+            }
         }
     },
     "shortcuts": {

@@ -268,7 +268,9 @@
         "admin": "Admin-Panel",
         "overview": "Übersicht",
         "terrarium": "Terrarium",
-        "careLog": "Pflegebuch"
+        "careLog": "Pflegebuch",
+        "vetVisits": "Tierarztbesuche",
+        "veterinarians": "Tierärzte"
     },
     "admin": {
         "title": "Administration",
@@ -751,7 +753,10 @@
             "feedingNoSchedule": "Kein Plan",
             "daysAgo": "vor {n} Tagen",
             "neverFed": "Nie gefüttert",
-            "today": "Heute"
+            "today": "Heute",
+            "upcomingVetVisits": "Anstehende Tierarzttermine",
+            "noUpcomingVetVisits": "Keine anstehenden Tierarzttermine",
+            "noVet": "Kein Tierarzt zugewiesen"
         },
         "enclosures": {
             "title": "Terrarien",
@@ -856,7 +861,9 @@
                 "maxSize": "Max. {size} MB pro Datei",
                 "takenAt": "Aufgenommen am",
                 "takenAtHint": "Wann wurde das Foto aufgenommen?"
-            }
+            },
+            "recentVetVisits": "Letzte Tierarztbesuche",
+            "noVetVisits": "Noch keine Tierarztbesuche erfasst"
         },
         "sensors": {
             "title": "Sensoren",
@@ -1094,7 +1101,7 @@
             "emptyHint": "Erstelle Tags, um deine Einträge zu kategorisieren",
             "globalTags": "Globale Tags",
             "global": "Global",
-            "deleteConfirm": "Tag \u201e{name}\u201c löschen?",
+            "deleteConfirm": "Tag „{name}“ löschen?",
             "category": {
                 "sensor": "Sensor",
                 "care": "Pflege",
@@ -1127,6 +1134,72 @@
             "docsCurlTitle": "cURL-Beispiel",
             "docsFetchTitle": "JavaScript (fetch)",
             "docsEndpointsTitle": "Verfügbare Endpunkte"
+        },
+        "veterinarians": {
+            "title": "Tierärzte",
+            "subtitle": "Verwalte deine Tierarztkontakte",
+            "add": "Tierarzt hinzufügen",
+            "addFirst": "Füge deinen ersten Tierarzt hinzu",
+            "create": "Neuer Tierarzt",
+            "edit": "Tierarzt bearbeiten",
+            "empty": "Noch keine Tierärzte angelegt",
+            "confirmDelete": "Diesen Tierarzt löschen? Verknüpfte Besuche behalten ihre Daten.",
+            "created": "Tierarzt erstellt",
+            "saved": "Tierarzt gespeichert",
+            "deleted": "Tierarzt gelöscht",
+            "visitCount": "{n} Besuche",
+            "fields": {
+                "name": "Name",
+                "clinicName": "Praxisname",
+                "address": "Adresse",
+                "phone": "Telefon",
+                "email": "E-Mail",
+                "notes": "Notizen"
+            }
+        },
+        "vetVisits": {
+            "title": "Tierarztbesuche",
+            "subtitle": "Tierarzttermine und Kosten verfolgen",
+            "add": "Besuch erfassen",
+            "addFirst": "Erfasse deinen ersten Tierarztbesuch",
+            "create": "Neuer Tierarztbesuch",
+            "edit": "Tierarztbesuch bearbeiten",
+            "empty": "Noch keine Tierarztbesuche erfasst",
+            "confirmDelete": "Diesen Tierarztbesuch löschen?",
+            "created": "Tierarztbesuch erstellt",
+            "saved": "Tierarztbesuch gespeichert",
+            "deleted": "Tierarztbesuch gelöscht",
+            "allPets": "Alle Tiere",
+            "allVets": "Alle Tierärzte",
+            "allTypes": "Alle Typen",
+            "noVet": "Kein Tierarzt",
+            "totalCosts": "Gesamte Tierarztkosten",
+            "visitCountLabel": "{n} Besuche",
+            "types": {
+                "CHECKUP": "Vorsorge",
+                "EMERGENCY": "Notfall",
+                "SURGERY": "Operation",
+                "VACCINATION": "Impfung",
+                "DEWORMING": "Entwurmung",
+                "FECAL_TEST": "Kotprobe",
+                "CONSULTATION": "Beratung",
+                "FOLLOW_UP": "Nachkontrolle",
+                "OTHER": "Sonstiges"
+            },
+            "fields": {
+                "pet": "Tier",
+                "veterinarian": "Tierarzt",
+                "noVet": "Kein Tierarzt ausgewählt",
+                "visitDate": "Besuchsdatum",
+                "visitType": "Besuchsart",
+                "reason": "Grund",
+                "diagnosis": "Diagnose",
+                "treatment": "Behandlung",
+                "cost": "Kosten (EUR)",
+                "weight": "Gewicht (Gramm)",
+                "nextAppointment": "Nächster Termin",
+                "notes": "Notizen"
+            }
         }
     },
     "shortcuts": {

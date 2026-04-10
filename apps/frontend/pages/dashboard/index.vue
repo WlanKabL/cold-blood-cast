@@ -205,6 +205,49 @@
                 </NuxtLink>
             </div>
         </div>
+
+        <!-- Upcoming Vet Appointments -->
+        <div>
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-fg text-lg font-semibold">
+                    {{ $t("pages.dashboard.upcomingVetVisits") }}
+                </h2>
+                <NuxtLink
+                    to="/vet-visits"
+                    class="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                >
+                    {{ $t("pages.dashboard.viewAll") }}
+                </NuxtLink>
+            </div>
+            <div
+                v-if="upcomingVetVisits?.length"
+                class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            >
+                <div
+                    v-for="visit in upcomingVetVisits"
+                    :key="visit.id"
+                    class="glass-card rounded-xl p-4"
+                >
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-fg font-semibold">{{ visit.pet?.name }}</p>
+                            <p class="text-fg-faint text-xs">
+                                {{ visit.veterinarian?.name ?? $t("pages.dashboard.noVet") }}
+                                <template v-if="visit.veterinarian?.clinicName"> · {{ visit.veterinarian.clinicName }}</template>
+                            </p>
+                        </div>
+                        <span class="bg-teal-500/10 text-teal-400 shrink-0 rounded-md px-2 py-0.5 text-xs font-medium">
+                            {{ new Date(visit.nextAppointment).toLocaleDateString() }}
+                        </span>
+                    </div>
+                    <p v-if="visit.reason" class="text-fg-faint mt-2 text-xs">{{ visit.reason }}</p>
+                </div>
+            </div>
+            <div v-else class="glass-card flex flex-col items-center rounded-xl py-8">
+                <Icon name="lucide:stethoscope" class="text-fg-faint mb-2 h-8 w-8" />
+                <p class="text-fg-muted text-sm">{{ $t("pages.dashboard.noUpcomingVetVisits") }}</p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -248,6 +291,14 @@ interface FeedingStatusItem {
     status: "ok" | "due" | "overdue" | "critical" | "no_schedule";
 }
 
+interface UpcomingVetVisit {
+    id: string;
+    reason: string | null;
+    nextAppointment: string;
+    pet: { id: string; name: string; species: string } | null;
+    veterinarian: { id: string; name: string; clinicName: string | null } | null;
+}
+
 const { t } = useI18n();
 const api = useApi();
 
@@ -284,6 +335,11 @@ const { data: allFeedingStatuses } = useQuery({
 const feedingStatuses = computed(() =>
     (allFeedingStatuses.value ?? []).filter((s) => s.status !== "no_schedule"),
 );
+
+const { data: upcomingVetVisits } = useQuery({
+    queryKey: ["vet-visits", "upcoming"],
+    queryFn: () => api.get<UpcomingVetVisit[]>("/api/vet-visits/upcoming"),
+});
 
 function feedingStatusBadgeClass(status: string): string {
     switch (status) {

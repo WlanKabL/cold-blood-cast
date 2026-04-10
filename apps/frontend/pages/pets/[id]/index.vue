@@ -187,6 +187,32 @@
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
             </div>
+
+            <!-- Recent Vet Visits -->
+            <div class="glass-card rounded-xl p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentVetVisits") }}</h2>
+                    <NuxtLink to="/vet-visits" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
+                </div>
+                <div v-if="vetVisits?.length" class="space-y-2">
+                    <div
+                        v-for="visit in vetVisits"
+                        :key="visit.id"
+                        class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
+                    >
+                        <div class="flex items-center gap-3">
+                            <Icon name="lucide:stethoscope" class="text-teal-400 h-4 w-4" />
+                            <span class="text-fg text-sm">{{ visit.reason || $t(`pages.vetVisits.types.${visit.visitType}`) }}</span>
+                            <span v-if="visit.veterinarian" class="text-fg-faint text-xs">({{ visit.veterinarian.name }})</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span v-if="visit.costCents" class="text-fg-faint text-xs">{{ formatVetCost(visit.costCents) }}</span>
+                            <span class="text-fg-faint text-xs">{{ new Date(visit.visitDate).toLocaleDateString() }}</span>
+                        </div>
+                    </div>
+                </div>
+                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noVetVisits") }}</p>
+            </div>
         </template>
 
         <!-- Edit Modal -->
@@ -297,6 +323,15 @@ interface FeedingStatusItem {
     status: "ok" | "due" | "overdue" | "critical" | "no_schedule";
 }
 
+interface PetVetVisit {
+    id: string;
+    visitDate: string;
+    visitType: string;
+    reason: string | null;
+    costCents: number | null;
+    veterinarian: { id: string; name: string; clinicName: string | null } | null;
+}
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -335,6 +370,15 @@ const { data: feedingStatuses } = useQuery({
     queryKey: ["feeding-reminders"],
     queryFn: () => api.get<FeedingStatusItem[]>("/api/feeding-reminders"),
 });
+
+const { data: vetVisits } = useQuery({
+    queryKey: ["vet-visits", { petId }],
+    queryFn: () => api.get<PetVetVisit[]>(`/api/vet-visits?petId=${petId}`),
+});
+
+function formatVetCost(cents: number): string {
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+}
 
 const feedingStatus = computed(() =>
     feedingStatuses.value?.find((s) => s.petId === petId) ?? null,

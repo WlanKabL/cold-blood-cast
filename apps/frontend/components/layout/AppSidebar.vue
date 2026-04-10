@@ -224,6 +224,18 @@ const careLogNavItems = [
         label: "nav.weights",
         feature: "weights",
     },
+    {
+        to: "/vet-visits",
+        icon: "lucide:stethoscope",
+        label: "nav.vetVisits",
+        feature: "vet_visits",
+    },
+    {
+        to: "/veterinarians",
+        icon: "lucide:building-2",
+        label: "nav.veterinarians",
+        feature: "vet_visits",
+    },
 ];
 
 type NavItem = {

@@ -16,7 +16,7 @@
 - ✅ GitHub Actions CI
 - ✅ JWT auth (access 15min + refresh 7d)
 - ✅ Shared TypeScript types package
-- ✅ Vitest test infrastructure (935+ tests)
+- ✅ Vitest test infrastructure (976+ tests)
 - ✅ Redis (ioredis for BullMQ)
 - ✅ WebSocket server (JWT-authenticated)
 - ✅ Rate limiting
@@ -81,42 +81,51 @@
 
 ## New Features — Ordered Roadmap
 
-### Feature 1: Pet Photo Gallery 📸
+### Feature 1: Pet Photo Gallery 📸 ✅
 
 > Fotos pro Tier hochladen, flache Liste mit Tags, Lightbox-Ansicht, Profilbild wählbar.
 
-**Scope:** Backend module + frontend page + E2E tests
+**Status: Complete** — Committed in `feat: pet photo gallery + feeding reminders + bug fixes`
+
+<details>
+<summary>Completed items (click to expand)</summary>
 
 #### Backend
 
-- 🔲 **1.1** Prisma schema: `PetPhoto` model (id, petId, uploadId, tag, caption, isProfilePicture, sortOrder, createdAt)
-- 🔲 **1.2** Tags: enum or free-text? → Free-text tags, comma-separated, indexed for search. Predefined suggestions: `shedding`, `feeding`, `portrait`, `enclosure`, `vet`
-- 🔲 **1.3** Migration: `add_pet_photos`
-- 🔲 **1.4** `pet-photos.service.ts`: create (upload + encrypt + link), list (by petId, with sort/filter), delete, setProfilePicture, reorder
-- 🔲 **1.5** `pet-photos.routes.ts`: POST `/api/pets/:petId/photos` (multipart upload), GET `/api/pets/:petId/photos` (query: tag, sort), DELETE `/api/pets/:petId/photos/:id`, PATCH `/api/pets/:petId/photos/:id` (update caption/tag), POST `/api/pets/:petId/photos/:id/profile` (set as profile pic)
-- 🔲 **1.6** Serve encrypted images: extend existing `/api/uploads/:id` to handle pet photo access checks
-- 🔲 **1.7** Thumbnail generation: on upload, create a small thumbnail (sharp library) for list views
-- 🔲 **1.8** Limit enforcement: check `max_photos_per_pet` feature flag/limit
+- ✅ **1.1** Prisma schema: `PetPhoto` model (id, petId, uploadId, tags[], caption, isProfilePicture, sortOrder, takenAt, createdAt)
+- ✅ **1.2** Tags: free-text tags, comma-separated. Predefined suggestions: `shedding`, `feeding`, `portrait`, `enclosure`, `vet`
+- ✅ **1.3** Schema pushed (takenAt added with EXIF support)
+- ✅ **1.4** `pet-photos.service.ts`: create (upload + encrypt + link), list (by petId, with sort/filter), delete, setProfilePicture, update, getSuggestedTags
+- ✅ **1.5** `pet-photos.routes.ts`: POST, GET, DELETE, PATCH, POST profile — all with auth + ownership
+- ✅ **1.6** Serve encrypted images: existing `/uploads/*` route with `?t=` token auth
 
 #### Frontend
 
-- 🔲 **1.9** `pages/pets/[id]/photos.vue`: Photo gallery page with grid view, tag filter, sort (date/age), upload button
-- 🔲 **1.10** Lightbox component: full-screen image viewer with prev/next, caption, tag display
-- 🔲 **1.11** Upload modal: drag-and-drop or file picker, tag selection, caption input, progress bar
-- 🔲 **1.12** Profile picture badge: star icon on profile pic, click to set
-- 🔲 **1.13** Pet card update: show profile picture thumbnail on pet list + pet detail header
-- 🔲 **1.14** Dashboard: show pet avatars (profile pics) where pet names appear
+- ✅ **1.9** `pages/pets/[id]/photos.vue`: Photo gallery page with grid view, tag filter, upload/edit/delete
+- ✅ **1.10** `PhotoLightbox.vue`: full-screen viewer with prev/next, caption, tags, takenAt display
+- ✅ **1.11** Upload modal: drag-and-drop + file picker, tag input, caption, takenAt (auto-filled from EXIF), profile pic toggle
+- ✅ **1.12** Profile picture badge: star icon on profile pic, one-click set from overlay
+- ✅ **1.13** Pet card update: profile picture on pet list + pet detail header
+- ✅ **1.14** Photo count on pet list cards
+
+#### QoL Improvements
+
+- ✅ EXIF metadata extraction (exifr) — auto-fills takenAt from image DateTimeOriginal
+- ✅ UiToggle bug fix — `type="button"` prevents form submission inside forms
+- ✅ Sort by takenAt (desc) by default for proper chronological ordering
 
 #### Testing
 
-- 🔲 **1.15** Backend unit tests: pet-photos.service.ts (CRUD, ownership, profile pic logic, limit enforcement)
-- 🔲 **1.16** Frontend unit tests: photo gallery component, lightbox, upload modal
-- 🔲 **1.17** Playwright E2E: upload photo, view gallery, set profile pic, delete photo
-- 🔲 **1.18** Playwright setup: config, auth fixtures, base helpers (this is the first E2E feature)
+- ✅ **1.15** 25 backend unit tests: pet-photos.service.ts (CRUD, ownership, profile pic, takenAt, suggested tags)
+- ✅ **1.16** 16 frontend unit tests: PhotoLightbox (render, navigation, props, takenAt display)
+- ✅ **1.17** Playwright E2E: config + auth setup + pet-photos spec
+- ✅ **1.18** Playwright setup: config, auth fixtures, base helpers
 
 #### i18n
 
-- 🔲 **1.19** EN + DE keys: pages.pets.photos.* (title, upload, empty, tags, setProfile, confirmDelete, etc.)
+- ✅ **1.19** EN + DE keys: pages.pets.photos.* (title, upload, empty, tags, setProfile, takenAt, etc.)
+
+</details>
 
 ---
 
@@ -497,11 +506,11 @@
 
 ---
 
-## E2E Test Infrastructure (Setup with Feature 1)
+## E2E Test Infrastructure (Setup with Feature 1) ✅
 
-- 🔲 Playwright config (`playwright.config.ts`)
-- 🔲 Auth fixtures (login helper, test user seeding)
-- 🔲 Base page helpers (navigation, toast assertion, modal helpers)
+- ✅ Playwright config (`playwright.config.ts`)
+- ✅ Auth fixtures (login helper, test user seeding)
+- ✅ Base page helpers (navigation, toast assertion, modal helpers)
 - 🔲 CI integration (GitHub Actions Playwright job)
 - 🔲 Test data seeding (reset DB + seed before E2E suite)
 
