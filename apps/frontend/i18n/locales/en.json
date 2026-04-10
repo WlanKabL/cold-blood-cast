@@ -742,7 +742,16 @@
             "yourEnclosures": "Your Enclosures",
             "viewAll": "View all",
             "noEnclosures": "No enclosures yet",
-            "addFirst": "Add your first enclosure"
+            "addFirst": "Add your first enclosure",
+            "feedingReminders": "Feeding Reminders",
+            "noPetsScheduled": "No feeding schedules configured",
+            "feedingOk": "OK",
+            "feedingDue": "Due",
+            "feedingCritical": "Overdue!",
+            "feedingNoSchedule": "No schedule",
+            "daysAgo": "{n} days ago",
+            "neverFed": "Never fed",
+            "today": "Today"
         },
         "enclosures": {
             "title": "Enclosures",
@@ -806,6 +815,8 @@
             "saved": "Pet saved",
             "created": "Pet created",
             "deleted": "Pet deleted",
+            "feedingSchedule": "Feeding Schedule",
+            "feedingScheduleHint": "Optional: Set a feeding interval to receive reminders",
             "fields": {
                 "name": "Name",
                 "enclosure": "Enclosure",
@@ -813,7 +824,38 @@
                 "morph": "Morph",
                 "gender": "Gender",
                 "birthDate": "Birth Date",
-                "notes": "Notes"
+                "notes": "Notes",
+                "feedingIntervalMinDays": "Min. interval (days)",
+                "feedingIntervalMaxDays": "Max. interval (days)"
+            },
+            "photos": {
+                "title": "Photos",
+                "subtitle": "Gallery of your pet",
+                "upload": "Upload Photo",
+                "empty": "No photos yet. Upload your first one!",
+                "emptyFiltered": "No photos match the selected filter.",
+                "caption": "Caption",
+                "captionPlaceholder": "Describe this photo...",
+                "tags": "Tags",
+                "tagsHint": "Separate tags with commas",
+                "setProfile": "Set as Profile Picture",
+                "isProfile": "Profile Picture",
+                "removeProfile": "Remove as Profile",
+                "confirmDelete": "Delete this photo? This cannot be undone.",
+                "deleted": "Photo deleted",
+                "uploaded": "Photo uploaded",
+                "updated": "Photo updated",
+                "profileSet": "Profile picture updated",
+                "filterByTag": "Filter by tag",
+                "allPhotos": "All Photos",
+                "editCaption": "Edit",
+                "photoCount": "{count} photo | {count} photos",
+                "viewGallery": "View Gallery",
+                "setAsProfile": "Use as Profile Picture",
+                "dropHint": "Drop image here or click to browse",
+                "maxSize": "Max. {size} MB per file",
+                "takenAt": "Taken on",
+                "takenAtHint": "When was this photo taken?"
             }
         },
         "sensors": {

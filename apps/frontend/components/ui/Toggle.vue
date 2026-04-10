@@ -1,5 +1,6 @@
 <template>
     <button
+        type="button"
         class="relative shrink-0 rounded-full transition-colors"
         :class="[sizeClass, active ? activeBgClass : 'bg-line']"
         :disabled="disabled"

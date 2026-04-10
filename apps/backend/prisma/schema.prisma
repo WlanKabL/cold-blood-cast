@@ -571,6 +571,7 @@ model Upload {
     updatedAt       DateTime @updatedAt @map("updated_at")
 
     user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    petPhotos       PetPhoto[]
 
     @@map("uploads")
 }
@@ -621,6 +622,9 @@ model Pet {
     notes           String?
     imageUrl        String?   @map("image_url")
 
+    feedingIntervalMinDays Int? @map("feeding_interval_min_days")
+    feedingIntervalMaxDays Int? @map("feeding_interval_max_days")
+
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -631,10 +635,35 @@ model Pet {
     weightRecords WeightRecord[]
     husbandryNotes HusbandryNote[] @relation("PetNotes")
     feedItems     FeedItem[]      @relation("PetFeedItems")
+    photos        PetPhoto[]
 
     @@index([userId])
     @@index([enclosureId])
     @@map("pets")
+}
+
+// ==========================================
+// CBC Domain: Pet Photos
+// ==========================================
+
+model PetPhoto {
+    id               String   @id @default(cuid())
+    petId            String   @map("pet_id")
+    uploadId         String   @map("upload_id")
+    caption          String?
+    tags             String[] @default([])
+    isProfilePicture Boolean  @default(false) @map("is_profile_picture")
+    sortOrder        Int      @default(0) @map("sort_order")
+    takenAt          DateTime @default(now()) @map("taken_at")
+
+    createdAt        DateTime @default(now()) @map("created_at")
+
+    pet              Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+    upload           Upload   @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+
+    @@index([petId])
+    @@index([petId, isProfilePicture])
+    @@map("pet_photos")
 }
 
 // ==========================================

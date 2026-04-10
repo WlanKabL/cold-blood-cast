@@ -58,22 +58,34 @@
                 :to="`/pets/${pet.id}`"
                 class="glass-card group rounded-xl p-5 transition-all hover:ring-1 hover:ring-white/10"
             >
-                <!-- Header: Name + Gender Badge -->
-                <div class="flex items-start justify-between gap-2">
+                <!-- Header: Avatar + Name + Gender Badge -->
+                <div class="flex items-start gap-3">
+                    <div v-if="pet.photos.length" class="shrink-0">
+                        <img
+                            :src="resolveUrl(pet.photos[0].upload.url)"
+                            :alt="pet.name"
+                            class="h-10 w-10 rounded-lg object-cover ring-1 ring-white/10"
+                        />
+                    </div>
+                    <div v-else class="bg-surface-raised flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                        <Icon name="lucide:heart" class="text-fg-faint h-5 w-5" />
+                    </div>
                     <div class="min-w-0 flex-1">
-                        <h3
-                            class="text-fg group-hover:text-primary-400 truncate font-semibold transition-colors"
-                        >
-                            {{ pet.name }}
-                        </h3>
+                        <div class="flex items-center justify-between gap-2">
+                            <h3
+                                class="text-fg group-hover:text-primary-400 truncate font-semibold transition-colors"
+                            >
+                                {{ pet.name }}
+                            </h3>
+                            <span
+                                v-if="pet.gender && pet.gender !== 'UNKNOWN'"
+                                class="bg-primary-500/10 text-primary-400 shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
+                            >
+                                {{ pet.gender }}
+                            </span>
+                        </div>
                         <p class="text-fg-faint mt-0.5 text-sm">{{ pet.species }}</p>
                     </div>
-                    <span
-                        v-if="pet.gender && pet.gender !== 'UNKNOWN'"
-                        class="bg-primary-500/10 text-primary-400 shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
-                    >
-                        {{ pet.gender }}
-                    </span>
                 </div>
 
                 <!-- Morph -->
@@ -110,6 +122,10 @@
                     <span class="text-fg-muted flex items-center gap-1.5 text-xs">
                         <Icon name="lucide:scale" class="h-3.5 w-3.5 text-blue-400" />
                         {{ pet._count.weightRecords }}
+                    </span>
+                    <span class="text-fg-muted flex items-center gap-1.5 text-xs">
+                        <Icon name="lucide:image" class="h-3.5 w-3.5 text-green-400" />
+                        {{ pet._count.photos }}
                     </span>
                 </div>
             </NuxtLink>
@@ -149,6 +165,29 @@
                 </UiSelect>
                 <UiTextInput v-model="form.birthDate" type="date" :label="$t('pages.pets.fields.birthDate')" />
                 <UiTextarea v-model="form.notes" :label="$t('pages.pets.fields.notes')" />
+
+                <!-- Feeding Schedule -->
+                <div class="border-t border-white/5 pt-4">
+                    <p class="text-fg-muted mb-1 text-sm font-medium">{{ $t("pages.pets.feedingSchedule") }}</p>
+                    <p class="text-fg-faint mb-3 text-xs">{{ $t("pages.pets.feedingScheduleHint") }}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <UiTextInput
+                            v-model="form.feedingIntervalMinDays"
+                            type="number"
+                            :label="$t('pages.pets.fields.feedingIntervalMinDays')"
+                            min="1"
+                            max="365"
+                        />
+                        <UiTextInput
+                            v-model="form.feedingIntervalMaxDays"
+                            type="number"
+                            :label="$t('pages.pets.fields.feedingIntervalMaxDays')"
+                            min="1"
+                            max="365"
+                        />
+                    </div>
+                </div>
+
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
@@ -170,7 +209,8 @@ interface Pet {
     birthDate: string | null;
     enclosureId: string | null;
     enclosure: { id: string; name: string } | null;
-    _count: { feedings: number; sheddings: number; weightRecords: number };
+    photos: { id: string; uploadId: string; upload: { url: string } }[];
+    _count: { feedings: number; sheddings: number; weightRecords: number; photos: number };
 }
 
 interface Enclosure {
@@ -182,6 +222,7 @@ const { t } = useI18n();
 const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
+const resolveUrl = useResolveUrl();
 
 definePageMeta({ layout: "default" });
 useHead({ title: () => t("pages.pets.title") });
@@ -236,6 +277,8 @@ const form = reactive({
     gender: "UNKNOWN",
     birthDate: "",
     notes: "",
+    feedingIntervalMinDays: "",
+    feedingIntervalMaxDays: "",
 });
 
 function resetForm() {
@@ -247,6 +290,8 @@ function resetForm() {
         gender: "UNKNOWN",
         birthDate: "",
         notes: "",
+        feedingIntervalMinDays: "",
+        feedingIntervalMaxDays: "",
     });
 }
 
@@ -265,6 +310,8 @@ const { mutate: createMutation, isPending: creating } = useMutation({
             gender: form.gender,
             birthDate: form.birthDate || undefined,
             notes: form.notes || undefined,
+            feedingIntervalMinDays: form.feedingIntervalMinDays ? Number(form.feedingIntervalMinDays) : undefined,
+            feedingIntervalMaxDays: form.feedingIntervalMaxDays ? Number(form.feedingIntervalMaxDays) : undefined,
         }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pets"] });

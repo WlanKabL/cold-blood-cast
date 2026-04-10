@@ -7,7 +7,12 @@ export async function listPets(userId: string) {
         where: { userId },
         include: {
             enclosure: { select: { id: true, name: true } },
-            _count: { select: { feedings: true, sheddings: true, weightRecords: true } },
+            photos: {
+                where: { isProfilePicture: true },
+                take: 1,
+                select: { id: true, uploadId: true, upload: { select: { url: true } } },
+            },
+            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true } },
         },
         orderBy: { createdAt: "desc" },
     });
@@ -18,7 +23,12 @@ export async function getPet(id: string, userId: string) {
         where: { id },
         include: {
             enclosure: { select: { id: true, name: true } },
-            _count: { select: { feedings: true, sheddings: true, weightRecords: true } },
+            photos: {
+                where: { isProfilePicture: true },
+                take: 1,
+                select: { id: true, uploadId: true, upload: { select: { url: true } } },
+            },
+            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true } },
         },
     });
     if (!pet || pet.userId !== userId) {
@@ -39,6 +49,8 @@ export async function createPet(
         acquisitionDate?: Date;
         notes?: string;
         imageUrl?: string;
+        feedingIntervalMinDays?: number;
+        feedingIntervalMaxDays?: number;
     },
 ) {
     if (data.enclosureId) {
@@ -67,6 +79,8 @@ export async function updatePet(
         acquisitionDate: Date;
         notes: string;
         imageUrl: string;
+        feedingIntervalMinDays: number;
+        feedingIntervalMaxDays: number;
     }>,
 ) {
     const existing = await prisma.pet.findUnique({ where: { id } });

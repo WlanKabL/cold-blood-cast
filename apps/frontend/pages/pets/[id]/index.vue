@@ -72,7 +72,75 @@
                         <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.fields.notes") }}</dt>
                         <dd class="text-fg mt-1 text-sm">{{ pet.notes }}</dd>
                     </div>
+                    <div v-if="pet.feedingIntervalMinDays && pet.feedingIntervalMaxDays" class="sm:col-span-2">
+                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.feedingSchedule") }}</dt>
+                        <dd class="text-fg mt-1 flex items-center gap-3 text-sm">
+                            <span>{{ pet.feedingIntervalMinDays }}–{{ pet.feedingIntervalMaxDays }} {{ $t("pages.pets.fields.feedingIntervalMinDays").split("(")[1]?.replace(")", "") || "days" }}</span>
+                            <span
+                                v-if="feedingStatus"
+                                :class="feedingStatusBadgeClass(feedingStatus.status)"
+                                class="rounded-md px-2 py-0.5 text-xs font-medium"
+                            >
+                                {{ feedingStatusLabel(feedingStatus.status) }}
+                                <template v-if="feedingStatus.daysSinceLastFeeding !== null">
+                                    · {{ feedingStatus.daysSinceLastFeeding }}d
+                                </template>
+                            </span>
+                        </dd>
+                    </div>
                 </dl>
+            </div>
+
+            <!-- Photos Preview -->
+            <div class="glass-card rounded-xl p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-fg font-semibold">
+                        {{ $t("pages.pets.photos.title") }}
+                        <span v-if="pet._count.photos" class="text-fg-faint ml-1 text-sm font-normal">
+                            ({{ pet._count.photos }})
+                        </span>
+                    </h2>
+                    <NuxtLink
+                        :to="`/pets/${petId}/photos`"
+                        class="text-primary-400 text-sm font-medium"
+                    >
+                        {{ $t("pages.pets.photos.viewGallery") }}
+                    </NuxtLink>
+                </div>
+                <div v-if="pet.photos.length" class="flex items-center gap-4">
+                    <img
+                        :src="resolveUrl(pet.photos[0].upload.url)"
+                        :alt="pet.name"
+                        class="h-20 w-20 rounded-xl object-cover ring-1 ring-white/10"
+                    />
+                    <div>
+                        <p class="text-fg text-sm">
+                            {{ $t("pages.pets.photos.photoCount", { count: pet._count.photos }) }}
+                        </p>
+                        <NuxtLink
+                            :to="`/pets/${petId}/photos`"
+                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                        >
+                            <Icon name="lucide:images" class="h-3.5 w-3.5" />
+                            {{ $t("pages.pets.photos.viewGallery") }}
+                        </NuxtLink>
+                    </div>
+                </div>
+                <div v-else class="flex items-center gap-3">
+                    <div class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl">
+                        <Icon name="lucide:image" class="text-fg-faint h-8 w-8" />
+                    </div>
+                    <div>
+                        <p class="text-fg-muted text-sm">{{ $t("pages.pets.photos.empty") }}</p>
+                        <NuxtLink
+                            :to="`/pets/${petId}/photos`"
+                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                        >
+                            <Icon name="lucide:upload" class="h-3.5 w-3.5" />
+                            {{ $t("pages.pets.photos.upload") }}
+                        </NuxtLink>
+                    </div>
+                </div>
             </div>
 
             <!-- Recent Feedings -->
@@ -136,6 +204,29 @@
                 </UiSelect>
                 <UiTextInput v-model="editForm.birthDate" :label="$t('pages.pets.fields.birthDate')" type="date" />
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.pets.fields.notes')" />
+
+                <!-- Feeding Schedule -->
+                <div class="border-t border-white/5 pt-4">
+                    <p class="text-fg-muted mb-1 text-sm font-medium">{{ $t("pages.pets.feedingSchedule") }}</p>
+                    <p class="text-fg-faint mb-3 text-xs">{{ $t("pages.pets.feedingScheduleHint") }}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <UiTextInput
+                            v-model="editForm.feedingIntervalMinDays"
+                            type="number"
+                            :label="$t('pages.pets.fields.feedingIntervalMinDays')"
+                            min="1"
+                            max="365"
+                        />
+                        <UiTextInput
+                            v-model="editForm.feedingIntervalMaxDays"
+                            type="number"
+                            :label="$t('pages.pets.fields.feedingIntervalMaxDays')"
+                            min="1"
+                            max="365"
+                        />
+                    </div>
+                </div>
+
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
@@ -171,6 +262,10 @@ interface Pet {
     notes: string | null;
     enclosureId: string | null;
     enclosure: { id: string; name: string } | null;
+    feedingIntervalMinDays: number | null;
+    feedingIntervalMaxDays: number | null;
+    photos: { id: string; uploadId: string; upload: { url: string } }[];
+    _count: { photos: number };
 }
 
 interface Feeding {
@@ -191,12 +286,24 @@ interface Enclosure {
     name: string;
 }
 
+interface FeedingStatusItem {
+    petId: string;
+    petName: string;
+    species: string;
+    intervalMinDays: number | null;
+    intervalMaxDays: number | null;
+    lastFedAt: string | null;
+    daysSinceLastFeeding: number | null;
+    status: "ok" | "due" | "overdue" | "critical" | "no_schedule";
+}
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
+const resolveUrl = useResolveUrl();
 
 const petId = route.params.id as string;
 const genderOptions = ["MALE", "FEMALE", "UNKNOWN"];
@@ -224,6 +331,41 @@ const { data: weights } = useQuery({
     queryFn: () => api.get<WeightRecord[]>(`/api/weights?petId=${petId}&limit=10`),
 });
 
+const { data: feedingStatuses } = useQuery({
+    queryKey: ["feeding-reminders"],
+    queryFn: () => api.get<FeedingStatusItem[]>("/api/feeding-reminders"),
+});
+
+const feedingStatus = computed(() =>
+    feedingStatuses.value?.find((s) => s.petId === petId) ?? null,
+);
+
+function feedingStatusBadgeClass(status: string): string {
+    switch (status) {
+        case "ok":
+            return "bg-green-500/10 text-green-400";
+        case "due":
+            return "bg-amber-500/10 text-amber-400";
+        case "critical":
+            return "bg-red-500/10 text-red-400";
+        default:
+            return "bg-white/5 text-fg-faint";
+    }
+}
+
+function feedingStatusLabel(status: string): string {
+    switch (status) {
+        case "ok":
+            return t("pages.dashboard.feedingOk");
+        case "due":
+            return t("pages.dashboard.feedingDue");
+        case "critical":
+            return t("pages.dashboard.feedingCritical");
+        default:
+            return t("pages.dashboard.feedingNoSchedule");
+    }
+}
+
 const { data: enclosures } = useQuery({
     queryKey: ["enclosures"],
     queryFn: () => api.get<Enclosure[]>("/api/enclosures"),
@@ -241,6 +383,8 @@ const editForm = reactive({
     gender: "UNKNOWN",
     birthDate: "",
     notes: "",
+    feedingIntervalMinDays: "",
+    feedingIntervalMaxDays: "",
 });
 
 function openEditModal() {
@@ -253,6 +397,8 @@ function openEditModal() {
         gender: pet.value.gender ?? "UNKNOWN",
         birthDate: pet.value.birthDate ? pet.value.birthDate.split("T")[0] : "",
         notes: pet.value.notes ?? "",
+        feedingIntervalMinDays: pet.value.feedingIntervalMinDays?.toString() ?? "",
+        feedingIntervalMaxDays: pet.value.feedingIntervalMaxDays?.toString() ?? "",
     });
     showEdit.value = true;
 }
@@ -267,6 +413,8 @@ const { mutate: updateMutation, isPending: updating } = useMutation({
             gender: editForm.gender,
             birthDate: editForm.birthDate || undefined,
             notes: editForm.notes || undefined,
+            feedingIntervalMinDays: editForm.feedingIntervalMinDays ? Number(editForm.feedingIntervalMinDays) : null,
+            feedingIntervalMaxDays: editForm.feedingIntervalMaxDays ? Number(editForm.feedingIntervalMaxDays) : null,
         }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pets"] });

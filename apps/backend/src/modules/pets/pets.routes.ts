@@ -4,7 +4,7 @@ import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import { listPets, getPet, createPet, updatePet, deletePet } from "./pets.service.js";
 
-const CreatePetSchema = z.object({
+const PetBaseSchema = z.object({
     enclosureId: z.string().cuid().optional(),
     name: z.string().min(1).max(100),
     species: z.string().min(1).max(100),
@@ -14,9 +14,20 @@ const CreatePetSchema = z.object({
     acquisitionDate: z.coerce.date().optional(),
     notes: z.string().max(2000).optional(),
     imageUrl: z.string().url().optional(),
+    feedingIntervalMinDays: z.number().int().min(1).max(365).optional().nullable(),
+    feedingIntervalMaxDays: z.number().int().min(1).max(365).optional().nullable(),
 });
 
-const UpdatePetSchema = CreatePetSchema.partial();
+const feedingIntervalRefine = (data: { feedingIntervalMinDays?: number | null; feedingIntervalMaxDays?: number | null }) => {
+    if (data.feedingIntervalMinDays && data.feedingIntervalMaxDays) {
+        return data.feedingIntervalMinDays <= data.feedingIntervalMaxDays;
+    }
+    return true;
+};
+const feedingIntervalMessage = { message: "Min interval must be less than or equal to max interval", path: ["feedingIntervalMinDays"] as const };
+
+const CreatePetSchema = PetBaseSchema.refine(feedingIntervalRefine, feedingIntervalMessage);
+const UpdatePetSchema = PetBaseSchema.partial().refine(feedingIntervalRefine, feedingIntervalMessage);
 
 export async function petRoutes(app: FastifyInstance) {
     app.addHook("preHandler", authGuard);

@@ -36,3 +36,4 @@ export { accountDeletionTemplate, type AccountDeletionData } from "./account-del
 export { accountDeletedTemplate, type AccountDeletedData } from "./account-deleted.js";
 export { dataExportReadyTemplate, type DataExportReadyData } from "./data-export-ready.js";
 export { newLoginTemplate, type NewLoginData } from "./new-login.js";
+export { feedingReminderTemplate, type FeedingReminderData } from "./feeding-reminder.js";

@@ -28,6 +28,7 @@ export const ErrorCodes = {
 
     // ── Pets ─────────────────────────────────────
     E_PET_NOT_FOUND: "E_PET_NOT_FOUND",
+    E_PET_PHOTO_NOT_FOUND: "E_PET_PHOTO_NOT_FOUND",
 
     // ── Sensors ──────────────────────────────────
     E_SENSOR_NOT_FOUND: "E_SENSOR_NOT_FOUND",

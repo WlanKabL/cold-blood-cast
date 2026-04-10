@@ -25,9 +25,11 @@ import { legalRoutes } from "@/modules/legal/index.js";
 import { cookieConsentRoutes } from "@/modules/cookie-consent/index.js";
 import { enclosureRoutes } from "@/modules/enclosures/index.js";
 import { petRoutes } from "@/modules/pets/index.js";
+import { petPhotoRoutes } from "@/modules/pet-photos/index.js";
 import { sensorRoutes } from "@/modules/sensors/index.js";
 import { feedingRoutes } from "@/modules/feedings/index.js";
 import { feedItemRoutes } from "@/modules/feed-items/index.js";
+import { feedingReminderRoutes, startFeedingReminderScheduler, stopFeedingReminderScheduler } from "@/modules/feeding-reminders/index.js";
 import { sheddingRoutes } from "@/modules/sheddings/index.js";
 import { weightRoutes } from "@/modules/weights/index.js";
 import {
@@ -253,9 +255,11 @@ async function main() {
     // ── CBC Domain Routes ────────────────────────
     await app.register(enclosureRoutes, { prefix: "/api/enclosures" });
     await app.register(petRoutes, { prefix: "/api/pets" });
+    await app.register(petPhotoRoutes, { prefix: "/api/pets" });
     await app.register(sensorRoutes, { prefix: "/api/sensors" });
     await app.register(feedingRoutes, { prefix: "/api/feedings" });
     await app.register(feedItemRoutes, { prefix: "/api/feed-items" });
+    await app.register(feedingReminderRoutes, { prefix: "/api/feeding-reminders" });
     await app.register(sheddingRoutes, { prefix: "/api/sheddings" });
     await app.register(weightRoutes, { prefix: "/api/weights" });
 
@@ -267,10 +271,19 @@ async function main() {
         app.log.warn({ err }, "Failed to start maintenance scheduler");
     }
 
+    // ── Start Feeding Reminder Scheduler (daily 08:00 Berlin) ──
+    try {
+        startFeedingReminderScheduler();
+        app.log.info("Feeding reminder scheduler started");
+    } catch (err) {
+        app.log.warn({ err }, "Failed to start feeding reminder scheduler");
+    }
+
     // ── Graceful Shutdown ────────────────────────
     const shutdown = async (signal: string) => {
         app.log.info(`Received ${signal}, shutting down...`);
         stopMaintenanceScheduler();
+        stopFeedingReminderScheduler();
         await app.close();
         await prisma.$disconnect();
         process.exit(0);

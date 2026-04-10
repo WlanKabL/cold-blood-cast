@@ -742,7 +742,16 @@
             "yourEnclosures": "Deine Terrarien",
             "viewAll": "Alle anzeigen",
             "noEnclosures": "Noch keine Terrarien",
-            "addFirst": "Füge dein erstes Terrarium hinzu"
+            "addFirst": "Füge dein erstes Terrarium hinzu",
+            "feedingReminders": "Fütterungserinnerungen",
+            "noPetsScheduled": "Keine Fütterungspläne konfiguriert",
+            "feedingOk": "OK",
+            "feedingDue": "Fällig",
+            "feedingCritical": "Überfällig!",
+            "feedingNoSchedule": "Kein Plan",
+            "daysAgo": "vor {n} Tagen",
+            "neverFed": "Nie gefüttert",
+            "today": "Heute"
         },
         "enclosures": {
             "title": "Terrarien",
@@ -806,6 +815,8 @@
             "saved": "Tier gespeichert",
             "created": "Tier erstellt",
             "deleted": "Tier gelöscht",
+            "feedingSchedule": "Fütterungsplan",
+            "feedingScheduleHint": "Optional: Lege ein Fütterungsintervall fest, um Erinnerungen zu erhalten",
             "fields": {
                 "name": "Name",
                 "enclosure": "Terrarium",
@@ -813,7 +824,38 @@
                 "morph": "Farbvariante",
                 "gender": "Geschlecht",
                 "birthDate": "Geburtsdatum",
-                "notes": "Notizen"
+                "notes": "Notizen",
+                "feedingIntervalMinDays": "Min. Intervall (Tage)",
+                "feedingIntervalMaxDays": "Max. Intervall (Tage)"
+            },
+            "photos": {
+                "title": "Fotos",
+                "subtitle": "Galerie deines Tieres",
+                "upload": "Foto hochladen",
+                "empty": "Noch keine Fotos. Lade dein erstes hoch!",
+                "emptyFiltered": "Keine Fotos für den ausgewählten Filter.",
+                "caption": "Beschreibung",
+                "captionPlaceholder": "Beschreibe dieses Foto...",
+                "tags": "Tags",
+                "tagsHint": "Tags mit Komma trennen",
+                "setProfile": "Als Profilbild setzen",
+                "isProfile": "Profilbild",
+                "removeProfile": "Als Profil entfernen",
+                "confirmDelete": "Dieses Foto löschen? Kann nicht rückgängig gemacht werden.",
+                "deleted": "Foto gelöscht",
+                "uploaded": "Foto hochgeladen",
+                "updated": "Foto aktualisiert",
+                "profileSet": "Profilbild aktualisiert",
+                "filterByTag": "Nach Tag filtern",
+                "allPhotos": "Alle Fotos",
+                "editCaption": "Bearbeiten",
+                "photoCount": "{count} Foto | {count} Fotos",
+                "viewGallery": "Galerie ansehen",
+                "setAsProfile": "Als Profilbild verwenden",
+                "dropHint": "Bild hierher ziehen oder klicken",
+                "maxSize": "Max. {size} MB pro Datei",
+                "takenAt": "Aufgenommen am",
+                "takenAtHint": "Wann wurde das Foto aufgenommen?"
             }
         },
         "sensors": {

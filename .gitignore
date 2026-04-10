@@ -40,6 +40,11 @@ coverage/
 .nyc_output/
 e2e-coverage/
 
+# Playwright
+/apps/frontend/e2e/.auth/
+/apps/frontend/test-results/
+/apps/frontend/playwright-report/
+
 # Cache
 .eslintcache
 .prettiercache
