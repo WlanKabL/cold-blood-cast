@@ -251,7 +251,7 @@ describe("updateVetVisitDocument", () => {
 // ─── deleteVetVisitDocument ────────────────────────────
 
 describe("deleteVetVisitDocument", () => {
-    it("deletes upload and document record", async () => {
+    it("deletes document record first, then upload (avoids cascade conflict)", async () => {
         mockPrisma.vetVisitDocument.findUnique.mockResolvedValue({
             id: DOC_ID,
             vetVisit: { userId: USER_ID },
@@ -262,10 +262,15 @@ describe("deleteVetVisitDocument", () => {
 
         await deleteVetVisitDocument(DOC_ID, USER_ID);
 
-        expect(mockDeleteUpload).toHaveBeenCalledWith(USER_ID, UPLOAD_ID);
         expect(mockPrisma.vetVisitDocument.delete).toHaveBeenCalledWith({
             where: { id: DOC_ID },
         });
+        expect(mockDeleteUpload).toHaveBeenCalledWith(USER_ID, UPLOAD_ID);
+
+        // Verify order: document.delete called before upload.delete
+        const deleteOrder = mockPrisma.vetVisitDocument.delete.mock.invocationCallOrder[0];
+        const uploadOrder = mockDeleteUpload.mock.invocationCallOrder[0];
+        expect(deleteOrder).toBeLessThan(uploadOrder);
     });
 
     it("throws for non-owned document", async () => {

@@ -97,6 +97,9 @@ export async function updateVetVisitDocument(
 export async function deleteVetVisitDocument(docId: string, userId: string) {
     const doc = await getDocumentWithOwnershipCheck(docId, userId);
 
-    await deleteUpload(userId, doc.upload.id);
+    // Delete document record first to remove FK, then delete Upload.
+    // Reversing this causes a 500: Upload's onDelete:Cascade would
+    // cascade-delete the document, making the subsequent delete() fail.
     await prisma.vetVisitDocument.delete({ where: { id: docId } });
+    await deleteUpload(userId, doc.upload.id);
 }
