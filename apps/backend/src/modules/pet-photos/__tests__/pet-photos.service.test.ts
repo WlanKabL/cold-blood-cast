@@ -198,7 +198,7 @@ describe("addPetPhoto", () => {
             tags: ["portrait"],
         });
 
-        expect(mockUploadFile).toHaveBeenCalledWith(USER_ID, mockFile, { caption: "My snake" }, undefined);
+        expect(mockUploadFile).toHaveBeenCalledWith(USER_ID, mockFile, { caption: "My snake", subDir: "petPhotos" }, undefined);
         expect(mockPrisma.petPhoto.create).toHaveBeenCalledWith({
             data: {
                 petId: PET_ID,

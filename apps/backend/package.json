@@ -16,7 +16,7 @@
         "db:migrate:deploy": "prisma migrate deploy",
         "db:migrate:status": "prisma migrate status",
         "db:migrate:reset": "prisma migrate reset",
-        "db:push": "prisma db push",
+        "db:push": "echo 'ERROR: db:push is disabled — use db:migrate instead to avoid schema drift and data loss' && exit 1",
         "db:seed": "tsx --env-file=.env src/config/seed.ts",
         "db:reseed": "tsx --env-file=.env src/config/seed.ts --reseed",
         "db:seed-demo": "tsx --env-file=.env src/config/seed-demo.ts",

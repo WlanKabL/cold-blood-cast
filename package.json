@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "docker compose up -d postgres && pnpm --filter @cold-blood-cast/shared run build && pnpm db:generate && pnpm db:push && pnpm --filter @cold-blood-cast/* run dev",
+        "dev": "docker compose up -d postgres && pnpm --filter @cold-blood-cast/shared run build && pnpm db:generate && pnpm db:migrate:deploy && pnpm --filter @cold-blood-cast/* run dev",
         "dev:start": "docker compose up -d postgres && pnpm --filter @cold-blood-cast/shared run build && pnpm --filter @cold-blood-cast/* run dev",
         "dev:apps": "pnpm --filter @cold-blood-cast/* run dev",
         "dev:frontend": "pnpm --filter @cold-blood-cast/frontend run dev",
@@ -22,7 +22,7 @@
         "db:migrate:deploy": "pnpm --filter @cold-blood-cast/backend run db:migrate:deploy",
         "db:migrate:status": "pnpm --filter @cold-blood-cast/backend run db:migrate:status",
         "db:migrate:reset": "pnpm --filter @cold-blood-cast/backend run db:migrate:reset",
-        "db:push": "pnpm --filter @cold-blood-cast/backend run db:push",
+        "db:push": "echo 'ERROR: db:push is disabled — use db:migrate instead to avoid schema drift and data loss' && exit 1",
         "db:seed": "pnpm --filter @cold-blood-cast/backend run db:seed",
         "db:reseed": "pnpm --filter @cold-blood-cast/backend run db:reseed",
         "db:seed-demo": "pnpm --filter @cold-blood-cast/backend run db:seed-demo",

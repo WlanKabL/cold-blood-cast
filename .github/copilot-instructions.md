@@ -138,6 +138,7 @@ Tests are not optional. They are part of the feature, not an afterthought.
 - No code that only works in the happy path
 - No i18n-less UI text
 - No new env vars without adding them to `config.ts`
+- No `prisma db push` — ever. It causes schema drift that leads to data loss on next migration
 
 ---
 
@@ -148,6 +149,17 @@ Tests are not optional. They are part of the feature, not an afterthought.
 - CORS: only configured origins from `CORS_ORIGINS` env var
 - Never log passwords, tokens, or personal data
 - Always validate and sanitize on the backend — the frontend is untrusted
+
+---
+
+## Database & Migrations
+
+- **Never use `prisma db push`** — it syncs the schema without creating migration files, causing drift that triggers a full DB reset on next `prisma migrate dev`
+- Every schema change gets its own migration: `pnpm db:migrate` (runs `prisma migrate dev`)
+- One migration per feature — clean, incremental, reviewable
+- Production deploys use `pnpm db:migrate:deploy` (`prisma migrate deploy`) — this only applies pending migrations, never resets, never prompts
+- Never edit an already-applied migration file — create a new one instead
+- The `db:push` script is intentionally disabled and will error if called
 
 ---
 
@@ -173,6 +185,14 @@ pnpm types:check          # TypeScript check all
 pnpm test                 # All tests
 pnpm test:backend         # Backend tests
 pnpm test:frontend        # Frontend tests
+
+# Database
+pnpm db:migrate           # Create + apply migration (dev only)
+pnpm db:migrate:deploy    # Apply pending migrations (production-safe)
+pnpm db:migrate:status    # Check migration status
+pnpm db:seed              # Seed database
+pnpm db:studio            # Open Prisma Studio
+# pnpm db:push            # DISABLED — causes data loss
 
 # Clean
 pnpm clean                # Remove all build artifacts + node_modules
