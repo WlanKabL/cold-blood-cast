@@ -17,9 +17,8 @@ const mockPrisma = {
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 vi.mock("@/config/env.js", () => ({ env: () => ({}) }));
 
-const { listFeedItems, getFeedItem, createFeedItem, updateFeedItem, deleteFeedItem } = await import(
-    "../feed-items.service.js"
-);
+const { listFeedItems, getFeedItem, createFeedItem, updateFeedItem, deleteFeedItem } =
+    await import("../feed-items.service.js");
 
 const USER_ID = "user_123";
 
@@ -30,7 +29,13 @@ beforeEach(() => {
 describe("listFeedItems", () => {
     it("returns all feed items for user", async () => {
         const items = [
-            { id: "fi_1", name: "Mouse", userId: USER_ID, suitablePets: [], _count: { feedings: 3 } },
+            {
+                id: "fi_1",
+                name: "Mouse",
+                userId: USER_ID,
+                suitablePets: [],
+                _count: { feedings: 3 },
+            },
         ];
         mockPrisma.feedItem.findMany.mockResolvedValue(items);
 
@@ -135,12 +140,16 @@ describe("updateFeedItem", () => {
 
     it("throws when feed item not found", async () => {
         mockPrisma.feedItem.findUnique.mockResolvedValue(null);
-        await expect(updateFeedItem("fi_x", USER_ID, { name: "X" })).rejects.toThrow("Feed item not found");
+        await expect(updateFeedItem("fi_x", USER_ID, { name: "X" })).rejects.toThrow(
+            "Feed item not found",
+        );
     });
 
     it("throws when feed item owned by different user", async () => {
         mockPrisma.feedItem.findUnique.mockResolvedValue({ id: "fi_1", userId: "other" });
-        await expect(updateFeedItem("fi_1", USER_ID, { name: "X" })).rejects.toThrow("Feed item not found");
+        await expect(updateFeedItem("fi_1", USER_ID, { name: "X" })).rejects.toThrow(
+            "Feed item not found",
+        );
     });
 });
 

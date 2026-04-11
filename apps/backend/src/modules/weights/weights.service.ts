@@ -33,7 +33,10 @@ export async function getWeightChartData(
         orderBy: { measuredAt: "asc" },
     });
 
-    const grouped: Record<string, { petName: string; points: { date: string; weightGrams: number }[] }> = {};
+    const grouped: Record<
+        string,
+        { petName: string; points: { date: string; weightGrams: number }[] }
+    > = {};
     for (const r of records) {
         if (!grouped[r.petId]) {
             grouped[r.petId] = { petName: r.pet.name, points: [] };
@@ -69,21 +72,27 @@ export function computeGrowthRate(
         };
     }
 
-    const sorted = [...points].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sorted = [...points].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
     const first = sorted[0];
     const latest = sorted[sorted.length - 1];
     const totalGainGrams = latest.weightGrams - first.weightGrams;
 
     const msSpan = new Date(latest.date).getTime() - new Date(first.date).getTime();
     const monthsSpan = msSpan / (1000 * 60 * 60 * 24 * 30.44);
-    const avgGramsPerMonth = monthsSpan > 0 ? Math.round((totalGainGrams / monthsSpan) * 100) / 100 : 0;
+    const avgGramsPerMonth =
+        monthsSpan > 0 ? Math.round((totalGainGrams / monthsSpan) * 100) / 100 : 0;
 
     let trend: "up" | "stable" | "down" = "stable";
     if (sorted.length >= 2) {
         const recentCount = Math.min(3, sorted.length);
         const recentSlice = sorted.slice(-recentCount);
-        const recentGain = recentSlice[recentSlice.length - 1].weightGrams - recentSlice[0].weightGrams;
-        const recentMs = new Date(recentSlice[recentSlice.length - 1].date).getTime() - new Date(recentSlice[0].date).getTime();
+        const recentGain =
+            recentSlice[recentSlice.length - 1].weightGrams - recentSlice[0].weightGrams;
+        const recentMs =
+            new Date(recentSlice[recentSlice.length - 1].date).getTime() -
+            new Date(recentSlice[0].date).getTime();
         const recentMonths = recentMs / (1000 * 60 * 60 * 24 * 30.44);
         const recentRate = recentMonths > 0 ? recentGain / recentMonths : 0;
 
@@ -103,10 +112,11 @@ export function computeGrowthRate(
     };
 }
 
-export async function getGrowthRates(userId: string, petIds?: string[]): Promise<GrowthRateResult[]> {
-    const where = petIds?.length
-        ? { pet: { userId }, petId: { in: petIds } }
-        : { pet: { userId } };
+export async function getGrowthRates(
+    userId: string,
+    petIds?: string[],
+): Promise<GrowthRateResult[]> {
+    const where = petIds?.length ? { pet: { userId }, petId: { in: petIds } } : { pet: { userId } };
 
     const records = await prisma.weightRecord.findMany({
         where,
@@ -114,7 +124,10 @@ export async function getGrowthRates(userId: string, petIds?: string[]): Promise
         orderBy: { measuredAt: "asc" },
     });
 
-    const grouped: Record<string, { petName: string; points: { date: string; weightGrams: number }[] }> = {};
+    const grouped: Record<
+        string,
+        { petName: string; points: { date: string; weightGrams: number }[] }
+    > = {};
     for (const r of records) {
         if (!grouped[r.petId]) {
             grouped[r.petId] = { petName: r.pet.name, points: [] };

@@ -37,7 +37,11 @@ export async function feedItemRoutes(app: FastifyInstance) {
     app.post("/", async (request, reply) => {
         const result = CreateFeedItemSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid feed item data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid feed item data",
+                result.error.flatten(),
+            );
         }
         const item = await createFeedItem(request.userId, result.data);
         return reply.status(201).send({ success: true, data: item });
@@ -46,7 +50,11 @@ export async function feedItemRoutes(app: FastifyInstance) {
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
         const result = UpdateFeedItemSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid feed item data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid feed item data",
+                result.error.flatten(),
+            );
         }
         const data = await updateFeedItem(request.params.id, request.userId, result.data);
         return { success: true, data };

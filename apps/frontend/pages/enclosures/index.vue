@@ -47,7 +47,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- Enclosure Grid -->
@@ -156,7 +158,11 @@
         </div>
 
         <!-- Create Modal -->
-        <UiModal :show="showCreate" :title="$t('pages.enclosures.create')" @close="showCreate = false">
+        <UiModal
+            :show="showCreate"
+            :title="$t('pages.enclosures.create')"
+            @close="showCreate = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreate">
                 <UiTextInput
                     v-model="form.name"
@@ -164,10 +170,7 @@
                     :label="$t('pages.enclosures.fields.name')"
                 />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiSelect
-                        v-model="form.type"
-                        :label="$t('pages.enclosures.fields.type')"
-                    >
+                    <UiSelect v-model="form.type" :label="$t('pages.enclosures.fields.type')">
                         <option v-for="t in enclosureTypes" :key="t" :value="t">{{ t }}</option>
                     </UiSelect>
                     <UiTextInput

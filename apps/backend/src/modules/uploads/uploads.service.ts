@@ -11,11 +11,14 @@ import { badRequest, notFound, internalError, ErrorCodes } from "@/helpers/index
 import { encryptFile } from "@/helpers/file-crypto.js";
 import { resolveUserLimits } from "@/modules/admin/feature-flags.service.js";
 
-export const ALLOWED_MIME_IMAGES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"]);
-export const ALLOWED_MIME_DOCUMENTS = new Set([
-    ...ALLOWED_MIME_IMAGES,
-    "application/pdf",
+export const ALLOWED_MIME_IMAGES = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/avif",
 ]);
+export const ALLOWED_MIME_DOCUMENTS = new Set([...ALLOWED_MIME_IMAGES, "application/pdf"]);
 
 async function ensureUploadDir(subDir: string): Promise<void> {
     const dir = join(env().UPLOAD_DIR, subDir);
@@ -49,10 +52,7 @@ export async function uploadFile(
 
     const allowedMime = opts.allowedMime ?? ALLOWED_MIME_IMAGES;
     if (!allowedMime.has(file.mimetype)) {
-        throw badRequest(
-            ErrorCodes.E_UPLOAD_INVALID_TYPE,
-            `Invalid file type: ${file.mimetype}`,
-        );
+        throw badRequest(ErrorCodes.E_UPLOAD_INVALID_TYPE, `Invalid file type: ${file.mimetype}`);
     }
 
     const subDir = opts.subDir ?? "uploads";

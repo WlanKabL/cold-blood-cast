@@ -3,10 +3,14 @@
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.veterinarians.title") }}</h1>
+                <h1 class="text-fg text-2xl font-bold tracking-tight">
+                    {{ $t("pages.veterinarians.title") }}
+                </h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.veterinarians.subtitle") }}</p>
             </div>
-            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.veterinarians.add") }}</UiButton>
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{
+                $t("pages.veterinarians.add")
+            }}</UiButton>
         </div>
 
         <!-- Loading -->
@@ -18,7 +22,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- List -->
@@ -29,7 +35,9 @@
                 class="glass-card flex items-center justify-between rounded-xl p-4"
             >
                 <div class="flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400"
+                    >
                         <Icon name="lucide:stethoscope" class="h-5 w-5" />
                     </div>
                     <div>
@@ -42,11 +50,23 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="bg-teal-500/10 text-teal-400 rounded-md px-2 py-0.5 text-xs font-medium">
+                    <span
+                        class="rounded-md bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-400"
+                    >
                         {{ $t("pages.veterinarians.visitCount", { n: vet._count.vetVisits }) }}
                     </span>
-                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(vet)" />
-                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(vet.id)" />
+                    <UiButton
+                        variant="ghost"
+                        icon="lucide:pencil"
+                        size="sm"
+                        @click="openEditModal(vet)"
+                    />
+                    <UiButton
+                        variant="danger"
+                        icon="lucide:trash-2"
+                        size="sm"
+                        @click="confirmDelete(vet.id)"
+                    />
                 </div>
             </div>
         </div>
@@ -55,40 +75,95 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:stethoscope" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.veterinarians.empty") }}</p>
-            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.veterinarians.addFirst") }}</UiButton>
+            <UiButton class="mt-4" @click="openCreateModal">{{
+                $t("pages.veterinarians.addFirst")
+            }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UiModal :show="showCreate" :title="$t('pages.veterinarians.create')" width="lg" @close="showCreate = false">
+        <UiModal
+            :show="showCreate"
+            :title="$t('pages.veterinarians.create')"
+            width="lg"
+            @close="showCreate = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreate">
-                <UiTextInput v-model="form.name" :label="$t('pages.veterinarians.fields.name')" required />
-                <UiTextInput v-model="form.clinicName" :label="$t('pages.veterinarians.fields.clinicName')" />
-                <UiTextInput v-model="form.address" :label="$t('pages.veterinarians.fields.address')" />
+                <UiTextInput
+                    v-model="form.name"
+                    :label="$t('pages.veterinarians.fields.name')"
+                    required
+                />
+                <UiTextInput
+                    v-model="form.clinicName"
+                    :label="$t('pages.veterinarians.fields.clinicName')"
+                />
+                <UiTextInput
+                    v-model="form.address"
+                    :label="$t('pages.veterinarians.fields.address')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="form.phone" :label="$t('pages.veterinarians.fields.phone')" type="tel" />
-                    <UiTextInput v-model="form.email" :label="$t('pages.veterinarians.fields.email')" type="email" />
+                    <UiTextInput
+                        v-model="form.phone"
+                        :label="$t('pages.veterinarians.fields.phone')"
+                        type="tel"
+                    />
+                    <UiTextInput
+                        v-model="form.email"
+                        :label="$t('pages.veterinarians.fields.email')"
+                        type="email"
+                    />
                 </div>
                 <UiTextarea v-model="form.notes" :label="$t('pages.veterinarians.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showCreate = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.veterinarians.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.veterinarians.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput v-model="editForm.name" :label="$t('pages.veterinarians.fields.name')" required />
-                <UiTextInput v-model="editForm.clinicName" :label="$t('pages.veterinarians.fields.clinicName')" />
-                <UiTextInput v-model="editForm.address" :label="$t('pages.veterinarians.fields.address')" />
+                <UiTextInput
+                    v-model="editForm.name"
+                    :label="$t('pages.veterinarians.fields.name')"
+                    required
+                />
+                <UiTextInput
+                    v-model="editForm.clinicName"
+                    :label="$t('pages.veterinarians.fields.clinicName')"
+                />
+                <UiTextInput
+                    v-model="editForm.address"
+                    :label="$t('pages.veterinarians.fields.address')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="editForm.phone" :label="$t('pages.veterinarians.fields.phone')" type="tel" />
-                    <UiTextInput v-model="editForm.email" :label="$t('pages.veterinarians.fields.email')" type="email" />
+                    <UiTextInput
+                        v-model="editForm.phone"
+                        :label="$t('pages.veterinarians.fields.phone')"
+                        type="tel"
+                    />
+                    <UiTextInput
+                        v-model="editForm.email"
+                        :label="$t('pages.veterinarians.fields.email')"
+                        type="email"
+                    />
                 </div>
-                <UiTextarea v-model="editForm.notes" :label="$t('pages.veterinarians.fields.notes')" />
+                <UiTextarea
+                    v-model="editForm.notes"
+                    :label="$t('pages.veterinarians.fields.notes')"
+                />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>

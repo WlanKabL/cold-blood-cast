@@ -29,9 +29,7 @@ const ListQuerySchema = z.object({
 });
 
 const ChartQuerySchema = z.object({
-    petIds: z
-        .string()
-        .transform((v) => v.split(",").filter(Boolean)),
+    petIds: z.string().transform((v) => v.split(",").filter(Boolean)),
     from: z.coerce.date().optional(),
     to: z.coerce.date().optional(),
 });
@@ -50,7 +48,11 @@ export async function weightRoutes(app: FastifyInstance) {
     app.get("/chart", async (request) => {
         const query = ChartQuerySchema.safeParse(request.query);
         if (!query.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid query parameters",
+                query.error.flatten(),
+            );
         }
         const data = await getWeightChartData(request.userId, query.data);
         return { success: true, data };
@@ -59,7 +61,11 @@ export async function weightRoutes(app: FastifyInstance) {
     app.get("/growth-rate", async (request) => {
         const query = GrowthRateQuerySchema.safeParse(request.query);
         if (!query.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid query parameters",
+                query.error.flatten(),
+            );
         }
         const data = await getGrowthRates(request.userId, query.data.petIds);
         return { success: true, data };
@@ -68,7 +74,11 @@ export async function weightRoutes(app: FastifyInstance) {
     app.get("/", async (request) => {
         const query = ListQuerySchema.safeParse(request.query);
         if (!query.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid query parameters",
+                query.error.flatten(),
+            );
         }
         const data = await listWeightRecords(request.userId, query.data);
         return { success: true, data };
@@ -82,7 +92,11 @@ export async function weightRoutes(app: FastifyInstance) {
     app.post("/", async (request, reply) => {
         const result = CreateWeightSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid weight data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid weight data",
+                result.error.flatten(),
+            );
         }
         const record = await createWeightRecord(request.userId, result.data);
         return reply.status(201).send({ success: true, data: record });
@@ -91,7 +105,11 @@ export async function weightRoutes(app: FastifyInstance) {
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
         const result = UpdateWeightSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid weight data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid weight data",
+                result.error.flatten(),
+            );
         }
         const data = await updateWeightRecord(request.params.id, request.userId, result.data);
         return { success: true, data };

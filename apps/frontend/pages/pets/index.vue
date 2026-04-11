@@ -25,13 +25,11 @@
                     <Icon name="lucide:search" class="h-4 w-4" />
                 </template>
             </UiTextInput>
-            <UiSelect
-                v-model="selectedEnclosure"
-                size="compact"
-                class="w-48"
-            >
+            <UiSelect v-model="selectedEnclosure" size="compact" class="w-48">
                 <option value="ALL">{{ $t("pages.pets.allEnclosures") }}</option>
-                <option v-for="enc in enclosures ?? []" :key="enc.id" :value="enc.id">{{ enc.name }}</option>
+                <option v-for="enc in enclosures ?? []" :key="enc.id" :value="enc.id">
+                    {{ enc.name }}
+                </option>
             </UiSelect>
         </div>
 
@@ -44,7 +42,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- Pet Grid -->
@@ -67,7 +67,10 @@
                             class="h-10 w-10 rounded-lg object-cover ring-1 ring-white/10"
                         />
                     </div>
-                    <div v-else class="bg-surface-raised flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                    <div
+                        v-else
+                        class="bg-surface-raised flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+                    >
                         <Icon name="lucide:heart" class="text-fg-faint h-5 w-5" />
                     </div>
                     <div class="min-w-0 flex-1">
@@ -156,20 +159,34 @@
                 <UiTextInput v-model="form.name" required :label="$t('pages.pets.fields.name')" />
                 <UiSelect v-model="form.enclosureId" :label="$t('pages.pets.fields.enclosure')">
                     <option value="NONE">—</option>
-                    <option v-for="enc in enclosures ?? []" :key="enc.id" :value="enc.id">{{ enc.name }}</option>
+                    <option v-for="enc in enclosures ?? []" :key="enc.id" :value="enc.id">
+                        {{ enc.name }}
+                    </option>
                 </UiSelect>
-                <UiTextInput v-model="form.species" required :label="$t('pages.pets.fields.species')" />
+                <UiTextInput
+                    v-model="form.species"
+                    required
+                    :label="$t('pages.pets.fields.species')"
+                />
                 <UiTextInput v-model="form.morph" :label="$t('pages.pets.fields.morph')" />
                 <UiSelect v-model="form.gender" :label="$t('pages.pets.fields.gender')">
                     <option v-for="g in genderOptions" :key="g" :value="g">{{ g }}</option>
                 </UiSelect>
-                <UiTextInput v-model="form.birthDate" type="date" :label="$t('pages.pets.fields.birthDate')" />
+                <UiTextInput
+                    v-model="form.birthDate"
+                    type="date"
+                    :label="$t('pages.pets.fields.birthDate')"
+                />
                 <UiTextarea v-model="form.notes" :label="$t('pages.pets.fields.notes')" />
 
                 <!-- Feeding Schedule -->
                 <div class="border-t border-white/5 pt-4">
-                    <p class="text-fg-muted mb-1 text-sm font-medium">{{ $t("pages.pets.feedingSchedule") }}</p>
-                    <p class="text-fg-faint mb-3 text-xs">{{ $t("pages.pets.feedingScheduleHint") }}</p>
+                    <p class="text-fg-muted mb-1 text-sm font-medium">
+                        {{ $t("pages.pets.feedingSchedule") }}
+                    </p>
+                    <p class="text-fg-faint mb-3 text-xs">
+                        {{ $t("pages.pets.feedingScheduleHint") }}
+                    </p>
                     <div class="grid grid-cols-2 gap-3">
                         <UiTextInput
                             v-model="form.feedingIntervalMinDays"
@@ -189,7 +206,9 @@
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showCreate = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
@@ -310,8 +329,12 @@ const { mutate: createMutation, isPending: creating } = useMutation({
             gender: form.gender,
             birthDate: form.birthDate || undefined,
             notes: form.notes || undefined,
-            feedingIntervalMinDays: form.feedingIntervalMinDays ? Number(form.feedingIntervalMinDays) : undefined,
-            feedingIntervalMaxDays: form.feedingIntervalMaxDays ? Number(form.feedingIntervalMaxDays) : undefined,
+            feedingIntervalMinDays: form.feedingIntervalMinDays
+                ? Number(form.feedingIntervalMinDays)
+                : undefined,
+            feedingIntervalMaxDays: form.feedingIntervalMaxDays
+                ? Number(form.feedingIntervalMaxDays)
+                : undefined,
         }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pets"] });

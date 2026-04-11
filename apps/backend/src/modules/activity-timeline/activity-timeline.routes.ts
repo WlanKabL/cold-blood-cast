@@ -14,7 +14,11 @@ const TimelineQuerySchema = z.object({
         .optional()
         .transform((val) => {
             if (!val) return VALID_TYPES;
-            return val.split(",").filter((t): t is TimelineEventType => VALID_TYPES.includes(t as TimelineEventType));
+            return val
+                .split(",")
+                .filter((t): t is TimelineEventType =>
+                    VALID_TYPES.includes(t as TimelineEventType),
+                );
         }),
 });
 
@@ -26,12 +30,20 @@ export async function activityTimelineRoutes(app: FastifyInstance) {
     app.get("/:petId/timeline", async (request) => {
         const params = z.object({ petId: z.string().cuid() }).safeParse(request.params);
         if (!params.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid pet ID", params.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid pet ID",
+                params.error.flatten(),
+            );
         }
 
         const query = TimelineQuerySchema.safeParse(request.query);
         if (!query.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid query parameters",
+                query.error.flatten(),
+            );
         }
 
         const result = await getTimeline(request.userId, params.data.petId, query.data);

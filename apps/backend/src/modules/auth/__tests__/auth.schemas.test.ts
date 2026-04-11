@@ -182,6 +182,15 @@ describe("updateProfileSchema", () => {
     it("rejects displayName too long", () => {
         expect(updateProfileSchema.safeParse({ displayName: "a".repeat(65) }).success).toBe(false);
     });
+
+    it("accepts weeklyReportEnabled boolean", () => {
+        expect(updateProfileSchema.safeParse({ weeklyReportEnabled: true }).success).toBe(true);
+        expect(updateProfileSchema.safeParse({ weeklyReportEnabled: false }).success).toBe(true);
+    });
+
+    it("rejects weeklyReportEnabled non-boolean", () => {
+        expect(updateProfileSchema.safeParse({ weeklyReportEnabled: "yes" }).success).toBe(false);
+    });
 });
 
 describe("confirmAccountDeletionSchema", () => {

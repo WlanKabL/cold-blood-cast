@@ -26,10 +26,19 @@ export const ErrorCodes = {
     // ── Enclosures ─────────────────────────────
     E_ENCLOSURE_NOT_FOUND: "E_ENCLOSURE_NOT_FOUND",
 
+    // ── Maintenance Tasks ────────────────────────
+    E_MAINTENANCE_TASK_NOT_FOUND: "E_MAINTENANCE_TASK_NOT_FOUND",
+
     // ── Pets ─────────────────────────────────────
     E_PET_NOT_FOUND: "E_PET_NOT_FOUND",
     E_PET_PHOTO_NOT_FOUND: "E_PET_PHOTO_NOT_FOUND",
     E_PET_DOCUMENT_NOT_FOUND: "E_PET_DOCUMENT_NOT_FOUND",
+
+    // ── Public Profiles ──────────────────────────
+    E_PUBLIC_PROFILE_NOT_FOUND: "E_PUBLIC_PROFILE_NOT_FOUND",
+    E_PUBLIC_PROFILE_SLUG_TAKEN: "E_PUBLIC_PROFILE_SLUG_TAKEN",
+    E_PUBLIC_PROFILE_ALREADY_EXISTS: "E_PUBLIC_PROFILE_ALREADY_EXISTS",
+    E_PUBLIC_PROFILE_INACTIVE: "E_PUBLIC_PROFILE_INACTIVE",
 
     // ── Veterinarians ────────────────────────────
     E_VETERINARIAN_NOT_FOUND: "E_VETERINARIAN_NOT_FOUND",

@@ -1,6 +1,6 @@
 # KeeperLog — Roadmap
 
-> Last updated: 2026-04-10
+> Last updated: 2026-04-11
 > Status legend: 🔲 Planned · 🧩 Scaffolded (schema exists, no routes/pages) · 🔨 In Progress · ✅ Done
 
 ---
@@ -16,7 +16,7 @@
 - ✅ GitHub Actions CI
 - ✅ JWT auth (access 15min + refresh 7d)
 - ✅ Shared TypeScript types package
-- ✅ Vitest test infrastructure (976+ tests)
+- ✅ Vitest test infrastructure (1254+ tests)
 - ✅ Redis (ioredis for BullMQ)
 - ✅ WebSocket server (JWT-authenticated)
 - ✅ Rate limiting
@@ -310,73 +310,127 @@
 
 ---
 
-### Feature 7: Enclosure Maintenance Log 🔧
+### Feature 7: Enclosure Maintenance Log 🔧 ✅
 
 > Terrarium-Wartung: Reinigung, Substrat-Wechsel, Lampen, Wassernapf. Wiederkehrende Erinnerungen.
 
-**Scope:** Backend module + frontend page + scheduler + E2E
+**Status: Complete** — Full backend + frontend + scheduler + E2E
+
+<details>
+<summary>Completed items (click to expand)</summary>
 
 #### Backend
 
-- 🔲 **7.1** Prisma schema: `MaintenanceTask` model (id, enclosureId, userId, type, description, completedAt, nextDueAt, intervalDays, recurring, notes, createdAt)
-- 🔲 **7.2** Types enum: `CLEANING`, `SUBSTRATE_CHANGE`, `LAMP_REPLACEMENT`, `WATER_CHANGE`, `FILTER_CHANGE`, `DISINFECTION`, `OTHER`
-- 🔲 **7.3** Migration: `add_enclosure_maintenance`
-- 🔲 **7.4** `enclosure-maintenance.service.ts`: CRUD, recurring task auto-calculation (next due = lastCompleted + intervalDays), overdue query
-- 🔲 **7.5** `enclosure-maintenance.routes.ts`: REST + GET `/api/enclosure-maintenance/overdue` + POST `/:id/complete` (mark done, auto-schedule next)
-- 🔲 **7.6** Maintenance reminder: integrate into 08:00 scheduler — email for overdue tasks
+- ✅ **7.1** Prisma schema: `MaintenanceTask` model (id, enclosureId, userId, type, description, completedAt, nextDueAt, intervalDays, recurring, notes, createdAt) + indexes
+- ✅ **7.2** Types enum: `CLEANING`, `SUBSTRATE_CHANGE`, `LAMP_REPLACEMENT`, `WATER_CHANGE`, `FILTER_CHANGE`, `DISINFECTION`, `OTHER`
+- ✅ **7.3** Migration: `20260411130000_add_enclosure_maintenance`
+- ✅ **7.4** `enclosure-maintenance.service.ts`: CRUD with ownership checks, completeTask (auto-reschedule if recurring), overdue queries, grouped-by-user query for scheduler
+- ✅ **7.5** `enclosure-maintenance.routes.ts`: REST + GET `/api/enclosure-maintenance/overdue` + POST `/:id/complete` — auth + emailVerified + feature gate
+- ✅ **7.6** `maintenance-reminders.queue.ts`: daily 08:00 Berlin scheduler, emails overdue tasks grouped by user
+- ✅ **7.7** Email template: `maintenance-reminder.ts` (localized DE/EN, type labels, overdue badge)
+- ✅ **7.8** Feature flag: `enclosure_maintenance` in seed.ts (v5 migration, all roles)
+- ✅ **7.9** Error code: `E_MAINTENANCE_TASK_NOT_FOUND` in errors.ts
 
 #### Frontend
 
-- 🔲 **7.7** `pages/enclosures/[id]/maintenance.vue`: task list with type badges, due dates, "mark done" button
-- 🔲 **7.8** Create/edit modal: type, description, interval (optional for non-recurring), notes
-- 🔲 **7.9** Enclosure detail page: "Maintenance" section showing overdue count + next due
-- 🔲 **7.10** Dashboard widget: "Overdue Maintenance" card
+- ✅ **7.10** `pages/maintenance/index.vue`: full task list with glass-card grid, type icons/colors, search + type/enclosure filters, create/edit modal, mark-done, delete confirmation
+- ✅ **7.11** Dashboard widget: "Overdue Maintenance" section on dashboard page with linked task cards
+- ✅ **7.12** Enclosure detail page: "Maintenance Tasks" section with overdue count badge, task list
+- ✅ **7.13** Sidebar nav entry: feature-gated wrench icon in care section
+- ✅ **7.14** Feature gate: `definePageMeta({ middleware: ["feature-gate"], requiredFeature: "enclosure_maintenance" })`
 
 #### Testing
 
-- 🔲 **7.11** Backend unit tests: CRUD, recurring auto-schedule, overdue detection
-- 🔲 **7.12** Frontend unit tests: due date formatting, overdue badge logic
-- 🔲 **7.13** Playwright E2E: create task, complete task, verify rescheduling
+- ✅ **7.15** Backend unit tests: 27 tests (CRUD, ownership, recurring auto-schedule, overdue detection, complete with/without interval)
+- ✅ **7.16** Playwright E2E: 13 tests (list page, task display, create modal, mark-done, empty state, dashboard widget, enclosure detail section)
 
 #### i18n
 
-- 🔲 **7.14** EN + DE keys: pages.enclosures.maintenance.* (title, types, due, overdue, complete)
+- ✅ **7.17** EN + DE keys: nav.maintenance, pages.maintenance.* (50+ keys — title, types, fields, status, CRUD messages), dashboard overdue keys, enclosure detail maintenance keys
+
+</details>
 
 ---
 
-### Feature 8: Public Pet Profile / Image Sharing 🌐
+### Feature 8: Weekly Care Planner ✅
+
+> Sonntag-Abend-Mail mit Wochenüberblick: was steht an, was ist überfällig, was kommt auf dich zu. Dazu ein Kalender im Frontend für die Wochenplanung.
+
+**Scope:** Backend email scheduler + calendar endpoint + frontend calendar page + E2E
+
+#### Backend
+
+- ✅ **8.1** `weekly-planner.service.ts`: aggregate upcoming tasks per user for next 7 days (feedings due, vet appointments, predicted sheddings, maintenance overdue)
+- ✅ **8.2** `weekly-planner.queue.ts`: scheduler runs Sunday 18:00 Berlin time, sends weekly digest email
+- ✅ **8.3** Email template: `weekly-care-digest.ts` (localized DE/EN) — grouped by day, color-coded by type
+- ✅ **8.4** `weekly-planner.routes.ts`: GET `/api/planner/week?from=DATE` — returns day-by-day event list for calendar view
+- ✅ **8.5** User preference: `weeklyReportEnabled` flag (opt-in via settings page, already on User model)
+- ✅ **8.6** Feature flag: `weekly_planner` in seed.ts v6, assigned to all roles
+- ✅ **8.7** Auth schema: `weeklyReportEnabled` added to updateProfileSchema + service + /me endpoint
+- ✅ **8.8** Shared types: `weeklyReportEnabled` added to AuthUser interface
+- ✅ **8.9** Server registration: routes at `/api/planner`, scheduler start/stop in lifecycle
+
+#### Frontend
+
+- ✅ **8.10** `pages/planner/index.vue`: weekly calendar view — 7-day glass-card grid with event cards per day (feeding, vet, shedding, maintenance), color-coded, legend, event count badges
+- ✅ **8.11** Week navigation: prev/next buttons, "today" quick-jump, formatted week label
+- ✅ **8.12** Settings page: weekly digest toggle in Notifications section (enable/disable via PATCH /api/auth/profile)
+- ✅ **8.13** Sidebar navigation entry: `lucide:calendar-days` icon in Overview section, feature-gated
+
+#### Testing
+
+- ✅ **8.14** Backend unit tests: 16 tests for aggregation service (all event types, empty states, opt-in filtering, overdue handling)
+- ✅ **8.15** Auth schema tests: weeklyReportEnabled boolean validation
+- ✅ **8.16** Playwright E2E: 12 tests — page rendering, event types, empty state, navigation, legend
+
+#### i18n
+
+- ✅ **8.17** EN + DE keys: nav.planner, pages.planner.*, pages.settings.weeklyDigest*, email template strings
+
+---
+
+### Feature 9: Public Pet Profile / Image Sharing 🌐 ✅
 
 > Öffentliches Tier-Profil mit ausgewählten Bildern, Art, Morph, Alter, Gewicht. Share-Link für Verkaufsseiten.
 
-**Scope:** Backend public endpoint + frontend public page + E2E
+**Status: Complete** — Full backend + frontend + OG middleware + embed + E2E
+
+<details>
+<summary>Completed items (click to expand)</summary>
 
 #### Backend
 
-- 🔲 **8.1** Prisma schema: `PublicProfile` model (id, petId, userId, slug, active, showPhotos, showWeight, showAge, showFeedings, bio, createdAt)
-- 🔲 **8.2** Migration: `add_public_profiles`
-- 🔲 **8.3** `public-profiles.service.ts`: create/update/toggle profile, generate unique slug, public data query (no auth required)
-- 🔲 **8.4** `public-profiles.routes.ts`: authenticated CRUD + GET `/public/pets/:slug` (no auth — public endpoint)
-- 🔲 **8.5** Rate limiting on public endpoint (prevent scraping)
+- ✅ **9.1** Prisma schema: `PublicProfile` model (id, petId, userId, slug, active, bio, showPhotos, showWeight, showAge, showFeedings, showSheddings, showSpecies, showMorph, views, createdAt, updatedAt)
+- ✅ **9.2** Migration: `20260411140000_add_public_profiles`
+- ✅ **9.3** `public-profiles.service.ts`: create (auto-slug from pet name), update (slug, bio, toggles), delete, toggle active, check slug availability, public data query with view counter increment, public photo serving
+- ✅ **9.4** `public-profiles.routes.ts`: authenticated CRUD at `/api/public-profiles` + public endpoints at `/api/public/pets/:slug` (no auth)
+- ✅ **9.5** Feature flag: `public_profiles` in seed.ts, assigned to all roles
 
 #### Frontend
 
-- 🔲 **8.6** Pet detail page: "Share" button → toggle public profile on/off, configure visible data, copy share link
-- 🔲 **8.7** `pages/public/pets/[slug].vue`: public-facing pet profile (no layout chrome, clean design for embedding)
-- 🔲 **8.8** OG meta tags: image, title, description for social media embeds
-- 🔲 **8.9** Embed code generator: HTML snippet for external sites
+- ✅ **9.6** `PetPublicProfileCard.vue`: full management card on pet detail — create/delete profile, slug editor, bio textarea, 7 visibility toggles, active/inactive badge, view counter, embed code modal with copy, QR code generation, share link
+- ✅ **9.7** `pages/p/[slug]/index.vue`: public-facing pet profile — photo gallery with lightbox, weight sparkline chart, recent feedings list, shedding history, age calculation, "Powered by KeeperLog" branding
+- ✅ **9.8** `pages/p/[slug]/embed.vue`: compact embeddable card (400×600 iframe) — header, bio, photo strip, stat grid, "View Full Profile" link
+- ✅ **9.9** `server/middleware/og-bot.ts`: OG meta tags for social media bots (title, description, image from profile photo)
+- ✅ **9.10** Auth middleware: `/p/` prefix added to public routes (no auth required)
 
 #### Testing
 
-- 🔲 **8.10** Backend unit tests: profile CRUD, slug generation, public query (no private data leak)
-- 🔲 **8.11** Playwright E2E: enable profile, access public link, verify data shown matches config
+- ✅ **9.11** Backend unit tests: 37 tests (CRUD, ownership, slug generation/collision, public data query, visibility toggles, view counter, photo serving, error cases)
+- ✅ **9.12** Playwright E2E: 49 tests across 3 spec files:
+  - `public-profile.spec.ts` (19 tests): full profile page, photo gallery, lightbox, weight chart, feedings, sheddings, SEO, not-found, minimal profile
+  - `public-profile-embed.spec.ts` (14 tests): compact card, stats, photo strip, links, branding, not-found, minimal
+  - `public-profile-management.spec.ts` (16 tests): create/delete flow, slug, badges, toggles, embed modal, QR, view counter
 
 #### i18n
 
-- 🔲 **8.12** EN + DE keys: pages.pets.publicProfile.* (enable, share, configure, slug, embed)
+- ✅ **9.13** EN + DE keys: publicProfile.* (50+ keys — title, share, configure, slug, embed, visibility toggles, powered by, not found, stats, feedings, sheddings, weight)
+
+</details>
 
 ---
 
-### Feature 9: Medication Plans 💊
+### Feature 10: Medication Plans 💊
 
 > Medikamenten-Katalog (wiederverwendbar) + individuelle Pläne pro Tier. Strenger als Fütterung: Mail + Dashboard-Alert.
 
@@ -384,42 +438,42 @@
 
 #### Backend
 
-- 🔲 **9.1** Prisma schema: `Medication` model (id, userId, name, activeIngredient, unit, defaultDosage, notes) — reusable catalog
-- 🔲 **9.2** Prisma schema: `MedicationPlan` model (id, petId, medicationId, userId, dosage, unit, intervalHours, startDate, endDate, notes, active, createdAt)
-- 🔲 **9.3** Prisma schema: `MedicationLog` model (id, planId, petId, userId, administeredAt, dosage, notes, skipped, skipReason)
-- 🔲 **9.4** Migration: `add_medications`
-- 🔲 **9.5** `medications.service.ts`: CRUD for catalog (ownership checks)
-- 🔲 **9.6** `medications.routes.ts`: standard REST
-- 🔲 **9.7** `medication-plans.service.ts`: CRUD, active plan queries, overdue detection (`computeMedicationStatus`)
-- 🔲 **9.8** `medication-plans.routes.ts`: REST + GET `/api/medication-plans/active` + GET `/api/medication-plans/overdue`
-- 🔲 **9.9** `medication-logs.service.ts`: log administered dose, mark as skipped
-- 🔲 **9.10** `medication-logs.routes.ts`: POST log, GET history per plan
-- 🔲 **9.11** Medication reminder scheduler: runs every hour, checks active plans, sends email when dose is overdue
-- 🔲 **9.12** Email template: `medication-reminder.ts` (localized DE/EN, stricter tone than feeding)
+- 🔲 **10.1** Prisma schema: `Medication` model (id, userId, name, activeIngredient, unit, defaultDosage, notes) — reusable catalog
+- 🔲 **10.2** Prisma schema: `MedicationPlan` model (id, petId, medicationId, userId, dosage, unit, intervalHours, startDate, endDate, notes, active, createdAt)
+- 🔲 **10.3** Prisma schema: `MedicationLog` model (id, planId, petId, userId, administeredAt, dosage, notes, skipped, skipReason)
+- 🔲 **10.4** Migration: `add_medications`
+- 🔲 **10.5** `medications.service.ts`: CRUD for catalog (ownership checks)
+- 🔲 **10.6** `medications.routes.ts`: standard REST
+- 🔲 **10.7** `medication-plans.service.ts`: CRUD, active plan queries, overdue detection (`computeMedicationStatus`)
+- 🔲 **10.8** `medication-plans.routes.ts`: REST + GET `/api/medication-plans/active` + GET `/api/medication-plans/overdue`
+- 🔲 **10.9** `medication-logs.service.ts`: log administered dose, mark as skipped
+- 🔲 **10.10** `medication-logs.routes.ts`: POST log, GET history per plan
+- 🔲 **10.11** Medication reminder scheduler: runs every hour, checks active plans, sends email when dose is overdue
+- 🔲 **10.12** Email template: `medication-reminder.ts` (localized DE/EN, stricter tone than feeding)
 
 #### Frontend
 
-- 🔲 **9.13** `pages/medications/index.vue`: Medication catalog CRUD
-- 🔲 **9.14** `pages/medication-plans/index.vue`: Active plans list, create/edit with medication selector
-- 🔲 **9.15** "Administer dose" quick action: one-click log from plan list
-- 🔲 **9.16** Plan timeline: visual view of doses given vs. expected
-- 🔲 **9.17** Pet detail page: active medication plans section
-- 🔲 **9.18** Dashboard widget: "Medication Alerts" card with overdue plans (red highlight)
-- 🔲 **9.19** Sidebar + topbar navigation entries
+- 🔲 **10.13** `pages/medications/index.vue`: Medication catalog CRUD
+- 🔲 **10.14** `pages/medication-plans/index.vue`: Active plans list, create/edit with medication selector
+- 🔲 **10.15** "Administer dose" quick action: one-click log from plan list
+- 🔲 **10.16** Plan timeline: visual view of doses given vs. expected
+- 🔲 **10.17** Pet detail page: active medication plans section
+- 🔲 **10.18** Dashboard widget: "Medication Alerts" card with overdue plans (red highlight)
+- 🔲 **10.19** Sidebar + topbar navigation entries
 
 #### Testing
 
-- 🔲 **9.20** Backend unit tests: all 3 services, overdue detection, scheduler logic
-- 🔲 **9.21** Frontend unit tests: plan display, status badges, dose logging
-- 🔲 **9.22** Playwright E2E: create medication, create plan, log dose, verify overdue alert
+- 🔲 **10.20** Backend unit tests: all 3 services, overdue detection, scheduler logic
+- 🔲 **10.21** Frontend unit tests: plan display, status badges, dose logging
+- 🔲 **10.22** Playwright E2E: create medication, create plan, log dose, verify overdue alert
 
 #### i18n
 
-- 🔲 **9.23** EN + DE keys: pages.medications.*, pages.medicationPlans.*, dashboard medication widget
+- 🔲 **10.23** EN + DE keys: pages.medications.*, pages.medicationPlans.*, dashboard medication widget
 
 ---
 
-### Feature 10: Data Export / Reports 📊
+### Feature 11: Data Export / Reports 📊
 
 > PDF-Report pro Tier (für Tierarzt/Käufer) + CSV-Export aller Daten (Backup).
 
@@ -427,31 +481,31 @@
 
 #### Backend
 
-- 🔲 **10.1** Install PDF library: `@react-pdf/renderer` or `pdfmake` or `puppeteer` (evaluate)
-- 🔲 **10.2** `data-export.service.ts`: generate pet report PDF (info, weight chart, feeding history, vet visits, photos)
-- 🔲 **10.3** `data-export.service.ts`: generate CSV per data type (feedings, sheddings, weights, vet visits)
-- 🔲 **10.4** `data-export.routes.ts`: GET `/api/exports/pet/:petId/pdf`, GET `/api/exports/pet/:petId/csv`, GET `/api/exports/all/csv` (full backup)
-- 🔲 **10.5** Rate limiting: max 5 exports per hour per user
-- 🔲 **10.6** Background generation: for large exports, queue via BullMQ + notify when ready
+- 🔲 **11.1** Install PDF library: `@react-pdf/renderer` or `pdfmake` or `puppeteer` (evaluate)
+- 🔲 **11.2** `data-export.service.ts`: generate pet report PDF (info, weight chart, feeding history, vet visits, photos)
+- 🔲 **11.3** `data-export.service.ts`: generate CSV per data type (feedings, sheddings, weights, vet visits)
+- 🔲 **11.4** `data-export.routes.ts`: GET `/api/exports/pet/:petId/pdf`, GET `/api/exports/pet/:petId/csv`, GET `/api/exports/all/csv` (full backup)
+- 🔲 **11.5** Rate limiting: max 5 exports per hour per user
+- 🔲 **11.6** Background generation: for large exports, queue via BullMQ + notify when ready
 
 #### Frontend
 
-- 🔲 **10.7** Pet detail page: "Export" dropdown (PDF Report, CSV Data)
-- 🔲 **10.8** Settings page: "Export All Data" button (GDPR compliance)
-- 🔲 **10.9** Download progress / notification when export is ready
+- 🔲 **11.7** Pet detail page: "Export" dropdown (PDF Report, CSV Data)
+- 🔲 **11.8** Settings page: "Export All Data" button (GDPR compliance)
+- 🔲 **11.9** Download progress / notification when export is ready
 
 #### Testing
 
-- 🔲 **10.10** Backend unit tests: PDF generation (verify structure), CSV generation (verify headers + rows)
-- 🔲 **10.11** Playwright E2E: trigger export, verify download
+- 🔲 **11.10** Backend unit tests: PDF generation (verify structure), CSV generation (verify headers + rows)
+- 🔲 **11.11** Playwright E2E: trigger export, verify download
 
 #### i18n
 
-- 🔲 **10.12** EN + DE keys: export.* (generatePdf, generateCsv, exportAll, processing, ready)
+- 🔲 **11.12** EN + DE keys: export.* (generatePdf, generateCsv, exportAll, processing, ready)
 
 ---
 
-### Feature 11: Breeding Management 🥚
+### Feature 12: Breeding Management 🥚
 
 > Verpaarungen, Gelege/Clutches, Schlupfdaten, Offspring mit Eltern-Verknüpfung. Nice-to-have, aber vollständig wenn umgesetzt.
 
@@ -459,37 +513,37 @@
 
 #### Backend
 
-- 🔲 **11.1** Prisma schema: `Pairing` model (id, userId, maleId, femaleId, pairingDate, notes, createdAt)
-- 🔲 **11.2** Prisma schema: `Clutch` model (id, pairingId, userId, layDate, eggCount, fertileCount, hatchDate, hatchCount, notes, createdAt)
-- 🔲 **11.3** Extend Pet model: `motherId`, `fatherId` optional FK → Pet (self-referencing for lineage)
-- 🔲 **11.4** Migration: `add_breeding`
-- 🔲 **11.5** `pairings.service.ts`: CRUD, gender validation (male/female), history per pet
-- 🔲 **11.6** `clutches.service.ts`: CRUD, link offspring as new pets with parent refs
-- 🔲 **11.7** `pairings.routes.ts` + `clutches.routes.ts`: standard REST
+- 🔲 **12.1** Prisma schema: `Pairing` model (id, userId, maleId, femaleId, pairingDate, notes, createdAt)
+- 🔲 **12.2** Prisma schema: `Clutch` model (id, pairingId, userId, layDate, eggCount, fertileCount, hatchDate, hatchCount, notes, createdAt)
+- 🔲 **12.3** Extend Pet model: `motherId`, `fatherId` optional FK → Pet (self-referencing for lineage)
+- 🔲 **12.4** Migration: `add_breeding`
+- 🔲 **12.5** `pairings.service.ts`: CRUD, gender validation (male/female), history per pet
+- 🔲 **12.6** `clutches.service.ts`: CRUD, link offspring as new pets with parent refs
+- 🔲 **12.7** `pairings.routes.ts` + `clutches.routes.ts`: standard REST
 
 #### Frontend
 
-- 🔲 **11.8** `pages/breeding/index.vue`: pairings list with clutch counts
-- 🔲 **11.9** Pairing detail: clutch history, offspring list
-- 🔲 **11.10** Create pairing: select male + female pets
-- 🔲 **11.11** Create clutch: link to pairing, egg counts, hatch results
-- 🔲 **11.12** "Create offspring" from clutch: pre-fill species, morph, parents
-- 🔲 **11.13** Pet detail page: "Parents" + "Offspring" sections (family tree)
-- 🔲 **11.14** Simple lineage visualization (parent → child tree, 2-3 generations)
+- 🔲 **12.8** `pages/breeding/index.vue`: pairings list with clutch counts
+- 🔲 **12.9** Pairing detail: clutch history, offspring list
+- 🔲 **12.10** Create pairing: select male + female pets
+- 🔲 **12.11** Create clutch: link to pairing, egg counts, hatch results
+- 🔲 **12.12** "Create offspring" from clutch: pre-fill species, morph, parents
+- 🔲 **12.13** Pet detail page: "Parents" + "Offspring" sections (family tree)
+- 🔲 **12.14** Simple lineage visualization (parent → child tree, 2-3 generations)
 
 #### Testing
 
-- 🔲 **11.15** Backend unit tests: pairing validation, clutch lifecycle, parent linking
-- 🔲 **11.16** Frontend unit tests: family tree rendering
-- 🔲 **11.17** Playwright E2E: create pairing, add clutch, create offspring, verify lineage
+- 🔲 **12.15** Backend unit tests: pairing validation, clutch lifecycle, parent linking
+- 🔲 **12.16** Frontend unit tests: family tree rendering
+- 🔲 **12.17** Playwright E2E: create pairing, add clutch, create offspring, verify lineage
 
 #### i18n
 
-- 🔲 **11.18** EN + DE keys: pages.breeding.*, pages.clutches.*
+- 🔲 **12.18** EN + DE keys: pages.breeding.*, pages.clutches.*
 
 ---
 
-### Feature 12: Dashboard Widgets Hub 🏠
+### Feature 13: Dashboard Widgets Hub 🏠
 
 > Dashboard als Zentrale: alle Widgets zusammenführen. Modular, jedes Feature liefert ein Widget.
 
@@ -497,28 +551,28 @@
 
 #### Architecture
 
-- 🔲 **12.1** Widget component pattern: each widget is a standalone component (`components/dashboard/FeedingWidget.vue`, `VetWidget.vue`, etc.)
-- 🔲 **12.2** Widget grid: responsive layout, 2-3 columns, auto-collapse on mobile
+- 🔲 **13.1** Widget component pattern: each widget is a standalone component (`components/dashboard/FeedingWidget.vue`, `VetWidget.vue`, etc.)
+- 🔲 **13.2** Widget grid: responsive layout, 2-3 columns, auto-collapse on mobile
 
 #### Widgets (depends on features above)
 
-- ✅ **12.3** Feeding reminders widget (already done)
-- 🔲 **12.4** Upcoming vet appointments widget (from Feature 2)
-- 🔲 **12.5** Medication alerts widget (from Feature 9)
-- 🔲 **12.6** Shedding predictions widget (from Feature 4)
-- 🔲 **12.7** Overdue maintenance widget (from Feature 7)
-- 🔲 **12.8** Recent activity feed widget (from Feature 5 — last 10 events across all pets)
-- 🔲 **12.9** Pet quick stats widget (pet count with profile pics, click to navigate)
-- 🔲 **12.10** Weight trend sparklines widget (mini charts per pet)
+- ✅ **13.3** Feeding reminders widget (already done)
+- 🔲 **13.4** Upcoming vet appointments widget (from Feature 2)
+- 🔲 **13.5** Medication alerts widget (from Feature 10)
+- 🔲 **13.6** Shedding predictions widget (from Feature 4)
+- 🔲 **13.7** Overdue maintenance widget (from Feature 7)
+- 🔲 **13.8** Recent activity feed widget (from Feature 5 — last 10 events across all pets)
+- 🔲 **13.9** Pet quick stats widget (pet count with profile pics, click to navigate)
+- 🔲 **13.10** Weight trend sparklines widget (mini charts per pet)
 
 #### Testing
 
-- 🔲 **12.11** Frontend unit tests: each widget component
-- 🔲 **12.12** Playwright E2E: dashboard loads all widgets, verify data displayed
+- 🔲 **13.11** Frontend unit tests: each widget component
+- 🔲 **13.12** Playwright E2E: dashboard loads all widgets, verify data displayed
 
 #### i18n
 
-- 🔲 **12.13** EN + DE keys: pages.dashboard.* (widget-specific labels)
+- 🔲 **13.13** EN + DE keys: pages.dashboard.* (widget-specific labels)
 
 ---
 

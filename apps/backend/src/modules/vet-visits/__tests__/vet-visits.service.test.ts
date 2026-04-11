@@ -398,7 +398,11 @@ describe("createVetVisit", () => {
         mockPrisma.veterinarian.findUnique.mockResolvedValue({ id: VET_ID, userId: "other_user" });
 
         await expect(
-            createVetVisit(USER_ID, { petId: PET_ID, visitDate: "2024-06-15", veterinarianId: VET_ID }),
+            createVetVisit(USER_ID, {
+                petId: PET_ID,
+                visitDate: "2024-06-15",
+                veterinarianId: VET_ID,
+            }),
         ).rejects.toThrow("Veterinarian not found");
     });
 
@@ -407,7 +411,11 @@ describe("createVetVisit", () => {
         mockPrisma.veterinarian.findUnique.mockResolvedValue(null);
 
         await expect(
-            createVetVisit(USER_ID, { petId: PET_ID, visitDate: "2024-06-15", veterinarianId: VET_ID }),
+            createVetVisit(USER_ID, {
+                petId: PET_ID,
+                visitDate: "2024-06-15",
+                veterinarianId: VET_ID,
+            }),
         ).rejects.toThrow("Veterinarian not found");
     });
 });
@@ -417,7 +425,10 @@ describe("createVetVisit", () => {
 describe("updateVetVisit", () => {
     it("updates specified fields for owned visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit());
-        const updated = makeVisit({ diagnosis: "Mild dehydration", treatment: "Soak in lukewarm water" });
+        const updated = makeVisit({
+            diagnosis: "Mild dehydration",
+            treatment: "Soak in lukewarm water",
+        });
         mockPrisma.vetVisit.update.mockResolvedValue(updated);
 
         const result = await updateVetVisit(VISIT_ID, USER_ID, {
@@ -438,7 +449,9 @@ describe("updateVetVisit", () => {
 
     it("allows setting nullable fields to null", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit());
-        mockPrisma.vetVisit.update.mockResolvedValue(makeVisit({ costCents: null, nextAppointment: null }));
+        mockPrisma.vetVisit.update.mockResolvedValue(
+            makeVisit({ costCents: null, nextAppointment: null }),
+        );
 
         await updateVetVisit(VISIT_ID, USER_ID, {
             costCents: null,
@@ -457,7 +470,10 @@ describe("updateVetVisit", () => {
 
     it("validates vet ownership when changing veterinarianId", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit());
-        mockPrisma.veterinarian.findUnique.mockResolvedValue({ id: "vet_new", userId: "other_user" });
+        mockPrisma.veterinarian.findUnique.mockResolvedValue({
+            id: "vet_new",
+            userId: "other_user",
+        });
 
         await expect(
             updateVetVisit(VISIT_ID, USER_ID, { veterinarianId: "vet_new" }),
@@ -467,9 +483,9 @@ describe("updateVetVisit", () => {
     it("throws notFound for non-owned visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit({ userId: "other_user" }));
 
-        await expect(
-            updateVetVisit(VISIT_ID, USER_ID, { reason: "X" }),
-        ).rejects.toThrow("Vet visit not found");
+        await expect(updateVetVisit(VISIT_ID, USER_ID, { reason: "X" })).rejects.toThrow(
+            "Vet visit not found",
+        );
     });
 });
 
@@ -504,8 +520,12 @@ describe("deleteVetVisit", () => {
 
 describe("getUpcomingAppointments", () => {
     it("returns merged scheduled appointments and follow-ups sorted by date", async () => {
-        const scheduled = [makeVisit({ id: "v1", isAppointment: true, visitDate: new Date("2025-02-01") })];
-        const followUps = [makeVisit({ id: "v2", isAppointment: false, nextAppointment: new Date("2025-01-15") })];
+        const scheduled = [
+            makeVisit({ id: "v1", isAppointment: true, visitDate: new Date("2025-02-01") }),
+        ];
+        const followUps = [
+            makeVisit({ id: "v2", isAppointment: false, nextAppointment: new Date("2025-01-15") }),
+        ];
         mockPrisma.vetVisit.findMany
             .mockResolvedValueOnce(scheduled)
             .mockResolvedValueOnce(followUps);
@@ -531,9 +551,7 @@ describe("getUpcomingAppointments", () => {
     });
 
     it("respects custom limit", async () => {
-        mockPrisma.vetVisit.findMany
-            .mockResolvedValueOnce([])
-            .mockResolvedValueOnce([]);
+        mockPrisma.vetVisit.findMany.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
         await getUpcomingAppointments(USER_ID, 5);
 
@@ -592,17 +610,17 @@ describe("convertAppointment", () => {
     it("throws when visit is not an appointment", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit({ isAppointment: false }));
 
-        await expect(
-            convertAppointment(VISIT_ID, USER_ID, {}),
-        ).rejects.toThrow("Visit is not an appointment");
+        await expect(convertAppointment(VISIT_ID, USER_ID, {})).rejects.toThrow(
+            "Visit is not an appointment",
+        );
     });
 
     it("throws notFound for non-owned visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(makeVisit({ userId: "other_user" }));
 
-        await expect(
-            convertAppointment(VISIT_ID, USER_ID, {}),
-        ).rejects.toThrow("Vet visit not found");
+        await expect(convertAppointment(VISIT_ID, USER_ID, {})).rejects.toThrow(
+            "Vet visit not found",
+        );
     });
 });
 
@@ -629,9 +647,7 @@ describe("getVetCosts", () => {
         expect(result).toEqual({
             totalCents: 15000,
             visitCount: 3,
-            perPet: [
-                { petId: PET_ID, petName: "Monty", totalCents: 15000, visitCount: 3 },
-            ],
+            perPet: [{ petId: PET_ID, petName: "Monty", totalCents: 15000, visitCount: 3 }],
         });
     });
 

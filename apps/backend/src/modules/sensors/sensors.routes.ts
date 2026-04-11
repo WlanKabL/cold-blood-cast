@@ -52,7 +52,11 @@ export async function sensorRoutes(app: FastifyInstance) {
     app.post("/", async (request, reply) => {
         const result = CreateSensorSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid sensor data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid sensor data",
+                result.error.flatten(),
+            );
         }
         const sensor = await createSensor(request.userId, result.data);
         return reply.status(201).send({ success: true, data: sensor });
@@ -61,7 +65,11 @@ export async function sensorRoutes(app: FastifyInstance) {
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
         const result = UpdateSensorSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid sensor data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid sensor data",
+                result.error.flatten(),
+            );
         }
         const data = await updateSensor(request.params.id, request.userId, result.data);
         return { success: true, data };
@@ -79,7 +87,11 @@ export async function sensorRoutes(app: FastifyInstance) {
         async (request) => {
             const query = ReadingsQuerySchema.safeParse(request.query);
             if (!query.success) {
-                throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid query parameters", query.error.flatten());
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Invalid query parameters",
+                    query.error.flatten(),
+                );
             }
             const data = await getSensorReadings(request.params.id, request.userId, query.data);
             return { success: true, data };
@@ -89,7 +101,11 @@ export async function sensorRoutes(app: FastifyInstance) {
     app.post<{ Params: { id: string } }>("/:id/readings", async (request, reply) => {
         const result = CreateReadingSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid reading data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid reading data",
+                result.error.flatten(),
+            );
         }
         const reading = await createSensorReading(request.params.id, request.userId, result.data);
         return reply.status(201).send({ success: true, data: reading });

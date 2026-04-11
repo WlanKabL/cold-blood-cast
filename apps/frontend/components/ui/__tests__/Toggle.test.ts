@@ -17,7 +17,7 @@ describe("UiToggle", () => {
     it("applies active styling when modelValue is true", () => {
         const wrapper = mount(Toggle, { props: { modelValue: true } });
         const btn = wrapper.find("button");
-        expect(btn.classes()).toContain("bg-accent");
+        expect(btn.classes()).toContain("bg-primary-500");
     });
 
     it("emits update:modelValue with true when clicked while off", async () => {

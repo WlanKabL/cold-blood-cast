@@ -241,6 +241,7 @@ export async function authRoutes(app: FastifyInstance) {
                 emailVerified: true,
                 onboardingCompleted: true,
                 locale: true,
+                weeklyReportEnabled: true,
             },
         });
 

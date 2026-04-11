@@ -53,7 +53,12 @@ export async function addPetPhoto(
 ) {
     await assertPetOwnership(petId, userId);
 
-    const upload = await uploadFile(userId, file, { caption: opts.caption, subDir: "petPhotos" }, log);
+    const upload = await uploadFile(
+        userId,
+        file,
+        { caption: opts.caption, subDir: "petPhotos" },
+        log,
+    );
 
     if (opts.isProfilePicture) {
         await prisma.petPhoto.updateMany({

@@ -28,9 +28,9 @@ test.describe("Activity Timeline — Full Page", () => {
     test("shows timeline page title", async ({ page }) => {
         await page.goto("/pets/pet_001/timeline");
 
-        await expect(
-            page.getByText(/activity timeline|aktivitäts-chronik/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/activity timeline|aktivitäts-chronik/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("displays events from all types", async ({ page }) => {
@@ -46,15 +46,11 @@ test.describe("Activity Timeline — Full Page", () => {
     test("shows type filter buttons", async ({ page }) => {
         await page.goto("/pets/pet_001/timeline");
 
-        await expect(
-            page.getByText(/feedings|fütterungen/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
-        await expect(
-            page.getByText(/sheddings|häutungen/i).first(),
-        ).toBeVisible();
-        await expect(
-            page.getByText(/weights|gewicht/i).first(),
-        ).toBeVisible();
+        await expect(page.getByText(/feedings|fütterungen/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
+        await expect(page.getByText(/sheddings|häutungen/i).first()).toBeVisible();
+        await expect(page.getByText(/weights|gewicht/i).first()).toBeVisible();
     });
 
     test("shows empty state when no events", async ({ page }) => {
@@ -62,9 +58,9 @@ test.describe("Activity Timeline — Full Page", () => {
 
         await page.goto("/pets/pet_001/timeline");
 
-        await expect(
-            page.getByText(/no events|noch keine ereignisse/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/no events|noch keine ereignisse/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows back link to pet detail", async ({ page }) => {
@@ -101,9 +97,9 @@ test.describe("Activity Timeline — Pet Detail Widget", () => {
     test("shows recent activity section", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
-        await expect(
-            page.getByText(/recent activity|letzte aktivität/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/recent activity|letzte aktivität/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows view timeline link", async ({ page }) => {
@@ -133,8 +129,6 @@ test.describe("Activity Timeline — Pet Detail Widget", () => {
             hasText: /recent activity|letzte aktivität/i,
         });
         await expect(activityCard).toBeVisible({ timeout: 15_000 });
-        await expect(
-            activityCard.getByText(/no events|noch keine ereignisse/i),
-        ).toBeVisible();
+        await expect(activityCard.getByText(/no events|noch keine ereignisse/i)).toBeVisible();
     });
 });

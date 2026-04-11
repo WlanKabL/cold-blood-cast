@@ -3,10 +3,14 @@
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.sheddings.title") }}</h1>
+                <h1 class="text-fg text-2xl font-bold tracking-tight">
+                    {{ $t("pages.sheddings.title") }}
+                </h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.sheddings.subtitle") }}</p>
             </div>
-            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.sheddings.add") }}</UiButton>
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{
+                $t("pages.sheddings.add")
+            }}</UiButton>
         </div>
 
         <!-- Filters -->
@@ -26,7 +30,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- List -->
@@ -37,29 +43,53 @@
                 class="glass-card flex items-center justify-between rounded-xl p-4"
             >
                 <div class="flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400"
+                    >
                         <Icon name="lucide:layers" class="h-5 w-5" />
                     </div>
                     <div>
                         <p class="text-fg text-sm font-medium">{{ shed.pet?.name ?? "" }}</p>
                         <p class="text-fg-faint text-xs">
-                            {{ $t("pages.sheddings.started") }}: {{ new Date(shed.startedAt).toLocaleDateString() }}
+                            {{ $t("pages.sheddings.started") }}:
+                            {{ new Date(shed.startedAt).toLocaleDateString() }}
                             <span v-if="shed.completedAt">
-                                · {{ $t("pages.sheddings.completed") }}: {{ new Date(shed.completedAt).toLocaleDateString() }}
+                                · {{ $t("pages.sheddings.completed") }}:
+                                {{ new Date(shed.completedAt).toLocaleDateString() }}
                             </span>
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <span
-                        :class="shed.complete ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'"
+                        :class="
+                            shed.complete
+                                ? 'bg-green-500/10 text-green-400'
+                                : 'bg-yellow-500/10 text-yellow-400'
+                        "
                         class="rounded-md px-2 py-0.5 text-xs font-medium"
                     >
-                        {{ shed.complete ? $t("pages.sheddings.complete") : $t("pages.sheddings.inProgress") }}
+                        {{
+                            shed.complete
+                                ? $t("pages.sheddings.complete")
+                                : $t("pages.sheddings.inProgress")
+                        }}
                     </span>
-                    <span v-if="shed.quality" class="text-fg-faint text-xs">{{ shed.quality }}</span>
-                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(shed)" />
-                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(shed.id)" />
+                    <span v-if="shed.quality" class="text-fg-faint text-xs">{{
+                        shed.quality
+                    }}</span>
+                    <UiButton
+                        variant="ghost"
+                        icon="lucide:pencil"
+                        size="sm"
+                        @click="openEditModal(shed)"
+                    />
+                    <UiButton
+                        variant="danger"
+                        icon="lucide:trash-2"
+                        size="sm"
+                        @click="confirmDelete(shed.id)"
+                    />
                 </div>
             </div>
         </div>
@@ -68,43 +98,89 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:layers" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.sheddings.empty") }}</p>
-            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.sheddings.addFirst") }}</UiButton>
+            <UiButton class="mt-4" @click="openCreateModal">{{
+                $t("pages.sheddings.addFirst")
+            }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UiModal :show="showCreate" :title="$t('pages.sheddings.create')" width="lg" @close="showCreate = false">
+        <UiModal
+            :show="showCreate"
+            :title="$t('pages.sheddings.create')"
+            width="lg"
+            @close="showCreate = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreate">
                 <UiSelect v-model="form.petId" :label="$t('pages.sheddings.fields.pet')" required>
                     <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </UiSelect>
-                <UiTextInput v-model="form.startedAt" :label="$t('pages.sheddings.fields.startedAt')" type="date" required />
-                <UiTextInput v-model="form.completedAt" :label="$t('pages.sheddings.fields.completedAt')" type="date" />
+                <UiTextInput
+                    v-model="form.startedAt"
+                    :label="$t('pages.sheddings.fields.startedAt')"
+                    type="date"
+                    required
+                />
+                <UiTextInput
+                    v-model="form.completedAt"
+                    :label="$t('pages.sheddings.fields.completedAt')"
+                    type="date"
+                />
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="form.complete" />
-                    <label class="text-fg text-sm">{{ $t("pages.sheddings.fields.completeLabel") }}</label>
+                    <label class="text-fg text-sm">{{
+                        $t("pages.sheddings.fields.completeLabel")
+                    }}</label>
                 </div>
-                <UiTextInput v-model="form.quality" :label="$t('pages.sheddings.fields.quality')" :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')" />
+                <UiTextInput
+                    v-model="form.quality"
+                    :label="$t('pages.sheddings.fields.quality')"
+                    :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')"
+                />
                 <UiTextarea v-model="form.notes" :label="$t('pages.sheddings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showCreate = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.sheddings.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.sheddings.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput v-model="editForm.startedAt" :label="$t('pages.sheddings.fields.startedAt')" type="date" required />
-                <UiTextInput v-model="editForm.completedAt" :label="$t('pages.sheddings.fields.completedAt')" type="date" />
+                <UiTextInput
+                    v-model="editForm.startedAt"
+                    :label="$t('pages.sheddings.fields.startedAt')"
+                    type="date"
+                    required
+                />
+                <UiTextInput
+                    v-model="editForm.completedAt"
+                    :label="$t('pages.sheddings.fields.completedAt')"
+                    type="date"
+                />
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="editForm.complete" />
-                    <label class="text-fg text-sm">{{ $t("pages.sheddings.fields.completeLabel") }}</label>
+                    <label class="text-fg text-sm">{{
+                        $t("pages.sheddings.fields.completeLabel")
+                    }}</label>
                 </div>
-                <UiTextInput v-model="editForm.quality" :label="$t('pages.sheddings.fields.quality')" :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')" />
+                <UiTextInput
+                    v-model="editForm.quality"
+                    :label="$t('pages.sheddings.fields.quality')"
+                    :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')"
+                />
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.sheddings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
@@ -167,7 +243,8 @@ const {
     refetch,
 } = useQuery({
     queryKey: ["sheddings", selectedPet],
-    queryFn: () => api.get<Shedding[]>(`/api/sheddings${queryParams.value ? `?${queryParams.value}` : ""}`),
+    queryFn: () =>
+        api.get<Shedding[]>(`/api/sheddings${queryParams.value ? `?${queryParams.value}` : ""}`),
 });
 
 const { data: pets } = useQuery({
@@ -187,7 +264,14 @@ const form = reactive({
 });
 
 function resetForm() {
-    Object.assign(form, { petId: "", startedAt: "", completedAt: "", complete: false, quality: "", notes: "" });
+    Object.assign(form, {
+        petId: "",
+        startedAt: "",
+        completedAt: "",
+        complete: false,
+        quality: "",
+        notes: "",
+    });
 }
 
 function openCreateModal() {

@@ -125,8 +125,44 @@
                 {{ $t("pages.settings.notifications") }}
             </h2>
             <div class="space-y-4">
-                <p class="text-fg-muted text-[13px]">
-                    {{ $t("pages.settings.notificationsHint") }}
+                <!-- Weekly Care Digest -->
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-fg text-[13px] font-medium">
+                            {{ $t("pages.settings.weeklyDigest") }}
+                        </p>
+                        <p class="text-fg-muted text-[12px]">
+                            {{ $t("pages.settings.weeklyDigestHint") }}
+                        </p>
+                    </div>
+                    <button
+                        :disabled="savingDigest"
+                        class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                        @click="toggleWeeklyDigest"
+                    >
+                        <Icon
+                            v-if="savingDigest"
+                            name="lucide:loader-2"
+                            class="mr-1.5 inline h-4 w-4 animate-spin"
+                        />
+                        <Icon
+                            v-else
+                            :name="weeklyDigestEnabled ? 'lucide:bell-off' : 'lucide:bell'"
+                            class="mr-1.5 inline h-4 w-4"
+                        />
+                        {{
+                            weeklyDigestEnabled
+                                ? $t("pages.settings.weeklyDigestDisable")
+                                : $t("pages.settings.weeklyDigestEnable")
+                        }}
+                    </button>
+                </div>
+                <p v-if="digestSuccess" class="text-[12px] text-green-500">
+                    <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
+                    {{ $t("pages.settings.weeklyDigestSaved") }}
+                </p>
+                <p v-if="digestError" class="text-[12px] text-red-500">
+                    {{ digestError }}
                 </p>
             </div>
         </div>
@@ -460,6 +496,38 @@ async function saveDisplayName() {
         profileError.value = err instanceof Error ? err.message : String(err);
     } finally {
         savingProfile.value = false;
+    }
+}
+
+// ── Weekly Digest Toggle ──
+const weeklyDigestEnabled = computed(() => !!authStore.user?.weeklyReportEnabled);
+const savingDigest = ref(false);
+const digestSuccess = ref(false);
+const digestError = ref("");
+
+async function toggleWeeklyDigest() {
+    savingDigest.value = true;
+    digestSuccess.value = false;
+    digestError.value = "";
+
+    try {
+        const newVal = !weeklyDigestEnabled.value;
+        const json = await api.patch<{ user: { weeklyReportEnabled: boolean } }>(
+            "/api/auth/profile",
+            { weeklyReportEnabled: newVal },
+        );
+
+        if (authStore.user) {
+            authStore.user = { ...authStore.user, weeklyReportEnabled: json.user.weeklyReportEnabled };
+        }
+        digestSuccess.value = true;
+        setTimeout(() => {
+            digestSuccess.value = false;
+        }, 3000);
+    } catch (err: unknown) {
+        digestError.value = err instanceof Error ? err.message : String(err);
+    } finally {
+        savingDigest.value = false;
     }
 }
 

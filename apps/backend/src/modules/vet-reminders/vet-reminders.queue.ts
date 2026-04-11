@@ -57,7 +57,15 @@ async function getUsersWithUpcomingAppointments(): Promise<UserReminderGroup[]> 
                 },
             },
             include: {
-                user: { select: { id: true, email: true, username: true, locale: true, emailVerified: true } },
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        username: true,
+                        locale: true,
+                        emailVerified: true,
+                    },
+                },
                 pet: { select: { name: true, species: true } },
                 veterinarian: { select: { name: true, clinicName: true } },
             },
@@ -71,7 +79,15 @@ async function getUsersWithUpcomingAppointments(): Promise<UserReminderGroup[]> 
                 },
             },
             include: {
-                user: { select: { id: true, email: true, username: true, locale: true, emailVerified: true } },
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        username: true,
+                        locale: true,
+                        emailVerified: true,
+                    },
+                },
                 pet: { select: { name: true, species: true } },
                 veterinarian: { select: { name: true, clinicName: true } },
             },
@@ -91,12 +107,15 @@ async function getUsersWithUpcomingAppointments(): Promise<UserReminderGroup[]> 
             species: visit.pet.species,
             vetName: visit.veterinarian?.name ?? null,
             clinicName: visit.veterinarian?.clinicName ?? null,
-            appointmentDate: apptDate.toLocaleDateString(visit.user.locale === "de" ? "de-DE" : "en-US", {
-                weekday: "short",
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-            }),
+            appointmentDate: apptDate.toLocaleDateString(
+                visit.user.locale === "de" ? "de-DE" : "en-US",
+                {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                },
+            ),
             isToday,
         };
 
@@ -125,12 +144,15 @@ async function getUsersWithUpcomingAppointments(): Promise<UserReminderGroup[]> 
             species: visit.pet.species,
             vetName: visit.veterinarian?.name ?? null,
             clinicName: visit.veterinarian?.clinicName ?? null,
-            appointmentDate: apptDate.toLocaleDateString(visit.user.locale === "de" ? "de-DE" : "en-US", {
-                weekday: "short",
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-            }),
+            appointmentDate: apptDate.toLocaleDateString(
+                visit.user.locale === "de" ? "de-DE" : "en-US",
+                {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                },
+            ),
             isToday,
         };
 

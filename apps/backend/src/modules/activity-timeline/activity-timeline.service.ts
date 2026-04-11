@@ -79,7 +79,11 @@ function sheddingToEvent(s: SheddingRow): TimelineEvent {
         title: `Shedding (${status}${qualityStr})`,
         detail: s.notes,
         icon: "lucide:sparkles",
-        meta: { complete: s.complete, quality: s.quality, completedAt: s.completedAt?.toISOString() ?? null },
+        meta: {
+            complete: s.complete,
+            quality: s.quality,
+            completedAt: s.completedAt?.toISOString() ?? null,
+        },
     };
 }
 
@@ -184,14 +188,29 @@ export async function getTimeline(
         typeSet.has("feeding")
             ? prisma.feeding.findMany({
                   where: { petId },
-                  select: { id: true, fedAt: true, foodType: true, foodSize: true, quantity: true, accepted: true, notes: true },
+                  select: {
+                      id: true,
+                      fedAt: true,
+                      foodType: true,
+                      foodSize: true,
+                      quantity: true,
+                      accepted: true,
+                      notes: true,
+                  },
                   orderBy: { fedAt: "desc" },
               })
             : Promise.resolve([]),
         typeSet.has("shedding")
             ? prisma.shedding.findMany({
                   where: { petId },
-                  select: { id: true, startedAt: true, completedAt: true, complete: true, quality: true, notes: true },
+                  select: {
+                      id: true,
+                      startedAt: true,
+                      completedAt: true,
+                      complete: true,
+                      quality: true,
+                      notes: true,
+                  },
                   orderBy: { startedAt: "desc" },
               })
             : Promise.resolve([]),
@@ -222,7 +241,13 @@ export async function getTimeline(
         typeSet.has("photo")
             ? prisma.petPhoto.findMany({
                   where: { petId },
-                  select: { id: true, takenAt: true, caption: true, tags: true, upload: { select: { url: true, originalName: true } } },
+                  select: {
+                      id: true,
+                      takenAt: true,
+                      caption: true,
+                      tags: true,
+                      upload: { select: { url: true, originalName: true } },
+                  },
                   orderBy: { takenAt: "desc" },
               })
             : Promise.resolve([]),

@@ -34,6 +34,30 @@
         <div v-if="activeTab === 'send'" class="grid gap-6 lg:grid-cols-2">
             <!-- Left: Form -->
             <div class="space-y-4">
+                <!-- Test Digest Card -->
+                <div class="glass-card flex items-center justify-between gap-4 p-4">
+                    <div>
+                        <p class="text-fg text-[13px] font-medium">
+                            {{ $t("admin.emails.testDigest.title") }}
+                        </p>
+                        <p class="text-fg-muted mt-0.5 text-[11px]">
+                            {{ $t("admin.emails.testDigest.description") }}
+                        </p>
+                    </div>
+                    <button
+                        class="bg-primary-600 hover:bg-primary-500 shrink-0 rounded-xl px-4 py-2 text-[12px] font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                        :disabled="sendingDigest"
+                        @click="sendTestDigest"
+                    >
+                        <Icon
+                            :name="sendingDigest ? 'lucide:loader-2' : 'lucide:calendar-check'"
+                            class="mr-1 inline h-3.5 w-3.5"
+                            :class="{ 'animate-spin': sendingDigest }"
+                        />
+                        {{ $t("admin.emails.testDigest.button") }}
+                    </button>
+                </div>
+
                 <div class="glass-card space-y-4 p-5">
                     <!-- Recipient mode toggle -->
                     <div>
@@ -845,6 +869,41 @@ interface SendResult {
 
 const sending = ref(false);
 const showConfirmModal = ref(false);
+
+// ─── Test Digest ─────────────────────────────────────────
+
+const sendingDigest = ref(false);
+
+async function sendTestDigest(): Promise<void> {
+    sendingDigest.value = true;
+    try {
+        const res = await api.post<{ sent: boolean; to: string }>(
+            "/api/admin/emails/test-digest",
+            {},
+        );
+        if (res.sent) {
+            toast.add({
+                title: t("admin.emails.testDigest.success", { email: res.to }),
+                color: "green",
+                timeout: 5000,
+            });
+        } else {
+            toast.add({
+                title: t("admin.emails.testDigest.failed"),
+                color: "red",
+                timeout: 5000,
+            });
+        }
+    } catch {
+        toast.add({
+            title: t("admin.emails.testDigest.failed"),
+            color: "red",
+            timeout: 5000,
+        });
+    } finally {
+        sendingDigest.value = false;
+    }
+}
 
 function confirmSend(): void {
     showConfirmModal.value = true;

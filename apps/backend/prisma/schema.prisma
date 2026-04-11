@@ -76,6 +76,8 @@ model User {
     veterinarians           Veterinarian[]
     vetVisits               VetVisit[]
     petDocuments            PetDocument[]
+    maintenanceTasks        MaintenanceTask[]
+    publicProfiles          PublicProfile[]
 
     @@map("users")
 }
@@ -633,6 +635,16 @@ enum EnclosureType {
     OTHER
 }
 
+enum MaintenanceType {
+    CLEANING
+    SUBSTRATE_CHANGE
+    LAMP_REPLACEMENT
+    WATER_CHANGE
+    FILTER_CHANGE
+    DISINFECTION
+    OTHER
+}
+
 enum Gender {
     MALE
     FEMALE
@@ -699,9 +711,37 @@ model Enclosure {
     user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     pets    Pet[]
     sensors Sensor[]
+    maintenanceTasks MaintenanceTask[]
 
     @@index([userId])
     @@map("enclosures")
+}
+
+// ==========================================
+// CBC Domain: Enclosure Maintenance
+// ==========================================
+
+model MaintenanceTask {
+    id           String          @id @default(cuid())
+    enclosureId  String          @map("enclosure_id")
+    userId       String          @map("user_id")
+    type         MaintenanceType @default(OTHER)
+    description  String?
+    completedAt  DateTime?       @map("completed_at")
+    nextDueAt    DateTime?       @map("next_due_at")
+    intervalDays Int?            @map("interval_days")
+    recurring    Boolean         @default(false)
+    notes        String?
+
+    createdAt    DateTime        @default(now()) @map("created_at")
+
+    enclosure    Enclosure       @relation(fields: [enclosureId], references: [id], onDelete: Cascade)
+    user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([enclosureId])
+    @@index([userId])
+    @@index([userId, nextDueAt])
+    @@map("maintenance_tasks")
 }
 
 // ==========================================
@@ -737,6 +777,7 @@ model Pet {
     photos        PetPhoto[]
     vetVisits     VetVisit[]
     documents     PetDocument[]
+    publicProfile PublicProfile?
 
     @@index([userId])
     @@index([enclosureId])
@@ -1022,4 +1063,39 @@ model TelegramRegistrationKey {
     createdAt DateTime @default(now()) @map("created_at")
 
     @@map("telegram_registration_keys")
+}
+
+// ==========================================
+// CBC Domain: Public Pet Profiles
+// ==========================================
+
+model PublicProfile {
+    id            String  @id @default(cuid())
+    petId         String  @unique @map("pet_id")
+    userId        String  @map("user_id")
+    slug          String  @unique
+    active        Boolean @default(false)
+    bio           String?
+
+    // ── Visibility Toggles ───────────────────────
+    showPhotos    Boolean @default(true) @map("show_photos")
+    showWeight    Boolean @default(true) @map("show_weight")
+    showAge       Boolean @default(true) @map("show_age")
+    showFeedings  Boolean @default(true) @map("show_feedings")
+    showSheddings Boolean @default(true) @map("show_sheddings")
+    showSpecies   Boolean @default(true) @map("show_species")
+    showMorph     Boolean @default(true) @map("show_morph")
+
+    // ── Stats ────────────────────────────────────
+    views         Int      @default(0)
+
+    createdAt     DateTime @default(now()) @map("created_at")
+    updatedAt     DateTime @updatedAt @map("updated_at")
+
+    // ── Relations ────────────────────────────────
+    pet           Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@map("public_profiles")
 }

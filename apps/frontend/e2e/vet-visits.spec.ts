@@ -23,7 +23,9 @@ test.describe("Vet Visits — List Page", () => {
 
     test("loads and displays visits", async ({ page }) => {
         await page.goto("/vet-visits");
-        await expect(page.locator("h1")).toContainText(/vet visit|tierarztbesuch/i, { timeout: 15_000 });
+        await expect(page.locator("h1")).toContainText(/vet visit|tierarztbesuch/i, {
+            timeout: 15_000,
+        });
 
         // Use unique visit reason text instead of pet names (pet names also appear in hidden <option> elements)
         await expect(page.getByText("Annual checkup").first()).toBeVisible();
@@ -52,7 +54,9 @@ test.describe("Vet Visits — List Page", () => {
         await addBtn.click();
 
         // Two mode options should appear in the modal/dialog
-        await expect(page.getByRole("button", { name: /appointment|termin/i })).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByRole("button", { name: /appointment|termin/i })).toBeVisible({
+            timeout: 10_000,
+        });
     });
 
     test("displays appointment badge for scheduled visits", async ({ page }) => {
@@ -158,7 +162,9 @@ test.describe("Vet Visits — Detail Page", () => {
     test("shows notes section", async ({ page }) => {
         await page.goto("/vet-visits/visit_001");
 
-        await expect(page.getByText("All good, come back next year").first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText("All good, come back next year").first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows follow-up chain", async ({ page }) => {
@@ -187,7 +193,9 @@ test.describe("Vet Visits — Detail Page", () => {
         await page.goto("/vet-visits/visit_001");
 
         // Use last() to distinguish from sidebar link
-        const backLink = page.locator("main a[href='/vet-visits'], [class*='max-w'] a[href='/vet-visits']").first();
+        const backLink = page
+            .locator("main a[href='/vet-visits'], [class*='max-w'] a[href='/vet-visits']")
+            .first();
         await expect(backLink).toBeVisible({ timeout: 15_000 });
     });
 
@@ -211,7 +219,9 @@ test.describe("Vet Visits — Detail Page", () => {
         await deleteBtn.click({ timeout: 15_000 });
 
         // Confirm dialog should appear with confirmation text or a second delete button
-        await expect(page.getByText(/confirm|bestätigen|are you sure|sicher/i).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(/confirm|bestätigen|are you sure|sicher/i).first()).toBeVisible(
+            { timeout: 10_000 },
+        );
     });
 
     test("appointment detail shows scheduled badge", async ({ page }) => {
@@ -228,7 +238,9 @@ test.describe("Vet Visits — Detail Page", () => {
 
         await page.goto("/vet-visits/visit_003");
 
-        await expect(page.getByText(/scheduled|geplant|appointment|termin/i).first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/scheduled|geplant|appointment|termin/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 });
 
@@ -243,6 +255,8 @@ test.describe("Vet Visits — Empty State", () => {
 
         await page.goto("/vet-visits");
 
-        await expect(page.getByText(/no.*visit|keine.*besuch/i).first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/no.*visit|keine.*besuch/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 });

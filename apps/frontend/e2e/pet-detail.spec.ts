@@ -25,7 +25,13 @@ async function mockPetDetailApis(page: import("@playwright/test").Page, petOverr
     await mockGet(page, "/api/feeding-reminders", []);
     await mockGet(page, `/api/vet-visits?petId=${petId}*`, []);
     await mockGet(page, `/api/sheddings/analysis/${petId}`, null);
-    await mockGet(page, `/api/pets/${petId}/timeline*`, { events: [], total: 0, page: 1, limit: 5, hasMore: false });
+    await mockGet(page, `/api/pets/${petId}/timeline*`, {
+        events: [],
+        total: 0,
+        page: 1,
+        limit: 5,
+        hasMore: false,
+    });
     await mockGet(page, "/api/enclosures", mockEnclosures);
 }
 

@@ -30,7 +30,7 @@
                     'rounded-full px-3 py-1 text-xs font-medium transition-colors',
                     !selectedTag
                         ? 'bg-primary-500/20 text-primary-400'
-                        : 'bg-white/5 text-fg-muted hover:bg-white/10',
+                        : 'text-fg-muted bg-white/5 hover:bg-white/10',
                 ]"
                 @click="selectedTag = ''"
             >
@@ -43,7 +43,7 @@
                     'rounded-full px-3 py-1 text-xs font-medium transition-colors',
                     selectedTag === tag
                         ? 'bg-primary-500/20 text-primary-400'
-                        : 'bg-white/5 text-fg-muted hover:bg-white/10',
+                        : 'text-fg-muted bg-white/5 hover:bg-white/10',
                 ]"
                 @click="selectedTag = tag"
             >
@@ -53,14 +53,20 @@
 
         <!-- Loading -->
         <div v-if="loading" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            <div v-for="i in 8" :key="i" class="glass-card aspect-square animate-pulse rounded-xl" />
+            <div
+                v-for="i in 8"
+                :key="i"
+                class="glass-card aspect-square animate-pulse rounded-xl"
+            />
         </div>
 
         <!-- Error -->
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- Photo Grid -->
@@ -95,16 +101,13 @@
                     class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
                 >
                     <div class="p-3">
-                        <p v-if="photo.caption" class="text-sm text-white/90 line-clamp-2">
+                        <p v-if="photo.caption" class="line-clamp-2 text-sm text-white/90">
                             {{ photo.caption }}
                         </p>
                         <p class="mt-0.5 text-[10px] text-white/60">
                             {{ new Date(photo.takenAt || photo.createdAt).toLocaleDateString() }}
                         </p>
-                        <div
-                            v-if="photo.tags.length"
-                            class="mt-1 flex flex-wrap gap-1"
-                        >
+                        <div v-if="photo.tags.length" class="mt-1 flex flex-wrap gap-1">
                             <span
                                 v-for="tag in photo.tags"
                                 :key="tag"
@@ -116,7 +119,9 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-end gap-1 border-t border-white/10 px-2 py-1.5">
+                    <div
+                        class="flex items-center justify-end gap-1 border-t border-white/10 px-2 py-1.5"
+                    >
                         <button
                             v-if="!photo.isProfilePicture"
                             class="rounded p-1 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
@@ -148,7 +153,11 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:image" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">
-                {{ selectedTag ? $t("pages.pets.photos.emptyFiltered") : $t("pages.pets.photos.empty") }}
+                {{
+                    selectedTag
+                        ? $t("pages.pets.photos.emptyFiltered")
+                        : $t("pages.pets.photos.empty")
+                }}
             </p>
             <UiButton v-if="!selectedTag" class="mt-4" @click="showUpload = true">
                 {{ $t("pages.pets.photos.upload") }}
@@ -172,7 +181,11 @@
         />
 
         <!-- Upload Modal -->
-        <UiModal :show="showUpload" :title="$t('pages.pets.photos.upload')" @close="showUpload = false">
+        <UiModal
+            :show="showUpload"
+            :title="$t('pages.pets.photos.upload')"
+            @close="showUpload = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpload">
                 <!-- File Input -->
                 <div>
@@ -183,7 +196,9 @@
                     >
                         <Icon name="lucide:image-plus" class="text-fg-faint mb-2 h-10 w-10" />
                         <p class="text-fg-muted text-sm">{{ $t("pages.pets.photos.dropHint") }}</p>
-                        <p class="text-fg-faint mt-1 text-xs">{{ $t("pages.pets.photos.maxSize", { size: 10 }) }}</p>
+                        <p class="text-fg-faint mt-1 text-xs">
+                            {{ $t("pages.pets.photos.maxSize", { size: 10 }) }}
+                        </p>
                         <input
                             ref="fileInputRef"
                             type="file"
@@ -195,7 +210,11 @@
                     <p v-if="selectedFile" class="text-fg mt-2 flex items-center gap-2 text-sm">
                         <Icon name="lucide:file-image" class="h-4 w-4" />
                         {{ selectedFile.name }}
-                        <button type="button" class="text-fg-faint hover:text-red-400" @click="selectedFile = null">
+                        <button
+                            type="button"
+                            class="text-fg-faint hover:text-red-400"
+                            @click="selectedFile = null"
+                        >
                             <Icon name="lucide:x" class="h-3.5 w-3.5" />
                         </button>
                     </p>
@@ -218,22 +237,32 @@
                     type="datetime-local"
                     :label="$t('pages.pets.photos.takenAt')"
                 />
-                <p v-if="dateAutoDetected" class="text-primary-400 -mt-2 flex items-center gap-1 text-xs">
+                <p
+                    v-if="dateAutoDetected"
+                    class="text-primary-400 -mt-2 flex items-center gap-1 text-xs"
+                >
                     <Icon name="lucide:sparkles" class="h-3 w-3" />
                     {{ $t("pages.pets.photos.dateAutoDetected") }}
                 </p>
-                <p v-else-if="dateDetectionFailed && selectedFile" class="text-amber-400 -mt-2 flex items-center gap-1 text-xs">
+                <p
+                    v-else-if="dateDetectionFailed && selectedFile"
+                    class="-mt-2 flex items-center gap-1 text-xs text-amber-400"
+                >
                     <Icon name="lucide:alert-circle" class="h-3 w-3" />
                     {{ $t("pages.pets.photos.dateNotDetected") }}
                 </p>
 
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="uploadForm.isProfilePicture" />
-                    <span class="text-fg-muted text-sm">{{ $t("pages.pets.photos.setProfile") }}</span>
+                    <span class="text-fg-muted text-sm">{{
+                        $t("pages.pets.photos.setProfile")
+                    }}</span>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showUpload = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showUpload = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :disabled="!selectedFile" :loading="uploading">
                         {{ $t("pages.pets.photos.upload") }}
                     </UiButton>
@@ -242,7 +271,11 @@
         </UiModal>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.pets.photos.editCaption')" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.pets.photos.editCaption')"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleEdit">
                 <UiTextInput
                     v-model="editForm.caption"
@@ -263,7 +296,9 @@
                 />
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="editing">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
@@ -400,7 +435,12 @@ function resetUploadForm() {
     selectedFile.value = null;
     dateAutoDetected.value = false;
     dateDetectionFailed.value = false;
-    Object.assign(uploadForm, { caption: "", tags: "", isProfilePicture: false, takenAt: new Date().toISOString().slice(0, 16) });
+    Object.assign(uploadForm, {
+        caption: "",
+        tags: "",
+        isProfilePicture: false,
+        takenAt: new Date().toISOString().slice(0, 16),
+    });
     if (fileInputRef.value) fileInputRef.value.value = "";
 }
 
@@ -424,7 +464,11 @@ async function extractExifDate(file: File) {
     dateDetectionFailed.value = false;
 
     try {
-        const exif = await exifr.parse(file, ["DateTimeOriginal", "DateTimeDigitized", "CreateDate"]);
+        const exif = await exifr.parse(file, [
+            "DateTimeOriginal",
+            "DateTimeDigitized",
+            "CreateDate",
+        ]);
         const date = exif?.DateTimeOriginal ?? exif?.DateTimeDigitized ?? exif?.CreateDate;
         if (date instanceof Date && !isNaN(date.getTime())) {
             uploadForm.takenAt = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
@@ -462,7 +506,8 @@ const { mutate: uploadMutation, isPending: uploading } = useMutation({
         if (uploadForm.caption) formData.append("caption", uploadForm.caption);
         if (uploadForm.tags) formData.append("tags", uploadForm.tags);
         if (uploadForm.isProfilePicture) formData.append("isProfilePicture", "true");
-        if (uploadForm.takenAt) formData.append("takenAt", new Date(uploadForm.takenAt).toISOString());
+        if (uploadForm.takenAt)
+            formData.append("takenAt", new Date(uploadForm.takenAt).toISOString());
         formData.append("file", selectedFile.value);
 
         const baseURL = useRuntimeConfig().public.apiBaseURL;
@@ -517,7 +562,10 @@ const { mutate: editMutation, isPending: editing } = useMutation({
         api.patch(`/api/pets/${petId}/photos/${editPhotoId.value}`, {
             caption: editForm.caption || undefined,
             tags: editForm.tags
-                ? editForm.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+                ? editForm.tags
+                      .split(",")
+                      .map((t: string) => t.trim())
+                      .filter(Boolean)
                 : [],
             takenAt: editForm.takenAt ? new Date(editForm.takenAt).toISOString() : undefined,
         }),
@@ -537,8 +585,7 @@ function handleEdit() {
 
 // ─── Set Profile Picture ─────────────────────────────────
 const { mutate: setProfileMutation } = useMutation({
-    mutationFn: (photoId: string) =>
-        api.post(`/api/pets/${petId}/photos/${photoId}/profile`),
+    mutationFn: (photoId: string) => api.post(`/api/pets/${petId}/photos/${photoId}/profile`),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pet-photos", petId] });
         queryClient.invalidateQueries({ queryKey: ["pets"] });
@@ -563,8 +610,7 @@ function confirmDeletePhoto(photo: PetPhoto) {
 }
 
 const { mutate: deleteMutation, isPending: deleting } = useMutation({
-    mutationFn: () =>
-        api.del(`/api/pets/${petId}/photos/${deletePhotoId.value}`),
+    mutationFn: () => api.del(`/api/pets/${petId}/photos/${deletePhotoId.value}`),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pet-photos", petId] });
         queryClient.invalidateQueries({ queryKey: ["pets"] });

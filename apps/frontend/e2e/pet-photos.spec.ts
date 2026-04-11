@@ -102,7 +102,9 @@ test.describe("Pet Photos — Empty State", () => {
         await page.goto(`/pets/${petId}/photos`);
 
         // Empty state text
-        await expect(page.getByText(/no photos|keine fotos/i).first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/no photos|keine fotos/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("empty state still has upload button", async ({ page }) => {
@@ -127,7 +129,10 @@ test.describe("Pet Photos — Actions", () => {
     test("hovering a photo reveals action buttons", async ({ page }) => {
         await page.goto(`/pets/${petId}/photos`);
 
-        const firstPhotoCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        const firstPhotoCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .first();
         await firstPhotoCard.hover();
 
         // Should see edit and delete buttons on hover overlay
@@ -137,7 +142,10 @@ test.describe("Pet Photos — Actions", () => {
     test("delete action shows confirmation dialog", async ({ page }) => {
         await page.goto(`/pets/${petId}/photos`);
 
-        const firstPhotoCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        const firstPhotoCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .first();
         await firstPhotoCard.hover();
 
         // Click the last button (delete is last in hover actions)
@@ -145,14 +153,19 @@ test.describe("Pet Photos — Actions", () => {
         await deleteBtn.click();
 
         // Confirm dialog should appear
-        await expect(page.getByRole("button", { name: /delete|löschen/i }).last()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByRole("button", { name: /delete|löschen/i }).last()).toBeVisible({
+            timeout: 10_000,
+        });
     });
 
     test("confirming delete calls API and shows success toast", async ({ page }) => {
         await mockDelete(page, `/api/pets/${petId}/photos/photo_001`);
         await page.goto(`/pets/${petId}/photos`);
 
-        const firstPhotoCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        const firstPhotoCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .first();
         await firstPhotoCard.hover();
 
         // Click delete (last button in hover overlay)
@@ -170,7 +183,10 @@ test.describe("Pet Photos — Actions", () => {
     test("cancelling delete keeps photo in gallery", async ({ page }) => {
         await page.goto(`/pets/${petId}/photos`);
 
-        const firstPhotoCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        const firstPhotoCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .first();
         await firstPhotoCard.hover();
 
         const deleteBtn = firstPhotoCard.locator("button").last();
@@ -197,7 +213,10 @@ test.describe("Pet Photos — Set Profile Picture", () => {
         await page.goto(`/pets/${petId}/photos`);
 
         // photo_002 is NOT the profile picture — hover to find the star button
-        const secondCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).nth(1);
+        const secondCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .nth(1);
         await secondCard.hover();
 
         // Star icon button for set-as-profile should be visible in the action bar
@@ -210,7 +229,10 @@ test.describe("Pet Photos — Set Profile Picture", () => {
         await page.goto(`/pets/${petId}/photos`);
 
         // photo_001 IS the profile picture — hover actions should not include star
-        const firstCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        const firstCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .first();
         await firstCard.hover();
 
         // Profile pics have 2 buttons: edit + delete (no star)
@@ -222,7 +244,10 @@ test.describe("Pet Photos — Set Profile Picture", () => {
         await mockMutation(page, "POST", `/api/pets/${petId}/photos/photo_002/profile`);
         await page.goto(`/pets/${petId}/photos`);
 
-        const secondCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).nth(1);
+        const secondCard = page
+            .locator(".group")
+            .filter({ has: page.locator("img[loading='lazy']") })
+            .nth(1);
         await secondCard.hover();
 
         // Click the star button (first action button on non-profile photo)
@@ -245,7 +270,9 @@ test.describe("Pet Photos — Upload Form", () => {
         await page.goto(`/pets/${petId}/photos`);
         await page.getByRole("button", { name: /upload|hochladen/i }).click();
 
-        await expect(page.getByText(/caption|beschreibung/i).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(/caption|beschreibung/i).first()).toBeVisible({
+            timeout: 10_000,
+        });
     });
 
     test("upload modal has tags field", async ({ page }) => {

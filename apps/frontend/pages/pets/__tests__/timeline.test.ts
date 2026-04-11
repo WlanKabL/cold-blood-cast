@@ -76,9 +76,33 @@ describe("eventColorClass", () => {
 
 describe("groupEventsByDate", () => {
     const events: TimelineEvent[] = [
-        { id: "1", type: "feeding", date: "2024-06-15T10:00:00.000Z", title: "Mouse", detail: null, icon: "lucide:utensils", meta: {} },
-        { id: "2", type: "weight", date: "2024-06-15T14:00:00.000Z", title: "350g", detail: null, icon: "lucide:scale", meta: {} },
-        { id: "3", type: "shedding", date: "2024-06-10T00:00:00.000Z", title: "Shedding", detail: null, icon: "lucide:sparkles", meta: {} },
+        {
+            id: "1",
+            type: "feeding",
+            date: "2024-06-15T10:00:00.000Z",
+            title: "Mouse",
+            detail: null,
+            icon: "lucide:utensils",
+            meta: {},
+        },
+        {
+            id: "2",
+            type: "weight",
+            date: "2024-06-15T14:00:00.000Z",
+            title: "350g",
+            detail: null,
+            icon: "lucide:scale",
+            meta: {},
+        },
+        {
+            id: "3",
+            type: "shedding",
+            date: "2024-06-10T00:00:00.000Z",
+            title: "Shedding",
+            detail: null,
+            icon: "lucide:sparkles",
+            meta: {},
+        },
     ];
 
     it("groups events by date string", () => {
@@ -101,11 +125,51 @@ describe("groupEventsByDate", () => {
 
 describe("filterEventsByTypes", () => {
     const events: TimelineEvent[] = [
-        { id: "1", type: "feeding", date: "2024-06-15T10:00:00.000Z", title: "Mouse", detail: null, icon: "lucide:utensils", meta: {} },
-        { id: "2", type: "weight", date: "2024-06-15T14:00:00.000Z", title: "350g", detail: null, icon: "lucide:scale", meta: {} },
-        { id: "3", type: "shedding", date: "2024-06-10T00:00:00.000Z", title: "Shedding", detail: null, icon: "lucide:sparkles", meta: {} },
-        { id: "4", type: "vet_visit", date: "2024-06-01T09:00:00.000Z", title: "Checkup", detail: null, icon: "lucide:stethoscope", meta: {} },
-        { id: "5", type: "photo", date: "2024-06-20T14:00:00.000Z", title: "Photo", detail: null, icon: "lucide:camera", meta: {} },
+        {
+            id: "1",
+            type: "feeding",
+            date: "2024-06-15T10:00:00.000Z",
+            title: "Mouse",
+            detail: null,
+            icon: "lucide:utensils",
+            meta: {},
+        },
+        {
+            id: "2",
+            type: "weight",
+            date: "2024-06-15T14:00:00.000Z",
+            title: "350g",
+            detail: null,
+            icon: "lucide:scale",
+            meta: {},
+        },
+        {
+            id: "3",
+            type: "shedding",
+            date: "2024-06-10T00:00:00.000Z",
+            title: "Shedding",
+            detail: null,
+            icon: "lucide:sparkles",
+            meta: {},
+        },
+        {
+            id: "4",
+            type: "vet_visit",
+            date: "2024-06-01T09:00:00.000Z",
+            title: "Checkup",
+            detail: null,
+            icon: "lucide:stethoscope",
+            meta: {},
+        },
+        {
+            id: "5",
+            type: "photo",
+            date: "2024-06-20T14:00:00.000Z",
+            title: "Photo",
+            detail: null,
+            icon: "lucide:camera",
+            meta: {},
+        },
     ];
 
     it("filters to single type", () => {
@@ -120,7 +184,13 @@ describe("filterEventsByTypes", () => {
     });
 
     it("returns all when all types selected", () => {
-        const result = filterEventsByTypes(events, ["feeding", "shedding", "weight", "vet_visit", "photo"]);
+        const result = filterEventsByTypes(events, [
+            "feeding",
+            "shedding",
+            "weight",
+            "vet_visit",
+            "photo",
+        ]);
         expect(result).toHaveLength(5);
     });
 

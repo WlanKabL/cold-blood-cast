@@ -57,7 +57,9 @@ test.describe("Enclosures — List Page", () => {
         await addBtn.click();
 
         // Modal title should be visible
-        await expect(page.getByText(/new enclosure|neues terrarium/i)).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(/new enclosure|neues terrarium/i)).toBeVisible({
+            timeout: 10_000,
+        });
     });
 
     test("search filters enclosures", async ({ page }) => {
@@ -97,6 +99,8 @@ test.describe("Enclosures — Empty State", () => {
         await page.goto("/enclosures");
 
         // Empty state text
-        await expect(page.getByText(/no enclosures|keine terrarien/i).first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/no enclosures|keine terrarien/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 });

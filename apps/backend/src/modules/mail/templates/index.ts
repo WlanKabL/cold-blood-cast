@@ -41,3 +41,11 @@ export {
     vetAppointmentReminderTemplate,
     type VetAppointmentReminderData,
 } from "./vet-appointment-reminder.js";
+export {
+    maintenanceReminderTemplate,
+    type MaintenanceReminderData,
+} from "./maintenance-reminder.js";
+export {
+    weeklyCareDigestTemplate,
+    type WeeklyCareDigestData,
+} from "./weekly-care-digest.js";

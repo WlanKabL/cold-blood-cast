@@ -67,6 +67,7 @@ export const updateProfileSchema = z.object({
         .optional(),
     onboardingCompleted: z.boolean().optional(),
     locale: z.enum(["de", "en"]).optional(),
+    weeklyReportEnabled: z.boolean().optional(),
 });
 
 export const confirmAccountDeletionSchema = z.object({

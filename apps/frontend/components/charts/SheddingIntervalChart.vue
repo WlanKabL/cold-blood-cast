@@ -1,6 +1,10 @@
 <template>
     <div class="relative" :style="{ height: height + 'px' }">
-        <Bar v-if="chartData.datasets.length > 0 && chartData.labels!.length > 0" :data="chartData" :options="chartOptions" />
+        <Bar
+            v-if="chartData.datasets.length > 0 && chartData.labels!.length > 0"
+            :data="chartData"
+            :options="chartOptions"
+        />
         <div v-else class="flex h-full items-center justify-center">
             <p class="text-fg-muted text-sm">{{ $t("pages.sheddings.analysis.noData") }}</p>
         </div>

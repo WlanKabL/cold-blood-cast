@@ -3,7 +3,11 @@ import type { FastifyBaseLogger } from "fastify";
 import type { PetDocumentCategory } from "@prisma/client";
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound } from "@/helpers/errors.js";
-import { uploadFile, deleteUpload, ALLOWED_MIME_DOCUMENTS } from "@/modules/uploads/uploads.service.js";
+import {
+    uploadFile,
+    deleteUpload,
+    ALLOWED_MIME_DOCUMENTS,
+} from "@/modules/uploads/uploads.service.js";
 
 const DOCUMENT_INCLUDE = {
     upload: { select: { id: true, url: true, originalName: true } },

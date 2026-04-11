@@ -8,7 +8,9 @@
                 </h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.sensors.subtitle") }}</p>
             </div>
-            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.sensors.add") }}</UiButton>
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{
+                $t("pages.sensors.add")
+            }}</UiButton>
         </div>
 
         <!-- Filters -->
@@ -37,7 +39,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- Sensor Grid -->
@@ -66,7 +70,9 @@
                             >
                                 {{ sensor.name }}
                             </h3>
-                            <p class="text-fg-faint text-sm">{{ sensor.type }} · {{ sensor.unit }}</p>
+                            <p class="text-fg-faint text-sm">
+                                {{ sensor.type }} · {{ sensor.unit }}
+                            </p>
                         </div>
                     </div>
                     <div class="flex shrink-0 items-center gap-2">
@@ -79,7 +85,10 @@
                     </div>
                 </div>
                 <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <span v-if="sensor.enclosure" class="text-fg-faint flex items-center gap-1.5 text-xs">
+                    <span
+                        v-if="sensor.enclosure"
+                        class="text-fg-faint flex items-center gap-1.5 text-xs"
+                    >
                         <Icon name="lucide:box" class="h-3.5 w-3.5" />
                         {{ sensor.enclosure.name }}
                     </span>
@@ -101,25 +110,44 @@
                 v-if="!searchQuery && (!selectedType || selectedType === 'ALL')"
                 class="mt-4"
                 @click="openCreateModal"
-            >{{ $t("pages.sensors.addFirst") }}</UiButton>
+                >{{ $t("pages.sensors.addFirst") }}</UiButton
+            >
         </div>
 
         <!-- Create Modal -->
-        <UiModal :show="showCreate" :title="$t('pages.sensors.create')" width="lg" @close="showCreate = false">
+        <UiModal
+            :show="showCreate"
+            :title="$t('pages.sensors.create')"
+            width="lg"
+            @close="showCreate = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreate">
-                <UiTextInput v-model="form.name" :label="$t('pages.sensors.fields.name')" required />
+                <UiTextInput
+                    v-model="form.name"
+                    :label="$t('pages.sensors.fields.name')"
+                    required
+                />
                 <div class="grid grid-cols-2 gap-3">
                     <UiSelect v-model="form.type" :label="$t('pages.sensors.fields.type')">
                         <option v-for="st in sensorTypes" :key="st" :value="st">{{ st }}</option>
                     </UiSelect>
-                    <UiTextInput v-model="form.unit" :label="$t('pages.sensors.fields.unit')" required :placeholder="$t('pages.sensors.fields.unitPlaceholder')" />
+                    <UiTextInput
+                        v-model="form.unit"
+                        :label="$t('pages.sensors.fields.unit')"
+                        required
+                        :placeholder="$t('pages.sensors.fields.unitPlaceholder')"
+                    />
                 </div>
                 <UiSelect v-model="form.enclosureId" :label="$t('pages.sensors.fields.enclosure')">
                     <option value="NONE">—</option>
-                    <option v-for="enc in enclosures" :key="enc.id" :value="enc.id">{{ enc.name }}</option>
+                    <option v-for="enc in enclosures" :key="enc.id" :value="enc.id">
+                        {{ enc.name }}
+                    </option>
                 </UiSelect>
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showCreate = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>

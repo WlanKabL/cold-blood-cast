@@ -2,12 +2,17 @@
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Back + Header -->
         <div class="flex items-center gap-3">
-            <NuxtLink to="/pets" class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors">
+            <NuxtLink
+                to="/pets"
+                class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors"
+            >
                 <Icon name="lucide:arrow-left" class="h-5 w-5" />
             </NuxtLink>
             <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2">
-                    <h1 class="text-fg truncate text-2xl font-bold tracking-tight">{{ pet?.name ?? "..." }}</h1>
+                    <h1 class="text-fg truncate text-2xl font-bold tracking-tight">
+                        {{ pet?.name ?? "..." }}
+                    </h1>
                     <span
                         v-if="pet?.gender && pet.gender !== 'UNKNOWN'"
                         class="bg-primary-500/10 text-primary-400 rounded-md px-2 py-0.5 text-xs font-medium"
@@ -22,7 +27,11 @@
             </div>
             <div v-if="pet" class="flex items-center gap-2">
                 <UiButton variant="ghost" icon="lucide:pencil" @click="openEditModal" />
-                <UiButton variant="danger" icon="lucide:trash-2" @click="showDeleteConfirm = true" />
+                <UiButton
+                    variant="danger"
+                    icon="lucide:trash-2"
+                    @click="showDeleteConfirm = true"
+                />
             </div>
         </div>
 
@@ -36,7 +45,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <template v-else-if="pet">
@@ -53,29 +64,53 @@
                 </div>
                 <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.fields.species") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.pets.fields.species") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ pet.species }}</dd>
                     </div>
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.fields.morph") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.pets.fields.morph") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ pet.morph || "—" }}</dd>
                     </div>
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.fields.gender") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.pets.fields.gender") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ pet.gender || "—" }}</dd>
                     </div>
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.fields.birthDate") }}</dt>
-                        <dd class="text-fg mt-1 text-sm">{{ pet.birthDate ? new Date(pet.birthDate).toLocaleDateString() : "—" }}</dd>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.pets.fields.birthDate") }}
+                        </dt>
+                        <dd class="text-fg mt-1 text-sm">
+                            {{ pet.birthDate ? new Date(pet.birthDate).toLocaleDateString() : "—" }}
+                        </dd>
                     </div>
                     <div v-if="pet.notes" class="sm:col-span-2">
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.fields.notes") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.pets.fields.notes") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ pet.notes }}</dd>
                     </div>
-                    <div v-if="pet.feedingIntervalMinDays && pet.feedingIntervalMaxDays" class="sm:col-span-2">
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.pets.feedingSchedule") }}</dt>
+                    <div
+                        v-if="pet.feedingIntervalMinDays && pet.feedingIntervalMaxDays"
+                        class="sm:col-span-2"
+                    >
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.pets.feedingSchedule") }}
+                        </dt>
                         <dd class="text-fg mt-1 flex items-center gap-3 text-sm">
-                            <span>{{ pet.feedingIntervalMinDays }}–{{ pet.feedingIntervalMaxDays }} {{ $t("pages.pets.fields.feedingIntervalMinDays").split("(")[1]?.replace(")", "") || "days" }}</span>
+                            <span
+                                >{{ pet.feedingIntervalMinDays }}–{{ pet.feedingIntervalMaxDays }}
+                                {{
+                                    $t("pages.pets.fields.feedingIntervalMinDays")
+                                        .split("(")[1]
+                                        ?.replace(")", "") || "days"
+                                }}</span
+                            >
                             <span
                                 v-if="feedingStatus"
                                 :class="feedingStatusBadgeClass(feedingStatus.status)"
@@ -96,7 +131,10 @@
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">
                         {{ $t("pages.pets.photos.title") }}
-                        <span v-if="pet._count.photos" class="text-fg-faint ml-1 text-sm font-normal">
+                        <span
+                            v-if="pet._count.photos"
+                            class="text-fg-faint ml-1 text-sm font-normal"
+                        >
                             ({{ pet._count.photos }})
                         </span>
                     </h2>
@@ -134,7 +172,9 @@
                     </div>
                 </div>
                 <div v-else class="flex items-center gap-3">
-                    <div class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl">
+                    <div
+                        class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl"
+                    >
                         <Icon name="lucide:image" class="text-fg-faint h-8 w-8" />
                     </div>
                     <div>
@@ -155,7 +195,10 @@
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">
                         {{ $t("pages.pets.documents.title") }}
-                        <span v-if="pet._count.documents" class="text-fg-faint ml-1 text-sm font-normal">
+                        <span
+                            v-if="pet._count.documents"
+                            class="text-fg-faint ml-1 text-sm font-normal"
+                        >
                             ({{ pet._count.documents }})
                         </span>
                     </h2>
@@ -167,12 +210,18 @@
                     </NuxtLink>
                 </div>
                 <div v-if="pet._count.documents" class="flex items-center gap-3">
-                    <div class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl">
+                    <div
+                        class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl"
+                    >
                         <Icon name="lucide:file-text" class="text-primary-400 h-5 w-5" />
                     </div>
                     <div>
                         <p class="text-fg text-sm">
-                            {{ $t("pages.pets.documents.documentCount", { count: pet._count.documents }) }}
+                            {{
+                                $t("pages.pets.documents.documentCount", {
+                                    count: pet._count.documents,
+                                })
+                            }}
                         </p>
                         <NuxtLink
                             :to="`/pets/${petId}/documents`"
@@ -184,7 +233,9 @@
                     </div>
                 </div>
                 <div v-else class="flex items-center gap-3">
-                    <div class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl">
+                    <div
+                        class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl"
+                    >
                         <Icon name="lucide:file-text" class="text-fg-faint h-5 w-5" />
                     </div>
                     <div>
@@ -204,7 +255,9 @@
             <div v-if="authStore.hasFeature('feedings')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentFeedings") }}</h2>
-                    <NuxtLink to="/feedings" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
+                    <NuxtLink to="/feedings" class="text-primary-400 text-sm font-medium">{{
+                        $t("pages.dashboard.viewAll")
+                    }}</NuxtLink>
                 </div>
                 <div v-if="feedings?.length" class="space-y-2">
                     <div
@@ -213,11 +266,15 @@
                         class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
                     >
                         <div class="flex items-center gap-3">
-                            <Icon name="lucide:utensils" class="text-amber-400 h-4 w-4" />
+                            <Icon name="lucide:utensils" class="h-4 w-4 text-amber-400" />
                             <span class="text-fg text-sm">{{ feeding.foodType }}</span>
-                            <span v-if="feeding.foodSize" class="text-fg-faint text-xs">({{ feeding.foodSize }})</span>
+                            <span v-if="feeding.foodSize" class="text-fg-faint text-xs"
+                                >({{ feeding.foodSize }})</span
+                            >
                         </div>
-                        <span class="text-fg-faint text-xs">{{ new Date(feeding.fedAt).toLocaleDateString() }}</span>
+                        <span class="text-fg-faint text-xs">{{
+                            new Date(feeding.fedAt).toLocaleDateString()
+                        }}</span>
                     </div>
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noFeedings") }}</p>
@@ -237,7 +294,9 @@
                             <option value="365">{{ $t("pages.weights.chart.last1y") }}</option>
                             <option value="0">{{ $t("pages.weights.chart.allTime") }}</option>
                         </select>
-                        <NuxtLink to="/weights" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
+                        <NuxtLink to="/weights" class="text-primary-400 text-sm font-medium">{{
+                            $t("pages.dashboard.viewAll")
+                        }}</NuxtLink>
                     </div>
                 </div>
 
@@ -245,19 +304,50 @@
                 <div v-if="growthRate" class="mb-4 flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2">
                         <Icon
-                            :name="growthRate.trend === 'up' ? 'lucide:trending-up' : growthRate.trend === 'down' ? 'lucide:trending-down' : 'lucide:minus'"
-                            :class="growthRate.trend === 'up' ? 'text-green-400' : growthRate.trend === 'down' ? 'text-red-400' : 'text-fg-faint'"
+                            :name="
+                                growthRate.trend === 'up'
+                                    ? 'lucide:trending-up'
+                                    : growthRate.trend === 'down'
+                                      ? 'lucide:trending-down'
+                                      : 'lucide:minus'
+                            "
+                            :class="
+                                growthRate.trend === 'up'
+                                    ? 'text-green-400'
+                                    : growthRate.trend === 'down'
+                                      ? 'text-red-400'
+                                      : 'text-fg-faint'
+                            "
                             class="h-4 w-4"
                         />
-                        <span :class="growthRate.trend === 'up' ? 'text-green-400' : growthRate.trend === 'down' ? 'text-red-400' : 'text-fg-faint'" class="text-xs font-medium">
-                            {{ $t(`pages.weights.chart.trend${growthRate.trend.charAt(0).toUpperCase() + growthRate.trend.slice(1)}`) }}
+                        <span
+                            :class="
+                                growthRate.trend === 'up'
+                                    ? 'text-green-400'
+                                    : growthRate.trend === 'down'
+                                      ? 'text-red-400'
+                                      : 'text-fg-faint'
+                            "
+                            class="text-xs font-medium"
+                        >
+                            {{
+                                $t(
+                                    `pages.weights.chart.trend${growthRate.trend.charAt(0).toUpperCase() + growthRate.trend.slice(1)}`,
+                                )
+                            }}
                         </span>
                     </div>
                     <span class="text-fg-faint text-xs">
-                        {{ $t("pages.weights.chart.perMonth", { rate: growthRate.avgGramsPerMonth }) }}
+                        {{
+                            $t("pages.weights.chart.perMonth", {
+                                rate: growthRate.avgGramsPerMonth,
+                            })
+                        }}
                     </span>
                     <span class="text-fg-faint text-xs">
-                        {{ $t("pages.weights.chart.totalGain", { gain: growthRate.totalGainGrams }) }}
+                        {{
+                            $t("pages.weights.chart.totalGain", { gain: growthRate.totalGainGrams })
+                        }}
                     </span>
                     <span class="text-fg-faint text-xs">
                         {{ $t("pages.weights.chart.records", { count: growthRate.recordCount }) }}
@@ -265,7 +355,11 @@
                 </div>
 
                 <div v-if="chartSeries?.length">
-                    <ChartsWeightLineChart :series="chartSeries" :height="250" :show-legend="false" />
+                    <ChartsWeightLineChart
+                        :series="chartSeries"
+                        :height="250"
+                        :show-legend="false"
+                    />
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
             </div>
@@ -283,36 +377,75 @@
                             {{ $t("pages.sheddings.analysis.warning") }}
                         </span>
                     </h2>
-                    <NuxtLink to="/sheddings" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
+                    <NuxtLink to="/sheddings" class="text-primary-400 text-sm font-medium">{{
+                        $t("pages.dashboard.viewAll")
+                    }}</NuxtLink>
                 </div>
                 <template v-if="sheddingAnalysis && sheddingAnalysis.sheddingCount >= 2">
                     <div class="mb-4 flex flex-wrap items-center gap-4">
                         <div class="flex items-center gap-2">
                             <Icon name="lucide:calendar-clock" class="text-primary-400 h-4 w-4" />
-                            <span class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.sheddings.analysis.averageCycle") }}</span>
-                            <span class="text-fg text-sm font-semibold">{{ $t("pages.sheddings.analysis.averageCycleDays", { days: sheddingAnalysis.averageIntervalDays }) }}</span>
+                            <span class="text-fg-faint text-xs font-medium uppercase">{{
+                                $t("pages.sheddings.analysis.averageCycle")
+                            }}</span>
+                            <span class="text-fg text-sm font-semibold">{{
+                                $t("pages.sheddings.analysis.averageCycleDays", {
+                                    days: sheddingAnalysis.averageIntervalDays,
+                                })
+                            }}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <Icon
-                                :name="sheddingAnalysis.trend === 'shortening' ? 'lucide:trending-down' : sheddingAnalysis.trend === 'lengthening' ? 'lucide:trending-up' : 'lucide:minus'"
-                                :class="sheddingAnalysis.trend === 'shortening' ? 'text-green-400' : sheddingAnalysis.trend === 'lengthening' ? 'text-amber-400' : 'text-fg-faint'"
+                                :name="
+                                    sheddingAnalysis.trend === 'shortening'
+                                        ? 'lucide:trending-down'
+                                        : sheddingAnalysis.trend === 'lengthening'
+                                          ? 'lucide:trending-up'
+                                          : 'lucide:minus'
+                                "
+                                :class="
+                                    sheddingAnalysis.trend === 'shortening'
+                                        ? 'text-green-400'
+                                        : sheddingAnalysis.trend === 'lengthening'
+                                          ? 'text-amber-400'
+                                          : 'text-fg-faint'
+                                "
                                 class="h-4 w-4"
                             />
                             <span
-                                :class="sheddingAnalysis.trend === 'shortening' ? 'text-green-400' : sheddingAnalysis.trend === 'lengthening' ? 'text-amber-400' : 'text-fg-faint'"
+                                :class="
+                                    sheddingAnalysis.trend === 'shortening'
+                                        ? 'text-green-400'
+                                        : sheddingAnalysis.trend === 'lengthening'
+                                          ? 'text-amber-400'
+                                          : 'text-fg-faint'
+                                "
                                 class="text-xs font-medium"
                             >
-                                {{ $t(`pages.sheddings.analysis.trend${sheddingAnalysis.trend.charAt(0).toUpperCase() + sheddingAnalysis.trend.slice(1)}`) }}
+                                {{
+                                    $t(
+                                        `pages.sheddings.analysis.trend${sheddingAnalysis.trend.charAt(0).toUpperCase() + sheddingAnalysis.trend.slice(1)}`,
+                                    )
+                                }}
                             </span>
                         </div>
                         <span v-if="sheddingAnalysis.lastShedDate" class="text-fg-faint text-xs">
-                            {{ $t("pages.sheddings.analysis.lastShed") }}: {{ new Date(sheddingAnalysis.lastShedDate).toLocaleDateString() }}
+                            {{ $t("pages.sheddings.analysis.lastShed") }}:
+                            {{ new Date(sheddingAnalysis.lastShedDate).toLocaleDateString() }}
                         </span>
-                        <span v-if="sheddingAnalysis.predictedNextDate" class="text-fg-faint text-xs">
-                            {{ $t("pages.sheddings.analysis.predicted") }}: {{ new Date(sheddingAnalysis.predictedNextDate).toLocaleDateString() }}
+                        <span
+                            v-if="sheddingAnalysis.predictedNextDate"
+                            class="text-fg-faint text-xs"
+                        >
+                            {{ $t("pages.sheddings.analysis.predicted") }}:
+                            {{ new Date(sheddingAnalysis.predictedNextDate).toLocaleDateString() }}
                         </span>
                         <span class="text-fg-faint text-xs">
-                            {{ $t("pages.sheddings.analysis.records", { count: sheddingAnalysis.sheddingCount }) }}
+                            {{
+                                $t("pages.sheddings.analysis.records", {
+                                    count: sheddingAnalysis.sheddingCount,
+                                })
+                            }}
                         </span>
                     </div>
                     <ChartsSheddingIntervalChart
@@ -328,7 +461,9 @@
             <div v-if="authStore.hasFeature('vet_visits')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentVetVisits") }}</h2>
-                    <NuxtLink to="/vet-visits" class="text-primary-400 text-sm font-medium">{{ $t("pages.dashboard.viewAll") }}</NuxtLink>
+                    <NuxtLink to="/vet-visits" class="text-primary-400 text-sm font-medium">{{
+                        $t("pages.dashboard.viewAll")
+                    }}</NuxtLink>
                 </div>
                 <div v-if="vetVisits?.length" class="space-y-2">
                     <div
@@ -337,13 +472,21 @@
                         class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
                     >
                         <div class="flex items-center gap-3">
-                            <Icon name="lucide:stethoscope" class="text-teal-400 h-4 w-4" />
-                            <span class="text-fg text-sm">{{ visit.reason || $t(`pages.vetVisits.types.${visit.visitType}`) }}</span>
-                            <span v-if="visit.veterinarian" class="text-fg-faint text-xs">({{ visit.veterinarian.name }})</span>
+                            <Icon name="lucide:stethoscope" class="h-4 w-4 text-teal-400" />
+                            <span class="text-fg text-sm">{{
+                                visit.reason || $t(`pages.vetVisits.types.${visit.visitType}`)
+                            }}</span>
+                            <span v-if="visit.veterinarian" class="text-fg-faint text-xs"
+                                >({{ visit.veterinarian.name }})</span
+                            >
                         </div>
                         <div class="flex items-center gap-2">
-                            <span v-if="visit.costCents" class="text-fg-faint text-xs">{{ formatVetCost(visit.costCents) }}</span>
-                            <span class="text-fg-faint text-xs">{{ new Date(visit.visitDate).toLocaleDateString() }}</span>
+                            <span v-if="visit.costCents" class="text-fg-faint text-xs">{{
+                                formatVetCost(visit.costCents)
+                            }}</span>
+                            <span class="text-fg-faint text-xs">{{
+                                new Date(visit.visitDate).toLocaleDateString()
+                            }}</span>
                         </div>
                     </div>
                 </div>
@@ -353,8 +496,13 @@
             <!-- Recent Activity / Timeline -->
             <div v-if="authStore.hasFeature('timeline')" class="glass-card rounded-xl p-6">
                 <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.timeline.recentActivity") }}</h2>
-                    <NuxtLink :to="`/pets/${petId}/timeline`" class="text-primary-400 text-sm font-medium">
+                    <h2 class="text-fg font-semibold">
+                        {{ $t("pages.pets.timeline.recentActivity") }}
+                    </h2>
+                    <NuxtLink
+                        :to="`/pets/${petId}/timeline`"
+                        class="text-primary-400 text-sm font-medium"
+                    >
                         {{ $t("pages.pets.timeline.viewTimeline") }}
                     </NuxtLink>
                 </div>
@@ -364,35 +512,69 @@
                         :key="event.id"
                         class="bg-surface-raised flex items-center gap-3 rounded-lg p-3"
                     >
-                        <Icon :name="event.icon" :class="timelineIconClass(event.type)" class="h-4 w-4" />
-                        <span class="text-fg min-w-0 flex-1 truncate text-sm">{{ event.title }}</span>
-                        <span class="text-fg-faint flex-shrink-0 text-xs">{{ new Date(event.date).toLocaleDateString() }}</span>
+                        <Icon
+                            :name="event.icon"
+                            :class="timelineIconClass(event.type)"
+                            class="h-4 w-4"
+                        />
+                        <span class="text-fg min-w-0 flex-1 truncate text-sm">{{
+                            event.title
+                        }}</span>
+                        <span class="text-fg-faint flex-shrink-0 text-xs">{{
+                            new Date(event.date).toLocaleDateString()
+                        }}</span>
                     </div>
                 </div>
                 <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.timeline.empty") }}</p>
             </div>
+
+            <!-- Public Profile / Sharing -->
+            <PetPublicProfileCard :pet-id="petId" />
         </template>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.pets.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.pets.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput v-model="editForm.name" :label="$t('pages.pets.fields.name')" required />
+                <UiTextInput
+                    v-model="editForm.name"
+                    :label="$t('pages.pets.fields.name')"
+                    required
+                />
                 <UiSelect v-model="editForm.enclosureId" :label="$t('pages.pets.fields.enclosure')">
                     <option value="NONE">—</option>
-                    <option v-for="enc in enclosures" :key="enc.id" :value="enc.id">{{ enc.name }}</option>
+                    <option v-for="enc in enclosures" :key="enc.id" :value="enc.id">
+                        {{ enc.name }}
+                    </option>
                 </UiSelect>
-                <UiTextInput v-model="editForm.species" :label="$t('pages.pets.fields.species')" required />
+                <UiTextInput
+                    v-model="editForm.species"
+                    :label="$t('pages.pets.fields.species')"
+                    required
+                />
                 <UiTextInput v-model="editForm.morph" :label="$t('pages.pets.fields.morph')" />
                 <UiSelect v-model="editForm.gender" :label="$t('pages.pets.fields.gender')">
                     <option v-for="g in genderOptions" :key="g" :value="g">{{ g }}</option>
                 </UiSelect>
-                <UiTextInput v-model="editForm.birthDate" :label="$t('pages.pets.fields.birthDate')" type="date" />
+                <UiTextInput
+                    v-model="editForm.birthDate"
+                    :label="$t('pages.pets.fields.birthDate')"
+                    type="date"
+                />
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.pets.fields.notes')" />
 
                 <!-- Feeding Schedule -->
                 <div class="border-t border-white/5 pt-4">
-                    <p class="text-fg-muted mb-1 text-sm font-medium">{{ $t("pages.pets.feedingSchedule") }}</p>
-                    <p class="text-fg-faint mb-3 text-xs">{{ $t("pages.pets.feedingScheduleHint") }}</p>
+                    <p class="text-fg-muted mb-1 text-sm font-medium">
+                        {{ $t("pages.pets.feedingSchedule") }}
+                    </p>
+                    <p class="text-fg-faint mb-3 text-xs">
+                        {{ $t("pages.pets.feedingScheduleHint") }}
+                    </p>
                     <div class="grid grid-cols-2 gap-3">
                         <UiTextInput
                             v-model="editForm.feedingIntervalMinDays"
@@ -412,7 +594,9 @@
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
@@ -591,7 +775,8 @@ const chartFromParam = computed(() => {
 
 const { data: chartSeries } = useQuery({
     queryKey: ["weights-chart", petId, weightRange],
-    queryFn: () => api.get<WeightChartSeries[]>(`/api/weights/chart?petIds=${petId}${chartFromParam.value}`),
+    queryFn: () =>
+        api.get<WeightChartSeries[]>(`/api/weights/chart?petIds=${petId}${chartFromParam.value}`),
 });
 
 const { data: growthRates } = useQuery({
@@ -643,12 +828,12 @@ function timelineIconClass(type: string): string {
 }
 
 function formatVetCost(cents: number): string {
-    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(
+        cents / 100,
+    );
 }
 
-const feedingStatus = computed(() =>
-    feedingStatuses.value?.find((s) => s.petId === petId) ?? null,
-);
+const feedingStatus = computed(() => feedingStatuses.value?.find((s) => s.petId === petId) ?? null);
 
 function feedingStatusBadgeClass(status: string): string {
     switch (status) {
@@ -723,8 +908,12 @@ const { mutate: updateMutation, isPending: updating } = useMutation({
             gender: editForm.gender,
             birthDate: editForm.birthDate || undefined,
             notes: editForm.notes || undefined,
-            feedingIntervalMinDays: editForm.feedingIntervalMinDays ? Number(editForm.feedingIntervalMinDays) : null,
-            feedingIntervalMaxDays: editForm.feedingIntervalMaxDays ? Number(editForm.feedingIntervalMaxDays) : null,
+            feedingIntervalMinDays: editForm.feedingIntervalMinDays
+                ? Number(editForm.feedingIntervalMinDays)
+                : null,
+            feedingIntervalMaxDays: editForm.feedingIntervalMaxDays
+                ? Number(editForm.feedingIntervalMaxDays)
+                : null,
         }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pets"] });

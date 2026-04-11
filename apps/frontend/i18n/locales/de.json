@@ -198,6 +198,8 @@
         "saved": "Gespeichert",
         "deleted": "Gelöscht",
         "copied": "Kopiert",
+        "copy": "Kopieren",
+        "download": "Herunterladen",
         "confirmDelete": "Löschen bestätigen",
         "all": "Alle",
         "days": "Tage",
@@ -270,7 +272,9 @@
         "terrarium": "Terrarium",
         "careLog": "Pflegebuch",
         "vetVisits": "Tierarztbesuche",
-        "veterinarians": "Tierärzte"
+        "veterinarians": "Tierärzte",
+        "maintenance": "Wartung",
+        "planner": "Wochenplaner"
     },
     "admin": {
         "title": "Administration",
@@ -553,7 +557,14 @@
             "variablesTitle": "Variablen",
             "variablesHint": "Verwende {'{{'}variableName{'}}'}  in Text, Überschrift oder Betreff, um dynamische Werte einzufügen.",
             "variablesSystem": "System",
-            "variablesUser": "Benutzer (Empfänger)"
+            "variablesUser": "Benutzer (Empfänger)",
+            "testDigest": {
+                "title": "Wochenplaner-Test",
+                "description": "Sende eine Vorschau des wöchentlichen Berichts an deine eigene E-Mail-Adresse.",
+                "button": "Test-Digest senden",
+                "success": "Test-Digest gesendet an {email}",
+                "failed": "Test-Digest konnte nicht gesendet werden."
+            }
         },
         "auditLog": {
             "title": "Audit-Log",
@@ -763,7 +774,9 @@
             "noUpcomingSheddings": "Keine Häutungen innerhalb von 7 Tagen erwartet",
             "predictedIn": "in {days}T",
             "predictedOverdue": "{days}T überfällig",
-            "avgCycle": "Ø {days}T Zyklus"
+            "avgCycle": "Ø {days}T Zyklus",
+            "overdueMaintenance": "Überfällige Wartung",
+            "noOverdueMaintenance": "Alle Wartungsaufgaben sind aktuell"
         },
         "enclosures": {
             "title": "Terrarien",
@@ -780,6 +793,9 @@
             "sensorsInEnclosure": "Sensoren in diesem Terrarium",
             "noPets": "Keine Tiere in diesem Terrarium",
             "noSensors": "Keine Sensoren in diesem Terrarium",
+            "maintenanceTasks": "Wartungsaufgaben",
+            "noMaintenanceTasks": "Keine Wartungsaufgaben für dieses Terrarium",
+            "overdueTasksCount": "{n} überfällige Aufgabe(n)",
             "confirmDelete": "Dieses Terrarium löschen? Alle verknüpften Sensoren werden getrennt. Kann nicht rückgängig gemacht werden.",
             "deleted": "Terrarium gelöscht",
             "saved": "Terrarium gespeichert",
@@ -925,6 +941,38 @@
                 "filterPhoto": "Fotos",
                 "recentActivity": "Letzte Aktivität",
                 "eventCount": "{count} Ereignis | {count} Ereignisse"
+            },
+            "publicProfile": {
+                "title": "Öffentliches Profil",
+                "description": "Teile eine öffentliche Seite für dieses Tier — Besucher können ausgewählte Daten ohne Konto einsehen.",
+                "create": "Öffentliches Profil erstellen",
+                "created": "Öffentliches Profil erstellt",
+                "deleted": "Öffentliches Profil gelöscht",
+                "active": "Aktiv",
+                "inactive": "Inaktiv",
+                "profileActive": "Profil sichtbar",
+                "activeHint": "Wenn aktiv, kann jeder mit dem Link dieses Profil sehen.",
+                "url": "Öffentliche URL",
+                "slug": "Benutzerdefinierter URL-Slug",
+                "bio": "Beschreibung",
+                "bioPlaceholder": "Eine kurze Beschreibung über dein Tier...",
+                "visibleData": "Sichtbare Daten",
+                "togglePhotos": "Fotos",
+                "toggleWeight": "Gewichtsverlauf",
+                "toggleAge": "Alter / Geburtsdatum",
+                "toggleFeedings": "Fütterungsprotokoll",
+                "toggleSheddings": "Häutungsverlauf",
+                "toggleSpecies": "Art",
+                "toggleMorph": "Farbvariante",
+                "views": "{count} Aufrufe",
+                "createdAt": "Erstellt am {date}",
+                "embedCode": "Einbettungscode",
+                "embedDescription": "Kopiere diesen Code, um eine kompakte Profilkarte auf einer beliebigen Website einzubetten.",
+                "qrCode": "QR-Code",
+                "qrHint": "Scannen, um das öffentliche Profil dieses Tieres zu öffnen.",
+                "delete": "Öffentliches Profil löschen",
+                "deleteConfirmTitle": "Öffentliches Profil löschen",
+                "deleteConfirmMessage": "Öffentliche Seite für dieses Tier entfernen? Die URL wird sofort ungültig."
             }
         },
         "sensors": {
@@ -1133,6 +1181,11 @@
             "resetSent": "Link gesendet",
             "resetSentHint": "Ein Passwort-Reset-Link wurde an deine E-Mail gesendet.",
             "notifications": "Benachrichtigungen",
+            "weeklyDigest": "Wöchentliche Pflegeübersicht",
+            "weeklyDigestHint": "Erhalte jeden Sonntag um 18:00 Uhr eine E-Mail mit deinen anstehenden Pflegeaufgaben für die nächste Woche.",
+            "weeklyDigestEnable": "Aktivieren",
+            "weeklyDigestDisable": "Deaktivieren",
+            "weeklyDigestSaved": "Benachrichtigungseinstellung aktualisiert.",
             "dangerZone": "Gefahrenzone",
             "cookiePreferences": "Cookie-Einstellungen",
             "cookiePreferencesLabel": "Cookie-Einwilligung",
@@ -1350,6 +1403,108 @@
                 "appointmentOn": "Termin am {date}",
                 "notSet": "Nicht angegeben"
             }
+        },
+        "maintenance": {
+            "title": "Terrarium-Wartung",
+            "subtitle": "Wartungsaufgaben für deine Terrarien verwalten und planen",
+            "add": "Aufgabe hinzufügen",
+            "addFirst": "Erstelle deine erste Wartungsaufgabe",
+            "create": "Neue Wartungsaufgabe",
+            "edit": "Aufgabe bearbeiten",
+            "empty": "Noch keine Wartungsaufgaben",
+            "confirmDelete": "Diese Wartungsaufgabe löschen?",
+            "created": "Aufgabe erstellt",
+            "saved": "Aufgabe aktualisiert",
+            "deleted": "Aufgabe gelöscht",
+            "completed": "Aufgabe erledigt",
+            "search": "Aufgaben suchen...",
+            "allTypes": "Alle Typen",
+            "overdue": "Überfällig",
+            "upcoming": "Anstehend",
+            "recurring": "Wiederkehrend",
+            "oneTime": "Einmalig",
+            "markDone": "Als erledigt markieren",
+            "noOverdue": "Keine überfälligen Wartungsaufgaben",
+            "overdueCount": "{n} überfällig",
+            "dueToday": "Heute fällig",
+            "daysOverdue": "{n} Tag(e) überfällig",
+            "dueIn": "Fällig in {n} Tag(en)",
+            "nextDue": "Nächste Fälligkeit: {date}",
+            "lastCompleted": "Zuletzt erledigt: {date}",
+            "neverCompleted": "Noch nie erledigt",
+            "every": "Alle {n} Tage",
+            "types": {
+                "CLEANING": "Reinigung",
+                "SUBSTRATE_CHANGE": "Substratwechsel",
+                "LAMP_REPLACEMENT": "Lampenwechsel",
+                "WATER_CHANGE": "Wasserwechsel",
+                "FILTER_CHANGE": "Filterwechsel",
+                "DISINFECTION": "Desinfektion",
+                "OTHER": "Sonstiges"
+            },
+            "fields": {
+                "enclosure": "Terrarium",
+                "type": "Typ",
+                "description": "Beschreibung",
+                "descriptionPlaceholder": "z.B. Alle Flächen gründlich reinigen",
+                "nextDueAt": "Nächste Fälligkeit",
+                "intervalDays": "Intervall (Tage)",
+                "intervalDaysHint": "Wie oft wiederholen",
+                "recurring": "Wiederkehrend",
+                "notes": "Notizen",
+                "notesPlaceholder": "Zusätzliche Notizen..."
+            }
+        },
+        "planner": {
+            "title": "Wochenplaner",
+            "subtitle": "Übersicht über anstehende Fütterungen, Tierarztbesuche, Häutungen und Wartungsaufgaben",
+            "today": "Heute",
+            "todayBadge": "(Heute)",
+            "noTasks": "Keine Aufgaben",
+            "overdue": "Überfällig",
+            "error": "Planer-Daten konnten nicht geladen werden",
+            "eventCount": "{n} Aufgabe(n)",
+            "legendTitle": "Aufgabentypen",
+            "stats": {
+                "total": "Aufgaben gesamt",
+                "overdue": "Überfällig",
+                "busiest": "Vollster Tag",
+                "types": "Nach Typ"
+            },
+            "detail": {
+                "hint": "Klicke auf einen Eintrag für Details",
+                "date": "Datum",
+                "info": "Details",
+                "pet": "Tier",
+                "enclosure": "Terrarium",
+                "status": "Status",
+                "interval": "Fütterungsintervall",
+                "days": "Tage",
+                "veterinarian": "Tierarzt",
+                "reason": "Grund",
+                "followUp": "Folgetermin",
+                "avgCycle": "Ø Zyklus",
+                "trend": "Trend",
+                "trends": {
+                    "increasing": "Steigend",
+                    "decreasing": "Sinkend",
+                    "stable": "Stabil"
+                },
+                "taskType": "Aufgabentyp",
+                "schedule": "Zeitplan",
+                "goTo": "Zur Quelle",
+                "feedingStatus": {
+                    "ok": "OK",
+                    "due": "Fällig",
+                    "critical": "Kritisch"
+                }
+            },
+            "legend": {
+                "feeding": "Fütterung",
+                "vetVisit": "Tierarztbesuch",
+                "shedding": "Häutung",
+                "maintenance": "Wartung"
+            }
         }
     },
     "shortcuts": {
@@ -1404,5 +1559,30 @@
         "title": "Fehler",
         "fallback": "Etwas ist schiefgelaufen",
         "goHome": "Zur Startseite"
+    },
+    "publicProfile": {
+        "notFound": "Profil nicht gefunden",
+        "notFoundHint": "Dieses Profil wurde möglicherweise entfernt oder existiert nicht.",
+        "backToHome": "Zur Startseite",
+        "photos": "Fotos",
+        "weightHistory": "Gewichtsverlauf",
+        "recentFeedings": "Letzte Fütterungen",
+        "sheddingHistory": "Häutungsverlauf",
+        "measurements": "Messungen",
+        "weight": "Gewicht",
+        "feedings": "Fütterungen",
+        "sheddings": "Häutungen",
+        "feedingRefused": "Verweigert",
+        "viewFullProfile": "Vollständiges Profil ansehen",
+        "poweredBy": "Bereitgestellt von",
+        "ageMonths": "{months} Monate alt",
+        "ageYears": "{years} Jahre alt",
+        "ageYearsMonths": "{years}J {months}M alt",
+        "ogDescription": "{name} — {species} auf KeeperLog",
+        "gender": {
+            "MALE": "Männlich",
+            "FEMALE": "Weiblich",
+            "UNKNOWN": "Unbekannt"
+        }
     }
 }

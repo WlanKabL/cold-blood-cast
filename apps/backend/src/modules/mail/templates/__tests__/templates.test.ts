@@ -8,6 +8,8 @@ import { accountRejectedTemplate } from "../account-rejected.js";
 import { customMailTemplate } from "../custom.js";
 import { pendingReviewTemplate } from "../pending-review.js";
 import { inviteCodeTemplate } from "../invite-code.js";
+import { weeklyCareDigestTemplate } from "../weekly-care-digest.js";
+import type { WeeklyCareDigestData } from "../weekly-care-digest.js";
 import {
     emailLayout,
     emailHeader,
@@ -332,5 +334,203 @@ describe("customMailTemplate", () => {
     it("converts single newlines to <br/>", () => {
         const html = customMailTemplate({ body: "Line 1\nLine 2" });
         expect(html).toContain("Line 1<br/>Line 2");
+    });
+});
+
+// ── Weekly Care Digest ───────────────────────────────────────
+
+describe("weeklyCareDigestTemplate", () => {
+    function makeDay(
+        date: string,
+        events: Array<{
+            id?: string;
+            type?: "feeding" | "vet_visit" | "shedding" | "maintenance";
+            title?: string;
+            detail?: string | null;
+            petName?: string | null;
+            enclosureName?: string | null;
+            meta?: Record<string, unknown>;
+        }> = [],
+    ) {
+        return {
+            date,
+            events: events.map((e, i) => ({
+                id: e.id ?? `evt-${i}`,
+                type: e.type ?? "feeding",
+                date,
+                title: e.title ?? "Test Event",
+                detail: e.detail ?? null,
+                petName: e.petName ?? null,
+                enclosureName: e.enclosureName ?? null,
+                meta: e.meta ?? {},
+            })),
+        };
+    }
+
+    const baseData: WeeklyCareDigestData = {
+        username: "SnakeKeeper",
+        days: [
+            makeDay("2026-04-13", [
+                { type: "feeding", title: "Feed Monty", detail: "2 mice", petName: "Monty" },
+            ]),
+            makeDay("2026-04-14"),
+            makeDay("2026-04-15", [
+                { type: "vet_visit", title: "Checkup", detail: "Annual exam" },
+            ]),
+            makeDay("2026-04-16"),
+            makeDay("2026-04-17", [
+                { type: "maintenance", title: "Clean terrarium" },
+                { type: "shedding", title: "Predicted shedding", meta: { isOverdue: false } },
+            ]),
+            makeDay("2026-04-18"),
+            makeDay("2026-04-19"),
+        ],
+        weekLabel: "Apr 13 – Apr 19",
+        plannerUrl: "https://cold-blood-cast.app/planner",
+        locale: "en",
+    };
+
+    it("renders valid HTML with DOCTYPE", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("<!DOCTYPE html");
+        expect(html).toContain("</html>");
+    });
+
+    it("includes username", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("SnakeKeeper");
+    });
+
+    it("includes week label", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("Apr 13 – Apr 19");
+    });
+
+    it("includes planner URL in button", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("https://cold-blood-cast.app/planner");
+    });
+
+    it("renders all 7 days", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("Monday");
+        expect(html).toContain("Wednesday");
+        expect(html).toContain("Friday");
+    });
+
+    it("renders event titles", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("Feed Monty");
+        expect(html).toContain("Checkup");
+        expect(html).toContain("Clean terrarium");
+        expect(html).toContain("Predicted shedding");
+    });
+
+    it("renders event type labels", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("Feeding");
+        expect(html).toContain("Vet Appointment");
+        expect(html).toContain("Maintenance");
+        expect(html).toContain("Predicted Shedding");
+    });
+
+    it("renders event detail text", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("2 mice");
+        expect(html).toContain("Annual exam");
+    });
+
+    it("renders pet name", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("Monty");
+    });
+
+    it("shows 'No tasks' for empty days", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("No tasks");
+    });
+
+    it("shows summary stats with total count", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        // 4 total events
+        expect(html).toContain(">4<");
+        expect(html).toContain("tasks this week");
+    });
+
+    it("renders overdue badge", () => {
+        const data: WeeklyCareDigestData = {
+            ...baseData,
+            days: [
+                makeDay("2026-04-13", [
+                    { type: "feeding", title: "Feed Monty", meta: { isOverdue: true } },
+                ]),
+                makeDay("2026-04-14"),
+                makeDay("2026-04-15"),
+                makeDay("2026-04-16"),
+                makeDay("2026-04-17"),
+                makeDay("2026-04-18"),
+                makeDay("2026-04-19"),
+            ],
+        };
+        const html = weeklyCareDigestTemplate(data);
+        expect(html).toContain("Overdue");
+        expect(html).toContain("1 overdue");
+    });
+
+    it("renders German locale correctly", () => {
+        const data: WeeklyCareDigestData = { ...baseData, locale: "de" };
+        const html = weeklyCareDigestTemplate(data);
+        expect(html).toContain("Dein Wochenplan");
+        expect(html).toContain("Fütterung");
+        expect(html).toContain("Tierarzttermin");
+        expect(html).toContain("Keine Aufgaben");
+        expect(html).toContain("Aufgaben diese Woche");
+        expect(html).toContain("Planer öffnen →");
+    });
+
+    it("uses dark theme colors (not light-mode)", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        // Should use dark theme brand colors
+        expect(html).toContain("#e8e6dd"); // text color
+        expect(html).toContain("#2a2a1c"); // card border
+        expect(html).toContain("#121208"); // dark bg
+        // Should NOT contain light-mode colors
+        expect(html).not.toContain("#f0f0f0");
+        expect(html).not.toContain("#374151");
+        expect(html).not.toContain("#1f2937");
+    });
+
+    it("includes settings opt-out info box", () => {
+        const html = weeklyCareDigestTemplate(baseData);
+        expect(html).toContain("weekly digest");
+        expect(html).toContain("settings");
+    });
+
+    it("renders with zero events across all days", () => {
+        const data: WeeklyCareDigestData = {
+            ...baseData,
+            days: Array.from({ length: 7 }, (_, i) =>
+                makeDay(`2026-04-${13 + i}`),
+            ),
+        };
+        const html = weeklyCareDigestTemplate(data);
+        expect(html).toContain("<!DOCTYPE html");
+        expect(html).toContain(">0<");
+    });
+
+    it("renders overdue badge in German", () => {
+        const data: WeeklyCareDigestData = {
+            ...baseData,
+            locale: "de",
+            days: [
+                makeDay("2026-04-13", [
+                    { type: "feeding", title: "Monty füttern", meta: { isOverdue: true } },
+                ]),
+                ...Array.from({ length: 6 }, (_, i) => makeDay(`2026-04-${14 + i}`)),
+            ],
+        };
+        const html = weeklyCareDigestTemplate(data);
+        expect(html).toContain("Überfällig");
+        expect(html).toContain("überfällig");
     });
 });

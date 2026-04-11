@@ -23,7 +23,9 @@ import {
     verifyEmailTemplate,
     passwordResetTemplate,
     customMailTemplate,
+    weeklyCareDigestTemplate,
 } from "./templates/index.js";
+import { getWeekEvents } from "@/modules/weekly-planner/weekly-planner.service.js";
 import type { EmailTemplate } from "@cold-blood-cast/shared";
 
 // ─── Template Registry ───────────────────────────────────────
@@ -561,6 +563,64 @@ export async function emailAdminRoutes(app: FastifyInstance): Promise<void> {
                 totalSent: sent ? 1 : 0,
                 totalFailed: sent ? 0 : 1,
             },
+        };
+    });
+
+    // ── POST /test-digest — send weekly digest preview to admin ──
+    app.post("/test-digest", async (request) => {
+        const admin = await prisma.user.findUnique({
+            where: { id: request.userId },
+            select: { id: true, email: true, username: true, locale: true },
+        });
+
+        if (!admin) {
+            throw notFound(ErrorCodes.E_USER_NOT_FOUND, "Admin user not found");
+        }
+
+        const now = new Date();
+        const day = now.getUTCDay();
+        const diff = day === 0 ? -6 : 1 - day;
+        const monday = new Date(now);
+        monday.setUTCDate(monday.getUTCDate() + diff);
+        monday.setUTCHours(0, 0, 0, 0);
+
+        const days = await getWeekEvents(admin.id, monday);
+
+        const locale = admin.locale || "en";
+        const start = monday;
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+
+        const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
+        const loc = locale === "de" ? "de-DE" : "en-US";
+        const weekLabel = `${start.toLocaleDateString(loc, opts)} – ${end.toLocaleDateString(loc, opts)}`;
+
+        const html = weeklyCareDigestTemplate({
+            username: admin.username,
+            days,
+            weekLabel,
+            plannerUrl: `${env().CORS_ORIGIN}/planner`,
+            locale,
+        });
+
+        const subject = locale === "de"
+            ? `[Test] Wochenplaner – ${weekLabel}`
+            : `[Test] Weekly Digest – ${weekLabel}`;
+
+        const sent = await sendMail({
+            to: admin.email,
+            subject,
+            html,
+            log: {
+                userId: admin.id,
+                template: "weekly_care_digest",
+                sentBy: request.userId,
+            },
+        });
+
+        return {
+            success: true,
+            data: { sent, to: admin.email },
         };
     });
 }

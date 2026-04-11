@@ -30,12 +30,8 @@ vi.mock("@/modules/uploads/uploads.service.js", () => ({
     ]),
 }));
 
-const {
-    listPetDocuments,
-    addPetDocument,
-    updatePetDocument,
-    deletePetDocument,
-} = await import("../pet-documents.service.js");
+const { listPetDocuments, addPetDocument, updatePetDocument, deletePetDocument } =
+    await import("../pet-documents.service.js");
 
 const USER_ID = "user_123";
 const PET_ID = "pet_456";
@@ -175,7 +171,9 @@ describe("addPetDocument", () => {
     it("throws for non-owned pet", async () => {
         mockPrisma.pet.findUnique.mockResolvedValue({ userId: "other_user" });
 
-        await expect(addPetDocument(PET_ID, USER_ID, mockFile, {})).rejects.toThrow("Pet not found");
+        await expect(addPetDocument(PET_ID, USER_ID, mockFile, {})).rejects.toThrow(
+            "Pet not found",
+        );
         expect(mockUploadFile).not.toHaveBeenCalled();
     });
 });
@@ -268,17 +266,17 @@ describe("updatePetDocument", () => {
             upload: { id: UPLOAD_ID, url: "/uploads/petDocs/test.pdf" },
         });
 
-        await expect(
-            updatePetDocument(DOC_ID, USER_ID, { label: "x" }),
-        ).rejects.toThrow("Document not found");
+        await expect(updatePetDocument(DOC_ID, USER_ID, { label: "x" })).rejects.toThrow(
+            "Document not found",
+        );
     });
 
     it("throws for non-existent document", async () => {
         mockPrisma.petDocument.findUnique.mockResolvedValue(null);
 
-        await expect(
-            updatePetDocument(DOC_ID, USER_ID, { label: "x" }),
-        ).rejects.toThrow("Document not found");
+        await expect(updatePetDocument(DOC_ID, USER_ID, { label: "x" })).rejects.toThrow(
+            "Document not found",
+        );
     });
 });
 

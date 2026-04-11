@@ -19,21 +19,27 @@ function computeGrowthDisplay(points: GrowthInput[]): GrowthResult {
         return { totalGainGrams: 0, avgGramsPerMonth: 0, trend: "stable", recordCount: 0 };
     }
 
-    const sorted = [...points].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sorted = [...points].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
     const first = sorted[0];
     const latest = sorted[sorted.length - 1];
     const totalGainGrams = latest.weightGrams - first.weightGrams;
 
     const msSpan = new Date(latest.date).getTime() - new Date(first.date).getTime();
     const monthsSpan = msSpan / (1000 * 60 * 60 * 24 * 30.44);
-    const avgGramsPerMonth = monthsSpan > 0 ? Math.round((totalGainGrams / monthsSpan) * 100) / 100 : 0;
+    const avgGramsPerMonth =
+        monthsSpan > 0 ? Math.round((totalGainGrams / monthsSpan) * 100) / 100 : 0;
 
     let trend: "up" | "stable" | "down" = "stable";
     if (sorted.length >= 2) {
         const recentCount = Math.min(3, sorted.length);
         const recentSlice = sorted.slice(-recentCount);
-        const recentGain = recentSlice[recentSlice.length - 1].weightGrams - recentSlice[0].weightGrams;
-        const recentMs = new Date(recentSlice[recentSlice.length - 1].date).getTime() - new Date(recentSlice[0].date).getTime();
+        const recentGain =
+            recentSlice[recentSlice.length - 1].weightGrams - recentSlice[0].weightGrams;
+        const recentMs =
+            new Date(recentSlice[recentSlice.length - 1].date).getTime() -
+            new Date(recentSlice[0].date).getTime();
         const recentMonths = recentMs / (1000 * 60 * 60 * 24 * 30.44);
         const recentRate = recentMonths > 0 ? recentGain / recentMonths : 0;
 

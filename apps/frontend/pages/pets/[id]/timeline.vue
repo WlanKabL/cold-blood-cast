@@ -27,7 +27,7 @@
                     'rounded-full px-3 py-1 text-xs font-medium transition-colors',
                     activeTypes.includes(filter.value)
                         ? 'bg-primary-500/20 text-primary-400'
-                        : 'bg-white/5 text-fg-faint hover:bg-white/10',
+                        : 'text-fg-faint bg-white/5 hover:bg-white/10',
                 ]"
                 @click="toggleType(filter.value)"
             >
@@ -45,12 +45,17 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- Timeline -->
         <template v-else-if="timeline">
-            <div v-if="timeline.events.length === 0" class="glass-card flex flex-col items-center rounded-xl py-16">
+            <div
+                v-if="timeline.events.length === 0"
+                class="glass-card flex flex-col items-center rounded-xl py-16"
+            >
                 <Icon name="lucide:calendar-x" class="mb-3 h-12 w-12 text-white/10" />
                 <p class="text-fg-muted text-sm">{{ $t("pages.pets.timeline.empty") }}</p>
             </div>
@@ -58,7 +63,9 @@
             <div v-else class="space-y-2">
                 <!-- Date group headers + events -->
                 <template v-for="(group, dateKey) in groupedEvents" :key="dateKey">
-                    <h3 class="text-fg-faint pt-4 text-xs font-semibold uppercase tracking-wider first:pt-0">
+                    <h3
+                        class="text-fg-faint pt-4 text-xs font-semibold tracking-wider uppercase first:pt-0"
+                    >
                         {{ dateKey }}
                     </h3>
                     <div
@@ -89,11 +96,17 @@
                                     {{ eventTypeLabel(event.type) }}
                                 </span>
                             </div>
-                            <p v-if="event.detail" class="text-fg-faint mt-0.5 text-xs">{{ event.detail }}</p>
+                            <p v-if="event.detail" class="text-fg-faint mt-0.5 text-xs">
+                                {{ event.detail }}
+                            </p>
                             <!-- Meta -->
-                            <div class="text-fg-faint mt-1 flex flex-wrap items-center gap-3 text-xs">
+                            <div
+                                class="text-fg-faint mt-1 flex flex-wrap items-center gap-3 text-xs"
+                            >
                                 <span>{{ formatTime(event.date) }}</span>
-                                <template v-if="event.type === 'feeding' && event.meta.quantity > 1">
+                                <template
+                                    v-if="event.type === 'feeding' && event.meta.quantity > 1"
+                                >
                                     <span>× {{ event.meta.quantity }}</span>
                                 </template>
                                 <template v-if="event.type === 'feeding' && !event.meta.accepted">
@@ -119,7 +132,10 @@
                         {{ $t("pages.pets.timeline.loadMore") }}
                     </UiButton>
                 </div>
-                <p v-else-if="timeline.events.length > 0" class="text-fg-faint pt-4 text-center text-xs">
+                <p
+                    v-else-if="timeline.events.length > 0"
+                    class="text-fg-faint pt-4 text-center text-xs"
+                >
                     {{ $t("pages.pets.timeline.noMore") }}
                 </p>
             </div>
@@ -163,17 +179,42 @@ const { data: pet } = useQuery({
     queryFn: () => api.get<{ id: string; name: string }>(`/api/pets/${petId}`),
 });
 
-useHead({ title: () => (pet.value?.name ? `${pet.value.name} — ${t("pages.pets.timeline.title")}` : t("pages.pets.timeline.title")) });
+useHead({
+    title: () =>
+        pet.value?.name
+            ? `${pet.value.name} — ${t("pages.pets.timeline.title")}`
+            : t("pages.pets.timeline.title"),
+});
 
 // ── Filters ──────────────────────────────────────────────
 type EventType = "feeding" | "shedding" | "weight" | "vet_visit" | "photo";
 
 const typeFilters = computed(() => [
-    { value: "feeding" as EventType, label: t("pages.pets.timeline.filterFeeding"), icon: "lucide:utensils" },
-    { value: "shedding" as EventType, label: t("pages.pets.timeline.filterShedding"), icon: "lucide:sparkles" },
-    { value: "weight" as EventType, label: t("pages.pets.timeline.filterWeight"), icon: "lucide:scale" },
-    { value: "vet_visit" as EventType, label: t("pages.pets.timeline.filterVetVisit"), icon: "lucide:stethoscope" },
-    { value: "photo" as EventType, label: t("pages.pets.timeline.filterPhoto"), icon: "lucide:camera" },
+    {
+        value: "feeding" as EventType,
+        label: t("pages.pets.timeline.filterFeeding"),
+        icon: "lucide:utensils",
+    },
+    {
+        value: "shedding" as EventType,
+        label: t("pages.pets.timeline.filterShedding"),
+        icon: "lucide:sparkles",
+    },
+    {
+        value: "weight" as EventType,
+        label: t("pages.pets.timeline.filterWeight"),
+        icon: "lucide:scale",
+    },
+    {
+        value: "vet_visit" as EventType,
+        label: t("pages.pets.timeline.filterVetVisit"),
+        icon: "lucide:stethoscope",
+    },
+    {
+        value: "photo" as EventType,
+        label: t("pages.pets.timeline.filterPhoto"),
+        icon: "lucide:camera",
+    },
 ]);
 
 const activeTypes = ref<EventType[]>(["feeding", "shedding", "weight", "vet_visit", "photo"]);
@@ -316,6 +357,8 @@ function formatTime(dateStr: string): string {
 }
 
 function formatCost(cents: number): string {
-    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(
+        cents / 100,
+    );
 }
 </script>

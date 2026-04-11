@@ -3,16 +3,22 @@
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.vetVisits.title") }}</h1>
+                <h1 class="text-fg text-2xl font-bold tracking-tight">
+                    {{ $t("pages.vetVisits.title") }}
+                </h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.vetVisits.subtitle") }}</p>
             </div>
-            <UiButton icon="lucide:plus" @click="showModeChoice = true">{{ $t("pages.vetVisits.add") }}</UiButton>
+            <UiButton icon="lucide:plus" @click="showModeChoice = true">{{
+                $t("pages.vetVisits.add")
+            }}</UiButton>
         </div>
 
         <!-- Cost Summary -->
         <div v-if="costs" class="glass-card rounded-xl p-5">
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400"
+                >
                     <Icon name="lucide:receipt" class="h-5 w-5" />
                 </div>
                 <div>
@@ -22,7 +28,9 @@
                     <p class="text-fg text-xl font-bold">{{ formatCost(costs.totalCents) }}</p>
                 </div>
                 <div class="ml-auto text-right">
-                    <p class="text-fg-faint text-xs">{{ $t("pages.vetVisits.visitCountLabel", { n: costs.visitCount }) }}</p>
+                    <p class="text-fg-faint text-xs">
+                        {{ $t("pages.vetVisits.visitCountLabel", { n: costs.visitCount }) }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -39,7 +47,9 @@
             </UiSelect>
             <UiSelect v-model="selectedType" class="w-48">
                 <option value="ALL">{{ $t("pages.vetVisits.allTypes") }}</option>
-                <option v-for="vt in visitTypes" :key="vt" :value="vt">{{ $t(`pages.vetVisits.types.${vt}`) }}</option>
+                <option v-for="vt in visitTypes" :key="vt" :value="vt">
+                    {{ $t(`pages.vetVisits.types.${vt}`) }}
+                </option>
             </UiSelect>
         </div>
 
@@ -52,7 +62,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- List -->
@@ -66,31 +78,59 @@
                 <div class="flex items-center gap-4">
                     <div
                         class="flex h-10 w-10 items-center justify-center rounded-lg"
-                        :class="visit.isAppointment ? 'bg-amber-500/10 text-amber-400' : 'bg-teal-500/10 text-teal-400'"
+                        :class="
+                            visit.isAppointment
+                                ? 'bg-amber-500/10 text-amber-400'
+                                : 'bg-teal-500/10 text-teal-400'
+                        "
                     >
-                        <Icon :name="visit.isAppointment ? 'lucide:calendar-clock' : 'lucide:stethoscope'" class="h-5 w-5" />
+                        <Icon
+                            :name="
+                                visit.isAppointment ? 'lucide:calendar-clock' : 'lucide:stethoscope'
+                            "
+                            class="h-5 w-5"
+                        />
                     </div>
                     <div>
                         <p class="text-fg text-sm font-medium">
                             {{ visit.pet?.name }}
-                            <span v-if="visit.reason" class="text-fg-faint"> — {{ visit.reason }}</span>
+                            <span v-if="visit.reason" class="text-fg-faint">
+                                — {{ visit.reason }}</span
+                            >
                         </p>
                         <p class="text-fg-faint text-xs">
                             {{ visit.veterinarian?.name ?? $t("pages.vetVisits.noVet") }}
-                            <template v-if="visit.veterinarian?.clinicName"> · {{ visit.veterinarian.clinicName }}</template>
+                            <template v-if="visit.veterinarian?.clinicName">
+                                · {{ visit.veterinarian.clinicName }}</template
+                            >
                         </p>
-                        <p v-if="visit.sourceVisit" class="text-fg-faint mt-0.5 flex items-center gap-1 text-xs">
+                        <p
+                            v-if="visit.sourceVisit"
+                            class="text-fg-faint mt-0.5 flex items-center gap-1 text-xs"
+                        >
                             <Icon name="lucide:corner-down-right" class="h-3 w-3" />
-                            {{ $t("pages.vetVisits.followUpFrom", { date: new Date(visit.sourceVisit.visitDate).toLocaleDateString() }) }}
+                            {{
+                                $t("pages.vetVisits.followUpFrom", {
+                                    date: new Date(
+                                        visit.sourceVisit.visitDate,
+                                    ).toLocaleDateString(),
+                                })
+                            }}
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="text-right">
                         <p class="text-fg-muted text-sm">
-                            {{ visit.isAppointment ? formatDatetime(visit.visitDate) : new Date(visit.visitDate).toLocaleDateString() }}
+                            {{
+                                visit.isAppointment
+                                    ? formatDatetime(visit.visitDate)
+                                    : new Date(visit.visitDate).toLocaleDateString()
+                            }}
                         </p>
-                        <p v-if="visit.costCents" class="text-fg-faint text-xs">{{ formatCost(visit.costCents) }}</p>
+                        <p v-if="visit.costCents" class="text-fg-faint text-xs">
+                            {{ formatCost(visit.costCents) }}
+                        </p>
                     </div>
                     <span
                         v-if="visit.isAppointment"
@@ -98,10 +138,17 @@
                     >
                         {{ $t("pages.vetVisits.scheduled") }}
                     </span>
-                    <span v-else :class="visitTypeBadgeClass(visit.visitType)" class="rounded-md px-2 py-0.5 text-xs font-medium">
+                    <span
+                        v-else
+                        :class="visitTypeBadgeClass(visit.visitType)"
+                        class="rounded-md px-2 py-0.5 text-xs font-medium"
+                    >
                         {{ $t(`pages.vetVisits.types.${visit.visitType}`) }}
                     </span>
-                    <span v-if="visit.documents?.length" class="text-fg-faint flex items-center gap-1 text-xs">
+                    <span
+                        v-if="visit.documents?.length"
+                        class="text-fg-faint flex items-center gap-1 text-xs"
+                    >
                         <Icon name="lucide:paperclip" class="h-3 w-3" />
                         {{ visit.documents.length }}
                     </span>
@@ -113,8 +160,18 @@
                         :title="$t('pages.vetVisits.convertTitle')"
                         @click.prevent="openConvertModal(visit)"
                     />
-                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click.prevent="openEditModal(visit)" />
-                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click.prevent="confirmDelete(visit.id)" />
+                    <UiButton
+                        variant="ghost"
+                        icon="lucide:pencil"
+                        size="sm"
+                        @click.prevent="openEditModal(visit)"
+                    />
+                    <UiButton
+                        variant="danger"
+                        icon="lucide:trash-2"
+                        size="sm"
+                        @click.prevent="confirmDelete(visit.id)"
+                    />
                 </div>
             </NuxtLink>
         </div>
@@ -123,170 +180,349 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:stethoscope" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.vetVisits.empty") }}</p>
-            <UiButton class="mt-4" @click="showModeChoice = true">{{ $t("pages.vetVisits.addFirst") }}</UiButton>
+            <UiButton class="mt-4" @click="showModeChoice = true">{{
+                $t("pages.vetVisits.addFirst")
+            }}</UiButton>
         </div>
 
         <!-- Mode Choice Dialog -->
-        <UiModal :show="showModeChoice" :title="$t('pages.vetVisits.chooseMode')" @close="showModeChoice = false">
+        <UiModal
+            :show="showModeChoice"
+            :title="$t('pages.vetVisits.chooseMode')"
+            @close="showModeChoice = false"
+        >
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <button
                     class="glass-card flex flex-col items-center gap-3 rounded-xl p-6 text-center transition hover:ring-2 hover:ring-amber-500/50"
                     @click="startAppointmentMode"
                 >
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+                    <div
+                        class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400"
+                    >
                         <Icon name="lucide:calendar-clock" class="h-6 w-6" />
                     </div>
                     <div>
-                        <p class="text-fg text-sm font-semibold">{{ $t("pages.vetVisits.modeAppointment") }}</p>
-                        <p class="text-fg-faint mt-1 text-xs">{{ $t("pages.vetVisits.modeAppointmentDesc") }}</p>
+                        <p class="text-fg text-sm font-semibold">
+                            {{ $t("pages.vetVisits.modeAppointment") }}
+                        </p>
+                        <p class="text-fg-faint mt-1 text-xs">
+                            {{ $t("pages.vetVisits.modeAppointmentDesc") }}
+                        </p>
                     </div>
                 </button>
                 <button
                     class="glass-card flex flex-col items-center gap-3 rounded-xl p-6 text-center transition hover:ring-2 hover:ring-teal-500/50"
                     @click="startPastVisitMode"
                 >
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400">
+                    <div
+                        class="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400"
+                    >
                         <Icon name="lucide:stethoscope" class="h-6 w-6" />
                     </div>
                     <div>
-                        <p class="text-fg text-sm font-semibold">{{ $t("pages.vetVisits.modePastVisit") }}</p>
-                        <p class="text-fg-faint mt-1 text-xs">{{ $t("pages.vetVisits.modePastVisitDesc") }}</p>
+                        <p class="text-fg text-sm font-semibold">
+                            {{ $t("pages.vetVisits.modePastVisit") }}
+                        </p>
+                        <p class="text-fg-faint mt-1 text-xs">
+                            {{ $t("pages.vetVisits.modePastVisitDesc") }}
+                        </p>
                     </div>
                 </button>
             </div>
         </UiModal>
 
         <!-- Appointment Modal (future — minimal fields) -->
-        <UiModal :show="showAppointment" :title="$t('pages.vetVisits.createAppointment')" width="lg" @close="showAppointment = false">
+        <UiModal
+            :show="showAppointment"
+            :title="$t('pages.vetVisits.createAppointment')"
+            width="lg"
+            @close="showAppointment = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreateAppointment">
                 <UiSelect v-model="form.petId" :label="$t('pages.vetVisits.fields.pet')" required>
                     <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </UiSelect>
-                <UiSelect v-model="form.veterinarianId" :label="$t('pages.vetVisits.fields.veterinarian')">
+                <UiSelect
+                    v-model="form.veterinarianId"
+                    :label="$t('pages.vetVisits.fields.veterinarian')"
+                >
                     <option value="">{{ $t("pages.vetVisits.fields.noVet") }}</option>
                     <option v-for="v in vets" :key="v.id" :value="v.id">{{ v.name }}</option>
                 </UiSelect>
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="form.visitDate" :label="$t('pages.vetVisits.fields.appointmentDate')" type="datetime-local" required />
-                    <UiSelect v-model="form.visitType" :label="$t('pages.vetVisits.fields.visitType')">
-                        <option v-for="vt in visitTypes" :key="vt" :value="vt">{{ $t(`pages.vetVisits.types.${vt}`) }}</option>
+                    <UiTextInput
+                        v-model="form.visitDate"
+                        :label="$t('pages.vetVisits.fields.appointmentDate')"
+                        type="datetime-local"
+                        required
+                    />
+                    <UiSelect
+                        v-model="form.visitType"
+                        :label="$t('pages.vetVisits.fields.visitType')"
+                    >
+                        <option v-for="vt in visitTypes" :key="vt" :value="vt">
+                            {{ $t(`pages.vetVisits.types.${vt}`) }}
+                        </option>
                     </UiSelect>
                 </div>
                 <UiTextInput v-model="form.reason" :label="$t('pages.vetVisits.fields.reason')" />
                 <UiTextarea v-model="form.notes" :label="$t('pages.vetVisits.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showAppointment = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showAppointment = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Past Visit Modal (full fields) -->
-        <UiModal :show="showPastVisit" :title="$t('pages.vetVisits.create')" width="lg" @close="showPastVisit = false">
+        <UiModal
+            :show="showPastVisit"
+            :title="$t('pages.vetVisits.create')"
+            width="lg"
+            @close="showPastVisit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreatePastVisit">
                 <UiSelect v-model="form.petId" :label="$t('pages.vetVisits.fields.pet')" required>
                     <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </UiSelect>
-                <UiSelect v-model="form.veterinarianId" :label="$t('pages.vetVisits.fields.veterinarian')">
+                <UiSelect
+                    v-model="form.veterinarianId"
+                    :label="$t('pages.vetVisits.fields.veterinarian')"
+                >
                     <option value="">{{ $t("pages.vetVisits.fields.noVet") }}</option>
                     <option v-for="v in vets" :key="v.id" :value="v.id">{{ v.name }}</option>
                 </UiSelect>
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="form.visitDate" :label="$t('pages.vetVisits.fields.visitDate')" type="date" required />
-                    <UiSelect v-model="form.visitType" :label="$t('pages.vetVisits.fields.visitType')">
-                        <option v-for="vt in visitTypes" :key="vt" :value="vt">{{ $t(`pages.vetVisits.types.${vt}`) }}</option>
+                    <UiTextInput
+                        v-model="form.visitDate"
+                        :label="$t('pages.vetVisits.fields.visitDate')"
+                        type="date"
+                        required
+                    />
+                    <UiSelect
+                        v-model="form.visitType"
+                        :label="$t('pages.vetVisits.fields.visitType')"
+                    >
+                        <option v-for="vt in visitTypes" :key="vt" :value="vt">
+                            {{ $t(`pages.vetVisits.types.${vt}`) }}
+                        </option>
                     </UiSelect>
                 </div>
                 <UiTextInput v-model="form.reason" :label="$t('pages.vetVisits.fields.reason')" />
-                <UiTextarea v-model="form.diagnosis" :label="$t('pages.vetVisits.fields.diagnosis')" />
-                <UiTextarea v-model="form.treatment" :label="$t('pages.vetVisits.fields.treatment')" />
+                <UiTextarea
+                    v-model="form.diagnosis"
+                    :label="$t('pages.vetVisits.fields.diagnosis')"
+                />
+                <UiTextarea
+                    v-model="form.treatment"
+                    :label="$t('pages.vetVisits.fields.treatment')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model.number="form.costEur" :label="$t('pages.vetVisits.fields.cost')" type="number" step="0.01" min="0" />
-                    <UiTextInput v-model.number="form.weightGrams" :label="$t('pages.vetVisits.fields.weight')" type="number" min="0" />
+                    <UiTextInput
+                        v-model.number="form.costEur"
+                        :label="$t('pages.vetVisits.fields.cost')"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                    />
+                    <UiTextInput
+                        v-model.number="form.weightGrams"
+                        :label="$t('pages.vetVisits.fields.weight')"
+                        type="number"
+                        min="0"
+                    />
                 </div>
-                <UiTextInput v-model="form.nextAppointment" :label="$t('pages.vetVisits.fields.nextAppointment')" type="date" />
+                <UiTextInput
+                    v-model="form.nextAppointment"
+                    :label="$t('pages.vetVisits.fields.nextAppointment')"
+                    type="date"
+                />
                 <UiTextarea v-model="form.notes" :label="$t('pages.vetVisits.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showPastVisit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showPastVisit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Convert Appointment Modal -->
-        <UiModal :show="showConvert" :title="$t('pages.vetVisits.convertTitle')" width="lg" @close="showConvert = false">
+        <UiModal
+            :show="showConvert"
+            :title="$t('pages.vetVisits.convertTitle')"
+            width="lg"
+            @close="showConvert = false"
+        >
             <form class="space-y-4" @submit.prevent="handleConvert">
                 <!-- Appointment info summary -->
-                <div v-if="convertingVisit" class="glass-card flex items-center gap-3 rounded-lg p-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">
+                <div
+                    v-if="convertingVisit"
+                    class="glass-card flex items-center gap-3 rounded-lg p-3"
+                >
+                    <div
+                        class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400"
+                    >
                         <Icon name="lucide:calendar-clock" class="h-4 w-4" />
                     </div>
                     <div>
                         <p class="text-fg text-sm font-medium">{{ convertingVisit.pet?.name }}</p>
                         <p class="text-fg-faint text-xs">
-                            {{ $t("pages.vetVisits.scheduledFor", { date: new Date(convertingVisit.visitDate).toLocaleDateString() }) }}
+                            {{
+                                $t("pages.vetVisits.scheduledFor", {
+                                    date: new Date(convertingVisit.visitDate).toLocaleDateString(),
+                                })
+                            }}
                         </p>
                     </div>
                 </div>
-                <UiTextInput v-model="convertForm.visitDate" :label="$t('pages.vetVisits.fields.actualVisitDate')" type="date" required />
-                <UiTextarea v-model="convertForm.diagnosis" :label="$t('pages.vetVisits.fields.diagnosis')" />
-                <UiTextarea v-model="convertForm.treatment" :label="$t('pages.vetVisits.fields.treatment')" />
+                <UiTextInput
+                    v-model="convertForm.visitDate"
+                    :label="$t('pages.vetVisits.fields.actualVisitDate')"
+                    type="date"
+                    required
+                />
+                <UiTextarea
+                    v-model="convertForm.diagnosis"
+                    :label="$t('pages.vetVisits.fields.diagnosis')"
+                />
+                <UiTextarea
+                    v-model="convertForm.treatment"
+                    :label="$t('pages.vetVisits.fields.treatment')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model.number="convertForm.costEur" :label="$t('pages.vetVisits.fields.cost')" type="number" step="0.01" min="0" />
-                    <UiTextInput v-model.number="convertForm.weightGrams" :label="$t('pages.vetVisits.fields.weight')" type="number" min="0" />
+                    <UiTextInput
+                        v-model.number="convertForm.costEur"
+                        :label="$t('pages.vetVisits.fields.cost')"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                    />
+                    <UiTextInput
+                        v-model.number="convertForm.weightGrams"
+                        :label="$t('pages.vetVisits.fields.weight')"
+                        type="number"
+                        min="0"
+                    />
                 </div>
-                <UiTextInput v-model="convertForm.nextAppointment" :label="$t('pages.vetVisits.fields.nextAppointment')" type="date" />
-                <UiTextarea v-model="convertForm.notes" :label="$t('pages.vetVisits.fields.notes')" />
+                <UiTextInput
+                    v-model="convertForm.nextAppointment"
+                    :label="$t('pages.vetVisits.fields.nextAppointment')"
+                    type="date"
+                />
+                <UiTextarea
+                    v-model="convertForm.notes"
+                    :label="$t('pages.vetVisits.fields.notes')"
+                />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showConvert = false">{{ $t("common.cancel") }}</UiButton>
-                    <UiButton type="submit" :loading="converting">{{ $t("pages.vetVisits.convertConfirm") }}</UiButton>
+                    <UiButton variant="ghost" @click="showConvert = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
+                    <UiButton type="submit" :loading="converting">{{
+                        $t("pages.vetVisits.convertConfirm")
+                    }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.vetVisits.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.vetVisits.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiSelect v-model="editForm.veterinarianId" :label="$t('pages.vetVisits.fields.veterinarian')">
+                <UiSelect
+                    v-model="editForm.veterinarianId"
+                    :label="$t('pages.vetVisits.fields.veterinarian')"
+                >
                     <option value="">{{ $t("pages.vetVisits.fields.noVet") }}</option>
                     <option v-for="v in vets" :key="v.id" :value="v.id">{{ v.name }}</option>
                 </UiSelect>
                 <div class="grid grid-cols-2 gap-3">
                     <UiTextInput
                         v-model="editForm.visitDate"
-                        :label="editingIsAppointment ? $t('pages.vetVisits.fields.appointmentDate') : $t('pages.vetVisits.fields.visitDate')"
+                        :label="
+                            editingIsAppointment
+                                ? $t('pages.vetVisits.fields.appointmentDate')
+                                : $t('pages.vetVisits.fields.visitDate')
+                        "
                         :type="editingIsAppointment ? 'datetime-local' : 'date'"
                         required
                     />
-                    <UiSelect v-model="editForm.visitType" :label="$t('pages.vetVisits.fields.visitType')">
-                        <option v-for="vt in visitTypes" :key="vt" :value="vt">{{ $t(`pages.vetVisits.types.${vt}`) }}</option>
+                    <UiSelect
+                        v-model="editForm.visitType"
+                        :label="$t('pages.vetVisits.fields.visitType')"
+                    >
+                        <option v-for="vt in visitTypes" :key="vt" :value="vt">
+                            {{ $t(`pages.vetVisits.types.${vt}`) }}
+                        </option>
                     </UiSelect>
                 </div>
-                <UiTextInput v-model="editForm.reason" :label="$t('pages.vetVisits.fields.reason')" />
+                <UiTextInput
+                    v-model="editForm.reason"
+                    :label="$t('pages.vetVisits.fields.reason')"
+                />
                 <template v-if="!editingIsAppointment">
-                    <UiTextarea v-model="editForm.diagnosis" :label="$t('pages.vetVisits.fields.diagnosis')" />
-                    <UiTextarea v-model="editForm.treatment" :label="$t('pages.vetVisits.fields.treatment')" />
+                    <UiTextarea
+                        v-model="editForm.diagnosis"
+                        :label="$t('pages.vetVisits.fields.diagnosis')"
+                    />
+                    <UiTextarea
+                        v-model="editForm.treatment"
+                        :label="$t('pages.vetVisits.fields.treatment')"
+                    />
                     <div class="grid grid-cols-2 gap-3">
-                        <UiTextInput v-model.number="editForm.costEur" :label="$t('pages.vetVisits.fields.cost')" type="number" step="0.01" min="0" />
-                        <UiTextInput v-model.number="editForm.weightGrams" :label="$t('pages.vetVisits.fields.weight')" type="number" min="0" />
+                        <UiTextInput
+                            v-model.number="editForm.costEur"
+                            :label="$t('pages.vetVisits.fields.cost')"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                        />
+                        <UiTextInput
+                            v-model.number="editForm.weightGrams"
+                            :label="$t('pages.vetVisits.fields.weight')"
+                            type="number"
+                            min="0"
+                        />
                     </div>
-                    <UiTextInput v-model="editForm.nextAppointment" :label="$t('pages.vetVisits.fields.nextAppointment')" type="date" />
+                    <UiTextInput
+                        v-model="editForm.nextAppointment"
+                        :label="$t('pages.vetVisits.fields.nextAppointment')"
+                        type="date"
+                    />
                 </template>
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.vetVisits.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Follow-Up Dialog (after creating past visit with nextAppointment) -->
-        <UiModal :show="showFollowUp" :title="$t('pages.vetVisits.followUpTitle')" @close="showFollowUp = false">
+        <UiModal
+            :show="showFollowUp"
+            :title="$t('pages.vetVisits.followUpTitle')"
+            @close="showFollowUp = false"
+        >
             <div class="space-y-4">
-                <p class="text-fg-muted text-sm">{{ $t("pages.vetVisits.followUpMessage", { date: followUpDate }) }}</p>
+                <p class="text-fg-muted text-sm">
+                    {{ $t("pages.vetVisits.followUpMessage", { date: followUpDate }) }}
+                </p>
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showFollowUp = false">{{ $t("pages.vetVisits.followUpSkip") }}</UiButton>
-                    <UiButton @click="openFollowUpAppointment">{{ $t("pages.vetVisits.followUpCreate") }}</UiButton>
+                    <UiButton variant="ghost" @click="showFollowUp = false">{{
+                        $t("pages.vetVisits.followUpSkip")
+                    }}</UiButton>
+                    <UiButton @click="openFollowUpAppointment">{{
+                        $t("pages.vetVisits.followUpCreate")
+                    }}</UiButton>
                 </div>
             </div>
         </UiModal>
@@ -374,8 +610,10 @@ const selectedType = ref("ALL");
 const queryParams = computed(() => {
     const params = new URLSearchParams();
     if (selectedPet.value && selectedPet.value !== "ALL") params.set("petId", selectedPet.value);
-    if (selectedVet.value && selectedVet.value !== "ALL") params.set("veterinarianId", selectedVet.value);
-    if (selectedType.value && selectedType.value !== "ALL") params.set("visitType", selectedType.value);
+    if (selectedVet.value && selectedVet.value !== "ALL")
+        params.set("veterinarianId", selectedVet.value);
+    if (selectedType.value && selectedType.value !== "ALL")
+        params.set("visitType", selectedType.value);
     return params.toString();
 });
 
@@ -387,7 +625,8 @@ const {
     refetch,
 } = useQuery({
     queryKey: ["vet-visits", selectedPet, selectedVet, selectedType],
-    queryFn: () => api.get<VetVisit[]>(`/api/vet-visits${queryParams.value ? `?${queryParams.value}` : ""}`),
+    queryFn: () =>
+        api.get<VetVisit[]>(`/api/vet-visits${queryParams.value ? `?${queryParams.value}` : ""}`),
 });
 
 const { data: pets } = useQuery({
@@ -407,7 +646,9 @@ const { data: costs } = useQuery({
 
 // ── Helpers ──────────────────────────────────────────────
 function formatCost(cents: number): string {
-    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(
+        cents / 100,
+    );
 }
 
 function visitTypeBadgeClass(type: string): string {
@@ -639,9 +880,12 @@ const { mutate: convertMutation, isPending: converting } = useMutation({
             visitDate: toDatetime(convertForm.visitDate),
             diagnosis: convertForm.diagnosis || undefined,
             treatment: convertForm.treatment || undefined,
-            costCents: convertForm.costEur != null ? Math.round(convertForm.costEur * 100) : undefined,
+            costCents:
+                convertForm.costEur != null ? Math.round(convertForm.costEur * 100) : undefined,
             weightGrams: convertForm.weightGrams ?? undefined,
-            nextAppointment: convertForm.nextAppointment ? toDatetime(convertForm.nextAppointment) : undefined,
+            nextAppointment: convertForm.nextAppointment
+                ? toDatetime(convertForm.nextAppointment)
+                : undefined,
             notes: convertForm.notes || undefined,
         }),
     onSuccess: () => {
@@ -690,7 +934,9 @@ function openEditModal(visit: VetVisit) {
     editingIsAppointment.value = visit.isAppointment;
     Object.assign(editForm, {
         veterinarianId: visit.veterinarianId ?? "",
-        visitDate: visit.isAppointment ? toLocalDatetimeStr(new Date(visit.visitDate)) : visit.visitDate.slice(0, 10),
+        visitDate: visit.isAppointment
+            ? toLocalDatetimeStr(new Date(visit.visitDate))
+            : visit.visitDate.slice(0, 10),
         visitType: visit.visitType,
         reason: visit.reason ?? "",
         diagnosis: visit.diagnosis ?? "",
@@ -712,9 +958,17 @@ const { mutate: updateMutation, isPending: updating } = useMutation({
             reason: editForm.reason || undefined,
             diagnosis: editingIsAppointment.value ? undefined : editForm.diagnosis || undefined,
             treatment: editingIsAppointment.value ? undefined : editForm.treatment || undefined,
-            costCents: editingIsAppointment.value ? undefined : (editForm.costEur != null ? Math.round(editForm.costEur * 100) : null),
+            costCents: editingIsAppointment.value
+                ? undefined
+                : editForm.costEur != null
+                  ? Math.round(editForm.costEur * 100)
+                  : null,
             weightGrams: editingIsAppointment.value ? undefined : editForm.weightGrams,
-            nextAppointment: editingIsAppointment.value ? undefined : (editForm.nextAppointment ? toDatetime(editForm.nextAppointment) : null),
+            nextAppointment: editingIsAppointment.value
+                ? undefined
+                : editForm.nextAppointment
+                  ? toDatetime(editForm.nextAppointment)
+                  : null,
             notes: editForm.notes || undefined,
         }),
     onSuccess: () => {

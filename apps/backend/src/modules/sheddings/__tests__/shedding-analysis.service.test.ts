@@ -12,9 +12,8 @@ const mockPrisma = {
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
-const { computeSheddingCycle, getSheddingAnalysis, getUpcomingSheddings } = await import(
-    "../shedding-analysis.service.js"
-);
+const { computeSheddingCycle, getSheddingAnalysis, getUpcomingSheddings } =
+    await import("../shedding-analysis.service.js");
 
 const USER_ID = "user_123";
 const PET_ID = "pet_001";
@@ -59,10 +58,7 @@ describe("computeSheddingCycle", () => {
 
     it("calculates average interval for two sheddings", () => {
         const result = computeSheddingCycle(
-            [
-                { startedAt: "2024-01-01T00:00:00.000Z" },
-                { startedAt: "2024-01-31T00:00:00.000Z" },
-            ],
+            [{ startedAt: "2024-01-01T00:00:00.000Z" }, { startedAt: "2024-01-31T00:00:00.000Z" }],
             PET_ID,
             PET_NAME,
         );
@@ -152,10 +148,7 @@ describe("computeSheddingCycle", () => {
 
     it("predicts next shedding date based on average", () => {
         const result = computeSheddingCycle(
-            [
-                { startedAt: "2024-01-01T00:00:00.000Z" },
-                { startedAt: "2024-01-31T00:00:00.000Z" },
-            ],
+            [{ startedAt: "2024-01-01T00:00:00.000Z" }, { startedAt: "2024-01-31T00:00:00.000Z" }],
             PET_ID,
             PET_NAME,
         );
@@ -172,10 +165,7 @@ describe("computeSheddingCycle", () => {
         const longAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
         const evenLongerAgo = new Date(longAgo.getTime() - 30 * 24 * 60 * 60 * 1000);
         const result = computeSheddingCycle(
-            [
-                { startedAt: evenLongerAgo.toISOString() },
-                { startedAt: longAgo.toISOString() },
-            ],
+            [{ startedAt: evenLongerAgo.toISOString() }, { startedAt: longAgo.toISOString() }],
             PET_ID,
             PET_NAME,
         );
@@ -187,10 +177,7 @@ describe("computeSheddingCycle", () => {
         const recent = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
         const before = new Date(recent.getTime() - 30 * 24 * 60 * 60 * 1000);
         const result = computeSheddingCycle(
-            [
-                { startedAt: before.toISOString() },
-                { startedAt: recent.toISOString() },
-            ],
+            [{ startedAt: before.toISOString() }, { startedAt: recent.toISOString() }],
             PET_ID,
             PET_NAME,
         );
@@ -278,9 +265,7 @@ describe("getUpcomingSheddings", () => {
         const recent = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000);
         const before = new Date(recent.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-        mockPrisma.pet.findMany.mockResolvedValue([
-            { id: PET_ID, name: PET_NAME },
-        ]);
+        mockPrisma.pet.findMany.mockResolvedValue([{ id: PET_ID, name: PET_NAME }]);
         mockPrisma.shedding.findMany.mockResolvedValue([
             { startedAt: before },
             { startedAt: recent },
@@ -295,9 +280,7 @@ describe("getUpcomingSheddings", () => {
     });
 
     it("excludes pets with no sheddings", async () => {
-        mockPrisma.pet.findMany.mockResolvedValue([
-            { id: PET_ID, name: PET_NAME },
-        ]);
+        mockPrisma.pet.findMany.mockResolvedValue([{ id: PET_ID, name: PET_NAME }]);
         mockPrisma.shedding.findMany.mockResolvedValue([]);
 
         const result = await getUpcomingSheddings(USER_ID);
@@ -305,12 +288,8 @@ describe("getUpcomingSheddings", () => {
     });
 
     it("excludes pets with only one shedding", async () => {
-        mockPrisma.pet.findMany.mockResolvedValue([
-            { id: PET_ID, name: PET_NAME },
-        ]);
-        mockPrisma.shedding.findMany.mockResolvedValue([
-            { startedAt: new Date("2024-06-01") },
-        ]);
+        mockPrisma.pet.findMany.mockResolvedValue([{ id: PET_ID, name: PET_NAME }]);
+        mockPrisma.shedding.findMany.mockResolvedValue([{ startedAt: new Date("2024-06-01") }]);
 
         const result = await getUpcomingSheddings(USER_ID);
         expect(result).toEqual([]);
@@ -320,9 +299,7 @@ describe("getUpcomingSheddings", () => {
         const recent = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         const before = new Date(recent.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-        mockPrisma.pet.findMany.mockResolvedValue([
-            { id: PET_ID, name: PET_NAME },
-        ]);
+        mockPrisma.pet.findMany.mockResolvedValue([{ id: PET_ID, name: PET_NAME }]);
         mockPrisma.shedding.findMany.mockResolvedValue([
             { startedAt: before },
             { startedAt: recent },

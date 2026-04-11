@@ -98,12 +98,18 @@
                 >
                     <div class="flex items-start justify-between gap-2">
                         <div class="min-w-0 flex-1">
-                            <NuxtLink :to="`/pets/${fs.petId}`" class="text-fg hover:text-primary-400 font-semibold transition-colors">
+                            <NuxtLink
+                                :to="`/pets/${fs.petId}`"
+                                class="text-fg hover:text-primary-400 font-semibold transition-colors"
+                            >
                                 {{ fs.petName }}
                             </NuxtLink>
                             <p class="text-fg-faint text-xs">{{ fs.species }}</p>
                         </div>
-                        <span :class="feedingStatusBadgeClass(fs.status)" class="shrink-0 rounded-md px-2 py-0.5 text-xs font-medium">
+                        <span
+                            :class="feedingStatusBadgeClass(fs.status)"
+                            class="shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
+                        >
                             {{ feedingStatusLabel(fs.status) }}
                         </span>
                     </div>
@@ -152,7 +158,10 @@
                     class="glass-card rounded-xl p-4"
                 >
                     <div class="mb-2 flex items-center justify-between">
-                        <NuxtLink :to="`/pets/${series.petId}`" class="text-fg hover:text-primary-400 text-sm font-semibold transition-colors">
+                        <NuxtLink
+                            :to="`/pets/${series.petId}`"
+                            class="text-fg hover:text-primary-400 text-sm font-semibold transition-colors"
+                        >
                             {{ series.petName }}
                         </NuxtLink>
                         <span v-if="series.points.length" class="text-fg-faint text-xs">
@@ -199,18 +208,32 @@
                 >
                     <div class="flex items-start justify-between gap-2">
                         <div class="min-w-0 flex-1">
-                            <p class="text-fg group-hover:text-primary-400 font-semibold transition-colors">{{ item.petName }}</p>
+                            <p
+                                class="text-fg group-hover:text-primary-400 font-semibold transition-colors"
+                            >
+                                {{ item.petName }}
+                            </p>
                             <p class="text-fg-faint text-xs">
-                                {{ $t("pages.dashboard.avgCycle", { days: item.averageIntervalDays }) }}
+                                {{
+                                    $t("pages.dashboard.avgCycle", {
+                                        days: item.averageIntervalDays,
+                                    })
+                                }}
                             </p>
                         </div>
                         <span
-                            :class="item.daysUntil <= 0 ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-400'"
+                            :class="
+                                item.daysUntil <= 0
+                                    ? 'bg-red-500/10 text-red-400'
+                                    : 'bg-amber-500/10 text-amber-400'
+                            "
                             class="shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
                         >
                             {{
                                 item.daysUntil <= 0
-                                    ? $t("pages.dashboard.predictedOverdue", { days: Math.abs(item.daysUntil) })
+                                    ? $t("pages.dashboard.predictedOverdue", {
+                                          days: Math.abs(item.daysUntil),
+                                      })
                                     : $t("pages.dashboard.predictedIn", { days: item.daysUntil })
                             }}
                         </span>
@@ -303,6 +326,59 @@
             </div>
         </div>
 
+        <!-- Overdue Maintenance -->
+        <div>
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-fg text-lg font-semibold">
+                    {{ $t("pages.dashboard.overdueMaintenance") }}
+                </h2>
+                <NuxtLink
+                    to="/maintenance"
+                    class="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                >
+                    {{ $t("pages.dashboard.viewAll") }}
+                </NuxtLink>
+            </div>
+            <div
+                v-if="overdueMaintenance?.length"
+                class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            >
+                <NuxtLink
+                    v-for="task in overdueMaintenance"
+                    :key="task.id"
+                    to="/maintenance"
+                    class="glass-card group rounded-xl p-4 transition-all hover:ring-1 hover:ring-white/10"
+                >
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                            <p
+                                class="text-fg group-hover:text-primary-400 font-semibold transition-colors"
+                            >
+                                {{ task.enclosure?.name }}
+                            </p>
+                            <p class="text-fg-faint text-xs">
+                                {{ task.description || task.type }}
+                            </p>
+                        </div>
+                        <span
+                            class="shrink-0 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                        >
+                            {{ $t("pages.maintenance.overdue") }}
+                        </span>
+                    </div>
+                    <p v-if="task.nextDueAt" class="text-fg-faint mt-2 text-xs">
+                        {{ new Date(task.nextDueAt).toLocaleDateString() }}
+                    </p>
+                </NuxtLink>
+            </div>
+            <div v-else class="glass-card flex flex-col items-center rounded-xl py-8">
+                <Icon name="lucide:wrench" class="text-fg-faint mb-2 h-8 w-8" />
+                <p class="text-fg-muted text-sm">
+                    {{ $t("pages.dashboard.noOverdueMaintenance") }}
+                </p>
+            </div>
+        </div>
+
         <!-- Upcoming Vet Appointments -->
         <div>
             <div class="mb-4 flex items-center justify-between">
@@ -331,17 +407,25 @@
                                 <p class="text-fg font-semibold">{{ visit.pet?.name }}</p>
                                 <p class="text-fg-faint text-xs">
                                     {{ visit.veterinarian?.name ?? $t("pages.dashboard.noVet") }}
-                                    <template v-if="visit.veterinarian?.clinicName"> · {{ visit.veterinarian.clinicName }}</template>
+                                    <template v-if="visit.veterinarian?.clinicName">
+                                        · {{ visit.veterinarian.clinicName }}</template
+                                    >
                                 </p>
                             </div>
                             <span
-                                :class="visit.isAppointment ? 'bg-amber-500/10 text-amber-400' : 'bg-teal-500/10 text-teal-400'"
+                                :class="
+                                    visit.isAppointment
+                                        ? 'bg-amber-500/10 text-amber-400'
+                                        : 'bg-teal-500/10 text-teal-400'
+                                "
                                 class="shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
                             >
                                 {{ new Date(visit._sortDate).toLocaleDateString() }}
                             </span>
                         </div>
-                        <p v-if="visit.reason" class="text-fg-faint mt-2 text-xs">{{ visit.reason }}</p>
+                        <p v-if="visit.reason" class="text-fg-faint mt-2 text-xs">
+                            {{ visit.reason }}
+                        </p>
                     </NuxtLink>
                 </div>
             </div>
@@ -404,6 +488,14 @@ interface UpcomingVetVisit {
     veterinarian: { id: string; name: string; clinicName: string | null } | null;
 }
 
+interface OverdueMaintenanceTask {
+    id: string;
+    type: string;
+    description: string | null;
+    nextDueAt: string | null;
+    enclosure: { id: string; name: string } | null;
+}
+
 interface WeightChartSeries {
     petId: string;
     petName: string;
@@ -458,6 +550,11 @@ const feedingStatuses = computed(() =>
 const { data: upcomingVetVisits } = useQuery({
     queryKey: ["vet-visits", "upcoming"],
     queryFn: () => api.get<UpcomingVetVisit[]>("/api/vet-visits/upcoming"),
+});
+
+const { data: overdueMaintenance } = useQuery({
+    queryKey: ["maintenance-tasks", "overdue"],
+    queryFn: () => api.get<OverdueMaintenanceTask[]>("/api/enclosure-maintenance/overdue"),
 });
 
 const allPetIds = computed(() => (pets.value ?? []).map((p) => p.id).join(","));

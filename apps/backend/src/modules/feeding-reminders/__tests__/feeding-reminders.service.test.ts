@@ -11,9 +11,8 @@ const mockPrisma = {
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
-const { computeFeedingStatus, getFeedingStatuses, getPetsNeedingReminder } = await import(
-    "../feeding-reminders.service.js"
-);
+const { computeFeedingStatus, getFeedingStatuses, getPetsNeedingReminder } =
+    await import("../feeding-reminders.service.js");
 
 const USER_ID = "user_123";
 

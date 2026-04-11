@@ -145,11 +145,46 @@ describe("categoryIconColor", () => {
 
 describe("filterByCategory", () => {
     const documents: PetDocument[] = [
-        { id: "1", category: "CITES", label: "CITES Cert", notes: null, documentDate: null, createdAt: "2025-01-01T00:00:00Z" },
-        { id: "2", category: "VET_REPORT", label: "Checkup", notes: "Good health", documentDate: "2025-02-01T00:00:00Z", createdAt: "2025-02-01T00:00:00Z" },
-        { id: "3", category: "CITES", label: "CITES Update", notes: null, documentDate: null, createdAt: "2025-03-01T00:00:00Z" },
-        { id: "4", category: "PURCHASE_RECEIPT", label: null, notes: null, documentDate: null, createdAt: "2025-04-01T00:00:00Z" },
-        { id: "5", category: "OTHER", label: "Misc", notes: null, documentDate: null, createdAt: "2025-05-01T00:00:00Z" },
+        {
+            id: "1",
+            category: "CITES",
+            label: "CITES Cert",
+            notes: null,
+            documentDate: null,
+            createdAt: "2025-01-01T00:00:00Z",
+        },
+        {
+            id: "2",
+            category: "VET_REPORT",
+            label: "Checkup",
+            notes: "Good health",
+            documentDate: "2025-02-01T00:00:00Z",
+            createdAt: "2025-02-01T00:00:00Z",
+        },
+        {
+            id: "3",
+            category: "CITES",
+            label: "CITES Update",
+            notes: null,
+            documentDate: null,
+            createdAt: "2025-03-01T00:00:00Z",
+        },
+        {
+            id: "4",
+            category: "PURCHASE_RECEIPT",
+            label: null,
+            notes: null,
+            documentDate: null,
+            createdAt: "2025-04-01T00:00:00Z",
+        },
+        {
+            id: "5",
+            category: "OTHER",
+            label: "Misc",
+            notes: null,
+            documentDate: null,
+            createdAt: "2025-05-01T00:00:00Z",
+        },
     ];
 
     it("returns all documents when no category filter", () => {

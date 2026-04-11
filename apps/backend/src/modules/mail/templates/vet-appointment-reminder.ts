@@ -29,13 +29,13 @@ export interface VetAppointmentReminderData {
 
 function appointmentRow(appointment: VetReminderAppointment, locale: string): string {
     const isDE = locale === "de";
-    const when = appointment.isToday
-        ? isDE ? "Heute" : "Today"
-        : isDE ? "Morgen" : "Tomorrow";
+    const when = appointment.isToday ? (isDE ? "Heute" : "Today") : isDE ? "Morgen" : "Tomorrow";
 
     const vetInfo = appointment.vetName
         ? `${appointment.vetName}${appointment.clinicName ? ` (${appointment.clinicName})` : ""}`
-        : isDE ? "Kein Tierarzt zugewiesen" : "No vet assigned";
+        : isDE
+          ? "Kein Tierarzt zugewiesen"
+          : "No vet assigned";
 
     return `<tr>
     <td style="padding:12px 0;border-bottom:1px solid #2a2a1c;">

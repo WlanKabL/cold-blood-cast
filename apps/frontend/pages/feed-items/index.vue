@@ -3,10 +3,14 @@
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.feedItems.title") }}</h1>
+                <h1 class="text-fg text-2xl font-bold tracking-tight">
+                    {{ $t("pages.feedItems.title") }}
+                </h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.feedItems.subtitle") }}</p>
             </div>
-            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.feedItems.add") }}</UiButton>
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{
+                $t("pages.feedItems.add")
+            }}</UiButton>
         </div>
 
         <!-- Loading -->
@@ -18,7 +22,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- List -->
@@ -29,7 +35,9 @@
                 class="glass-card flex items-center justify-between rounded-xl p-4"
             >
                 <div class="flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10 text-orange-400">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10 text-orange-400"
+                    >
                         <Icon name="lucide:rat" class="h-5 w-5" />
                     </div>
                     <div>
@@ -38,7 +46,9 @@
                             <span v-if="item.size">{{ item.size }}</span>
                             <span v-if="item.size && item.weightGrams"> · </span>
                             <span v-if="item.weightGrams">{{ item.weightGrams }}g</span>
-                            <span v-if="!item.size && !item.weightGrams">{{ $t("pages.feedItems.noDetails") }}</span>
+                            <span v-if="!item.size && !item.weightGrams">{{
+                                $t("pages.feedItems.noDetails")
+                            }}</span>
                         </p>
                     </div>
                 </div>
@@ -48,11 +58,25 @@
                             {{ item.suitablePets.map((p: { name: string }) => p.name).join(", ") }}
                         </p>
                         <p class="text-fg-faint text-xs">
-                            {{ $t("pages.feedItems.usedCount", { count: item._count?.feedings ?? 0 }) }}
+                            {{
+                                $t("pages.feedItems.usedCount", {
+                                    count: item._count?.feedings ?? 0,
+                                })
+                            }}
                         </p>
                     </div>
-                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(item)" />
-                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(item.id)" />
+                    <UiButton
+                        variant="ghost"
+                        icon="lucide:pencil"
+                        size="sm"
+                        @click="openEditModal(item)"
+                    />
+                    <UiButton
+                        variant="danger"
+                        icon="lucide:trash-2"
+                        size="sm"
+                        @click="confirmDelete(item.id)"
+                    />
                 </div>
             </div>
         </div>
@@ -61,56 +85,120 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:rat" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.feedItems.empty") }}</p>
-            <p class="text-fg-faint mt-1 max-w-sm text-center text-xs">{{ $t("pages.feedItems.emptyHint") }}</p>
-            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.feedItems.addFirst") }}</UiButton>
+            <p class="text-fg-faint mt-1 max-w-sm text-center text-xs">
+                {{ $t("pages.feedItems.emptyHint") }}
+            </p>
+            <UiButton class="mt-4" @click="openCreateModal">{{
+                $t("pages.feedItems.addFirst")
+            }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UiModal :show="showCreate" :title="$t('pages.feedItems.create')" width="lg" @close="showCreate = false">
+        <UiModal
+            :show="showCreate"
+            :title="$t('pages.feedItems.create')"
+            width="lg"
+            @close="showCreate = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreate">
-                <UiTextInput v-model="form.name" :label="$t('pages.feedItems.fields.name')" required :placeholder="$t('pages.feedItems.fields.namePlaceholder')" />
+                <UiTextInput
+                    v-model="form.name"
+                    :label="$t('pages.feedItems.fields.name')"
+                    required
+                    :placeholder="$t('pages.feedItems.fields.namePlaceholder')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="form.size" :label="$t('pages.feedItems.fields.size')" :placeholder="$t('pages.feedItems.fields.sizePlaceholder')" />
-                    <UiTextInput v-model.number="form.weightGrams" :label="$t('pages.feedItems.fields.weight')" type="number" step="0.1" min="0" />
+                    <UiTextInput
+                        v-model="form.size"
+                        :label="$t('pages.feedItems.fields.size')"
+                        :placeholder="$t('pages.feedItems.fields.sizePlaceholder')"
+                    />
+                    <UiTextInput
+                        v-model.number="form.weightGrams"
+                        :label="$t('pages.feedItems.fields.weight')"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                    />
                 </div>
                 <div>
-                    <label class="text-fg mb-1.5 block text-sm font-medium">{{ $t("pages.feedItems.fields.suitablePets") }}</label>
+                    <label class="text-fg mb-1.5 block text-sm font-medium">{{
+                        $t("pages.feedItems.fields.suitablePets")
+                    }}</label>
                     <div class="space-y-1.5">
                         <label v-for="p in pets" :key="p.id" class="flex items-center gap-2">
-                            <input v-model="form.suitablePetIds" type="checkbox" :value="p.id" class="accent-primary-500 h-4 w-4 rounded" />
+                            <input
+                                v-model="form.suitablePetIds"
+                                type="checkbox"
+                                :value="p.id"
+                                class="accent-primary-500 h-4 w-4 rounded"
+                            />
                             <span class="text-fg text-sm">{{ p.name }}</span>
                         </label>
-                        <p v-if="!pets?.length" class="text-fg-faint text-xs">{{ $t("pages.feedItems.noPetsYet") }}</p>
+                        <p v-if="!pets?.length" class="text-fg-faint text-xs">
+                            {{ $t("pages.feedItems.noPetsYet") }}
+                        </p>
                     </div>
                 </div>
                 <UiTextarea v-model="form.notes" :label="$t('pages.feedItems.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showCreate = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.feedItems.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.feedItems.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput v-model="editForm.name" :label="$t('pages.feedItems.fields.name')" required :placeholder="$t('pages.feedItems.fields.namePlaceholder')" />
+                <UiTextInput
+                    v-model="editForm.name"
+                    :label="$t('pages.feedItems.fields.name')"
+                    required
+                    :placeholder="$t('pages.feedItems.fields.namePlaceholder')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="editForm.size" :label="$t('pages.feedItems.fields.size')" :placeholder="$t('pages.feedItems.fields.sizePlaceholder')" />
-                    <UiTextInput v-model.number="editForm.weightGrams" :label="$t('pages.feedItems.fields.weight')" type="number" step="0.1" min="0" />
+                    <UiTextInput
+                        v-model="editForm.size"
+                        :label="$t('pages.feedItems.fields.size')"
+                        :placeholder="$t('pages.feedItems.fields.sizePlaceholder')"
+                    />
+                    <UiTextInput
+                        v-model.number="editForm.weightGrams"
+                        :label="$t('pages.feedItems.fields.weight')"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                    />
                 </div>
                 <div>
-                    <label class="text-fg mb-1.5 block text-sm font-medium">{{ $t("pages.feedItems.fields.suitablePets") }}</label>
+                    <label class="text-fg mb-1.5 block text-sm font-medium">{{
+                        $t("pages.feedItems.fields.suitablePets")
+                    }}</label>
                     <div class="space-y-1.5">
                         <label v-for="p in pets" :key="p.id" class="flex items-center gap-2">
-                            <input v-model="editForm.suitablePetIds" type="checkbox" :value="p.id" class="accent-primary-500 h-4 w-4 rounded" />
+                            <input
+                                v-model="editForm.suitablePetIds"
+                                type="checkbox"
+                                :value="p.id"
+                                class="accent-primary-500 h-4 w-4 rounded"
+                            />
                             <span class="text-fg text-sm">{{ p.name }}</span>
                         </label>
                     </div>
                 </div>
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.feedItems.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>

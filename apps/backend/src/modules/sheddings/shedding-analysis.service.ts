@@ -103,9 +103,7 @@ export function computeSheddingCycle(
     const predictedNextDate = predicted.toISOString();
 
     // Anomaly detection: if current gap is >30% longer than average
-    const daysSinceLastShed = Math.round(
-        (Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const daysSinceLastShed = Math.round((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
     const anomalyThreshold = averageIntervalDays * 1.3;
     const isAnomaly = daysSinceLastShed > anomalyThreshold;
     const anomalyMessage = isAnomaly

@@ -2,12 +2,17 @@
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Back + Header -->
         <div class="flex items-center gap-3">
-            <NuxtLink to="/sensors" class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors">
+            <NuxtLink
+                to="/sensors"
+                class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors"
+            >
                 <Icon name="lucide:arrow-left" class="h-5 w-5" />
             </NuxtLink>
             <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2">
-                    <h1 class="text-fg truncate text-2xl font-bold tracking-tight">{{ sensor?.name ?? "..." }}</h1>
+                    <h1 class="text-fg truncate text-2xl font-bold tracking-tight">
+                        {{ sensor?.name ?? "..." }}
+                    </h1>
                     <span
                         v-if="sensor && !sensor.active"
                         class="rounded-md bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400"
@@ -22,7 +27,11 @@
             </div>
             <div v-if="sensor" class="flex items-center gap-2">
                 <UiButton variant="ghost" icon="lucide:pencil" @click="openEditModal" />
-                <UiButton variant="danger" icon="lucide:trash-2" @click="showDeleteConfirm = true" />
+                <UiButton
+                    variant="danger"
+                    icon="lucide:trash-2"
+                    @click="showDeleteConfirm = true"
+                />
             </div>
         </div>
 
@@ -36,7 +45,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <template v-else-if="sensor">
@@ -45,23 +56,37 @@
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.sensors.details") }}</h2>
                     <span
-                        :class="sensor.active ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-400'"
+                        :class="
+                            sensor.active
+                                ? 'bg-green-500/10 text-green-400'
+                                : 'bg-amber-500/10 text-amber-400'
+                        "
                         class="rounded-md px-2 py-0.5 text-xs font-medium"
                     >
-                        {{ sensor.active ? $t("pages.sensors.activeStatus") : $t("pages.sensors.inactive") }}
+                        {{
+                            sensor.active
+                                ? $t("pages.sensors.activeStatus")
+                                : $t("pages.sensors.inactive")
+                        }}
                     </span>
                 </div>
                 <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.sensors.fields.type") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.sensors.fields.type") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ sensor.type }}</dd>
                     </div>
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.sensors.fields.unit") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.sensors.fields.unit") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ sensor.unit }}</dd>
                     </div>
                     <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">{{ $t("pages.sensors.fields.enclosure") }}</dt>
+                        <dt class="text-fg-faint text-xs font-medium uppercase">
+                            {{ $t("pages.sensors.fields.enclosure") }}
+                        </dt>
                         <dd class="text-fg mt-1 text-sm">{{ sensor.enclosure?.name || "—" }}</dd>
                     </div>
                 </dl>
@@ -72,7 +97,9 @@
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">{{ $t("pages.sensors.readings") }}</h2>
                     <UiSelect v-model="timeRange" size="compact">
-                        <option v-for="opt in timeRangeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                        <option v-for="opt in timeRangeOptions" :key="opt.value" :value="opt.value">
+                            {{ opt.label }}
+                        </option>
                     </UiSelect>
                 </div>
 
@@ -91,8 +118,12 @@
                         :key="r.id"
                         class="bg-surface-raised grid grid-cols-3 gap-2 rounded-lg p-3 text-sm"
                     >
-                        <span class="text-fg-faint text-xs">{{ new Date(r.recordedAt).toLocaleString() }}</span>
-                        <span class="text-fg font-medium">{{ r.value != null ? r.value : "—" }}</span>
+                        <span class="text-fg-faint text-xs">{{
+                            new Date(r.recordedAt).toLocaleString()
+                        }}</span>
+                        <span class="text-fg font-medium">{{
+                            r.value != null ? r.value : "—"
+                        }}</span>
                         <span class="text-fg-faint text-xs">{{ sensor.unit }}</span>
                     </div>
                 </div>
@@ -105,25 +136,46 @@
         </template>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.sensors.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.sensors.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput v-model="editForm.name" :label="$t('pages.sensors.fields.name')" required />
+                <UiTextInput
+                    v-model="editForm.name"
+                    :label="$t('pages.sensors.fields.name')"
+                    required
+                />
                 <div class="grid grid-cols-2 gap-3">
                     <UiSelect v-model="editForm.type" :label="$t('pages.sensors.fields.type')">
                         <option v-for="st in sensorTypes" :key="st" :value="st">{{ st }}</option>
                     </UiSelect>
-                    <UiTextInput v-model="editForm.unit" :label="$t('pages.sensors.fields.unit')" required :placeholder="$t('pages.sensors.fields.unitPlaceholder')" />
+                    <UiTextInput
+                        v-model="editForm.unit"
+                        :label="$t('pages.sensors.fields.unit')"
+                        required
+                        :placeholder="$t('pages.sensors.fields.unitPlaceholder')"
+                    />
                 </div>
-                <UiSelect v-model="editForm.enclosureId" :label="$t('pages.sensors.fields.enclosure')">
+                <UiSelect
+                    v-model="editForm.enclosureId"
+                    :label="$t('pages.sensors.fields.enclosure')"
+                >
                     <option value="NONE">—</option>
-                    <option v-for="enc in enclosures" :key="enc.id" :value="enc.id">{{ enc.name }}</option>
+                    <option v-for="enc in enclosures" :key="enc.id" :value="enc.id">
+                        {{ enc.name }}
+                    </option>
                 </UiSelect>
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="editForm.active" />
                     <label class="text-fg text-sm">{{ $t("pages.sensors.fields.active") }}</label>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
@@ -209,7 +261,8 @@ useHead({ title: () => sensor.value?.name ?? t("pages.sensors.title") });
 
 const { data: readings, isLoading: readingsLoading } = useQuery({
     queryKey: ["sensorReadings", sensorId, timeRange],
-    queryFn: () => api.get<SensorReading[]>(`/api/sensors/${sensorId}/readings?from=${fromDate.value}`),
+    queryFn: () =>
+        api.get<SensorReading[]>(`/api/sensors/${sensorId}/readings?from=${fromDate.value}`),
 });
 
 const { data: enclosures } = useQuery({

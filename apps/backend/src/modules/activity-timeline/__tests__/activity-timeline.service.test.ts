@@ -155,13 +155,33 @@ describe("normalizeEvents", () => {
 
     it("sorts all events by date descending", () => {
         const feedings = [
-            { id: "f1", fedAt: new Date("2024-06-15T10:00:00.000Z"), foodType: "Mouse", foodSize: null, quantity: 1, accepted: true, notes: null },
+            {
+                id: "f1",
+                fedAt: new Date("2024-06-15T10:00:00.000Z"),
+                foodType: "Mouse",
+                foodSize: null,
+                quantity: 1,
+                accepted: true,
+                notes: null,
+            },
         ];
         const weights = [
-            { id: "w1", measuredAt: new Date("2024-06-20T12:00:00.000Z"), weightGrams: 350, notes: null },
+            {
+                id: "w1",
+                measuredAt: new Date("2024-06-20T12:00:00.000Z"),
+                weightGrams: 350,
+                notes: null,
+            },
         ];
         const sheddings = [
-            { id: "s1", startedAt: new Date("2024-06-01T00:00:00.000Z"), completedAt: null, complete: false, quality: null, notes: null },
+            {
+                id: "s1",
+                startedAt: new Date("2024-06-01T00:00:00.000Z"),
+                completedAt: null,
+                complete: false,
+                quality: null,
+                notes: null,
+            },
         ];
 
         const events = normalizeEvents(feedings, sheddings, weights, [], []);
@@ -171,29 +191,79 @@ describe("normalizeEvents", () => {
 
     it("merges events from all sources", () => {
         const feedings = [
-            { id: "f1", fedAt: new Date("2024-06-15T10:00:00.000Z"), foodType: "Mouse", foodSize: null, quantity: 1, accepted: true, notes: null },
+            {
+                id: "f1",
+                fedAt: new Date("2024-06-15T10:00:00.000Z"),
+                foodType: "Mouse",
+                foodSize: null,
+                quantity: 1,
+                accepted: true,
+                notes: null,
+            },
         ];
         const sheddings = [
-            { id: "s1", startedAt: new Date("2024-06-10T00:00:00.000Z"), completedAt: null, complete: false, quality: null, notes: null },
+            {
+                id: "s1",
+                startedAt: new Date("2024-06-10T00:00:00.000Z"),
+                completedAt: null,
+                complete: false,
+                quality: null,
+                notes: null,
+            },
         ];
         const weights = [
-            { id: "w1", measuredAt: new Date("2024-06-05T12:00:00.000Z"), weightGrams: 350, notes: null },
+            {
+                id: "w1",
+                measuredAt: new Date("2024-06-05T12:00:00.000Z"),
+                weightGrams: 350,
+                notes: null,
+            },
         ];
         const vet = [
-            { id: "v1", visitDate: new Date("2024-06-01T09:00:00.000Z"), visitType: "CHECKUP", reason: null, diagnosis: null, treatment: null, costCents: null, notes: null, veterinarian: null },
+            {
+                id: "v1",
+                visitDate: new Date("2024-06-01T09:00:00.000Z"),
+                visitType: "CHECKUP",
+                reason: null,
+                diagnosis: null,
+                treatment: null,
+                costCents: null,
+                notes: null,
+                veterinarian: null,
+            },
         ];
         const photos = [
-            { id: "p1", takenAt: new Date("2024-06-20T14:00:00.000Z"), caption: null, tags: [], upload: { url: "/img.jpg" } },
+            {
+                id: "p1",
+                takenAt: new Date("2024-06-20T14:00:00.000Z"),
+                caption: null,
+                tags: [],
+                upload: { url: "/img.jpg" },
+            },
         ];
 
         const events = normalizeEvents(feedings, sheddings, weights, vet, photos);
         expect(events).toHaveLength(5);
-        expect(events.map((e) => e.type)).toEqual(["photo", "feeding", "shedding", "weight", "vet_visit"]);
+        expect(events.map((e) => e.type)).toEqual([
+            "photo",
+            "feeding",
+            "shedding",
+            "weight",
+            "vet_visit",
+        ]);
     });
 
     it("handles feeding without foodSize", () => {
         const feedings = [
-            { id: "f1", fedAt: new Date("2024-06-15T10:00:00.000Z"), foodType: "Cricket", foodSize: null, quantity: 3, accepted: true, notes: null },
+            {
+                id: "f1",
+                fedAt: new Date("2024-06-15T10:00:00.000Z"),
+                foodType: "Cricket",
+                foodSize: null,
+                quantity: 3,
+                accepted: true,
+                notes: null,
+            },
         ];
         const events = normalizeEvents(feedings, [], [], [], []);
         expect(events[0].title).toBe("Cricket");
@@ -201,7 +271,17 @@ describe("normalizeEvents", () => {
 
     it("handles vet visit without reason (uses visitType)", () => {
         const vet = [
-            { id: "v1", visitDate: new Date("2024-06-01T09:00:00.000Z"), visitType: "EMERGENCY", reason: null, diagnosis: null, treatment: null, costCents: null, notes: "urgent", veterinarian: null },
+            {
+                id: "v1",
+                visitDate: new Date("2024-06-01T09:00:00.000Z"),
+                visitType: "EMERGENCY",
+                reason: null,
+                diagnosis: null,
+                treatment: null,
+                costCents: null,
+                notes: "urgent",
+                veterinarian: null,
+            },
         ];
         const events = normalizeEvents([], [], [], vet, []);
         expect(events[0].title).toBe("EMERGENCY");
@@ -210,7 +290,13 @@ describe("normalizeEvents", () => {
 
     it("handles photo without caption", () => {
         const photos = [
-            { id: "p1", takenAt: new Date("2024-06-20T14:00:00.000Z"), caption: null, tags: [], upload: { url: "/img.jpg" } },
+            {
+                id: "p1",
+                takenAt: new Date("2024-06-20T14:00:00.000Z"),
+                caption: null,
+                tags: [],
+                upload: { url: "/img.jpg" },
+            },
         ];
         const events = normalizeEvents([], [], [], [], photos);
         expect(events[0].title).toBe("Photo");
@@ -219,7 +305,14 @@ describe("normalizeEvents", () => {
 
     it("handles shedding in progress", () => {
         const sheddings = [
-            { id: "s1", startedAt: new Date("2024-06-10T00:00:00.000Z"), completedAt: null, complete: false, quality: null, notes: null },
+            {
+                id: "s1",
+                startedAt: new Date("2024-06-10T00:00:00.000Z"),
+                completedAt: null,
+                complete: false,
+                quality: null,
+                notes: null,
+            },
         ];
         const events = normalizeEvents([], sheddings, [], [], []);
         expect(events[0].title).toBe("Shedding (in progress)");
@@ -232,8 +325,24 @@ describe("getTimeline", () => {
     it("returns paginated timeline for a pet", async () => {
         mockPrisma.pet.findUnique.mockResolvedValue({ userId: USER_ID });
         mockPrisma.feeding.findMany.mockResolvedValue([
-            { id: "f1", fedAt: new Date("2024-06-15T10:00:00.000Z"), foodType: "Mouse", foodSize: null, quantity: 1, accepted: true, notes: null },
-            { id: "f2", fedAt: new Date("2024-06-10T10:00:00.000Z"), foodType: "Rat", foodSize: "Small", quantity: 1, accepted: true, notes: null },
+            {
+                id: "f1",
+                fedAt: new Date("2024-06-15T10:00:00.000Z"),
+                foodType: "Mouse",
+                foodSize: null,
+                quantity: 1,
+                accepted: true,
+                notes: null,
+            },
+            {
+                id: "f2",
+                fedAt: new Date("2024-06-10T10:00:00.000Z"),
+                foodType: "Rat",
+                foodSize: "Small",
+                quantity: 1,
+                accepted: true,
+                notes: null,
+            },
         ]);
         mockPrisma.shedding.findMany.mockResolvedValue([]);
         mockPrisma.weightRecord.findMany.mockResolvedValue([]);
@@ -271,7 +380,15 @@ describe("getTimeline", () => {
     it("only queries requested types", async () => {
         mockPrisma.pet.findUnique.mockResolvedValue({ userId: USER_ID });
         mockPrisma.feeding.findMany.mockResolvedValue([
-            { id: "f1", fedAt: new Date("2024-06-15T10:00:00.000Z"), foodType: "Mouse", foodSize: null, quantity: 1, accepted: true, notes: null },
+            {
+                id: "f1",
+                fedAt: new Date("2024-06-15T10:00:00.000Z"),
+                foodType: "Mouse",
+                foodSize: null,
+                quantity: 1,
+                accepted: true,
+                notes: null,
+            },
         ]);
 
         const result = await getTimeline(USER_ID, PET_ID, {
@@ -327,13 +444,33 @@ describe("getTimeline", () => {
     it("returns events sorted by date descending across types", async () => {
         mockPrisma.pet.findUnique.mockResolvedValue({ userId: USER_ID });
         mockPrisma.feeding.findMany.mockResolvedValue([
-            { id: "f1", fedAt: new Date("2024-06-15T10:00:00.000Z"), foodType: "Mouse", foodSize: null, quantity: 1, accepted: true, notes: null },
+            {
+                id: "f1",
+                fedAt: new Date("2024-06-15T10:00:00.000Z"),
+                foodType: "Mouse",
+                foodSize: null,
+                quantity: 1,
+                accepted: true,
+                notes: null,
+            },
         ]);
         mockPrisma.shedding.findMany.mockResolvedValue([
-            { id: "s1", startedAt: new Date("2024-06-20T00:00:00.000Z"), completedAt: null, complete: false, quality: null, notes: null },
+            {
+                id: "s1",
+                startedAt: new Date("2024-06-20T00:00:00.000Z"),
+                completedAt: null,
+                complete: false,
+                quality: null,
+                notes: null,
+            },
         ]);
         mockPrisma.weightRecord.findMany.mockResolvedValue([
-            { id: "w1", measuredAt: new Date("2024-06-10T12:00:00.000Z"), weightGrams: 350, notes: null },
+            {
+                id: "w1",
+                measuredAt: new Date("2024-06-10T12:00:00.000Z"),
+                weightGrams: 350,
+                notes: null,
+            },
         ]);
         mockPrisma.vetVisit.findMany.mockResolvedValue([]);
         mockPrisma.petPhoto.findMany.mockResolvedValue([]);

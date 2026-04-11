@@ -573,6 +573,11 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         data.locale = input.locale;
     }
 
+    if (input.weeklyReportEnabled !== undefined) {
+        data.weeklyReportEnabled = input.weeklyReportEnabled;
+        data.weeklyReportDecidedAt = new Date();
+    }
+
     if (Object.keys(data).length === 0) {
         throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "No fields to update");
     }
@@ -590,6 +595,7 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
             emailVerified: true,
             onboardingCompleted: true,
             locale: true,
+            weeklyReportEnabled: true,
         },
     });
 

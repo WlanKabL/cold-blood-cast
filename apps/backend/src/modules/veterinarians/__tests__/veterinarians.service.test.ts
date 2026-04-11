@@ -188,17 +188,17 @@ describe("updateVeterinarian", () => {
     it("throws notFound for non-existent vet", async () => {
         mockPrisma.veterinarian.findUnique.mockResolvedValue(null);
 
-        await expect(
-            updateVeterinarian(VET_ID, USER_ID, { name: "X" }),
-        ).rejects.toThrow("Veterinarian not found");
+        await expect(updateVeterinarian(VET_ID, USER_ID, { name: "X" })).rejects.toThrow(
+            "Veterinarian not found",
+        );
     });
 
     it("throws notFound for vet owned by another user", async () => {
         mockPrisma.veterinarian.findUnique.mockResolvedValue(makeVet({ userId: "other_user" }));
 
-        await expect(
-            updateVeterinarian(VET_ID, USER_ID, { name: "X" }),
-        ).rejects.toThrow("Veterinarian not found");
+        await expect(updateVeterinarian(VET_ID, USER_ID, { name: "X" })).rejects.toThrow(
+            "Veterinarian not found",
+        );
     });
 });
 

@@ -23,9 +23,17 @@ test.describe("Pet Detail — Weight Chart", () => {
         await mockGet(page, "/api/pets/pet_001", mockPets[0]);
         await mockGet(page, "/api/feedings*", []);
         await mockGet(page, "/api/feeding-reminders", mockFeedingReminders);
-        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries.filter((s) => s.petId === "pet_001"));
+        await mockGet(
+            page,
+            "/api/weights/chart*",
+            mockWeightChartSeries.filter((s) => s.petId === "pet_001"),
+        );
         await mockGet(page, "/api/weights/growth-rate*", [mockGrowthRates[0]]);
-        await mockGet(page, "/api/vet-visits*", mockVetVisits.filter((v) => v.petId === "pet_001"));
+        await mockGet(
+            page,
+            "/api/vet-visits*",
+            mockVetVisits.filter((v) => v.petId === "pet_001"),
+        );
         await mockGet(page, "/api/enclosures", mockEnclosures);
         await mockGet(page, "/api/pets/pet_001/timeline*", mockTimelinePreview);
     });
@@ -33,7 +41,9 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("shows weight chart section", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
-        await expect(page.getByText(/weight history|gewichtsverlauf/i).first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/weight history|gewichtsverlauf/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("displays growth rate indicator", async ({ page }) => {
@@ -86,7 +96,9 @@ test.describe("Weight Comparison Page", () => {
     test("loads comparison page with header", async ({ page }) => {
         await page.goto("/weights/chart");
 
-        await expect(page.locator("h1")).toContainText(/comparison|vergleich/i, { timeout: 15_000 });
+        await expect(page.locator("h1")).toContainText(/comparison|vergleich/i, {
+            timeout: 15_000,
+        });
     });
 
     test("shows pet selector buttons", async ({ page }) => {
@@ -99,7 +111,9 @@ test.describe("Weight Comparison Page", () => {
     test("shows select at least message when no pets selected", async ({ page }) => {
         await page.goto("/weights/chart");
 
-        await expect(page.getByText(/select at least|mindestens/i)).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/select at least|mindestens/i)).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("displays growth rate cards after selecting pets", async ({ page }) => {
@@ -157,7 +171,9 @@ test.describe("Dashboard — Weight Trends", () => {
 
         await page.goto("/dashboard");
 
-        await expect(page.getByText(/weight trends|gewichtstrends/i)).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/weight trends|gewichtstrends/i)).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows pet sparkline cards with latest weight", async ({ page }) => {

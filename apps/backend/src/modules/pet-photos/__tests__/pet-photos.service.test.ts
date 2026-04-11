@@ -198,7 +198,12 @@ describe("addPetPhoto", () => {
             tags: ["portrait"],
         });
 
-        expect(mockUploadFile).toHaveBeenCalledWith(USER_ID, mockFile, { caption: "My snake", subDir: "petPhotos" }, undefined);
+        expect(mockUploadFile).toHaveBeenCalledWith(
+            USER_ID,
+            mockFile,
+            { caption: "My snake", subDir: "petPhotos" },
+            undefined,
+        );
         expect(mockPrisma.petPhoto.create).toHaveBeenCalledWith({
             data: {
                 petId: PET_ID,
@@ -325,17 +330,17 @@ describe("updatePetPhoto", () => {
             pet: { userId: "other_user" },
         });
 
-        await expect(
-            updatePetPhoto(PHOTO_ID, USER_ID, { caption: "x" }),
-        ).rejects.toThrow("Photo not found");
+        await expect(updatePetPhoto(PHOTO_ID, USER_ID, { caption: "x" })).rejects.toThrow(
+            "Photo not found",
+        );
     });
 
     it("throws for non-existent photo", async () => {
         mockPrisma.petPhoto.findUnique.mockResolvedValue(null);
 
-        await expect(
-            updatePetPhoto(PHOTO_ID, USER_ID, { caption: "x" }),
-        ).rejects.toThrow("Photo not found");
+        await expect(updatePetPhoto(PHOTO_ID, USER_ID, { caption: "x" })).rejects.toThrow(
+            "Photo not found",
+        );
     });
 });
 
@@ -363,7 +368,11 @@ describe("setProfilePicture", () => {
             expect.anything(),
             expect.anything(),
         ]);
-        expect(result).toEqual({ id: PHOTO_ID, isProfilePicture: true, upload: { url: "/uploads/uploads/test.jpg" } });
+        expect(result).toEqual({
+            id: PHOTO_ID,
+            isProfilePicture: true,
+            upload: { url: "/uploads/uploads/test.jpg" },
+        });
     });
 
     it("throws for non-owned photo", async () => {

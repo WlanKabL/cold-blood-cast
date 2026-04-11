@@ -3,10 +3,14 @@
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("pages.feedings.title") }}</h1>
+                <h1 class="text-fg text-2xl font-bold tracking-tight">
+                    {{ $t("pages.feedings.title") }}
+                </h1>
                 <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.feedings.subtitle") }}</p>
             </div>
-            <UiButton icon="lucide:plus" @click="openCreateModal">{{ $t("pages.feedings.add") }}</UiButton>
+            <UiButton icon="lucide:plus" @click="openCreateModal">{{
+                $t("pages.feedings.add")
+            }}</UiButton>
         </div>
 
         <!-- Filters -->
@@ -26,7 +30,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <!-- List -->
@@ -37,7 +43,9 @@
                 class="glass-card flex items-center justify-between rounded-xl p-4"
             >
                 <div class="flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400"
+                    >
                         <Icon name="lucide:utensils" class="h-5 w-5" />
                     </div>
                     <div>
@@ -51,17 +59,39 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="text-right">
-                        <p class="text-fg-muted text-sm">{{ new Date(feeding.fedAt).toLocaleDateString() }}</p>
-                        <p class="text-fg-faint text-xs">{{ new Date(feeding.fedAt).toLocaleTimeString() }}</p>
+                        <p class="text-fg-muted text-sm">
+                            {{ new Date(feeding.fedAt).toLocaleDateString() }}
+                        </p>
+                        <p class="text-fg-faint text-xs">
+                            {{ new Date(feeding.fedAt).toLocaleTimeString() }}
+                        </p>
                     </div>
                     <span
-                        :class="feeding.accepted ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'"
+                        :class="
+                            feeding.accepted
+                                ? 'bg-green-500/10 text-green-400'
+                                : 'bg-red-500/10 text-red-400'
+                        "
                         class="rounded-md px-2 py-0.5 text-xs font-medium"
                     >
-                        {{ feeding.accepted ? $t("pages.feedings.accepted") : $t("pages.feedings.refused") }}
+                        {{
+                            feeding.accepted
+                                ? $t("pages.feedings.accepted")
+                                : $t("pages.feedings.refused")
+                        }}
                     </span>
-                    <UiButton variant="ghost" icon="lucide:pencil" size="sm" @click="openEditModal(feeding)" />
-                    <UiButton variant="danger" icon="lucide:trash-2" size="sm" @click="confirmDelete(feeding.id)" />
+                    <UiButton
+                        variant="ghost"
+                        icon="lucide:pencil"
+                        size="sm"
+                        @click="openEditModal(feeding)"
+                    />
+                    <UiButton
+                        variant="danger"
+                        icon="lucide:trash-2"
+                        size="sm"
+                        @click="confirmDelete(feeding.id)"
+                    />
                 </div>
             </div>
         </div>
@@ -70,61 +100,125 @@
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:utensils" class="text-fg-faint mb-3 h-12 w-12" />
             <p class="text-fg-muted text-sm">{{ $t("pages.feedings.empty") }}</p>
-            <UiButton class="mt-4" @click="openCreateModal">{{ $t("pages.feedings.addFirst") }}</UiButton>
+            <UiButton class="mt-4" @click="openCreateModal">{{
+                $t("pages.feedings.addFirst")
+            }}</UiButton>
         </div>
 
         <!-- Create Modal -->
-        <UiModal :show="showCreate" :title="$t('pages.feedings.create')" width="lg" @close="showCreate = false">
+        <UiModal
+            :show="showCreate"
+            :title="$t('pages.feedings.create')"
+            width="lg"
+            @close="showCreate = false"
+        >
             <form class="space-y-4" @submit.prevent="handleCreate">
                 <UiSelect v-model="form.petId" :label="$t('pages.feedings.fields.pet')" required>
                     <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </UiSelect>
-                <UiTextInput v-model="form.fedAt" :label="$t('pages.feedings.fields.fedAt')" type="datetime-local" required />
-                <UiSelect v-model="form.feedItemId" :label="$t('pages.feedings.fields.feedItem')" @update:model-value="onFeedItemSelected">
+                <UiTextInput
+                    v-model="form.fedAt"
+                    :label="$t('pages.feedings.fields.fedAt')"
+                    type="datetime-local"
+                    required
+                />
+                <UiSelect
+                    v-model="form.feedItemId"
+                    :label="$t('pages.feedings.fields.feedItem')"
+                    @update:model-value="onFeedItemSelected"
+                >
                     <option value="">{{ $t("pages.feedings.fields.feedItemNone") }}</option>
                     <option v-for="fi in petFeedItems" :key="fi.id" :value="fi.id">
                         {{ fi.name }}<template v-if="fi.size"> ({{ fi.size }})</template>
                     </option>
                 </UiSelect>
-                <UiTextInput v-model="form.foodType" :label="$t('pages.feedings.fields.foodType')" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
+                <UiTextInput
+                    v-model="form.foodType"
+                    :label="$t('pages.feedings.fields.foodType')"
+                    required
+                    :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="form.foodSize" :label="$t('pages.feedings.fields.foodSize')" />
-                    <UiTextInput v-model.number="form.quantity" :label="$t('pages.feedings.fields.quantity')" type="number" min="1" />
+                    <UiTextInput
+                        v-model="form.foodSize"
+                        :label="$t('pages.feedings.fields.foodSize')"
+                    />
+                    <UiTextInput
+                        v-model.number="form.quantity"
+                        :label="$t('pages.feedings.fields.quantity')"
+                        type="number"
+                        min="1"
+                    />
                 </div>
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="form.accepted" />
-                    <label class="text-fg text-sm">{{ $t("pages.feedings.fields.acceptedLabel") }}</label>
+                    <label class="text-fg text-sm">{{
+                        $t("pages.feedings.fields.acceptedLabel")
+                    }}</label>
                 </div>
                 <UiTextarea v-model="form.notes" :label="$t('pages.feedings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showCreate = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showCreate = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="creating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
         </UiModal>
 
         <!-- Edit Modal -->
-        <UiModal :show="showEdit" :title="$t('pages.feedings.edit')" width="lg" @close="showEdit = false">
+        <UiModal
+            :show="showEdit"
+            :title="$t('pages.feedings.edit')"
+            width="lg"
+            @close="showEdit = false"
+        >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput v-model="editForm.fedAt" :label="$t('pages.feedings.fields.fedAt')" type="datetime-local" required />
-                <UiSelect v-model="editForm.feedItemId" :label="$t('pages.feedings.fields.feedItem')" @update:model-value="onEditFeedItemSelected">
+                <UiTextInput
+                    v-model="editForm.fedAt"
+                    :label="$t('pages.feedings.fields.fedAt')"
+                    type="datetime-local"
+                    required
+                />
+                <UiSelect
+                    v-model="editForm.feedItemId"
+                    :label="$t('pages.feedings.fields.feedItem')"
+                    @update:model-value="onEditFeedItemSelected"
+                >
                     <option value="">{{ $t("pages.feedings.fields.feedItemNone") }}</option>
                     <option v-for="fi in feedItemsList" :key="fi.id" :value="fi.id">
                         {{ fi.name }}<template v-if="fi.size"> ({{ fi.size }})</template>
                     </option>
                 </UiSelect>
-                <UiTextInput v-model="editForm.foodType" :label="$t('pages.feedings.fields.foodType')" required :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')" />
+                <UiTextInput
+                    v-model="editForm.foodType"
+                    :label="$t('pages.feedings.fields.foodType')"
+                    required
+                    :placeholder="$t('pages.feedings.fields.foodTypePlaceholder')"
+                />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiTextInput v-model="editForm.foodSize" :label="$t('pages.feedings.fields.foodSize')" />
-                    <UiTextInput v-model.number="editForm.quantity" :label="$t('pages.feedings.fields.quantity')" type="number" min="1" />
+                    <UiTextInput
+                        v-model="editForm.foodSize"
+                        :label="$t('pages.feedings.fields.foodSize')"
+                    />
+                    <UiTextInput
+                        v-model.number="editForm.quantity"
+                        :label="$t('pages.feedings.fields.quantity')"
+                        type="number"
+                        min="1"
+                    />
                 </div>
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="editForm.accepted" />
-                    <label class="text-fg text-sm">{{ $t("pages.feedings.fields.acceptedLabel") }}</label>
+                    <label class="text-fg text-sm">{{
+                        $t("pages.feedings.fields.acceptedLabel")
+                    }}</label>
                 </div>
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.feedings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton variant="ghost" @click="showEdit = false">{{ $t("common.cancel") }}</UiButton>
+                    <UiButton variant="ghost" @click="showEdit = false">{{
+                        $t("common.cancel")
+                    }}</UiButton>
                     <UiButton type="submit" :loading="updating">{{ $t("common.save") }}</UiButton>
                 </div>
             </form>
@@ -198,7 +292,8 @@ const {
     refetch,
 } = useQuery({
     queryKey: ["feedings", selectedPet],
-    queryFn: () => api.get<Feeding[]>(`/api/feedings${queryParams.value ? `?${queryParams.value}` : ""}`),
+    queryFn: () =>
+        api.get<Feeding[]>(`/api/feedings${queryParams.value ? `?${queryParams.value}` : ""}`),
 });
 
 const { data: pets } = useQuery({
@@ -232,7 +327,16 @@ const form = reactive({
 });
 
 function resetForm() {
-    Object.assign(form, { petId: "", feedItemId: "", fedAt: "", foodType: "", foodSize: "", quantity: 1, accepted: true, notes: "" });
+    Object.assign(form, {
+        petId: "",
+        feedItemId: "",
+        fedAt: "",
+        foodType: "",
+        foodSize: "",
+        quantity: 1,
+        accepted: true,
+        notes: "",
+    });
 }
 
 function openCreateModal() {

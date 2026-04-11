@@ -23,7 +23,9 @@ function visitTypeBadgeClass(type: string): string {
 // ─── formatCost (cents → EUR, matches vet-visits/index.vue) ──
 
 function formatCost(cents: number): string {
-    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(
+        cents / 100,
+    );
 }
 
 // ─── Tests ───────────────────────────────────────────────────

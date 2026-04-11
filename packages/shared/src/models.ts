@@ -15,6 +15,7 @@ export interface AuthUser {
     emailVerified?: boolean;
     onboardingCompleted?: boolean;
     locale?: string;
+    weeklyReportEnabled?: boolean;
 }
 
 export interface FeatureTierInfo {

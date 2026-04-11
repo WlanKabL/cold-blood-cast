@@ -79,6 +79,8 @@ test.describe("Pets — Empty State", () => {
         await page.goto("/pets");
 
         // Empty state text
-        await expect(page.getByText(/no pets|keine tiere/i).first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/no pets|keine tiere/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 });

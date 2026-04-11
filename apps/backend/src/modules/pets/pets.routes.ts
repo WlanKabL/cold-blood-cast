@@ -18,16 +18,25 @@ const PetBaseSchema = z.object({
     feedingIntervalMaxDays: z.number().int().min(1).max(365).optional().nullable(),
 });
 
-const feedingIntervalRefine = (data: { feedingIntervalMinDays?: number | null; feedingIntervalMaxDays?: number | null }) => {
+const feedingIntervalRefine = (data: {
+    feedingIntervalMinDays?: number | null;
+    feedingIntervalMaxDays?: number | null;
+}) => {
     if (data.feedingIntervalMinDays && data.feedingIntervalMaxDays) {
         return data.feedingIntervalMinDays <= data.feedingIntervalMaxDays;
     }
     return true;
 };
-const feedingIntervalMessage = { message: "Min interval must be less than or equal to max interval", path: ["feedingIntervalMinDays"] as const };
+const feedingIntervalMessage = {
+    message: "Min interval must be less than or equal to max interval",
+    path: ["feedingIntervalMinDays"] as const,
+};
 
 const CreatePetSchema = PetBaseSchema.refine(feedingIntervalRefine, feedingIntervalMessage);
-const UpdatePetSchema = PetBaseSchema.partial().refine(feedingIntervalRefine, feedingIntervalMessage);
+const UpdatePetSchema = PetBaseSchema.partial().refine(
+    feedingIntervalRefine,
+    feedingIntervalMessage,
+);
 
 export async function petRoutes(app: FastifyInstance) {
     app.addHook("preHandler", authGuard);
@@ -46,7 +55,11 @@ export async function petRoutes(app: FastifyInstance) {
     app.post("/", async (request, reply) => {
         const result = CreatePetSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid pet data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid pet data",
+                result.error.flatten(),
+            );
         }
         const pet = await createPet(request.userId, result.data);
         return reply.status(201).send({ success: true, data: pet });
@@ -55,7 +68,11 @@ export async function petRoutes(app: FastifyInstance) {
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
         const result = UpdatePetSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid pet data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid pet data",
+                result.error.flatten(),
+            );
         }
         const data = await updatePet(request.params.id, request.userId, result.data);
         return { success: true, data };

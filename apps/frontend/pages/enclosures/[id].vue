@@ -45,7 +45,9 @@
         <div v-else-if="error" class="glass-card flex flex-col items-center rounded-xl py-16">
             <Icon name="lucide:alert-triangle" class="mb-3 h-12 w-12 text-red-400" />
             <p class="text-fg-muted text-sm">{{ $t("common.error") }}</p>
-            <UiButton class="mt-4" variant="ghost" @click="refetch">{{ $t("common.retry") }}</UiButton>
+            <UiButton class="mt-4" variant="ghost" @click="refetch">{{
+                $t("common.retry")
+            }}</UiButton>
         </div>
 
         <template v-else-if="enclosure">
@@ -180,6 +182,62 @@
                     {{ $t("pages.enclosures.noSensors") }}
                 </p>
             </div>
+
+            <!-- Maintenance Tasks -->
+            <div class="glass-card rounded-xl p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-fg font-semibold">
+                            {{ $t("pages.enclosures.maintenanceTasks") }}
+                        </h2>
+                        <span
+                            v-if="overdueCount > 0"
+                            class="rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                        >
+                            {{ $t("pages.enclosures.overdueTasksCount", { n: overdueCount }) }}
+                        </span>
+                    </div>
+                    <NuxtLink
+                        :to="`/maintenance`"
+                        class="text-primary-400 text-sm font-medium"
+                    >
+                        {{ $t("pages.dashboard.viewAll") }}
+                    </NuxtLink>
+                </div>
+                <div v-if="maintenanceTasks?.length" class="space-y-2">
+                    <div
+                        v-for="task in maintenanceTasks"
+                        :key="task.id"
+                        class="bg-surface-raised flex items-center justify-between gap-3 rounded-lg p-3"
+                    >
+                        <div class="flex items-center gap-3">
+                            <Icon name="lucide:wrench" class="text-fg-faint h-4 w-4" />
+                            <div>
+                                <span class="text-fg text-sm font-medium">
+                                    {{ task.description || task.type }}
+                                </span>
+                                <p class="text-fg-faint text-xs">
+                                    <template v-if="task.nextDueAt">
+                                        {{ new Date(task.nextDueAt).toLocaleDateString() }}
+                                    </template>
+                                    <template v-if="task.recurring">
+                                        · {{ $t("pages.maintenance.recurring") }}
+                                    </template>
+                                </p>
+                            </div>
+                        </div>
+                        <span
+                            v-if="task.nextDueAt && new Date(task.nextDueAt) < new Date() && !task.completedAt"
+                            class="shrink-0 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                        >
+                            {{ $t("pages.maintenance.overdue") }}
+                        </span>
+                    </div>
+                </div>
+                <p v-else class="text-fg-muted text-sm">
+                    {{ $t("pages.enclosures.noMaintenanceTasks") }}
+                </p>
+            </div>
         </template>
 
         <!-- Edit Modal -->
@@ -191,10 +249,7 @@
                     :label="$t('pages.enclosures.fields.name')"
                 />
                 <div class="grid grid-cols-2 gap-3">
-                    <UiSelect
-                        v-model="editForm.type"
-                        :label="$t('pages.enclosures.fields.type')"
-                    >
+                    <UiSelect v-model="editForm.type" :label="$t('pages.enclosures.fields.type')">
                         <option v-for="et in enclosureTypes" :key="et" :value="et">{{ et }}</option>
                     </UiSelect>
                     <UiTextInput
@@ -233,7 +288,9 @@
                     />
                 </div>
                 <div class="flex items-center gap-3">
-                    <label class="text-fg-dim text-[13px] font-medium">{{ $t("pages.enclosures.fields.active") }}</label>
+                    <label class="text-fg-dim text-[13px] font-medium">{{
+                        $t("pages.enclosures.fields.active")
+                    }}</label>
                     <UiToggle v-model="editForm.active" />
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
@@ -298,6 +355,15 @@ interface EnclosureDetail {
     sensors: EnclosureSensor[];
 }
 
+interface MaintenanceTaskItem {
+    id: string;
+    type: string;
+    description: string | null;
+    completedAt: string | null;
+    nextDueAt: string | null;
+    recurring: boolean;
+}
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -323,6 +389,22 @@ const {
 });
 
 useHead({ title: () => enclosure.value?.name ?? t("pages.enclosures.title") });
+
+// ── Maintenance Tasks ────────────────────────────────────
+const { data: maintenanceTasks } = useQuery({
+    queryKey: ["maintenance-tasks", enclosureId],
+    queryFn: () =>
+        api.get<MaintenanceTaskItem[]>(
+            `/api/enclosure-maintenance?enclosureId=${enclosureId}`,
+        ),
+});
+
+const overdueCount = computed(
+    () =>
+        (maintenanceTasks.value ?? []).filter(
+            (t) => t.nextDueAt && new Date(t.nextDueAt) < new Date() && !t.completedAt,
+        ).length,
+);
 
 // ── Edit ─────────────────────────────────────────────────
 const showEdit = ref(false);

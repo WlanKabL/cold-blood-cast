@@ -29,14 +29,32 @@ import { petPhotoRoutes } from "@/modules/pet-photos/index.js";
 import { sensorRoutes } from "@/modules/sensors/index.js";
 import { feedingRoutes } from "@/modules/feedings/index.js";
 import { feedItemRoutes } from "@/modules/feed-items/index.js";
-import { feedingReminderRoutes, startFeedingReminderScheduler, stopFeedingReminderScheduler } from "@/modules/feeding-reminders/index.js";
+import {
+    feedingReminderRoutes,
+    startFeedingReminderScheduler,
+    stopFeedingReminderScheduler,
+} from "@/modules/feeding-reminders/index.js";
 import { sheddingRoutes, sheddingAnalysisRoutes } from "@/modules/sheddings/index.js";
 import { weightRoutes } from "@/modules/weights/index.js";
 import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
 import { vetVisitRoutes, vetVisitDocumentRoutes } from "@/modules/vet-visits/index.js";
 import { petDocumentRoutes } from "@/modules/pet-documents/index.js";
 import { activityTimelineRoutes } from "@/modules/activity-timeline/index.js";
-import { startVetReminderScheduler, stopVetReminderScheduler } from "@/modules/vet-reminders/index.js";
+import { enclosureMaintenanceRoutes } from "@/modules/enclosure-maintenance/index.js";
+import {
+    startMaintenanceReminderScheduler,
+    stopMaintenanceReminderScheduler,
+} from "@/modules/enclosure-maintenance/index.js";
+import { weeklyPlannerRoutes } from "@/modules/weekly-planner/index.js";
+import { publicProfileRoutes, publicPetRoutes } from "@/modules/public-profiles/index.js";
+import {
+    startWeeklyPlannerScheduler,
+    stopWeeklyPlannerScheduler,
+} from "@/modules/weekly-planner/index.js";
+import {
+    startVetReminderScheduler,
+    stopVetReminderScheduler,
+} from "@/modules/vet-reminders/index.js";
 import {
     startMaintenanceScheduler,
     stopMaintenanceScheduler,
@@ -144,6 +162,7 @@ async function main() {
     app.addHook("onRequest", async (request, _reply) => {
         const pathname = request.url.split("?")[0];
         if (MAINTENANCE_ALLOWED.has(pathname)) return;
+        if (pathname.startsWith("/api/public/")) return;
 
         const now = Date.now();
         if (now - maintenanceCache.ts > MAINTENANCE_TTL) {
@@ -273,6 +292,10 @@ async function main() {
     await app.register(vetVisitRoutes, { prefix: "/api/vet-visits" });
     await app.register(vetVisitDocumentRoutes, { prefix: "/api/vet-visits" });
     await app.register(activityTimelineRoutes, { prefix: "/api/pets" });
+    await app.register(enclosureMaintenanceRoutes, { prefix: "/api/enclosure-maintenance" });
+    await app.register(weeklyPlannerRoutes, { prefix: "/api/planner" });
+    await app.register(publicProfileRoutes, { prefix: "/api/public-profiles" });
+    await app.register(publicPetRoutes, { prefix: "/api/public/pets" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {
@@ -298,12 +321,30 @@ async function main() {
         app.log.warn({ err }, "Failed to start vet reminder scheduler");
     }
 
+    // ── Start Maintenance Reminder Scheduler (daily 08:00 Berlin) ──
+    try {
+        startMaintenanceReminderScheduler();
+        app.log.info("Maintenance reminder scheduler started");
+    } catch (err) {
+        app.log.warn({ err }, "Failed to start maintenance reminder scheduler");
+    }
+
+    // ── Start Weekly Planner Scheduler (Sunday 18:00 Berlin) ──
+    try {
+        startWeeklyPlannerScheduler();
+        app.log.info("Weekly planner scheduler started");
+    } catch (err) {
+        app.log.warn({ err }, "Failed to start weekly planner scheduler");
+    }
+
     // ── Graceful Shutdown ────────────────────────
     const shutdown = async (signal: string) => {
         app.log.info(`Received ${signal}, shutting down...`);
         stopMaintenanceScheduler();
         stopFeedingReminderScheduler();
         stopVetReminderScheduler();
+        stopMaintenanceReminderScheduler();
+        stopWeeklyPlannerScheduler();
         await app.close();
         await prisma.$disconnect();
         process.exit(0);

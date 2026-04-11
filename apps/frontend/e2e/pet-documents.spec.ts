@@ -31,7 +31,9 @@ test.describe("Pet Documents — List", () => {
     test("shows document label", async ({ page }) => {
         await page.goto(`/pets/${petId}/documents`);
 
-        await expect(page.getByText("CITES Certificate 2024").first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText("CITES Certificate 2024").first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows upload button", async ({ page }) => {
@@ -85,7 +87,10 @@ test.describe("Pet Documents — Category Filter", () => {
         await expect(cards).toHaveCount(1, { timeout: 15_000 });
 
         // Click All filter
-        await page.getByRole("button", { name: /all|alle/i }).first().click();
+        await page
+            .getByRole("button", { name: /all|alle/i })
+            .first()
+            .click();
         await expect(cards).toHaveCount(3, { timeout: 15_000 });
     });
 });
@@ -358,7 +363,9 @@ test.describe("Pet Documents — Upload Metadata", () => {
         // The FormData should contain category, label, and documentDate BEFORE the file
         // (critical for Fastify multipart field parsing)
         // We verify the upload was attempted (toast success)
-        await expect(page.getByText(/uploaded|hochgeladen/i).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(/uploaded|hochgeladen/i).first()).toBeVisible({
+            timeout: 10_000,
+        });
     });
 });
 
@@ -373,7 +380,9 @@ test.describe("Pet Documents — Document Display", () => {
         await page.goto(`/pets/${petId}/documents`);
 
         // doc_001 has notes: "Official CITES certificate for Monty"
-        await expect(page.getByText("Official CITES certificate").first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText("Official CITES certificate").first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows document date", async ({ page }) => {

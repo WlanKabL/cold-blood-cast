@@ -151,9 +151,25 @@ describe("computeGrowthRate", () => {
 describe("getWeightChartData", () => {
     it("returns grouped chart data for multiple pets", async () => {
         mockPrisma.weightRecord.findMany.mockResolvedValue([
-            makeRecord({ id: "wr_1", petId: PET_ID_1, weightGrams: 200, measuredAt: new Date("2024-01-01") }),
-            makeRecord({ id: "wr_2", petId: PET_ID_1, weightGrams: 250, measuredAt: new Date("2024-02-01") }),
-            makeRecord({ id: "wr_3", petId: PET_ID_2, weightGrams: 300, measuredAt: new Date("2024-01-15"), pet: { id: PET_ID_2, name: "Slinky" } }),
+            makeRecord({
+                id: "wr_1",
+                petId: PET_ID_1,
+                weightGrams: 200,
+                measuredAt: new Date("2024-01-01"),
+            }),
+            makeRecord({
+                id: "wr_2",
+                petId: PET_ID_1,
+                weightGrams: 250,
+                measuredAt: new Date("2024-02-01"),
+            }),
+            makeRecord({
+                id: "wr_3",
+                petId: PET_ID_2,
+                weightGrams: 300,
+                measuredAt: new Date("2024-01-15"),
+                pet: { id: PET_ID_2, name: "Slinky" },
+            }),
         ]);
 
         const result = await getWeightChartData(USER_ID, { petIds: [PET_ID_1, PET_ID_2] });
@@ -214,9 +230,25 @@ describe("getWeightChartData", () => {
 describe("getGrowthRates", () => {
     it("computes growth rates for all pets", async () => {
         mockPrisma.weightRecord.findMany.mockResolvedValue([
-            makeRecord({ id: "wr_1", petId: PET_ID_1, weightGrams: 100, measuredAt: new Date("2024-01-01") }),
-            makeRecord({ id: "wr_2", petId: PET_ID_1, weightGrams: 200, measuredAt: new Date("2024-04-01") }),
-            makeRecord({ id: "wr_3", petId: PET_ID_2, weightGrams: 300, measuredAt: new Date("2024-01-01"), pet: { id: PET_ID_2, name: "Slinky" } }),
+            makeRecord({
+                id: "wr_1",
+                petId: PET_ID_1,
+                weightGrams: 100,
+                measuredAt: new Date("2024-01-01"),
+            }),
+            makeRecord({
+                id: "wr_2",
+                petId: PET_ID_1,
+                weightGrams: 200,
+                measuredAt: new Date("2024-04-01"),
+            }),
+            makeRecord({
+                id: "wr_3",
+                petId: PET_ID_2,
+                weightGrams: 300,
+                measuredAt: new Date("2024-01-01"),
+                pet: { id: PET_ID_2, name: "Slinky" },
+            }),
         ]);
 
         const result = await getGrowthRates(USER_ID);
@@ -346,7 +378,9 @@ describe("updateWeightRecord", () => {
 
     it("throws when record not found", async () => {
         mockPrisma.weightRecord.findUnique.mockResolvedValue(null);
-        await expect(updateWeightRecord("wr_999", USER_ID, { weightGrams: 300 })).rejects.toThrow("Weight record not found");
+        await expect(updateWeightRecord("wr_999", USER_ID, { weightGrams: 300 })).rejects.toThrow(
+            "Weight record not found",
+        );
     });
 });
 
@@ -363,13 +397,17 @@ describe("deleteWeightRecord", () => {
 
     it("throws when record not found", async () => {
         mockPrisma.weightRecord.findUnique.mockResolvedValue(null);
-        await expect(deleteWeightRecord("wr_999", USER_ID)).rejects.toThrow("Weight record not found");
+        await expect(deleteWeightRecord("wr_999", USER_ID)).rejects.toThrow(
+            "Weight record not found",
+        );
     });
 
     it("throws when record belongs to different user", async () => {
         mockPrisma.weightRecord.findUnique.mockResolvedValue(
             makeRecord({ pet: { userId: "other_user" } }),
         );
-        await expect(deleteWeightRecord("wr_1", USER_ID)).rejects.toThrow("Weight record not found");
+        await expect(deleteWeightRecord("wr_1", USER_ID)).rejects.toThrow(
+            "Weight record not found",
+        );
     });
 });

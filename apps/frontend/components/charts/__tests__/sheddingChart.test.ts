@@ -65,10 +65,7 @@ function computeSheddingDisplay(sheddings: SheddingInput[]): SheddingAnalysisDis
 
 // ── Chart bar color logic ──
 
-function getBarColor(
-    intervalDays: number,
-    averageDays: number,
-): "normal" | "anomaly" {
+function getBarColor(intervalDays: number, averageDays: number): "normal" | "anomaly" {
     if (averageDays <= 0) return "normal";
     return intervalDays > averageDays * 1.3 ? "anomaly" : "normal";
 }
@@ -105,9 +102,7 @@ describe("computeSheddingDisplay", () => {
     });
 
     it("returns defaults for single shedding", () => {
-        const result = computeSheddingDisplay([
-            { startedAt: "2024-06-01T00:00:00.000Z" },
-        ]);
+        const result = computeSheddingDisplay([{ startedAt: "2024-06-01T00:00:00.000Z" }]);
         expect(result.sheddingCount).toBe(1);
         expect(result.averageIntervalDays).toBe(0);
         expect(result.intervals).toEqual([]);

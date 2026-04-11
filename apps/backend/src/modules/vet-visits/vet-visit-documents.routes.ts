@@ -35,7 +35,13 @@ export async function vetVisitDocumentRoutes(app: FastifyInstance) {
         const fields = data.fields as Record<string, { value?: string } | undefined>;
         const label = fields.label?.value || undefined;
 
-        const doc = await addVetVisitDocument(visitId, request.userId, data, { label }, request.log);
+        const doc = await addVetVisitDocument(
+            visitId,
+            request.userId,
+            data,
+            { label },
+            request.log,
+        );
 
         return reply.status(201).send({ success: true, data: doc });
     });

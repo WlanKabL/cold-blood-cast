@@ -198,6 +198,8 @@
         "saved": "Saved",
         "deleted": "Deleted",
         "copied": "Copied",
+        "copy": "Copy",
+        "download": "Download",
         "confirmDelete": "Confirm Delete",
         "all": "All",
         "days": "days",
@@ -270,7 +272,9 @@
         "terrarium": "Terrarium",
         "careLog": "Care Log",
         "vetVisits": "Vet Visits",
-        "veterinarians": "Veterinarians"
+        "veterinarians": "Veterinarians",
+        "maintenance": "Maintenance",
+        "planner": "Weekly Planner"
     },
     "admin": {
         "title": "Administration",
@@ -553,7 +557,14 @@
             "variablesTitle": "Variables",
             "variablesHint": "Use {'{{'}variableName{'}}'}  in the body, heading, or subject to insert dynamic values.",
             "variablesSystem": "System",
-            "variablesUser": "User (recipient)"
+            "variablesUser": "User (recipient)",
+            "testDigest": {
+                "title": "Weekly Digest Test",
+                "description": "Send a preview of the weekly care digest to your own email address.",
+                "button": "Send Test Digest",
+                "success": "Test digest sent to {email}",
+                "failed": "Failed to send test digest."
+            }
         },
         "auditLog": {
             "title": "Audit Log",
@@ -763,7 +774,9 @@
             "noUpcomingSheddings": "No sheddings predicted within 7 days",
             "predictedIn": "in {days}d",
             "predictedOverdue": "{days}d overdue",
-            "avgCycle": "avg. {days}d cycle"
+            "avgCycle": "avg. {days}d cycle",
+            "overdueMaintenance": "Overdue Maintenance",
+            "noOverdueMaintenance": "All maintenance tasks are up to date"
         },
         "enclosures": {
             "title": "Enclosures",
@@ -780,6 +793,9 @@
             "sensorsInEnclosure": "Sensors in this Enclosure",
             "noPets": "No pets in this enclosure",
             "noSensors": "No sensors in this enclosure",
+            "maintenanceTasks": "Maintenance Tasks",
+            "noMaintenanceTasks": "No maintenance tasks for this enclosure",
+            "overdueTasksCount": "{n} overdue task(s)",
             "confirmDelete": "Delete this enclosure? All linked sensors will be unlinked. This cannot be undone.",
             "deleted": "Enclosure deleted",
             "saved": "Enclosure saved",
@@ -925,6 +941,38 @@
                 "filterPhoto": "Photos",
                 "recentActivity": "Recent Activity",
                 "eventCount": "{count} event | {count} events"
+            },
+            "publicProfile": {
+                "title": "Public Profile",
+                "description": "Share a public page for this pet — visitors can see selected data without an account.",
+                "create": "Create Public Profile",
+                "created": "Public profile created",
+                "deleted": "Public profile deleted",
+                "active": "Active",
+                "inactive": "Inactive",
+                "profileActive": "Profile visible",
+                "activeHint": "When active, anyone with the link can view this profile.",
+                "url": "Public URL",
+                "slug": "Custom URL slug",
+                "bio": "Bio",
+                "bioPlaceholder": "A short description about your pet...",
+                "visibleData": "Visible Data",
+                "togglePhotos": "Photos",
+                "toggleWeight": "Weight History",
+                "toggleAge": "Age / Birth Date",
+                "toggleFeedings": "Feeding Log",
+                "toggleSheddings": "Shedding History",
+                "toggleSpecies": "Species",
+                "toggleMorph": "Morph",
+                "views": "{count} views",
+                "createdAt": "Created {date}",
+                "embedCode": "Embed Code",
+                "embedDescription": "Copy this code to embed a compact profile card on any website.",
+                "qrCode": "QR Code",
+                "qrHint": "Scan to open this pet's public profile.",
+                "delete": "Delete Public Profile",
+                "deleteConfirmTitle": "Delete Public Profile",
+                "deleteConfirmMessage": "Remove the public page for this pet? The URL will stop working immediately."
             }
         },
         "sensors": {
@@ -1133,6 +1181,11 @@
             "resetSent": "Link Sent",
             "resetSentHint": "A password reset link has been sent to your email.",
             "notifications": "Notifications",
+            "weeklyDigest": "Weekly Care Digest",
+            "weeklyDigestHint": "Receive a summary email every Sunday at 18:00 with your upcoming care tasks for the next week.",
+            "weeklyDigestEnable": "Enable",
+            "weeklyDigestDisable": "Disable",
+            "weeklyDigestSaved": "Notification preference updated.",
             "dangerZone": "Danger Zone",
             "cookiePreferences": "Cookie Preferences",
             "cookiePreferencesLabel": "Cookie Consent",
@@ -1350,6 +1403,108 @@
                 "appointmentOn": "Appointment on {date}",
                 "notSet": "Not set"
             }
+        },
+        "maintenance": {
+            "title": "Enclosure Maintenance",
+            "subtitle": "Track and schedule maintenance tasks for your terrariums",
+            "add": "Add Task",
+            "addFirst": "Create your first maintenance task",
+            "create": "New Maintenance Task",
+            "edit": "Edit Task",
+            "empty": "No maintenance tasks yet",
+            "confirmDelete": "Delete this maintenance task?",
+            "created": "Task created",
+            "saved": "Task updated",
+            "deleted": "Task deleted",
+            "completed": "Task completed",
+            "search": "Search tasks...",
+            "allTypes": "All Types",
+            "overdue": "Overdue",
+            "upcoming": "Upcoming",
+            "recurring": "Recurring",
+            "oneTime": "One-time",
+            "markDone": "Mark as Done",
+            "noOverdue": "No overdue maintenance tasks",
+            "overdueCount": "{n} overdue",
+            "dueToday": "Due today",
+            "daysOverdue": "{n} day(s) overdue",
+            "dueIn": "Due in {n} day(s)",
+            "nextDue": "Next due: {date}",
+            "lastCompleted": "Last completed: {date}",
+            "neverCompleted": "Never completed",
+            "every": "Every {n} days",
+            "types": {
+                "CLEANING": "Cleaning",
+                "SUBSTRATE_CHANGE": "Substrate Change",
+                "LAMP_REPLACEMENT": "Lamp Replacement",
+                "WATER_CHANGE": "Water Change",
+                "FILTER_CHANGE": "Filter Change",
+                "DISINFECTION": "Disinfection",
+                "OTHER": "Other"
+            },
+            "fields": {
+                "enclosure": "Enclosure",
+                "type": "Type",
+                "description": "Description",
+                "descriptionPlaceholder": "e.g. Deep clean all surfaces",
+                "nextDueAt": "Next Due Date",
+                "intervalDays": "Interval (days)",
+                "intervalDaysHint": "How often to repeat",
+                "recurring": "Recurring",
+                "notes": "Notes",
+                "notesPlaceholder": "Additional notes..."
+            }
+        },
+        "planner": {
+            "title": "Weekly Care Planner",
+            "subtitle": "Overview of upcoming feedings, vet visits, sheddings, and maintenance tasks",
+            "today": "Today",
+            "todayBadge": "(Today)",
+            "noTasks": "No tasks",
+            "overdue": "Overdue",
+            "error": "Failed to load planner data",
+            "eventCount": "{n} task(s)",
+            "legendTitle": "Event Types",
+            "stats": {
+                "total": "Total Tasks",
+                "overdue": "Overdue",
+                "busiest": "Busiest Day",
+                "types": "By Type"
+            },
+            "detail": {
+                "hint": "Click an event to see details",
+                "date": "Date",
+                "info": "Details",
+                "pet": "Pet",
+                "enclosure": "Enclosure",
+                "status": "Status",
+                "interval": "Feeding Interval",
+                "days": "days",
+                "veterinarian": "Veterinarian",
+                "reason": "Reason",
+                "followUp": "Follow-up",
+                "avgCycle": "Avg. Cycle",
+                "trend": "Trend",
+                "trends": {
+                    "increasing": "Increasing",
+                    "decreasing": "Decreasing",
+                    "stable": "Stable"
+                },
+                "taskType": "Task Type",
+                "schedule": "Schedule",
+                "goTo": "Go to source",
+                "feedingStatus": {
+                    "ok": "OK",
+                    "due": "Due",
+                    "critical": "Critical"
+                }
+            },
+            "legend": {
+                "feeding": "Feeding",
+                "vetVisit": "Vet Visit",
+                "shedding": "Shedding",
+                "maintenance": "Maintenance"
+            }
         }
     },
     "shortcuts": {
@@ -1404,5 +1559,30 @@
         "title": "Error",
         "fallback": "Something went wrong",
         "goHome": "Go Home"
+    },
+    "publicProfile": {
+        "notFound": "Profile Not Found",
+        "notFoundHint": "This profile may have been removed or does not exist.",
+        "backToHome": "Back to Home",
+        "photos": "Photos",
+        "weightHistory": "Weight History",
+        "recentFeedings": "Recent Feedings",
+        "sheddingHistory": "Shedding History",
+        "measurements": "measurements",
+        "weight": "Weight",
+        "feedings": "Feedings",
+        "sheddings": "Sheddings",
+        "feedingRefused": "Refused",
+        "viewFullProfile": "View Full Profile",
+        "poweredBy": "Powered by",
+        "ageMonths": "{months} months old",
+        "ageYears": "{years} years old",
+        "ageYearsMonths": "{years}y {months}m old",
+        "ogDescription": "{name} — {species} on KeeperLog",
+        "gender": {
+            "MALE": "Male",
+            "FEMALE": "Female",
+            "UNKNOWN": "Unknown"
+        }
     }
 }

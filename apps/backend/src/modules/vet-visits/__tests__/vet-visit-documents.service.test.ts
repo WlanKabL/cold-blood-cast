@@ -56,8 +56,18 @@ describe("listVetVisitDocuments", () => {
     it("returns documents for an owned visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue({ userId: USER_ID });
         const docs = [
-            { id: "d1", vetVisitId: VISIT_ID, label: "Invoice", upload: { id: "u1", url: "/uploads/vetDocs/a.pdf" } },
-            { id: "d2", vetVisitId: VISIT_ID, label: null, upload: { id: "u2", url: "/uploads/vetDocs/b.jpg" } },
+            {
+                id: "d1",
+                vetVisitId: VISIT_ID,
+                label: "Invoice",
+                upload: { id: "u1", url: "/uploads/vetDocs/a.pdf" },
+            },
+            {
+                id: "d2",
+                vetVisitId: VISIT_ID,
+                label: null,
+                upload: { id: "u2", url: "/uploads/vetDocs/b.jpg" },
+            },
         ];
         mockPrisma.vetVisitDocument.findMany.mockResolvedValue(docs);
 
@@ -78,13 +88,17 @@ describe("listVetVisitDocuments", () => {
     it("throws notFound for non-owned visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue({ userId: "other_user" });
 
-        await expect(listVetVisitDocuments(VISIT_ID, USER_ID)).rejects.toThrow("Vet visit not found");
+        await expect(listVetVisitDocuments(VISIT_ID, USER_ID)).rejects.toThrow(
+            "Vet visit not found",
+        );
     });
 
     it("throws notFound for non-existent visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(null);
 
-        await expect(listVetVisitDocuments(VISIT_ID, USER_ID)).rejects.toThrow("Vet visit not found");
+        await expect(listVetVisitDocuments(VISIT_ID, USER_ID)).rejects.toThrow(
+            "Vet visit not found",
+        );
     });
 });
 
@@ -105,7 +119,9 @@ describe("addVetVisitDocument", () => {
         };
         mockPrisma.vetVisitDocument.create.mockResolvedValue(createdDoc);
 
-        const result = await addVetVisitDocument(VISIT_ID, USER_ID, mockFile, { label: "Blood test" });
+        const result = await addVetVisitDocument(VISIT_ID, USER_ID, mockFile, {
+            label: "Blood test",
+        });
 
         expect(mockUploadFile).toHaveBeenCalledWith(
             USER_ID,
@@ -170,9 +186,9 @@ describe("addVetVisitDocument", () => {
     it("throws for non-existent visit", async () => {
         mockPrisma.vetVisit.findUnique.mockResolvedValue(null);
 
-        await expect(
-            addVetVisitDocument(VISIT_ID, USER_ID, mockFile, {}),
-        ).rejects.toThrow("Vet visit not found");
+        await expect(addVetVisitDocument(VISIT_ID, USER_ID, mockFile, {})).rejects.toThrow(
+            "Vet visit not found",
+        );
         expect(mockUploadFile).not.toHaveBeenCalled();
     });
 });
@@ -234,17 +250,17 @@ describe("updateVetVisitDocument", () => {
             upload: { id: UPLOAD_ID, url: "/uploads/vetDocs/test.pdf" },
         });
 
-        await expect(
-            updateVetVisitDocument(DOC_ID, USER_ID, { label: "x" }),
-        ).rejects.toThrow("Document not found");
+        await expect(updateVetVisitDocument(DOC_ID, USER_ID, { label: "x" })).rejects.toThrow(
+            "Document not found",
+        );
     });
 
     it("throws for non-existent document", async () => {
         mockPrisma.vetVisitDocument.findUnique.mockResolvedValue(null);
 
-        await expect(
-            updateVetVisitDocument(DOC_ID, USER_ID, { label: "x" }),
-        ).rejects.toThrow("Document not found");
+        await expect(updateVetVisitDocument(DOC_ID, USER_ID, { label: "x" })).rejects.toThrow(
+            "Document not found",
+        );
     });
 });
 

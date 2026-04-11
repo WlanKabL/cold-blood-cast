@@ -105,7 +105,11 @@ describe("PhotoLightbox", () => {
         });
 
         const buttons = wrapper.findAll("button");
-        const nextButton = buttons.find((b) => b.attributes("class")?.includes("right-4") && !b.attributes("class")?.includes("top-4"));
+        const nextButton = buttons.find(
+            (b) =>
+                b.attributes("class")?.includes("right-4") &&
+                !b.attributes("class")?.includes("top-4"),
+        );
         expect(nextButton?.exists()).toBe(true);
     });
 
@@ -115,7 +119,9 @@ describe("PhotoLightbox", () => {
             global: { stubs },
         });
 
-        const closeButton = wrapper.findAll("button").find((b) => b.attributes("class")?.includes("top-4"));
+        const closeButton = wrapper
+            .findAll("button")
+            .find((b) => b.attributes("class")?.includes("top-4"));
         await closeButton?.trigger("click");
 
         expect(wrapper.emitted("close")).toBeTruthy();
@@ -153,7 +159,11 @@ describe("PhotoLightbox", () => {
         });
 
         const buttons = wrapper.findAll("button");
-        const nextButton = buttons.find((b) => b.attributes("class")?.includes("right-4") && !b.attributes("class")?.includes("top-4"));
+        const nextButton = buttons.find(
+            (b) =>
+                b.attributes("class")?.includes("right-4") &&
+                !b.attributes("class")?.includes("top-4"),
+        );
         await nextButton?.trigger("click");
 
         expect(wrapper.emitted("next")).toBeTruthy();

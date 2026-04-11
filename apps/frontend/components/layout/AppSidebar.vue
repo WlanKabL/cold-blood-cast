@@ -11,9 +11,7 @@
                     alt="KeeperLog"
                     class="shadow-primary-500/20 h-8 w-8 rounded-xl shadow-lg"
                 />
-                <span class="text-fg text-[17px] font-semibold tracking-tight"
-                    >KeeperLog</span
-                >
+                <span class="text-fg text-[17px] font-semibold tracking-tight">KeeperLog</span>
             </NuxtLink>
         </div>
 
@@ -173,6 +171,12 @@ const overviewNavItems = [
         feature: "dashboard",
         shortcut: "D",
     },
+    {
+        to: "/planner",
+        icon: "lucide:calendar-days",
+        label: "nav.planner",
+        feature: "weekly_planner",
+    },
 ];
 
 const terrariumNavItems = [
@@ -235,6 +239,12 @@ const careLogNavItems = [
         icon: "lucide:building-2",
         label: "nav.veterinarians",
         feature: "vet_visits",
+    },
+    {
+        to: "/maintenance",
+        icon: "lucide:wrench",
+        label: "nav.maintenance",
+        feature: "enclosure_maintenance",
     },
 ];
 

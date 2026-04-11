@@ -25,7 +25,10 @@ export function computeFeedingStatus(
     now: Date = new Date(),
 ): { daysSinceLastFeeding: number | null; status: FeedingStatus } {
     if (!intervalMin || !intervalMax) {
-        return { daysSinceLastFeeding: lastFedAt ? daysBetween(lastFedAt, now) : null, status: "no_schedule" };
+        return {
+            daysSinceLastFeeding: lastFedAt ? daysBetween(lastFedAt, now) : null,
+            status: "no_schedule",
+        };
     }
 
     if (!lastFedAt) {

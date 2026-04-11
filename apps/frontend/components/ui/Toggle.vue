@@ -19,13 +19,13 @@ interface Props {
     /** Size variant */
     size?: "sm" | "md";
     /** Color when active */
-    color?: "accent" | "emerald" | "red";
+    color?: "primary" | "accent" | "emerald" | "red";
     disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     size: "md",
-    color: "accent",
+    color: "primary",
     disabled: false,
 });
 
@@ -47,10 +47,11 @@ const thumbPositionClass = computed(() => {
 });
 
 const colorMap: Record<string, string> = {
+    primary: "bg-primary-500",
     accent: "bg-accent",
     emerald: "bg-emerald-500",
     red: "bg-red-500",
 };
 
-const activeBgClass = computed(() => colorMap[props.color] ?? colorMap.accent);
+const activeBgClass = computed(() => colorMap[props.color] ?? colorMap.primary);
 </script>

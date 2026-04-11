@@ -20,6 +20,8 @@ const ALL_FEATURES: Record<string, boolean> = {
     timeline: true,
     pet_documents: true,
     api_access: true,
+    enclosure_maintenance: true,
+    weekly_planner: true,
 };
 
 // ─── User Fixtures ─────────────────────────────────────────
@@ -35,12 +37,16 @@ export interface MockMeResponse {
         emailVerified: boolean;
         onboardingCompleted: boolean;
         locale: string;
+        weeklyReportEnabled?: boolean;
     };
     roles: string[];
     features: Record<string, boolean>;
     limits: Record<string, number>;
     enabledFlags: string[];
-    featureTiers: Record<string, { role: string; displayName: string; color: string; priority: number }[]>;
+    featureTiers: Record<
+        string,
+        { role: string; displayName: string; color: string; priority: number }[]
+    >;
     impersonatedBy: string | null;
 }
 
@@ -108,7 +114,11 @@ export const mockPets = [
         feedingIntervalMinDays: 7,
         feedingIntervalMaxDays: 14,
         photos: [
-            { id: "photo_001", uploadId: "upl_photo_001", upload: { url: "/uploads/uploads/monty-shed.jpg" } },
+            {
+                id: "photo_001",
+                uploadId: "upl_photo_001",
+                upload: { url: "/uploads/uploads/monty-shed.jpg" },
+            },
         ],
         _count: { feedings: 12, sheddings: 3, weightRecords: 8, photos: 2, documents: 3 },
         createdAt: "2025-01-15T10:00:00.000Z",
@@ -209,7 +219,14 @@ export const mockVetVisits = [
         pet: { id: "pet_002", name: "Slither", species: "corn_snake" },
         veterinarian: { id: "vet_001", name: "Dr. Schmidt", clinicName: "Reptile Clinic Berlin" },
         sourceVisit: null,
-        documents: [{ id: "doc_001", uploadId: "upl_001", label: "Lab results", upload: { id: "upl_001", url: "/uploads/vetDocs/lab.pdf" } }],
+        documents: [
+            {
+                id: "doc_001",
+                uploadId: "upl_001",
+                label: "Lab results",
+                upload: { id: "upl_001", url: "/uploads/vetDocs/lab.pdf" },
+            },
+        ],
     },
     {
         id: "visit_003",
@@ -599,7 +616,12 @@ export const mockTimelineEvents = {
             title: "Annual checkup",
             detail: "Healthy",
             icon: "lucide:stethoscope",
-            meta: { visitType: "CHECKUP", costCents: 5000, treatment: null, vetName: "Dr. Schmidt" },
+            meta: {
+                visitType: "CHECKUP",
+                costCents: 5000,
+                treatment: null,
+                vetName: "Dr. Schmidt",
+            },
         },
         {
             id: "p_001",
@@ -692,3 +714,202 @@ export const mockPetDocuments = [
         createdAt: "2025-03-01T08:00:00.000Z",
     },
 ];
+
+// ─── Maintenance Task Fixtures ─────────────────────────────
+
+export const mockMaintenanceTasks = [
+    {
+        id: "mt_001",
+        enclosureId: "enc_001",
+        userId: "usr_test_001",
+        type: "CLEANING",
+        description: "Full terrarium cleaning",
+        completedAt: null,
+        nextDueAt: "2026-04-05T00:00:00.000Z",
+        intervalDays: 14,
+        recurring: true,
+        notes: "Use reptile-safe disinfectant",
+        createdAt: "2026-03-01T10:00:00.000Z",
+        enclosure: { id: "enc_001", name: "Desert Terrarium" },
+    },
+    {
+        id: "mt_002",
+        enclosureId: "enc_001",
+        userId: "usr_test_001",
+        type: "SUBSTRATE_CHANGE",
+        description: "Replace aspen bedding",
+        completedAt: null,
+        nextDueAt: "2026-04-20T00:00:00.000Z",
+        intervalDays: 30,
+        recurring: true,
+        notes: null,
+        createdAt: "2026-03-15T08:00:00.000Z",
+        enclosure: { id: "enc_001", name: "Desert Terrarium" },
+    },
+    {
+        id: "mt_003",
+        enclosureId: "enc_001",
+        userId: "usr_test_001",
+        type: "WATER_CHANGE",
+        description: "Clean and refill water bowl",
+        completedAt: "2026-04-10T09:00:00.000Z",
+        nextDueAt: "2026-04-13T00:00:00.000Z",
+        intervalDays: 3,
+        recurring: true,
+        notes: null,
+        createdAt: "2026-03-01T10:00:00.000Z",
+        enclosure: { id: "enc_001", name: "Desert Terrarium" },
+    },
+    {
+        id: "mt_004",
+        enclosureId: "enc_001",
+        userId: "usr_test_001",
+        type: "LAMP_REPLACEMENT",
+        description: "Replace UVB bulb",
+        completedAt: null,
+        nextDueAt: "2026-06-01T00:00:00.000Z",
+        intervalDays: null,
+        recurring: false,
+        notes: "Arcadia T5 12%",
+        createdAt: "2026-01-01T10:00:00.000Z",
+        enclosure: { id: "enc_001", name: "Desert Terrarium" },
+    },
+];
+
+export const mockOverdueMaintenanceTasks = [mockMaintenanceTasks[0]];
+
+export const mockMaintenanceEmpty: never[] = [];
+
+// ─── Public Profile Fixtures ───────────────────────────────
+
+export const mockPublicProfile = {
+    id: "pp_001",
+    petId: "pet_001",
+    userId: "usr_test_001",
+    slug: "monty-the-snake",
+    active: true,
+    bio: "A friendly corn snake who loves to explore",
+    showPhotos: true,
+    showWeight: true,
+    showAge: true,
+    showFeedings: true,
+    showSheddings: true,
+    showSpecies: true,
+    showMorph: true,
+    views: 42,
+    createdAt: "2026-03-01T10:00:00.000Z",
+    updatedAt: "2026-03-15T10:00:00.000Z",
+};
+
+export const mockPublicProfileInactive = {
+    ...mockPublicProfile,
+    id: "pp_002",
+    active: false,
+    views: 0,
+};
+
+export const mockPublicPetData = {
+    name: "Monty",
+    bio: "A friendly corn snake who loves to explore",
+    species: "Corn Snake",
+    morph: "Amel",
+    gender: "MALE",
+    birthDate: "2022-03-10T00:00:00.000Z",
+    acquisitionDate: "2022-05-01T00:00:00.000Z",
+    profilePhotoId: "photo_001",
+    photos: [
+        {
+            id: "photo_001",
+            caption: "Profile picture",
+            tags: ["portrait"],
+            isProfilePicture: true,
+            takenAt: "2025-06-01T10:00:00.000Z",
+        },
+        {
+            id: "photo_002",
+            caption: "Feeding time",
+            tags: ["feeding"],
+            isProfilePicture: false,
+            takenAt: "2025-08-15T10:00:00.000Z",
+        },
+    ],
+    feedings: [
+        {
+            feedItem: "Mouse",
+            foodType: "MOUSE",
+            foodSize: "Adult",
+            quantity: 1,
+            accepted: true,
+            fedAt: "2026-03-01T10:00:00.000Z",
+            notes: null,
+        },
+        {
+            feedItem: "Mouse",
+            foodType: "MOUSE",
+            foodSize: "Small",
+            quantity: 2,
+            accepted: true,
+            fedAt: "2026-02-15T10:00:00.000Z",
+            notes: null,
+        },
+        {
+            feedItem: "Rat",
+            foodType: "RAT",
+            foodSize: "Pinky",
+            quantity: 1,
+            accepted: false,
+            fedAt: "2026-02-01T10:00:00.000Z",
+            notes: "Refused feeding",
+        },
+    ],
+    sheddings: [
+        {
+            startedAt: "2026-02-20T00:00:00.000Z",
+            completedAt: "2026-02-24T00:00:00.000Z",
+            complete: true,
+            quality: "complete",
+            notes: null,
+        },
+        {
+            startedAt: "2026-01-15T00:00:00.000Z",
+            completedAt: null,
+            complete: false,
+            quality: null,
+            notes: "In blue phase",
+        },
+    ],
+    weightRecords: [
+        { weightGrams: 450, measuredAt: "2026-03-01T00:00:00.000Z" },
+        { weightGrams: 430, measuredAt: "2026-02-01T00:00:00.000Z" },
+        { weightGrams: 410, measuredAt: "2026-01-01T00:00:00.000Z" },
+    ],
+    views: 42,
+    slug: "monty-the-snake",
+    createdAt: "2026-03-01T10:00:00.000Z",
+};
+
+export const mockPublicPetDataMinimal = {
+    name: "Slither",
+    bio: null,
+    species: null,
+    morph: null,
+    gender: "FEMALE",
+    birthDate: null,
+    acquisitionDate: null,
+    profilePhotoId: null,
+    photos: [],
+    feedings: [],
+    sheddings: [],
+    weightRecords: [],
+    views: 0,
+    slug: "slither-minimal",
+    createdAt: "2026-04-01T10:00:00.000Z",
+};
+
+export const mockSlugCheck = {
+    available: true,
+};
+
+export const mockSlugCheckTaken = {
+    available: false,
+};

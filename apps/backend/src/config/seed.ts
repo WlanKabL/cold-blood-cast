@@ -19,7 +19,7 @@ import { resolve } from "node:path";
 //  2. Bump CURRENT_SEED_VERSION to match the new entry's version.
 //  3. Deploy — it applies once, then never again until the next bump.
 
-const CURRENT_SEED_VERSION = 4;
+const CURRENT_SEED_VERSION = 6;
 
 // ─── Shared Data ─────────────────────────────────────────────────────────────
 
@@ -142,6 +142,18 @@ const DEFAULT_FEATURE_FLAGS = [
         name: "Pet Documents",
         category: "care",
         description: "Upload and organize pet documents (CITES, receipts, vet reports)",
+    },
+    {
+        key: "enclosure_maintenance",
+        name: "Enclosure Maintenance",
+        category: "care",
+        description: "Track and schedule terrarium maintenance tasks",
+    },
+    {
+        key: "weekly_planner",
+        name: "Weekly Care Planner",
+        category: "care",
+        description: "Weekly calendar view and Sunday digest email for upcoming care tasks",
     },
     // Alerts & monitoring
     {
@@ -535,6 +547,72 @@ const MIGRATIONS: Migration[] = [
                 "create-only",
             );
             console.log("  → pet_documents flag assigned to all roles");
+        },
+    },
+
+    // ─────────────────────────────────────── v5: enclosure_maintenance feature flag
+    {
+        version: 5,
+        description: "Add enclosure_maintenance feature flag to all roles",
+        apply: async (ctx) => {
+            for (const flag of DEFAULT_FEATURE_FLAGS.filter((f) =>
+                ["enclosure_maintenance"].includes(f.key),
+            )) {
+                await ctx.prisma.featureFlag.upsert({
+                    where: { key: flag.key },
+                    update: {},
+                    create: { ...flag, enabled: true },
+                });
+            }
+
+            ctx.flags = await ctx.prisma.featureFlag.findMany();
+
+            await applyRoleFlagMapping(
+                ctx,
+                {
+                    FREE: { enclosure_maintenance: true },
+                    BETA_TESTER: { enclosure_maintenance: true },
+                    PREMIUM: { enclosure_maintenance: true },
+                    PRO: { enclosure_maintenance: true },
+                    MODERATOR: { enclosure_maintenance: true },
+                    ADMIN: { enclosure_maintenance: true },
+                },
+                "create-only",
+            );
+            console.log("  → enclosure_maintenance flag assigned to all roles");
+        },
+    },
+
+    // ─────────────────────────────────────── v6: weekly_planner feature flag
+    {
+        version: 6,
+        description: "Add weekly_planner feature flag to all roles",
+        apply: async (ctx) => {
+            for (const flag of DEFAULT_FEATURE_FLAGS.filter((f) =>
+                ["weekly_planner"].includes(f.key),
+            )) {
+                await ctx.prisma.featureFlag.upsert({
+                    where: { key: flag.key },
+                    update: {},
+                    create: { ...flag, enabled: true },
+                });
+            }
+
+            ctx.flags = await ctx.prisma.featureFlag.findMany();
+
+            await applyRoleFlagMapping(
+                ctx,
+                {
+                    FREE: { weekly_planner: true },
+                    BETA_TESTER: { weekly_planner: true },
+                    PREMIUM: { weekly_planner: true },
+                    PRO: { weekly_planner: true },
+                    MODERATOR: { weekly_planner: true },
+                    ADMIN: { weekly_planner: true },
+                },
+                "create-only",
+            );
+            console.log("  → weekly_planner flag assigned to all roles");
         },
     },
 
