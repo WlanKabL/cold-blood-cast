@@ -105,8 +105,12 @@ export const mockPets = [
         enclosureId: "enc_001",
         enclosure: { id: "enc_001", name: "Main Vivarium" },
         notes: null,
-        photos: [],
-        _count: { feedings: 12, sheddings: 3, weightRecords: 8, photos: 2 },
+        feedingIntervalMinDays: 7,
+        feedingIntervalMaxDays: 14,
+        photos: [
+            { id: "photo_001", uploadId: "upl_photo_001", upload: { url: "/uploads/uploads/monty-shed.jpg" } },
+        ],
+        _count: { feedings: 12, sheddings: 3, weightRecords: 8, photos: 2, petDocuments: 3 },
         createdAt: "2025-01-15T10:00:00.000Z",
         updatedAt: "2025-01-15T10:00:00.000Z",
     },
@@ -122,8 +126,10 @@ export const mockPets = [
         enclosureId: "enc_001",
         enclosure: { id: "enc_001", name: "Main Vivarium" },
         notes: "Very friendly",
+        feedingIntervalMinDays: null,
+        feedingIntervalMaxDays: null,
         photos: [],
-        _count: { feedings: 5, sheddings: 1, weightRecords: 3, photos: 0 },
+        _count: { feedings: 5, sheddings: 1, weightRecords: 3, photos: 0, petDocuments: 0 },
         createdAt: "2025-02-01T10:00:00.000Z",
         updatedAt: "2025-02-01T10:00:00.000Z",
     },
@@ -366,6 +372,29 @@ export const mockSensors = [
 export const mockFeedings = [
     { id: "feeding_001", petId: "pet_001", fedAt: "2025-09-10T10:00:00.000Z" },
     { id: "feeding_002", petId: "pet_002", fedAt: "2025-09-08T10:00:00.000Z" },
+];
+
+export const mockPetDetailFeedings = [
+    {
+        id: "feeding_010",
+        petId: "pet_001",
+        foodType: "Mouse",
+        foodSize: "Small",
+        quantity: 1,
+        accepted: true,
+        fedAt: "2025-09-10T10:00:00.000Z",
+        notes: null,
+    },
+    {
+        id: "feeding_011",
+        petId: "pet_001",
+        foodType: "Mouse",
+        foodSize: "Medium",
+        quantity: 1,
+        accepted: true,
+        fedAt: "2025-09-03T10:00:00.000Z",
+        notes: null,
+    },
 ];
 export const mockFeedingReminders: unknown[] = [];
 export const mockAnnouncements: unknown[] = [];

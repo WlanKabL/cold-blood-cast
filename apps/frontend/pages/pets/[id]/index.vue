@@ -107,12 +107,19 @@
                         {{ $t("pages.pets.photos.viewGallery") }}
                     </NuxtLink>
                 </div>
-                <div v-if="pet.photos.length" class="flex items-center gap-4">
+                <div v-if="pet._count.photos" class="flex items-center gap-4">
                     <img
+                        v-if="pet.photos.length"
                         :src="resolveUrl(pet.photos[0].upload.url)"
                         :alt="pet.name"
                         class="h-20 w-20 rounded-xl object-cover ring-1 ring-white/10"
                     />
+                    <div
+                        v-else
+                        class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl"
+                    >
+                        <Icon name="lucide:images" class="text-fg-faint h-8 w-8" />
+                    </div>
                     <div>
                         <p class="text-fg text-sm">
                             {{ $t("pages.pets.photos.photoCount", { count: pet._count.photos }) }}
@@ -148,8 +155,8 @@
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-fg font-semibold">
                         {{ $t("pages.pets.documents.title") }}
-                        <span v-if="pet._count.documents" class="text-fg-faint ml-1 text-sm font-normal">
-                            ({{ pet._count.documents }})
+                        <span v-if="pet._count.petDocuments" class="text-fg-faint ml-1 text-sm font-normal">
+                            ({{ pet._count.petDocuments }})
                         </span>
                     </h2>
                     <NuxtLink
@@ -159,13 +166,13 @@
                         {{ $t("pages.pets.documents.viewDocuments") }}
                     </NuxtLink>
                 </div>
-                <div v-if="pet._count.documents" class="flex items-center gap-3">
+                <div v-if="pet._count.petDocuments" class="flex items-center gap-3">
                     <div class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl">
                         <Icon name="lucide:file-text" class="text-primary-400 h-5 w-5" />
                     </div>
                     <div>
                         <p class="text-fg text-sm">
-                            {{ $t("pages.pets.documents.documentCount", { count: pet._count.documents }) }}
+                            {{ $t("pages.pets.documents.documentCount", { count: pet._count.petDocuments }) }}
                         </p>
                         <NuxtLink
                             :to="`/pets/${petId}/documents`"
@@ -442,7 +449,7 @@ interface Pet {
     feedingIntervalMinDays: number | null;
     feedingIntervalMaxDays: number | null;
     photos: { id: string; uploadId: string; upload: { url: string } }[];
-    _count: { photos: number; documents: number };
+    _count: { photos: number; petDocuments: number };
 }
 
 interface Feeding {

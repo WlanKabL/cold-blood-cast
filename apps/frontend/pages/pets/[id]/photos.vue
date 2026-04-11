@@ -424,11 +424,11 @@ const { mutate: uploadMutation, isPending: uploading } = useMutation({
         if (!selectedFile.value) return;
 
         const formData = new FormData();
-        formData.append("file", selectedFile.value);
         if (uploadForm.caption) formData.append("caption", uploadForm.caption);
         if (uploadForm.tags) formData.append("tags", uploadForm.tags);
         if (uploadForm.isProfilePicture) formData.append("isProfilePicture", "true");
         if (uploadForm.takenAt) formData.append("takenAt", new Date(uploadForm.takenAt).toISOString());
+        formData.append("file", selectedFile.value);
 
         const baseURL = useRuntimeConfig().public.apiBaseURL;
         const authStore = useAuthStore();

@@ -8,11 +8,11 @@ export async function listPets(userId: string) {
         include: {
             enclosure: { select: { id: true, name: true } },
             photos: {
-                where: { isProfilePicture: true },
+                orderBy: [{ isProfilePicture: "desc" }, { createdAt: "desc" }],
                 take: 1,
                 select: { id: true, uploadId: true, upload: { select: { url: true } } },
             },
-            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true } },
+            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true, petDocuments: true } },
         },
         orderBy: { createdAt: "desc" },
     });
@@ -24,11 +24,11 @@ export async function getPet(id: string, userId: string) {
         include: {
             enclosure: { select: { id: true, name: true } },
             photos: {
-                where: { isProfilePicture: true },
+                orderBy: [{ isProfilePicture: "desc" }, { createdAt: "desc" }],
                 take: 1,
                 select: { id: true, uploadId: true, upload: { select: { url: true } } },
             },
-            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true } },
+            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true, petDocuments: true } },
         },
     });
     if (!pet || pet.userId !== userId) {

@@ -185,3 +185,97 @@ test.describe("Pet Photos — Actions", () => {
         await expect(images).toHaveCount(2, { timeout: 10_000 });
     });
 });
+
+test.describe("Pet Photos — Set Profile Picture", () => {
+    test.beforeEach(async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, `/api/pets/${petId}`, mockPets[0]);
+        await mockGet(page, `/api/pets/${petId}/photos`, mockPetPhotos);
+    });
+
+    test("non-profile photos show set-profile button on hover", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+
+        // photo_002 is NOT the profile picture — hover to find the star button
+        const secondCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).nth(1);
+        await secondCard.hover();
+
+        // Star icon button for set-as-profile should be visible in the action bar
+        const actionButtons = secondCard.locator(".border-t button");
+        // Non-profile photos have 3 buttons: star, edit, delete
+        await expect(actionButtons).toHaveCount(3, { timeout: 5_000 });
+    });
+
+    test("profile photo does NOT show set-profile button", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+
+        // photo_001 IS the profile picture — hover actions should not include star
+        const firstCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).first();
+        await firstCard.hover();
+
+        // Profile pics have 2 buttons: edit + delete (no star)
+        const actionButtons = firstCard.locator(".border-t button");
+        await expect(actionButtons).toHaveCount(2, { timeout: 5_000 });
+    });
+
+    test("clicking set-profile calls API and shows success", async ({ page }) => {
+        await mockMutation(page, "POST", `/api/pets/${petId}/photos/photo_002/profile`);
+        await page.goto(`/pets/${petId}/photos`);
+
+        const secondCard = page.locator(".group").filter({ has: page.locator("img[loading='lazy']") }).nth(1);
+        await secondCard.hover();
+
+        // Click the star button (first action button on non-profile photo)
+        const starBtn = secondCard.locator(".border-t button").first();
+        await starBtn.click();
+
+        // Success toast
+        await expect(page.getByText(/profile|profil/i).first()).toBeVisible({ timeout: 10_000 });
+    });
+});
+
+test.describe("Pet Photos — Upload Form", () => {
+    test.beforeEach(async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, `/api/pets/${petId}`, mockPets[0]);
+        await mockGet(page, `/api/pets/${petId}/photos`, mockPetPhotos);
+    });
+
+    test("upload modal has caption field", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+        await page.getByRole("button", { name: /upload|hochladen/i }).click();
+
+        await expect(page.getByText(/caption|beschreibung/i).first()).toBeVisible({ timeout: 10_000 });
+    });
+
+    test("upload modal has tags field", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+        await page.getByRole("button", { name: /upload|hochladen/i }).click();
+
+        await expect(page.getByText(/tags/i).first()).toBeVisible({ timeout: 10_000 });
+    });
+
+    test("upload modal has profile picture toggle", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+        await page.getByRole("button", { name: /upload|hochladen/i }).click();
+
+        await expect(page.getByText(/profile|profil/i).first()).toBeVisible({ timeout: 10_000 });
+    });
+
+    test("upload modal has taken-at datetime field", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+        await page.getByRole("button", { name: /upload|hochladen/i }).click();
+
+        const dateInput = page.locator("input[type='datetime-local']");
+        await expect(dateInput).toBeVisible({ timeout: 10_000 });
+    });
+
+    test("submit button is disabled without file", async ({ page }) => {
+        await page.goto(`/pets/${petId}/photos`);
+        await page.getByRole("button", { name: /upload|hochladen/i }).click();
+
+        // The submit button inside the modal should be disabled
+        const submitBtn = page.locator("form button[type='submit']");
+        await expect(submitBtn).toBeDisabled({ timeout: 10_000 });
+    });
+});
