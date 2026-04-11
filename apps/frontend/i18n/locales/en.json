@@ -867,7 +867,9 @@
                 "dropHint": "Drop image here or click to browse",
                 "maxSize": "Max. {size} MB per file",
                 "takenAt": "Taken on",
-                "takenAtHint": "When was this photo taken?"
+                "takenAtHint": "When was this photo taken?",
+                "dateAutoDetected": "Date automatically detected from image metadata",
+                "dateNotDetected": "Date could not be detected — please enter manually"
             },
             "documents": {
                 "title": "Documents",
@@ -899,7 +901,10 @@
                 "documentCount": "{count} document | {count} documents",
                 "viewDocuments": "View Documents",
                 "dropHint": "Drop file here or click to browse",
-                "maxSize": "Images and PDF files"
+                "maxSize": "Images and PDF files",
+                "uploadedAt": "Uploaded on",
+                "dateAutoDetected": "Date automatically detected from file metadata",
+                "dateNotDetected": "Date could not be detected — please enter manually"
             },
             "recentVetVisits": "Recent Vet Visits",
             "noVetVisits": "No vet visits recorded yet",

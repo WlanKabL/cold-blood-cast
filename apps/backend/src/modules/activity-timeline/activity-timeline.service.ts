@@ -222,7 +222,7 @@ export async function getTimeline(
         typeSet.has("photo")
             ? prisma.petPhoto.findMany({
                   where: { petId },
-                  select: { id: true, takenAt: true, caption: true, tags: true, upload: { select: { url: true } } },
+                  select: { id: true, takenAt: true, caption: true, tags: true, upload: { select: { url: true, originalName: true } } },
                   orderBy: { takenAt: "desc" },
               })
             : Promise.resolve([]),

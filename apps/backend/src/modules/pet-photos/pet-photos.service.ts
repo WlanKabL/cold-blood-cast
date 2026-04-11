@@ -6,6 +6,8 @@ import { uploadFile, deleteUpload } from "@/modules/uploads/uploads.service.js";
 
 const SUGGESTED_TAGS = ["portrait", "shedding", "feeding", "enclosure", "vet"] as const;
 
+const PHOTO_UPLOAD_SELECT = { select: { url: true, originalName: true } } as const;
+
 export function getSuggestedTags(): readonly string[] {
     return SUGGESTED_TAGS;
 }
@@ -28,7 +30,7 @@ export async function listPetPhotos(
         where,
         include: {
             pet: { select: { userId: true } },
-            upload: { select: { url: true } },
+            upload: PHOTO_UPLOAD_SELECT,
         },
         orderBy: opts?.sort === "order" ? { sortOrder: "asc" } : { takenAt: "desc" },
     });
@@ -75,7 +77,7 @@ export async function addPetPhoto(
             sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
             takenAt: opts.takenAt ? new Date(opts.takenAt) : new Date(),
         },
-        include: { upload: { select: { url: true } } },
+        include: { upload: PHOTO_UPLOAD_SELECT },
     });
 
     return photo;
@@ -97,7 +99,7 @@ export async function updatePetPhoto(
             ...(data.tags !== undefined ? { tags: data.tags } : {}),
             ...(data.takenAt !== undefined ? { takenAt: new Date(data.takenAt) } : {}),
         },
-        include: { upload: { select: { url: true } } },
+        include: { upload: PHOTO_UPLOAD_SELECT },
     });
 }
 
@@ -119,7 +121,7 @@ export async function setProfilePicture(photoId: string, userId: string) {
 
     return prisma.petPhoto.findUnique({
         where: { id: photo.id },
-        include: { upload: { select: { url: true } } },
+        include: { upload: PHOTO_UPLOAD_SELECT },
     });
 }
 
@@ -142,7 +144,7 @@ export async function getProfilePicture(petId: string, userId: string) {
 
     return prisma.petPhoto.findFirst({
         where: { petId, isProfilePicture: true },
-        include: { upload: { select: { url: true } } },
+        include: { upload: PHOTO_UPLOAD_SELECT },
     });
 }
 
@@ -164,7 +166,7 @@ async function getPhotoWithOwnershipCheck(photoId: string, userId: string) {
         where: { id: photoId },
         include: {
             pet: { select: { userId: true } },
-            upload: { select: { url: true } },
+            upload: PHOTO_UPLOAD_SELECT,
         },
     });
 

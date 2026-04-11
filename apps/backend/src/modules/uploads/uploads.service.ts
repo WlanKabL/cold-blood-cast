@@ -103,6 +103,7 @@ export async function uploadFile(
             data: {
                 userId,
                 url: `/uploads/${relPath}`,
+                originalName: file.filename,
                 caption: opts.caption ?? null,
                 allowedUserIds: [userId],
             },

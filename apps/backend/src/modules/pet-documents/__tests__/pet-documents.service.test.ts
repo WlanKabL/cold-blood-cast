@@ -65,7 +65,7 @@ describe("listPetDocuments", () => {
         });
         expect(mockPrisma.petDocument.findMany).toHaveBeenCalledWith({
             where: { petId: PET_ID },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
             orderBy: { createdAt: "desc" },
         });
         expect(result).toEqual(docs);
@@ -79,7 +79,7 @@ describe("listPetDocuments", () => {
 
         expect(mockPrisma.petDocument.findMany).toHaveBeenCalledWith({
             where: { petId: PET_ID, category: "CITES" },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
             orderBy: { createdAt: "desc" },
         });
     });
@@ -138,7 +138,7 @@ describe("addPetDocument", () => {
                 notes: null,
                 documentDate: null,
             },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
         });
         expect(result).toEqual(createdDoc);
     });
@@ -201,7 +201,7 @@ describe("updatePetDocument", () => {
         expect(mockPrisma.petDocument.update).toHaveBeenCalledWith({
             where: { id: DOC_ID },
             data: { label: "Updated label", notes: "Some notes" },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
         });
         expect(result).toEqual(updated);
     });
@@ -220,7 +220,7 @@ describe("updatePetDocument", () => {
         expect(mockPrisma.petDocument.update).toHaveBeenCalledWith({
             where: { id: DOC_ID },
             data: { category: "INSURANCE" },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
         });
     });
 
@@ -239,7 +239,7 @@ describe("updatePetDocument", () => {
         expect(mockPrisma.petDocument.update).toHaveBeenCalledWith({
             where: { id: DOC_ID },
             data: { documentDate: new Date(iso) },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
         });
     });
 
@@ -257,7 +257,7 @@ describe("updatePetDocument", () => {
         expect(mockPrisma.petDocument.update).toHaveBeenCalledWith({
             where: { id: DOC_ID },
             data: { label: "Only label" },
-            include: { upload: { select: { id: true, url: true } } },
+            include: { upload: { select: { id: true, url: true, originalName: true } } },
         });
     });
 

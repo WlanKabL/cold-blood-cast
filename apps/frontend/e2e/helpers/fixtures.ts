@@ -110,7 +110,7 @@ export const mockPets = [
         photos: [
             { id: "photo_001", uploadId: "upl_photo_001", upload: { url: "/uploads/uploads/monty-shed.jpg" } },
         ],
-        _count: { feedings: 12, sheddings: 3, weightRecords: 8, photos: 2, petDocuments: 3 },
+        _count: { feedings: 12, sheddings: 3, weightRecords: 8, photos: 2, documents: 3 },
         createdAt: "2025-01-15T10:00:00.000Z",
         updatedAt: "2025-01-15T10:00:00.000Z",
     },
@@ -129,7 +129,7 @@ export const mockPets = [
         feedingIntervalMinDays: null,
         feedingIntervalMaxDays: null,
         photos: [],
-        _count: { feedings: 5, sheddings: 1, weightRecords: 3, photos: 0, petDocuments: 0 },
+        _count: { feedings: 5, sheddings: 1, weightRecords: 3, photos: 0, documents: 0 },
         createdAt: "2025-02-01T10:00:00.000Z",
         updatedAt: "2025-02-01T10:00:00.000Z",
     },

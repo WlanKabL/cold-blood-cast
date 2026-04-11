@@ -660,6 +660,7 @@ model Upload {
     id              String   @id @default(cuid())
     userId          String   @map("user_id")
     url             String
+    originalName    String?  @map("original_name")
     caption         String?
     allowedUserIds  String[] @map("allowed_user_ids")
 

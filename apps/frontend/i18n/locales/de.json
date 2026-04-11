@@ -867,7 +867,9 @@
                 "dropHint": "Bild hierher ziehen oder klicken",
                 "maxSize": "Max. {size} MB pro Datei",
                 "takenAt": "Aufgenommen am",
-                "takenAtHint": "Wann wurde das Foto aufgenommen?"
+                "takenAtHint": "Wann wurde das Foto aufgenommen?",
+                "dateAutoDetected": "Datum automatisch aus den Bilddaten erkannt",
+                "dateNotDetected": "Datum konnte nicht erkannt werden — bitte manuell angeben"
             },
             "documents": {
                 "title": "Dokumente",
@@ -899,7 +901,10 @@
                 "documentCount": "{count} Dokument | {count} Dokumente",
                 "viewDocuments": "Dokumente ansehen",
                 "dropHint": "Datei hierher ziehen oder klicken",
-                "maxSize": "Bilder und PDF-Dateien"
+                "maxSize": "Bilder und PDF-Dateien",
+                "uploadedAt": "Hochgeladen am",
+                "dateAutoDetected": "Datum automatisch aus der Datei erkannt",
+                "dateNotDetected": "Datum konnte nicht erkannt werden — bitte manuell angeben"
             },
             "recentVetVisits": "Letzte Tierarztbesuche",
             "noVetVisits": "Noch keine Tierarztbesuche erfasst",

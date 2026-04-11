@@ -12,7 +12,7 @@ export async function listPets(userId: string) {
                 take: 1,
                 select: { id: true, uploadId: true, upload: { select: { url: true } } },
             },
-            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true, petDocuments: true } },
+            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true, documents: true } },
         },
         orderBy: { createdAt: "desc" },
     });
@@ -28,7 +28,7 @@ export async function getPet(id: string, userId: string) {
                 take: 1,
                 select: { id: true, uploadId: true, upload: { select: { url: true } } },
             },
-            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true, petDocuments: true } },
+            _count: { select: { feedings: true, sheddings: true, weightRecords: true, photos: true, documents: true } },
         },
     });
     if (!pet || pet.userId !== userId) {

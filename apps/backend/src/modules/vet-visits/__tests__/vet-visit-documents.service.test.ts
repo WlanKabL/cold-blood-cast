@@ -43,7 +43,7 @@ const DOC_ID = "doc_789";
 const UPLOAD_ID = "upload_abc";
 
 const DOCUMENT_INCLUDE = {
-    upload: { select: { id: true, url: true } },
+    upload: { select: { id: true, url: true, originalName: true } },
 } as const;
 
 beforeEach(() => {

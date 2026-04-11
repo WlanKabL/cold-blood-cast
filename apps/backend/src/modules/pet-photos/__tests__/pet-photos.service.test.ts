@@ -81,7 +81,7 @@ describe("listPetPhotos", () => {
             where: { petId: PET_ID },
             include: {
                 pet: { select: { userId: true } },
-                upload: { select: { url: true } },
+                upload: { select: { url: true, originalName: true } },
             },
             orderBy: { takenAt: "desc" },
         });
@@ -98,7 +98,7 @@ describe("listPetPhotos", () => {
             where: { petId: PET_ID, tags: { has: "portrait" } },
             include: {
                 pet: { select: { userId: true } },
-                upload: { select: { url: true } },
+                upload: { select: { url: true, originalName: true } },
             },
             orderBy: { takenAt: "desc" },
         });
@@ -114,7 +114,7 @@ describe("listPetPhotos", () => {
             where: { petId: PET_ID },
             include: {
                 pet: { select: { userId: true } },
-                upload: { select: { url: true } },
+                upload: { select: { url: true, originalName: true } },
             },
             orderBy: { sortOrder: "asc" },
         });
@@ -151,7 +151,7 @@ describe("getPetPhoto", () => {
             where: { id: PHOTO_ID },
             include: {
                 pet: { select: { userId: true } },
-                upload: { select: { url: true } },
+                upload: { select: { url: true, originalName: true } },
             },
         });
         expect(result).toEqual(photo);
@@ -209,7 +209,7 @@ describe("addPetPhoto", () => {
                 sortOrder: 3,
                 takenAt: expect.any(Date),
             },
-            include: { upload: { select: { url: true } } },
+            include: { upload: { select: { url: true, originalName: true } } },
         });
         expect(result).toEqual(createdPhoto);
     });
@@ -244,7 +244,7 @@ describe("addPetPhoto", () => {
         expect(mockPrisma.petPhoto.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 data: expect.objectContaining({ sortOrder: 0 }),
-                include: { upload: { select: { url: true } } },
+                include: { upload: { select: { url: true, originalName: true } } },
             }),
         );
     });
@@ -277,7 +277,7 @@ describe("updatePetPhoto", () => {
         expect(mockPrisma.petPhoto.update).toHaveBeenCalledWith({
             where: { id: PHOTO_ID },
             data: { caption: "New caption", tags: ["vet"] },
-            include: { upload: { select: { url: true } } },
+            include: { upload: { select: { url: true, originalName: true } } },
         });
         expect(result).toEqual(updated);
     });
@@ -297,7 +297,7 @@ describe("updatePetPhoto", () => {
         expect(mockPrisma.petPhoto.update).toHaveBeenCalledWith({
             where: { id: PHOTO_ID },
             data: { takenAt: new Date(iso) },
-            include: { upload: { select: { url: true } } },
+            include: { upload: { select: { url: true, originalName: true } } },
         });
         expect(result).toEqual(updated);
     });
@@ -315,7 +315,7 @@ describe("updatePetPhoto", () => {
         expect(mockPrisma.petPhoto.update).toHaveBeenCalledWith({
             where: { id: PHOTO_ID },
             data: { caption: "Updated" },
-            include: { upload: { select: { url: true } } },
+            include: { upload: { select: { url: true, originalName: true } } },
         });
     });
 
@@ -426,7 +426,7 @@ describe("getProfilePicture", () => {
 
         expect(mockPrisma.petPhoto.findFirst).toHaveBeenCalledWith({
             where: { petId: PET_ID, isProfilePicture: true },
-            include: { upload: { select: { url: true } } },
+            include: { upload: { select: { url: true, originalName: true } } },
         });
         expect(result).toEqual(profilePic);
     });

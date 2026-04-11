@@ -88,11 +88,18 @@
                             {{ $t(`pages.pets.documents.categories.${doc.category}`) }}
                         </span>
                     </div>
+                    <p v-if="doc.upload.originalName" class="text-fg-muted mt-0.5 truncate text-xs">
+                        {{ doc.upload.originalName }}
+                    </p>
                     <div class="text-fg-faint mt-0.5 flex items-center gap-3 text-xs">
-                        <span v-if="doc.documentDate">
-                            {{ new Date(doc.documentDate).toLocaleDateString() }}
+                        <span v-if="doc.documentDate" :title="$t('pages.pets.documents.documentDate')">
+                            <Icon name="lucide:calendar" class="mr-0.5 inline h-3 w-3" />
+                            {{ $t("pages.pets.documents.documentDate") }}: {{ new Date(doc.documentDate).toLocaleDateString() }}
                         </span>
-                        <span>{{ new Date(doc.createdAt).toLocaleDateString() }}</span>
+                        <span :title="$t('pages.pets.documents.uploadedAt')">
+                            <Icon name="lucide:upload" class="mr-0.5 inline h-3 w-3" />
+                            {{ $t("pages.pets.documents.uploadedAt") }}: {{ new Date(doc.createdAt).toLocaleDateString() }}
+                        </span>
                     </div>
                     <p v-if="doc.notes" class="text-fg-muted mt-1 text-xs line-clamp-1">{{ doc.notes }}</p>
                 </div>
@@ -183,6 +190,14 @@
                     type="date"
                     :label="$t('pages.pets.documents.documentDate')"
                 />
+                <p v-if="dateAutoDetected" class="text-primary-400 -mt-2 flex items-center gap-1 text-xs">
+                    <Icon name="lucide:sparkles" class="h-3 w-3" />
+                    {{ $t("pages.pets.documents.dateAutoDetected") }}
+                </p>
+                <p v-else-if="dateDetectionFailed && selectedFile" class="text-amber-400 -mt-2 flex items-center gap-1 text-xs">
+                    <Icon name="lucide:alert-circle" class="h-3 w-3" />
+                    {{ $t("pages.pets.documents.dateNotDetected") }}
+                </p>
 
                 <UiTextarea
                     v-model="uploadForm.notes"
@@ -256,7 +271,7 @@ interface PetDocument {
     petId: string;
     userId: string;
     uploadId: string;
-    upload: { id: string; url: string };
+    upload: { id: string; url: string; originalName: string | null };
     category: string;
     label: string | null;
     notes: string | null;
@@ -373,28 +388,74 @@ const showUpload = ref(false);
 const selectedFile = ref<File | null>(null);
 const fileInputRef = ref<HTMLInputElement>();
 
+function todayDate() {
+    return new Date().toISOString().split("T")[0];
+}
+
 const uploadForm = reactive({
     category: "OTHER" as string,
     label: "",
     notes: "",
-    documentDate: "",
+    documentDate: todayDate(),
 });
+
+const dateAutoDetected = ref(false);
+const dateDetectionFailed = ref(false);
 
 function resetUploadForm() {
     selectedFile.value = null;
-    Object.assign(uploadForm, { category: "OTHER", label: "", notes: "", documentDate: "" });
+    dateAutoDetected.value = false;
+    dateDetectionFailed.value = false;
+    Object.assign(uploadForm, { category: "OTHER", label: "", notes: "", documentDate: todayDate() });
     if (fileInputRef.value) fileInputRef.value.value = "";
+}
+
+async function extractFileDate(file: File) {
+    dateAutoDetected.value = false;
+    dateDetectionFailed.value = false;
+
+    // Try EXIF for images
+    if (file.type.startsWith("image/")) {
+        try {
+            const exif = await import("exifr").then((m) => m.default.parse(file, ["DateTimeOriginal", "DateTimeDigitized", "CreateDate"]));
+            const date = exif?.DateTimeOriginal ?? exif?.DateTimeDigitized ?? exif?.CreateDate;
+            if (date instanceof Date && !isNaN(date.getTime())) {
+                uploadForm.documentDate = date.toISOString().split("T")[0];
+                dateAutoDetected.value = true;
+                return;
+            }
+        } catch {
+            // No EXIF data
+        }
+    }
+
+    // Fallback: File.lastModified (filesystem date)
+    if (file.lastModified) {
+        const lastMod = new Date(file.lastModified);
+        if (!isNaN(lastMod.getTime())) {
+            uploadForm.documentDate = lastMod.toISOString().split("T")[0];
+            dateAutoDetected.value = true;
+            return;
+        }
+    }
+
+    // Could not extract any date
+    uploadForm.documentDate = todayDate();
+    dateDetectionFailed.value = true;
 }
 
 function handleFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
-    selectedFile.value = input.files?.[0] ?? null;
+    const file = input.files?.[0] ?? null;
+    selectedFile.value = file;
+    if (file) extractFileDate(file);
 }
 
 function handleDrop(event: DragEvent) {
     const file = event.dataTransfer?.files[0];
     if (file) {
         selectedFile.value = file;
+        extractFileDate(file);
     }
 }
 

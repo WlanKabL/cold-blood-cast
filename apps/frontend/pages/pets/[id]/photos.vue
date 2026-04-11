@@ -99,7 +99,7 @@
                             {{ photo.caption }}
                         </p>
                         <p class="mt-0.5 text-[10px] text-white/60">
-                            {{ new Date(photo.takenAt).toLocaleDateString() }}
+                            {{ new Date(photo.takenAt || photo.createdAt).toLocaleDateString() }}
                         </p>
                         <div
                             v-if="photo.tags.length"
@@ -218,6 +218,14 @@
                     type="datetime-local"
                     :label="$t('pages.pets.photos.takenAt')"
                 />
+                <p v-if="dateAutoDetected" class="text-primary-400 -mt-2 flex items-center gap-1 text-xs">
+                    <Icon name="lucide:sparkles" class="h-3 w-3" />
+                    {{ $t("pages.pets.photos.dateAutoDetected") }}
+                </p>
+                <p v-else-if="dateDetectionFailed && selectedFile" class="text-amber-400 -mt-2 flex items-center gap-1 text-xs">
+                    <Icon name="lucide:alert-circle" class="h-3 w-3" />
+                    {{ $t("pages.pets.photos.dateNotDetected") }}
+                </p>
 
                 <div class="flex items-center gap-3">
                     <UiToggle v-model="uploadForm.isProfilePicture" />
@@ -364,7 +372,8 @@ const lightboxTags = computed(() => {
 });
 
 const lightboxTakenAt = computed(() => {
-    return filteredPhotos.value[lightboxIndex.value]?.takenAt ?? "";
+    const photo = filteredPhotos.value[lightboxIndex.value];
+    return photo?.takenAt || photo?.createdAt || "";
 });
 
 function openLightbox(index: number) {
@@ -384,8 +393,13 @@ const uploadForm = reactive({
     takenAt: new Date().toISOString().slice(0, 16),
 });
 
+const dateAutoDetected = ref(false);
+const dateDetectionFailed = ref(false);
+
 function resetUploadForm() {
     selectedFile.value = null;
+    dateAutoDetected.value = false;
+    dateDetectionFailed.value = false;
     Object.assign(uploadForm, { caption: "", tags: "", isProfilePicture: false, takenAt: new Date().toISOString().slice(0, 16) });
     if (fileInputRef.value) fileInputRef.value.value = "";
 }
@@ -406,6 +420,9 @@ function handleDrop(event: DragEvent) {
 }
 
 async function extractExifDate(file: File) {
+    dateAutoDetected.value = false;
+    dateDetectionFailed.value = false;
+
     try {
         const exif = await exifr.parse(file, ["DateTimeOriginal", "DateTimeDigitized", "CreateDate"]);
         const date = exif?.DateTimeOriginal ?? exif?.DateTimeDigitized ?? exif?.CreateDate;
@@ -413,10 +430,28 @@ async function extractExifDate(file: File) {
             uploadForm.takenAt = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
                 .toISOString()
                 .slice(0, 16);
+            dateAutoDetected.value = true;
+            return;
         }
     } catch {
-        // No EXIF data or unsupported format — keep default (now)
+        // No EXIF data or unsupported format
     }
+
+    // Fallback: File.lastModified
+    if (file.lastModified) {
+        const lastMod = new Date(file.lastModified);
+        if (!isNaN(lastMod.getTime())) {
+            uploadForm.takenAt = new Date(lastMod.getTime() - lastMod.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            dateAutoDetected.value = true;
+            return;
+        }
+    }
+
+    // Could not extract
+    uploadForm.takenAt = new Date().toISOString().slice(0, 16);
+    dateDetectionFailed.value = true;
 }
 
 const { mutate: uploadMutation, isPending: uploading } = useMutation({

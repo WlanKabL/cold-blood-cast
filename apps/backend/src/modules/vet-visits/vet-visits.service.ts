@@ -6,7 +6,7 @@ const VISIT_INCLUDE = {
     pet: { select: { id: true, name: true, species: true } },
     veterinarian: { select: { id: true, name: true, clinicName: true } },
     sourceVisit: { select: { id: true, visitDate: true, visitType: true, reason: true } },
-    documents: { include: { upload: { select: { id: true, url: true } } } },
+    documents: { include: { upload: { select: { id: true, url: true, originalName: true } } } },
 } as const;
 
 const VISIT_DETAIL_INCLUDE = {

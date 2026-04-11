@@ -108,7 +108,7 @@ test.describe("Pet Detail — Documents Section", () => {
 
         await page.goto(`/pets/${petId}`);
 
-        // _count.petDocuments = 3
+        // _count.documents = 3
         await expect(page.getByText("(3)").first()).toBeVisible({ timeout: 15_000 });
     });
 
@@ -126,7 +126,7 @@ test.describe("Pet Detail — Documents Section", () => {
         await mockAuth(page);
         const petNoDocs = {
             ...mockPets[0],
-            _count: { ...mockPets[0]._count, petDocuments: 0 },
+            _count: { ...mockPets[0]._count, documents: 0 },
         };
         await mockPetDetailApis(page, petNoDocs);
 
