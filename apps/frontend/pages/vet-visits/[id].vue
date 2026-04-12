@@ -434,7 +434,9 @@
                                 class="text-primary-400 h-6 w-6"
                             />
                             <span class="text-fg text-sm">{{ selectedFile.name }}</span>
-                            <span class="text-fg-faint text-xs">({{ formatFileSize(selectedFile.size) }})</span>
+                            <span class="text-fg-faint text-xs"
+                                >({{ formatFileSize(selectedFile.size) }})</span
+                            >
                             <button
                                 type="button"
                                 class="text-fg-faint hover:text-red-400"

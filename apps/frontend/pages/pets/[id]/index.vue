@@ -83,7 +83,9 @@
                                 <dt class="text-fg-faint text-xs font-medium uppercase">
                                     {{ $t("pages.pets.fields.gender") }}
                                 </dt>
-                                <dd class="text-fg mt-1 text-sm">{{ pet.gender ? $t(`common.gender.${pet.gender}`) : "—" }}</dd>
+                                <dd class="text-fg mt-1 text-sm">
+                                    {{ pet.gender ? $t(`common.gender.${pet.gender}`) : "—" }}
+                                </dd>
                             </div>
                             <div>
                                 <dt class="text-fg-faint text-xs font-medium uppercase">
