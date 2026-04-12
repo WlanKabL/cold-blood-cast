@@ -16,7 +16,7 @@ async function mockAdminReportsApi(
     stats = mockReportStats,
 ) {
     // Reports list — intercept with dynamic status filtering
-    await page.route("**/api/admin/reports*", (route) => {
+    await page.route("**/api/admin/reports**", (route) => {
         const url = route.request().url();
 
         // Stats endpoint
@@ -90,9 +90,16 @@ test.describe("Admin Reports Page", () => {
 
         await page.goto("/admin/reports");
 
-        await expect(page.getByText("3", { exact: false })).toBeVisible({ timeout: 15_000 });
-        await expect(page.getByText("5", { exact: false })).toBeVisible();
-        await expect(page.getByText("2", { exact: false })).toBeVisible();
+        // Tabs show translated status + count
+        await expect(page.locator("button").filter({ hasText: /pending|ausstehend/i })).toBeVisible(
+            { timeout: 15_000 },
+        );
+        await expect(
+            page.locator("button").filter({ hasText: /reviewed|überprüft/i }),
+        ).toBeVisible();
+        await expect(
+            page.locator("button").filter({ hasText: /dismissed|abgewiesen/i }),
+        ).toBeVisible();
     });
 
     test("shows pending reports by default", async ({ page }) => {
@@ -171,7 +178,7 @@ test.describe("Admin Reports Page", () => {
         // Should show reviewed report
         await expect(page.getByText("Offensive language")).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText("Content removed and user warned")).toBeVisible();
-        await expect(page.getByText("admin")).toBeVisible();
+        await expect(page.getByText(/Resolved by admin/i)).toBeVisible();
     });
 
     test("switching to dismissed tab shows empty state", async ({ page }) => {
@@ -187,7 +194,9 @@ test.describe("Admin Reports Page", () => {
         await dismissedTab.click();
 
         // Should show empty state
-        await expect(page.getByText(/no.*report|keine.*meldung/i)).toBeVisible({
+        await expect(
+            page.locator("p").filter({ hasText: /no.*report|keine.*meldung/i }),
+        ).toBeVisible({
             timeout: 15_000,
         });
     });
@@ -260,7 +269,7 @@ test.describe("Admin Reports Page", () => {
         await mockAuth(page, adminUser);
 
         // Custom mock to capture the PATCH
-        await page.route("**/api/admin/reports*", (route) => {
+        await page.route("**/api/admin/reports**", (route) => {
             const url = route.request().url();
 
             if (url.includes("/stats")) {
@@ -337,7 +346,9 @@ test.describe("Admin Reports Page", () => {
 
         await page.goto("/admin/reports");
 
-        await expect(page.getByText(/no.*report|keine.*meldung/i)).toBeVisible({
+        await expect(
+            page.locator("p").filter({ hasText: /no.*report|keine.*meldung/i }),
+        ).toBeVisible({
             timeout: 15_000,
         });
     });

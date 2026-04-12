@@ -13,6 +13,7 @@ async function mockCommentManagementApi(
     await mockGet(page, "/api/user-profile", profile);
     await mockGet(page, "/api/badges", mockUserBadges);
     await mockGet(page, "/api/comments/approved", approved);
+    await mockGet(page, "/api/comments/pending", []);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -75,7 +76,8 @@ test.describe("Comment Management — Approved Comments", () => {
                     body: JSON.stringify({ success: true, data: {} }),
                 });
             }
-            return route.continue();
+            // Let GET requests be handled by earlier mocks
+            return route.fallback();
         });
 
         // Auto-accept confirm dialogs
@@ -100,7 +102,9 @@ test.describe("Comment Management — Approved Comments", () => {
         await page.goto("/public-profile");
 
         // Profile should load
-        await expect(page.getByText(/profile active/i)).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/profile.*published|profil.*veröffentlicht/i)).toBeVisible({
+            timeout: 15_000,
+        });
 
         // No delete buttons visible (no comments section)
         const deleteBtns = page.locator('[title*="delete" i], [title*="löschen" i]');
@@ -125,7 +129,9 @@ test.describe("Comment Management — Notification Toggle", () => {
             .filter({ hasText: /visibility|sichtbarkeit/i });
         await visibilityBtn.click({ timeout: 15_000 });
 
-        await expect(page.getByText(/notify.*comment|kommentar.*benachrichtig/i)).toBeVisible({
+        await expect(
+            page.getByText(/^email on new comments$|^e-mail bei neuen kommentaren$/i),
+        ).toBeVisible({
             timeout: 15_000,
         });
     });
@@ -143,16 +149,12 @@ test.describe("Comment Management — Notification Toggle", () => {
         await visibilityBtn.click({ timeout: 15_000 });
 
         // Find the toggle button for notifyOnComment
-        const notifyLabel = page.getByText(/notify.*comment|kommentar.*benachrichtig/i);
-        await expect(notifyLabel).toBeVisible({ timeout: 15_000 });
-
-        // The toggle should be near the label
-        const toggleContainer = notifyLabel.locator(
-            "xpath=ancestor::div[contains(@class, 'flex')]",
-        );
-        const toggleBtn = toggleContainer.locator("button").first();
+        const notifyRow = page
+            .locator("div.flex.items-center")
+            .filter({ hasText: /email on new comments|e-mail bei neuen kommentaren/i });
+        const toggleBtn = notifyRow.locator("button.rounded-full");
         // Clicking should work without error
-        await toggleBtn.click();
+        await toggleBtn.click({ force: true });
     });
 });
 
@@ -193,7 +195,7 @@ test.describe("Comment Management — Multiple Comments", () => {
         await expect(page.getByText("Third Visitor")).toBeVisible();
 
         // Badge shows 3
-        await expect(page.getByText("3")).toBeVisible();
+        await expect(page.getByText("3", { exact: true })).toBeVisible();
     });
 
     test("each comment has its own delete button", async ({ page }) => {

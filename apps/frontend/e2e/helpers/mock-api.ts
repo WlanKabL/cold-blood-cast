@@ -13,7 +13,7 @@ import type { Page } from "@playwright/test";
  */
 export async function mockGet(page: Page, urlPattern: string, data: unknown, status = 200) {
     await page.route(`**${urlPattern}`, (route) => {
-        if (route.request().method() !== "GET") return route.continue();
+        if (route.request().method() !== "GET") return route.fallback();
         return route.fulfill({
             status,
             contentType: "application/json",
@@ -40,7 +40,7 @@ export async function mockMutation(
                 body: JSON.stringify({ success: true, data: responseData }),
             });
         }
-        return route.continue();
+        return route.fallback();
     });
 }
 

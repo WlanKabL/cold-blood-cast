@@ -206,30 +206,40 @@
 
                 <!-- Add Comment -->
                 <div class="public-card mb-4 rounded-xl p-4">
-                    <input
-                        v-model="commentAuthor"
-                        type="text"
-                        :placeholder="$t('community.yourName')"
-                        maxlength="80"
-                        class="bg-surface-sunken border-line text-fg mb-2 w-full rounded-lg border px-3 py-2 text-sm"
-                    />
-                    <textarea
-                        v-model="commentText"
-                        :placeholder="$t('community.writePlaceholder')"
-                        rows="2"
-                        maxlength="500"
-                        class="bg-surface-sunken border-line text-fg w-full rounded-lg border px-3 py-2 text-sm"
-                    />
-                    <div class="mt-2 flex justify-end">
-                        <button
-                            class="bg-primary-500 hover:bg-primary-400 rounded-lg px-4 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
-                            :disabled="
-                                !commentText.trim() || !commentAuthor.trim() || submittingComment
-                            "
-                            @click="handleAddComment"
+                    <template v-if="authStore.isAuthenticated">
+                        <div class="text-fg-faint mb-2 flex items-center gap-2 text-xs">
+                            <Icon name="lucide:user" class="h-3.5 w-3.5" />
+                            {{
+                                $t("community.commentingAs", {
+                                    name: authStore.user?.displayName || authStore.user?.username,
+                                })
+                            }}
+                        </div>
+                        <textarea
+                            v-model="commentText"
+                            :placeholder="$t('community.writePlaceholder')"
+                            rows="2"
+                            maxlength="500"
+                            class="bg-surface-sunken border-line text-fg w-full rounded-lg border px-3 py-2 text-sm"
+                        />
+                        <div class="mt-2 flex justify-end">
+                            <button
+                                class="bg-primary-500 hover:bg-primary-400 rounded-lg px-4 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+                                :disabled="!commentText.trim() || submittingComment"
+                                @click="handleAddComment"
+                            >
+                                {{ $t("community.send") }}
+                            </button>
+                        </div>
+                    </template>
+                    <div v-else class="flex items-center justify-between">
+                        <p class="text-fg-faint text-sm">{{ $t("community.loginToComment") }}</p>
+                        <NuxtLink
+                            :to="`/login?redirect=${encodeURIComponent($route.fullPath)}`"
+                            class="bg-primary-500 hover:bg-primary-400 rounded-lg px-4 py-1.5 text-xs font-medium text-white transition-colors"
                         >
-                            {{ $t("community.send") }}
-                        </button>
+                            {{ $t("community.login") }}
+                        </NuxtLink>
                     </div>
                 </div>
 
@@ -244,14 +254,46 @@
                             <span class="text-fg text-sm font-medium">{{
                                 comment.authorName
                             }}</span>
-                            <span class="text-fg-faint text-xs">
-                                {{ new Date(comment.createdAt).toLocaleDateString() }}
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-fg-faint text-xs">
+                                    {{ new Date(comment.createdAt).toLocaleDateString() }}
+                                </span>
+                                <button
+                                    v-if="
+                                        authStore.isAuthenticated &&
+                                        authStore.user?.id === comment.authorId
+                                    "
+                                    class="text-fg-faint transition-colors hover:text-red-400"
+                                    :disabled="deletingCommentId === comment.id"
+                                    :aria-label="$t('community.deleteComment')"
+                                    @click="handleDeleteOwnComment(comment.id)"
+                                >
+                                    <Icon name="lucide:trash-2" class="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                    class="text-fg-faint transition-colors hover:text-red-400"
+                                    :aria-label="$t('report.reportComment')"
+                                    @click="openReportModal('comment', comment.id)"
+                                >
+                                    <Icon name="lucide:flag" class="h-3.5 w-3.5" />
+                                </button>
+                            </div>
                         </div>
                         <p class="text-fg-muted mt-1 text-sm">{{ comment.content }}</p>
                     </div>
                 </div>
                 <p v-else class="text-fg-faint text-sm">{{ $t("community.noComments") }}</p>
+            </section>
+
+            <!-- Report Profile Button -->
+            <section class="animate-fade-in-up mb-8 delay-500">
+                <button
+                    class="text-fg-faint flex items-center gap-1.5 text-xs transition-colors hover:text-red-400"
+                    @click="openReportModal('user_profile', slug)"
+                >
+                    <Icon name="lucide:flag" class="h-3.5 w-3.5" />
+                    {{ $t("report.reportProfile") }}
+                </button>
             </section>
 
             <!-- Footer -->
@@ -271,6 +313,15 @@
             </footer>
         </div>
     </div>
+
+    <!-- Report Modal -->
+    <ReportModal
+        :open="reportModalOpen"
+        :target-type="reportTarget.type"
+        :target-id="reportTarget.id"
+        @close="reportModalOpen = false"
+        @submitted="reportModalOpen = false"
+    />
 </template>
 
 <script setup lang="ts">
@@ -314,17 +365,27 @@ const slug = route.params.slug as string;
 
 const apiBase = config.public.apiBaseURL;
 
+const authStore = useAuthStore();
+
 const loading = ref(true);
 const userData = ref<PublicUserData | null>(null);
 const liked = ref(false);
 const likeCount = ref(0);
 const liking = ref(false);
 const submittingComment = ref(false);
-const commentAuthor = ref("");
 const commentText = ref("");
-const comments = ref<Array<{ id: string; authorName: string; content: string; createdAt: string }>>(
-    [],
-);
+const deletingCommentId = ref<string | null>(null);
+const reportModalOpen = ref(false);
+const reportTarget = ref<{ type: string; id: string }>({ type: "user_profile", id: slug });
+const comments = ref<
+    Array<{
+        id: string;
+        authorId: string | null;
+        authorName: string;
+        content: string;
+        createdAt: string;
+    }>
+>([]);
 
 // ─── Fetch Data ──────────────────────────────────────────
 
@@ -380,6 +441,7 @@ async function fetchComments() {
 }
 
 onMounted(async () => {
+    await authStore.init();
     await fetchProfile();
     await Promise.all([fetchLikeStatus(), fetchComments()]);
 });
@@ -411,28 +473,58 @@ async function handleToggleLike() {
 }
 
 async function handleAddComment() {
-    if (!commentText.value.trim() || !commentAuthor.value.trim()) return;
+    if (!commentText.value.trim() || !authStore.accessToken) return;
     submittingComment.value = true;
     try {
         const res = await fetch(
             `${apiBase}/api/public/community/user/${encodeURIComponent(slug)}/comments`,
             {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authStore.accessToken}`,
+                },
                 body: JSON.stringify({
-                    authorName: commentAuthor.value.trim(),
                     content: commentText.value.trim(),
                 }),
             },
         );
         if (res.ok) {
             commentText.value = "";
+            await fetchComments();
         }
     } catch {
         // Ignore
     } finally {
         submittingComment.value = false;
     }
+}
+
+async function handleDeleteOwnComment(commentId: string) {
+    deletingCommentId.value = commentId;
+    try {
+        const res = await fetch(
+            `${apiBase}/api/public/community/user/${encodeURIComponent(slug)}/comments/${commentId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${authStore.accessToken}`,
+                },
+            },
+        );
+        if (res.ok) {
+            comments.value = comments.value.filter((c) => c.id !== commentId);
+        }
+    } catch {
+        // Ignore
+    } finally {
+        deletingCommentId.value = null;
+    }
+}
+
+function openReportModal(type: string, id: string) {
+    reportTarget.value = { type, id };
+    reportModalOpen.value = true;
 }
 
 // ─── Computed ────────────────────────────────────────────

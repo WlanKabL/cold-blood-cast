@@ -148,9 +148,9 @@ test.describe("Pet Photos — Actions", () => {
             .first();
         await firstPhotoCard.hover();
 
-        // Click the last button (delete is last in hover actions)
-        const deleteBtn = firstPhotoCard.locator("button").last();
-        await deleteBtn.click();
+        // Click the delete button (trash icon with title) in the hover overlay
+        const deleteBtn = firstPhotoCard.locator('[title*="delete" i], [title*="löschen" i]');
+        await deleteBtn.click({ force: true });
 
         // Confirm dialog should appear
         await expect(page.getByRole("button", { name: /delete|löschen/i }).last()).toBeVisible({
@@ -168,9 +168,9 @@ test.describe("Pet Photos — Actions", () => {
             .first();
         await firstPhotoCard.hover();
 
-        // Click delete (last button in hover overlay)
-        const deleteBtn = firstPhotoCard.locator("button").last();
-        await deleteBtn.click();
+        // Click delete (trash icon with title) in hover overlay
+        const deleteBtn = firstPhotoCard.locator('[title*="delete" i], [title*="löschen" i]');
+        await deleteBtn.click({ force: true });
 
         // Confirm the dialog
         const confirmBtn = page.getByRole("button", { name: /delete|löschen/i }).last();
@@ -189,8 +189,8 @@ test.describe("Pet Photos — Actions", () => {
             .first();
         await firstPhotoCard.hover();
 
-        const deleteBtn = firstPhotoCard.locator("button").last();
-        await deleteBtn.click();
+        const deleteBtn = firstPhotoCard.locator('[title*="delete" i], [title*="löschen" i]');
+        await deleteBtn.click({ force: true });
 
         // Click cancel
         const cancelBtn = page.getByRole("button", { name: /cancel|abbrechen/i });

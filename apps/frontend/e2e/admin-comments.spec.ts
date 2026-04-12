@@ -13,7 +13,7 @@ async function mockAdminCommentsApi(
     page: import("@playwright/test").Page,
     comments = mockAdminComments,
 ) {
-    await page.route("**/api/admin/comments*", (route) => {
+    await page.route("**/api/admin/comments**", (route) => {
         const url = route.request().url();
         const method = route.request().method();
 
@@ -180,7 +180,7 @@ test.describe("Admin Comments Page", () => {
         await mockAuth(page, adminUser);
 
         // Custom mock to track DELETE call
-        await page.route("**/api/admin/comments*", (route) => {
+        await page.route("**/api/admin/comments**", (route) => {
             if (route.request().method() === "DELETE") {
                 deleteCalled = true;
                 return route.fulfill({
@@ -220,7 +220,9 @@ test.describe("Admin Comments Page", () => {
 
         await page.goto("/admin/comments");
 
-        await expect(page.getByText(/no.*comment|keine.*kommentar/i)).toBeVisible({
+        await expect(
+            page.locator("p").filter({ hasText: /no.*comment|keine.*kommentar/i }),
+        ).toBeVisible({
             timeout: 15_000,
         });
     });

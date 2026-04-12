@@ -135,7 +135,9 @@ test.describe("User Public Profile Management", () => {
 
         await page.goto("/public-profile");
 
-        await expect(page.getByText(/create public profile/i)).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByRole("heading", { name: /create public profile/i })).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows profile management when profile exists", async ({ page }) => {
@@ -144,7 +146,9 @@ test.describe("User Public Profile Management", () => {
 
         await page.goto("/public-profile");
 
-        await expect(page.getByText(/profile active/i)).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/profile.*published|profil.*veröffentlicht/i)).toBeVisible({
+            timeout: 15_000,
+        });
         await expect(page.getByText("128")).toBeVisible(); // views
     });
 
@@ -182,9 +186,15 @@ test.describe("User Public Profile Management", () => {
 
         await page.goto("/public-profile");
 
-        await expect(page.getByText(/visibility/i)).toBeVisible({ timeout: 15_000 });
-        await expect(page.getByText(/show statistics/i)).toBeVisible();
-        await expect(page.getByText(/show pets/i)).toBeVisible();
+        const visibilityBtn = page
+            .locator("button")
+            .filter({ hasText: /visibility|sichtbarkeit/i });
+        await visibilityBtn.click({ timeout: 15_000 });
+
+        await expect(page.getByText(/show statistics|statistiken anzeigen/i)).toBeVisible({
+            timeout: 15_000,
+        });
+        await expect(page.getByText(/show pets|tiere anzeigen/i)).toBeVisible();
     });
 
     test("shows theme preset selector", async ({ page }) => {
@@ -283,7 +293,7 @@ test.describe("Public User Profile Page", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        await expect(page.getByText("3")).toBeVisible({ timeout: 15_000 }); // pet count
+        await expect(page.getByText("3", { exact: true })).toBeVisible({ timeout: 15_000 }); // pet count
         await expect(page.getByText("45")).toBeVisible(); // photos
         await expect(page.getByText("120")).toBeVisible(); // feedings
     });
@@ -329,7 +339,9 @@ test.describe("Public User Profile Page", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        await expect(page.getByText("5")).toBeVisible({ timeout: 15_000 });
+        const likeBtn = page.getByRole("button", { name: /like/i });
+        await expect(likeBtn).toBeVisible({ timeout: 15_000 });
+        await expect(likeBtn).toContainText("5");
     });
 
     test("shows comments section", async ({ page }) => {

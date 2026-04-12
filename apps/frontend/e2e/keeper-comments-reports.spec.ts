@@ -408,7 +408,9 @@ test.describe("Keeper Profile — Like Feature", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        await expect(page.getByText("5")).toBeVisible({ timeout: 15_000 });
+        const likeBtn = page.getByRole("button", { name: /like/i });
+        await expect(likeBtn).toBeVisible({ timeout: 15_000 });
+        await expect(likeBtn).toContainText("5");
     });
 
     test("clicking like button toggles to liked state", async ({ page }) => {
@@ -416,13 +418,14 @@ test.describe("Keeper Profile — Like Feature", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        await expect(page.getByText("5")).toBeVisible({ timeout: 15_000 });
+        const likeBtn = page.getByRole("button", { name: /like/i });
+        await expect(likeBtn).toBeVisible({ timeout: 15_000 });
+        await expect(likeBtn).toContainText("5");
 
         // Click like
-        const likeBtn = page.locator("button").filter({ hasText: "5" });
         await likeBtn.click();
 
         // Count should update to 6
-        await expect(page.getByText("6")).toBeVisible({ timeout: 10_000 });
+        await expect(likeBtn).toContainText("6", { timeout: 10_000 });
     });
 });

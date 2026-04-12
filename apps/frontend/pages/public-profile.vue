@@ -489,6 +489,33 @@
                 </div>
             </div>
 
+            <!-- Pending Comments -->
+            <div v-if="pendingComments.length > 0" class="glass-card space-y-4 p-6">
+                <h2 class="text-fg text-[15px] font-semibold">
+                    {{ $t("community.pendingComments") }}
+                    <span
+                        class="ml-2 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-400"
+                    >
+                        {{ pendingComments.length }}
+                    </span>
+                </h2>
+                <div
+                    v-for="comment in pendingComments"
+                    :key="comment.id"
+                    class="border-line rounded-xl border p-4"
+                >
+                    <div class="flex items-center justify-between">
+                        <span class="text-fg text-[13px] font-medium">
+                            {{ comment.authorName }}
+                        </span>
+                        <span class="text-fg-faint text-[11px]">
+                            {{ new Date(comment.createdAt).toLocaleDateString() }}
+                        </span>
+                    </div>
+                    <p class="text-fg-muted mt-1 text-[13px]">{{ comment.content }}</p>
+                </div>
+            </div>
+
             <!-- Comment Management -->
             <div v-if="approvedComments.length > 0" class="glass-card space-y-4 p-6">
                 <h2 class="text-fg text-[15px] font-semibold">
@@ -637,6 +664,9 @@ const badges = ref<
 const approvedComments = ref<
     Array<{ id: string; authorName: string; content: string; createdAt: string }>
 >([]);
+const pendingComments = ref<
+    Array<{ id: string; authorName: string; content: string; createdAt: string }>
+>([]);
 
 const THEME_COLORS: Record<string, string> = {
     default: "rgb(138, 156, 74)",
@@ -703,6 +733,15 @@ async function loadApprovedComments() {
     }
 }
 
+async function loadPendingComments() {
+    try {
+        const res = await get<typeof pendingComments.value>("/api/comments/pending");
+        pendingComments.value = res ?? [];
+    } catch {
+        pendingComments.value = [];
+    }
+}
+
 async function loadSocialLinks() {
     // Loaded as part of the profile, but if we need separate:
     // Social links come from the profile GET already
@@ -710,7 +749,7 @@ async function loadSocialLinks() {
 
 onMounted(async () => {
     await loadProfile();
-    await Promise.all([loadBadges(), loadApprovedComments()]);
+    await Promise.all([loadBadges(), loadApprovedComments(), loadPendingComments()]);
 });
 
 // ─── Actions ─────────────────────────────────────────────────

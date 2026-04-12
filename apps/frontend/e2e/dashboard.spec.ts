@@ -34,8 +34,8 @@ test.describe("Dashboard", () => {
     test("shows stat cards with correct counts", async ({ page }) => {
         await page.goto("/dashboard");
 
-        // Enclosures: 1 (mockEnclosures has 1 item)
-        await expect(page.getByText("1").first()).toBeVisible({ timeout: 15_000 });
+        // Enclosures: 2 (mockEnclosures has 2 items)
+        await expect(page.getByText("2").first()).toBeVisible({ timeout: 15_000 });
 
         // Pets: 2 (mockPets has Monty + Slither)
         await expect(page.getByText("2").first()).toBeVisible();

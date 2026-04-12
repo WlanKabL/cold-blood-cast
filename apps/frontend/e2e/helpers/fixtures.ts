@@ -22,6 +22,7 @@ const ALL_FEATURES: Record<string, boolean> = {
     api_access: true,
     enclosure_maintenance: true,
     weekly_planner: true,
+    user_public_profiles: true,
 };
 
 // ─── User Fixtures ─────────────────────────────────────────
