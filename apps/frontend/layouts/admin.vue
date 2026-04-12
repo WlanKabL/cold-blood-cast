@@ -208,6 +208,7 @@ const contentNav = [
 ];
 
 const systemNav = [
+    { to: "/admin/notifications", icon: "lucide:bell", label: "admin.nav.notifications" },
     { to: "/admin/settings", icon: "lucide:settings", label: "admin.nav.settings" },
     { to: "/admin/emails", icon: "lucide:mail", label: "admin.nav.emails" },
     { to: "/admin/audit-log", icon: "lucide:scroll-text", label: "admin.nav.auditLog" },
