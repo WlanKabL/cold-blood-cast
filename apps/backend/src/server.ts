@@ -76,6 +76,7 @@ async function main() {
                     : undefined,
         },
         trustProxy: true,
+        bodyLimit: env().MAX_FILE_SIZE + 1_048_576, // MAX_FILE_SIZE + 1 MB overhead for multipart metadata
     });
 
     // ── Plugins ──────────────────────────────────
