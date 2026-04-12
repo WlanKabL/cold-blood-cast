@@ -9,6 +9,7 @@
 ## Übersicht
 
 Ein User kann ein öffentliches Profil erstellen, das als persönliche Landingpage fungiert. Darauf sieht man:
+
 - Wer der Keeper ist (Bio, Avatar, Tagline, Social Links)
 - Welche Tiere er hält (Masonry-Grid mit Click → Pet Public Profile)
 - Statistiken, Badges, und Community-Features (Likes/Kommentare)
@@ -28,7 +29,7 @@ Das Profil existiert **erst nach expliziter Aktivierung** (Opt-in).
 Jeder User kann `/keeper/alice/p/byte` und `/keeper/bob/p/byte` haben.
 
 **Pet Profile ohne User Profile:** `/keeper/WlanKabL/p/byte` funktioniert auch wenn
-der User kein aktives User Public Profile hat. In dem Fall liefert `/keeper/WlanKabL` 
+der User kein aktives User Public Profile hat. In dem Fall liefert `/keeper/WlanKabL`
 ein 404 / "Kein öffentliches Profil", aber `/keeper/WlanKabL/p/byte` ist erreichbar
 wenn das Pet ein aktives Public Profile hat.
 
@@ -126,6 +127,7 @@ model PublicProfile {
 ```
 
 **Migration-Schritte:**
+
 1. Drop unique constraint auf `slug` allein
 2. Add composite unique constraint `@@unique([userId, slug])`
 3. Bestehende Slugs bleiben — sie sind de facto bereits per-user unique (jeder User hat eigene Tiere)
@@ -198,31 +200,32 @@ model UserPetOrder {
 Verzeichnis: `apps/backend/src/modules/user-public-profiles/`
 
 **Dateien:**
+
 - `user-public-profiles.routes.ts`
 - `user-public-profiles.service.ts`
 
 #### Authentifizierte Routen (Prefix: `/api/user-profile`)
 
-| Method | Route | Beschreibung |
-|--------|-------|-------------|
-| `GET` | `/` | Eigenes Profil laden (config view) |
-| `POST` | `/` | Profil erstellen (slug optional, sonst auto-generate aus username) |
-| `PATCH` | `/` | Profil updaten (bio, tagline, location, keeperSince, visibility toggles, theme) |
-| `DELETE` | `/` | Profil löschen |
-| `POST` | `/avatar` | Avatar hochladen (multipart, in `uploads/userAvatars/`) |
-| `DELETE` | `/avatar` | Avatar löschen |
-| `GET` | `/slug-check/:slug` | Slug-Verfügbarkeit prüfen |
-| `PUT` | `/social-links` | Social Links setzen (Array, ersetzt alle) |
-| `PUT` | `/pet-order` | Tier-Reihenfolge setzen (Array von `{ petId, sortOrder }`) |
+| Method   | Route               | Beschreibung                                                                    |
+| -------- | ------------------- | ------------------------------------------------------------------------------- |
+| `GET`    | `/`                 | Eigenes Profil laden (config view)                                              |
+| `POST`   | `/`                 | Profil erstellen (slug optional, sonst auto-generate aus username)              |
+| `PATCH`  | `/`                 | Profil updaten (bio, tagline, location, keeperSince, visibility toggles, theme) |
+| `DELETE` | `/`                 | Profil löschen                                                                  |
+| `POST`   | `/avatar`           | Avatar hochladen (multipart, in `uploads/userAvatars/`)                         |
+| `DELETE` | `/avatar`           | Avatar löschen                                                                  |
+| `GET`    | `/slug-check/:slug` | Slug-Verfügbarkeit prüfen                                                       |
+| `PUT`    | `/social-links`     | Social Links setzen (Array, ersetzt alle)                                       |
+| `PUT`    | `/pet-order`        | Tier-Reihenfolge setzen (Array von `{ petId, sortOrder }`)                      |
 
 #### Öffentliche Routen (Prefix: `/api/public/users`)
 
-| Method | Route | Beschreibung |
-|--------|-------|-------------|
-| `GET` | `/:userSlug` | Öffentliches User-Profil laden (inkl. Tiere mit Public Profile) |
-| `GET` | `/:userSlug/avatar` | Avatar-Bild servieren (decrypt + stream) |
-| `GET` | `/:userSlug/pets/:petSlug` | Öffentliches Pet-Profil laden |
-| `GET` | `/:userSlug/pets/:petSlug/photos/:photoId` | Pet-Foto servieren |
+| Method | Route                                      | Beschreibung                                                    |
+| ------ | ------------------------------------------ | --------------------------------------------------------------- |
+| `GET`  | `/:userSlug`                               | Öffentliches User-Profil laden (inkl. Tiere mit Public Profile) |
+| `GET`  | `/:userSlug/avatar`                        | Avatar-Bild servieren (decrypt + stream)                        |
+| `GET`  | `/:userSlug/pets/:petSlug`                 | Öffentliches Pet-Profil laden                                   |
+| `GET`  | `/:userSlug/pets/:petSlug/photos/:photoId` | Pet-Foto servieren                                              |
 
 #### Response: `GET /api/public/users/:userSlug`
 
@@ -233,41 +236,45 @@ interface PublicUserData {
     username: string;
     bio: string | null;
     tagline: string | null;
-    location: string | null;        // nur wenn showLocation
-    keeperSince: string | null;     // nur wenn showKeeperSince
+    location: string | null; // nur wenn showLocation
+    keeperSince: string | null; // nur wenn showKeeperSince
     hasAvatar: boolean;
     themePreset: string;
     views: number;
     createdAt: string;
 
-    socialLinks: Array<{            // nur wenn showSocialLinks
+    socialLinks: Array<{
+        // nur wenn showSocialLinks
         platform: string;
         url: string;
         label: string | null;
     }>;
 
-    stats: {                        // nur wenn showStats
+    stats: {
+        // nur wenn showStats
         petCount: number;
         totalPhotos: number;
         totalFeedings: number;
         totalWeightRecords: number;
     } | null;
 
-    badges: Array<{                 // nur wenn showBadges (Phase 3)
+    badges: Array<{
+        // nur wenn showBadges (Phase 3)
         key: string;
         label: string;
         icon: string;
         earnedAt: string;
     }>;
 
-    pets: Array<{                   // nur wenn showPets
+    pets: Array<{
+        // nur wenn showPets
         id: string;
         name: string;
         species: string | null;
         morph: string | null;
         profilePhotoUrl: string | null;
-        petSlug: string | null;     // Pet Public Profile slug → Link: /keeper/{userSlug}/p/{petSlug}
-        bio: string | null;         // Pet Public Profile bio
+        petSlug: string | null; // Pet Public Profile slug → Link: /keeper/{userSlug}/p/{petSlug}
+        bio: string | null; // Pet Public Profile bio
     }>;
 }
 ```
@@ -282,7 +289,12 @@ Fütterungen, Häutungen, Gewichte — genau wie bisher.
 
 ```typescript
 const CreateProfileSchema = z.object({
-    slug: z.string().min(3).max(60).regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/).optional(),
+    slug: z
+        .string()
+        .min(3)
+        .max(60)
+        .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/)
+        .optional(),
 });
 
 const UpdateProfileSchema = z.object({
@@ -296,22 +308,37 @@ const UpdateProfileSchema = z.object({
     showLocation: z.boolean().optional(),
     showKeeperSince: z.boolean().optional(),
     showBadges: z.boolean().optional(),
-    themePreset: z.enum(["default", "ocean", "forest", "sunset", "midnight", "desert", "arctic"]).optional(),
+    themePreset: z
+        .enum(["default", "ocean", "forest", "sunset", "midnight", "desert", "arctic"])
+        .optional(),
     active: z.boolean().optional(),
 });
 
 const SocialLinkSchema = z.object({
-    platform: z.enum(["instagram", "youtube", "tiktok", "twitter", "facebook", "website", "discord", "custom"]),
+    platform: z.enum([
+        "instagram",
+        "youtube",
+        "tiktok",
+        "twitter",
+        "facebook",
+        "website",
+        "discord",
+        "custom",
+    ]),
     url: z.string().url().max(500),
     label: z.string().max(50).optional(),
 });
 
 const SocialLinksSchema = z.array(SocialLinkSchema).max(15);
 
-const PetOrderSchema = z.array(z.object({
-    petId: z.string(),
-    sortOrder: z.number().int().min(0),
-})).max(50);
+const PetOrderSchema = z
+    .array(
+        z.object({
+            petId: z.string(),
+            sortOrder: z.number().int().min(0),
+        }),
+    )
+    .max(50);
 ```
 
 ---
@@ -398,6 +425,7 @@ const PetOrderSchema = z.array(z.object({
 ### 1.4 Frontend — Public Pages
 
 **Neue Seiten:**
+
 - `apps/frontend/pages/keeper/[slug]/index.vue` → User Profil
 - `apps/frontend/pages/keeper/[slug]/p/[petSlug]/index.vue` → Pet Profil
 - `apps/frontend/pages/keeper/[slug]/p/[petSlug]/embed.vue` → Pet Embed Widget
@@ -451,12 +479,12 @@ const PetOrderSchema = z.array(z.object({
 
 ### 1.5 Cross-Links
 
-| Ort | Was zeigen |
-|-----|-----------|
-| **Sidebar** (`AppSidebar.vue`) | Neuer Nav-Eintrag "Public Profile" (icon: `lucide:globe`) unter General-Sektion |
-| **Pet-Detail** (`/pets/[id]`) | Info-Banner "Erstelle ein öffentliches Profil für dieses Tier" wenn kein Public Profile existiert |
-| **Tier-Liste** (`/pets`) | Badge-Icon (🌐) bei Tieren mit aktivem Public Profile |
-| **Settings** (`/settings`) | Link-Card zu `/settings/public-profile` |
+| Ort                            | Was zeigen                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------- |
+| **Sidebar** (`AppSidebar.vue`) | Neuer Nav-Eintrag "Public Profile" (icon: `lucide:globe`) unter General-Sektion                   |
+| **Pet-Detail** (`/pets/[id]`)  | Info-Banner "Erstelle ein öffentliches Profil für dieses Tier" wenn kein Public Profile existiert |
+| **Tier-Liste** (`/pets`)       | Badge-Icon (🌐) bei Tieren mit aktivem Public Profile                                             |
+| **Settings** (`/settings`)     | Link-Card zu `/settings/public-profile`                                                           |
 
 ---
 
@@ -465,6 +493,7 @@ const PetOrderSchema = z.array(z.object({
 Neue Keys unter `settings.publicProfile.*` und `publicUserProfile.*`:
 
 **DE:**
+
 ```json
 {
     "settings": {
@@ -546,6 +575,7 @@ Neue Keys unter `settings.publicProfile.*` und `publicUserProfile.*`:
 ### 2.1 Theme System
 
 Jeder Preset definiert:
+
 - Primary Color
 - Background Gradient (oder Bild)
 - Card-Style (glass/solid)
@@ -553,19 +583,20 @@ Jeder Preset definiert:
 
 ```typescript
 const THEME_PRESETS = {
-    default:  { primary: "#6366f1", bg: "bg-base", card: "glass-card" },
-    ocean:    { primary: "#06b6d4", bg: "from-cyan-950 to-blue-950", card: "..." },
-    forest:   { primary: "#22c55e", bg: "from-green-950 to-emerald-950", card: "..." },
-    sunset:   { primary: "#f97316", bg: "from-orange-950 to-rose-950", card: "..." },
+    default: { primary: "#6366f1", bg: "bg-base", card: "glass-card" },
+    ocean: { primary: "#06b6d4", bg: "from-cyan-950 to-blue-950", card: "..." },
+    forest: { primary: "#22c55e", bg: "from-green-950 to-emerald-950", card: "..." },
+    sunset: { primary: "#f97316", bg: "from-orange-950 to-rose-950", card: "..." },
     midnight: { primary: "#8b5cf6", bg: "from-violet-950 to-slate-950", card: "..." },
-    desert:   { primary: "#d97706", bg: "from-amber-950 to-stone-950", card: "..." },
-    arctic:   { primary: "#38bdf8", bg: "from-sky-950 to-slate-950", card: "..." },
+    desert: { primary: "#d97706", bg: "from-amber-950 to-stone-950", card: "..." },
+    arctic: { primary: "#38bdf8", bg: "from-sky-950 to-slate-950", card: "..." },
 } as const;
 ```
 
 ### 2.2 Custom Hintergrundbilder
 
 Spätere Erweiterung: AI-generierte Hintergrundbilder die man auswählen kann.
+
 - Statische Assets unter `/public/backgrounds/`
 - `backgroundImage` Feld in `UserPublicProfile` (nullable String)
 - Galerie-Auswahl im Management UI
@@ -607,18 +638,18 @@ model UserBadge {
 
 ### 3.2 Badge-Definitionen
 
-| Key | Name (DE) | Bedingung |
-|-----|-----------|-----------|
-| `early_adopter` | Frühstarter | Account vor v1.0 erstellt |
-| `photo_pro_10` | Fotograf | 10 Fotos hochgeladen |
-| `photo_pro_50` | Profi-Fotograf | 50 Fotos hochgeladen |
-| `pet_parent_1` | Tierhalter | 1 Tier registriert |
-| `pet_parent_5` | Rudel-Keeper | 5 Tiere registriert |
-| `consistent_feeder` | Regelmäßig | 30 Tage am Stück Fütterungen eingetragen |
-| `weight_tracker_50` | Datensammler | 50 Gewichtsmessungen |
-| `public_star` | Öffentlicher Star | Public Profile hat 100+ Aufrufe |
-| `social_butterfly` | Social Butterfly | 5+ Social Links verknüpft |
-| `vet_diligent` | Tierarzt-Profi | 5 Tierarztbesuche dokumentiert |
+| Key                 | Name (DE)         | Bedingung                                |
+| ------------------- | ----------------- | ---------------------------------------- |
+| `early_adopter`     | Frühstarter       | Account vor v1.0 erstellt                |
+| `photo_pro_10`      | Fotograf          | 10 Fotos hochgeladen                     |
+| `photo_pro_50`      | Profi-Fotograf    | 50 Fotos hochgeladen                     |
+| `pet_parent_1`      | Tierhalter        | 1 Tier registriert                       |
+| `pet_parent_5`      | Rudel-Keeper      | 5 Tiere registriert                      |
+| `consistent_feeder` | Regelmäßig        | 30 Tage am Stück Fütterungen eingetragen |
+| `weight_tracker_50` | Datensammler      | 50 Gewichtsmessungen                     |
+| `public_star`       | Öffentlicher Star | Public Profile hat 100+ Aufrufe          |
+| `social_butterfly`  | Social Butterfly  | 5+ Social Links verknüpft                |
+| `vet_diligent`      | Tierarzt-Profi    | 5 Tierarztbesuche dokumentiert           |
 
 ### 3.3 Badge-Check Service
 
@@ -677,10 +708,12 @@ model ProfileComment {
 ### 5.1 Embed Pages
 
 **User Embed:** `/keeper/[slug]/embed`
+
 - Kompakte Version des User-Profils für iframes
 - `width="400" height="600"` Standard
 
 **Pet Embed:** `/keeper/[slug]/p/[petSlug]/embed`
+
 - Gleiche Embed-Logik wie bisher, nur neue URL
 
 ### 5.2 QR Code
@@ -695,6 +728,7 @@ model ProfileComment {
 ## Implementierungs-Reihenfolge
 
 ### Sprint 1: Fundament
+
 1. Prisma Migration: `UserPublicProfile`, `UserSocialLink`, `UserPetOrder` Models
 2. Prisma Migration: `PublicProfile.slug` von global-unique → per-user-unique (`@@unique([userId, slug])`)
 3. Backend Service + Routes (CRUD, Avatar Upload, Social Links, Pet Order)
@@ -702,12 +736,14 @@ model ProfileComment {
 5. Shared Types / Zod Schemas
 
 ### Sprint 2: Frontend Management
+
 7. `/settings/public-profile` — Management Page (alle Sections)
 8. Avatar Upload Component
 9. Social Links Editor
 10. Drag & Drop Tier-Sortierung
 
 ### Sprint 3: Public Pages
+
 11. `/keeper/[slug]` — Public User Page
 12. `/keeper/[slug]/p/[petSlug]` — Pet Public Profile
 13. Theme Preset CSS/Styles
@@ -715,6 +751,7 @@ model ProfileComment {
 15. Responsive Design + Mobile
 
 ### Sprint 4: Cross-Links & Polish
+
 16. Sidebar Nav-Eintrag
 17. Pet-Detail CTA Banner
 18. /pets Badge-Icons
@@ -723,12 +760,14 @@ model ProfileComment {
 21. PetPublicProfileCard.vue — URL-Anzeige + Slug-Check updaten
 
 ### Sprint 5: Badges
+
 22. Badge Models + Migration
 23. Badge-Check Service
 24. Badge-Anzeige auf Public Profile
 25. Badge-Verwaltung (Admin)
 
 ### Sprint 6: Community
+
 26. Likes + Kommentare Models
 27. Public API Endpoints
 28. Moderation UI
