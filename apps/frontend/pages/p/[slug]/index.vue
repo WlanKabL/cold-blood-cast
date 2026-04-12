@@ -240,7 +240,7 @@
                 @click.self="lightboxPhoto = null"
             >
                 <button
-                    class="absolute top-4 right-4 text-white/60 hover:text-white"
+                    class="absolute top-4 right-4 rounded-full bg-black/40 p-2 text-white/80 backdrop-blur-sm transition-colors hover:text-white active:bg-white/20"
                     @click="lightboxPhoto = null"
                 >
                     <Icon name="lucide:x" class="h-6 w-6" />

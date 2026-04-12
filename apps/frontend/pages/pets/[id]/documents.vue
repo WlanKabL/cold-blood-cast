@@ -123,7 +123,7 @@
 
                 <!-- Actions -->
                 <div
-                    class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                    class="flex items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
                 >
                     <a
                         :href="resolveUrl(doc.upload.url)"

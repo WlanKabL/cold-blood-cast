@@ -98,9 +98,9 @@
                     {{ $t("pages.pets.photos.isProfile") }}
                 </div>
 
-                <!-- Overlay on hover -->
+                <!-- Overlay on hover (desktop) -->
                 <div
-                    class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+                    class="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity sm:group-hover:opacity-100"
                 >
                     <div class="p-3">
                         <p v-if="photo.caption" class="line-clamp-2 text-sm text-white/90">
@@ -120,9 +120,9 @@
                         </div>
                     </div>
 
-                    <!-- Actions -->
+                    <!-- Actions (desktop) -->
                     <div
-                        class="flex items-center justify-end gap-1 border-t border-white/10 px-2 py-1.5"
+                        class="pointer-events-auto flex items-center justify-end gap-1 border-t border-white/10 px-2 py-1.5"
                     >
                         <button
                             v-if="!photo.isProfilePicture"
@@ -147,6 +147,31 @@
                             <Icon name="lucide:trash-2" class="h-3.5 w-3.5" />
                         </button>
                     </div>
+                </div>
+
+                <!-- Mobile action bar (always visible on small screens) -->
+                <div
+                    class="absolute right-1 bottom-1 flex items-center gap-0.5 rounded-lg bg-black/60 px-1 py-0.5 backdrop-blur-sm sm:hidden"
+                >
+                    <button
+                        v-if="!photo.isProfilePicture"
+                        class="rounded p-1.5 text-white/80 active:bg-white/20"
+                        @click.stop="handleSetProfile(photo.id)"
+                    >
+                        <Icon name="lucide:star" class="h-4 w-4" />
+                    </button>
+                    <button
+                        class="rounded p-1.5 text-white/80 active:bg-white/20"
+                        @click.stop="openEditModal(photo)"
+                    >
+                        <Icon name="lucide:pencil" class="h-4 w-4" />
+                    </button>
+                    <button
+                        class="rounded p-1.5 text-white/80 active:text-red-400"
+                        @click.stop="confirmDeletePhoto(photo)"
+                    >
+                        <Icon name="lucide:trash-2" class="h-4 w-4" />
+                    </button>
                 </div>
             </div>
         </div>
@@ -205,29 +230,42 @@
                             ref="fileInputRef"
                             type="file"
                             accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                            multiple
                             class="hidden"
                             @change="handleFileSelect"
                         />
                     </label>
-                    <p v-if="selectedFile" class="text-fg mt-2 flex items-center gap-2 text-sm">
-                        <Icon name="lucide:file-image" class="h-4 w-4" />
-                        {{ selectedFile.name }}
-                        <span class="text-fg-faint">({{ formatFileSize(selectedFile.size) }})</span>
-                        <button
-                            type="button"
-                            class="text-fg-faint hover:text-red-400"
-                            @click="selectedFile = null"
+                    <!-- Selected files list -->
+                    <div v-if="selectedFiles.length" class="mt-2 space-y-1">
+                        <p
+                            v-for="(file, i) in selectedFiles"
+                            :key="i"
+                            class="text-fg flex items-center gap-2 text-sm"
                         >
-                            <Icon name="lucide:x" class="h-3.5 w-3.5" />
-                        </button>
-                    </p>
+                            <Icon name="lucide:file-image" class="h-4 w-4 shrink-0" />
+                            <span class="min-w-0 truncate">{{ file.name }}</span>
+                            <span class="text-fg-faint shrink-0"
+                                >({{ formatFileSize(file.size) }})</span
+                            >
+                            <button
+                                type="button"
+                                class="text-fg-faint shrink-0 hover:text-red-400"
+                                @click="removeFile(i)"
+                            >
+                                <Icon name="lucide:x" class="h-3.5 w-3.5" />
+                            </button>
+                        </p>
+                    </div>
                 </div>
 
-                <UiTextInput
-                    v-model="uploadForm.caption"
-                    :label="$t('pages.pets.photos.caption')"
-                    :placeholder="$t('pages.pets.photos.captionPlaceholder')"
-                />
+                <!-- Single-file fields (hidden during multi-upload) -->
+                <template v-if="!isMultiUpload">
+                    <UiTextInput
+                        v-model="uploadForm.caption"
+                        :label="$t('pages.pets.photos.caption')"
+                        :placeholder="$t('pages.pets.photos.captionPlaceholder')"
+                    />
+                </template>
 
                 <UiTextInput
                     v-model="uploadForm.tags"
@@ -235,39 +273,73 @@
                     :placeholder="$t('pages.pets.photos.tagsHint')"
                 />
 
-                <UiTextInput
-                    v-model="uploadForm.takenAt"
-                    type="datetime-local"
-                    :label="$t('pages.pets.photos.takenAt')"
-                />
-                <p
-                    v-if="dateAutoDetected"
-                    class="text-primary-400 -mt-2 flex items-center gap-1 text-xs"
-                >
-                    <Icon name="lucide:sparkles" class="h-3 w-3" />
-                    {{ $t("pages.pets.photos.dateAutoDetected") }}
-                </p>
-                <p
-                    v-else-if="dateDetectionFailed && selectedFile"
-                    class="-mt-2 flex items-center gap-1 text-xs text-amber-400"
-                >
-                    <Icon name="lucide:alert-circle" class="h-3 w-3" />
-                    {{ $t("pages.pets.photos.dateNotDetected") }}
-                </p>
+                <!-- Single-file fields (hidden during multi-upload) -->
+                <template v-if="!isMultiUpload">
+                    <UiTextInput
+                        v-model="uploadForm.takenAt"
+                        type="datetime-local"
+                        :label="$t('pages.pets.photos.takenAt')"
+                    />
+                    <p
+                        v-if="dateAutoDetected"
+                        class="text-primary-400 -mt-2 flex items-center gap-1 text-xs"
+                    >
+                        <Icon name="lucide:sparkles" class="h-3 w-3" />
+                        {{ $t("pages.pets.photos.dateAutoDetected") }}
+                    </p>
+                    <p
+                        v-else-if="dateDetectionFailed && selectedFiles.length === 1"
+                        class="-mt-2 flex items-center gap-1 text-xs text-amber-400"
+                    >
+                        <Icon name="lucide:alert-circle" class="h-3 w-3" />
+                        {{ $t("pages.pets.photos.dateNotDetected") }}
+                    </p>
 
-                <div class="flex items-center gap-3">
-                    <UiToggle v-model="uploadForm.isProfilePicture" />
-                    <span class="text-fg-muted text-sm">{{
-                        $t("pages.pets.photos.setProfile")
-                    }}</span>
+                    <div class="flex items-center gap-3">
+                        <UiToggle v-model="uploadForm.isProfilePicture" />
+                        <span class="text-fg-muted text-sm">{{
+                            $t("pages.pets.photos.setProfile")
+                        }}</span>
+                    </div>
+                </template>
+
+                <!-- Upload progress -->
+                <div
+                    v-if="uploading && isMultiUpload"
+                    class="bg-surface-raised rounded-lg p-3 text-sm"
+                >
+                    <div class="text-fg-muted mb-1 flex justify-between">
+                        <span>{{ $t("pages.pets.photos.uploadingProgress") }}</span>
+                        <span class="text-fg font-medium"
+                            >{{ uploadProgress }} / {{ selectedFiles.length }}</span
+                        >
+                    </div>
+                    <div class="bg-surface h-1.5 overflow-hidden rounded-full">
+                        <div
+                            class="bg-primary-500 h-full rounded-full transition-all duration-300"
+                            :style="{
+                                width: `${(uploadProgress / selectedFiles.length) * 100}%`,
+                            }"
+                        />
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showUpload = false">{{
                         $t("common.cancel")
                     }}</UiButton>
-                    <UiButton type="submit" :disabled="!selectedFile" :loading="uploading">
-                        {{ $t("pages.pets.photos.upload") }}
+                    <UiButton
+                        type="submit"
+                        :disabled="!selectedFiles.length"
+                        :loading="uploading"
+                    >
+                        {{
+                            isMultiUpload
+                                ? $t("pages.pets.photos.uploadCount", {
+                                      count: selectedFiles.length,
+                                  })
+                                : $t("pages.pets.photos.upload")
+                        }}
                     </UiButton>
                 </div>
             </form>
@@ -424,8 +496,11 @@ function openLightbox(index: number) {
 
 // ─── Upload ──────────────────────────────────────────────
 const showUpload = ref(false);
-const selectedFile = ref<File | null>(null);
+const selectedFiles = ref<File[]>([]);
 const fileInputRef = ref<HTMLInputElement>();
+const uploadProgress = ref(0);
+
+const isMultiUpload = computed(() => selectedFiles.value.length > 1);
 
 const uploadForm = reactive({
     caption: "",
@@ -438,7 +513,8 @@ const dateAutoDetected = ref(false);
 const dateDetectionFailed = ref(false);
 
 function resetUploadForm() {
-    selectedFile.value = null;
+    selectedFiles.value = [];
+    uploadProgress.value = 0;
     dateAutoDetected.value = false;
     dateDetectionFailed.value = false;
     Object.assign(uploadForm, {
@@ -450,28 +526,51 @@ function resetUploadForm() {
     if (fileInputRef.value) fileInputRef.value.value = "";
 }
 
+function removeFile(index: number) {
+    selectedFiles.value = selectedFiles.value.filter((_, i) => i !== index);
+    if (selectedFiles.value.length === 1) {
+        extractExifDate(selectedFiles.value[0]);
+    }
+    if (selectedFiles.value.length === 0 && fileInputRef.value) {
+        fileInputRef.value.value = "";
+    }
+}
+
 function handleFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    if (file && file.size > MAX_FILE_SIZE) {
-        toast.error(t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }));
-        input.value = "";
-        return;
+    const files = Array.from(input.files ?? []);
+    const valid: File[] = [];
+    for (const file of files) {
+        if (file.size > MAX_FILE_SIZE) {
+            toast.error(
+                t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }) +
+                    ` (${file.name})`,
+            );
+            continue;
+        }
+        valid.push(file);
     }
-    selectedFile.value = file;
-    if (file) extractExifDate(file);
+    selectedFiles.value = valid;
+    if (valid.length === 1) extractExifDate(valid[0]);
 }
 
 function handleDrop(event: DragEvent) {
-    const file = event.dataTransfer?.files[0];
-    if (file && file.type.startsWith("image/")) {
+    const files = Array.from(event.dataTransfer?.files ?? []).filter((f) =>
+        f.type.startsWith("image/"),
+    );
+    const valid: File[] = [];
+    for (const file of files) {
         if (file.size > MAX_FILE_SIZE) {
-            toast.error(t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }));
-            return;
+            toast.error(
+                t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }) +
+                    ` (${file.name})`,
+            );
+            continue;
         }
-        selectedFile.value = file;
-        extractExifDate(file);
+        valid.push(file);
     }
+    selectedFiles.value = valid;
+    if (valid.length === 1) extractExifDate(valid[0]);
 }
 
 async function extractExifDate(file: File) {
@@ -515,33 +614,73 @@ async function extractExifDate(file: File) {
 
 const { mutate: uploadMutation, isPending: uploading } = useMutation({
     mutationFn: async () => {
-        if (!selectedFile.value) return;
-
-        const formData = new FormData();
-        if (uploadForm.caption) formData.append("caption", uploadForm.caption);
-        if (uploadForm.tags) formData.append("tags", uploadForm.tags);
-        if (uploadForm.isProfilePicture) formData.append("isProfilePicture", "true");
-        if (uploadForm.takenAt)
-            formData.append("takenAt", new Date(uploadForm.takenAt).toISOString());
-        formData.append("file", selectedFile.value);
+        if (!selectedFiles.value.length) return;
 
         const baseURL = useRuntimeConfig().public.apiBaseURL;
         const authStore = useAuthStore();
-        const res = await fetch(`${baseURL}/api/pets/${petId}/photos`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${authStore.accessToken}` },
-            body: formData,
-            credentials: "include",
-        });
+        const headers = { Authorization: `Bearer ${authStore.accessToken}` };
 
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error?.message ?? "Upload failed");
-        return json.data;
+        const tags = uploadForm.tags || undefined;
+
+        async function uploadSingleFile(file: File, opts?: { caption?: string; isProfilePicture?: boolean; takenAt?: string }) {
+            const formData = new FormData();
+            if (opts?.caption) formData.append("caption", opts.caption);
+            if (tags) formData.append("tags", tags);
+            if (opts?.isProfilePicture) formData.append("isProfilePicture", "true");
+            if (opts?.takenAt) formData.append("takenAt", new Date(opts.takenAt).toISOString());
+            formData.append("file", file);
+
+            const res = await fetch(`${baseURL}/api/pets/${petId}/photos`, {
+                method: "POST",
+                headers,
+                body: formData,
+                credentials: "include",
+            });
+
+            const json = await res.json();
+            if (!json.success) throw new Error(json.error?.message ?? "Upload failed");
+            return json.data;
+        }
+
+        if (selectedFiles.value.length === 1) {
+            // Single file — use form fields
+            await uploadSingleFile(selectedFiles.value[0], {
+                caption: uploadForm.caption || undefined,
+                isProfilePicture: uploadForm.isProfilePicture,
+                takenAt: uploadForm.takenAt || undefined,
+            });
+        } else {
+            // Multi-file — upload sequentially, auto-detect takenAt per file
+            uploadProgress.value = 0;
+            for (const file of selectedFiles.value) {
+                let takenAt: string | undefined;
+                try {
+                    const exif = await exifr.parse(file, ["DateTimeOriginal", "DateTimeDigitized", "CreateDate"]);
+                    const date = exif?.DateTimeOriginal ?? exif?.DateTimeDigitized ?? exif?.CreateDate;
+                    if (date instanceof Date && !isNaN(date.getTime())) {
+                        takenAt = date.toISOString();
+                    }
+                } catch {
+                    // No EXIF
+                }
+                if (!takenAt && file.lastModified) {
+                    takenAt = new Date(file.lastModified).toISOString();
+                }
+
+                await uploadSingleFile(file, { takenAt });
+                uploadProgress.value++;
+            }
+        }
     },
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pet-photos", petId] });
         queryClient.invalidateQueries({ queryKey: ["pets"] });
-        toast.success(t("pages.pets.photos.uploaded"));
+        const count = selectedFiles.value.length;
+        toast.success(
+            count > 1
+                ? t("pages.pets.photos.uploadedCount", { count })
+                : t("pages.pets.photos.uploaded"),
+        );
         showUpload.value = false;
         resetUploadForm();
     },
