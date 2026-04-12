@@ -38,7 +38,7 @@ services:
             PORT: "3001"
             NODE_ENV: production
         ports:
-            - "3001:3001"
+            - "3301:3001"
         volumes:
             - ${UPLOADS_DIR:-./uploads}:/app/uploads
         networks:
@@ -61,7 +61,7 @@ services:
         environment:
             PORT: "3000"
         ports:
-            - "3000:3000"
+            - "3300:3000"
         networks:
             - web
         depends_on:
