@@ -50,14 +50,17 @@ export default defineEventHandler(async (event) => {
     const apiBase = config.public.apiBaseURL;
 
     try {
-        const res = await $fetch<{ success: boolean; data: {
-            name: string;
-            bio: string | null;
-            species: string | null;
-            morph: string | null;
-            profilePhotoId: string | null;
-            slug: string;
-        } }>(`${apiBase}/api/public/pets/${encodeURIComponent(slug)}`);
+        const res = await $fetch<{
+            success: boolean;
+            data: {
+                name: string;
+                bio: string | null;
+                species: string | null;
+                morph: string | null;
+                profilePhotoId: string | null;
+                slug: string;
+            };
+        }>(`${apiBase}/api/public/pets/${encodeURIComponent(slug)}`);
 
         if (!res.success) return;
 
@@ -66,9 +69,9 @@ export default defineEventHandler(async (event) => {
         const title = escapeHtml(`${pet.name} — KeeperLog`);
         const description = escapeHtml(
             pet.bio ??
-            (pet.species
-                ? `${pet.name} — ${pet.species}${pet.morph ? ` (${pet.morph})` : ""}`
-                : pet.name),
+                (pet.species
+                    ? `${pet.name} — ${pet.species}${pet.morph ? ` (${pet.morph})` : ""}`
+                    : pet.name),
         );
         const url = `${siteUrl}/p/${pet.slug}`;
         const image = pet.profilePhotoId

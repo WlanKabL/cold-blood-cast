@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-7xl space-y-6 p-6">
         <!-- Back + Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div class="flex items-center gap-3">
                 <NuxtLink
                     :to="`/pets/${petId}`"

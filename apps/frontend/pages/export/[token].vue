@@ -119,9 +119,11 @@ async function startDownload() {
         }
 
         const blob = await response.blob();
+        const contentType = response.headers.get("Content-Type") ?? "";
         const contentDisposition = response.headers.get("Content-Disposition");
         const serverName = contentDisposition?.match(/filename="(.+)"/)?.[1];
-        const ext = serverName?.endsWith(".zip") ? "zip" : "json";
+        const isZip = contentType.includes("zip") || serverName?.endsWith(".zip");
+        const ext = isZip ? "zip" : "json";
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;

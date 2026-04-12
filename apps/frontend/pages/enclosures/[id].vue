@@ -1,7 +1,7 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Back + Header -->
-        <div class="flex items-center gap-3">
+        <div class="animate-fade-in-up flex items-center gap-3">
             <NuxtLink
                 to="/enclosures"
                 class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors"
@@ -51,193 +51,225 @@
         </div>
 
         <template v-else-if="enclosure">
-            <!-- Info Card -->
-            <div class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">{{ $t("pages.enclosures.details") }}</h2>
-                    <span
-                        class="bg-primary-500/10 text-primary-400 rounded-md px-2 py-0.5 text-xs font-medium"
-                    >
-                        {{ enclosure.type }}
-                    </span>
-                </div>
-                <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.enclosures.fields.species") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">{{ enclosure.species || "—" }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.enclosures.fields.room") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">
-                            {{ enclosure.room || $t("pages.enclosures.noRoom") }}
-                        </dd>
-                    </div>
-                    <div v-if="enclosure.lengthCm || enclosure.widthCm || enclosure.heightCm">
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.enclosures.fields.dimensions") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">
-                            {{ enclosure.lengthCm ?? "—" }} × {{ enclosure.widthCm ?? "—" }} ×
-                            {{ enclosure.heightCm ?? "—" }} cm
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.enclosures.fields.active") }}
-                        </dt>
-                        <dd class="mt-1">
+            <!-- Tabs -->
+            <UiTabs v-model="activeTab" :tabs="enclosureTabs">
+                <!-- Info Tab -->
+                <div v-if="activeTab === 'info'" class="space-y-6">
+                    <!-- Info Card -->
+                    <div class="glass-card-accent rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.enclosures.details") }}
+                            </h2>
                             <span
-                                :class="
-                                    enclosure.active
-                                        ? 'bg-green-500/10 text-green-400'
-                                        : 'bg-amber-500/10 text-amber-400'
-                                "
-                                class="rounded-md px-2 py-0.5 text-xs font-medium"
+                                class="bg-primary-500/10 text-primary-400 rounded-md px-2 py-0.5 text-xs font-medium"
                             >
-                                {{
-                                    enclosure.active
-                                        ? $t("pages.enclosures.active")
-                                        : $t("pages.enclosures.inactive")
-                                }}
-                            </span>
-                        </dd>
-                    </div>
-                    <div v-if="enclosure.description" class="sm:col-span-2">
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.enclosures.fields.description") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">{{ enclosure.description }}</dd>
-                    </div>
-                </dl>
-            </div>
-
-            <!-- Pets in this enclosure -->
-            <div class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">
-                        {{ $t("pages.enclosures.petsInEnclosure") }}
-                    </h2>
-                    <NuxtLink to="/pets" class="text-primary-400 text-sm font-medium">
-                        {{ $t("pages.dashboard.viewAll") }}
-                    </NuxtLink>
-                </div>
-                <div v-if="enclosure.pets?.length" class="space-y-2">
-                    <NuxtLink
-                        v-for="pet in enclosure.pets"
-                        :key="pet.id"
-                        :to="`/pets/${pet.id}`"
-                        class="bg-surface-raised hover:bg-surface-hover flex items-center gap-3 rounded-lg p-3 transition-colors"
-                    >
-                        <Icon name="lucide:heart" class="text-primary-400 h-4 w-4" />
-                        <span class="text-fg text-sm font-medium">{{ pet.name }}</span>
-                        <span class="text-fg-faint text-xs">
-                            {{ pet.species }}
-                            <template v-if="pet.morph"> · {{ pet.morph }}</template>
-                            <template v-if="pet.gender"> · {{ pet.gender }}</template>
-                        </span>
-                    </NuxtLink>
-                </div>
-                <p v-else class="text-fg-muted text-sm">
-                    {{ $t("pages.enclosures.noPets") }}
-                </p>
-            </div>
-
-            <!-- Sensors in this enclosure -->
-            <div class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">
-                        {{ $t("pages.enclosures.sensorsInEnclosure") }}
-                    </h2>
-                    <NuxtLink to="/sensors" class="text-primary-400 text-sm font-medium">
-                        {{ $t("pages.dashboard.viewAll") }}
-                    </NuxtLink>
-                </div>
-                <div v-if="enclosure.sensors?.length" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <NuxtLink
-                        v-for="sensor in enclosure.sensors"
-                        :key="sensor.id"
-                        :to="`/sensors/${sensor.id}`"
-                        class="bg-surface-raised hover:bg-surface-hover rounded-lg p-3 transition-colors"
-                    >
-                        <div class="flex items-center gap-2">
-                            <Icon name="lucide:thermometer" class="h-4 w-4 text-green-400" />
-                            <span class="text-fg text-sm font-medium">{{ sensor.name }}</span>
-                            <span
-                                v-if="!sensor.active"
-                                class="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-400"
-                            >
-                                {{ $t("pages.enclosures.inactive") }}
+                                {{ enclosure.type }}
                             </span>
                         </div>
-                        <p class="text-fg-faint mt-1 text-xs">
-                            {{ sensor.type }} · {{ sensor.unit }}
-                        </p>
-                    </NuxtLink>
-                </div>
-                <p v-else class="text-fg-muted text-sm">
-                    {{ $t("pages.enclosures.noSensors") }}
-                </p>
-            </div>
-
-            <!-- Maintenance Tasks -->
-            <div class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-fg font-semibold">
-                            {{ $t("pages.enclosures.maintenanceTasks") }}
-                        </h2>
-                        <span
-                            v-if="overdueCount > 0"
-                            class="rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
-                        >
-                            {{ $t("pages.enclosures.overdueTasksCount", { n: overdueCount }) }}
-                        </span>
-                    </div>
-                    <NuxtLink
-                        :to="`/maintenance`"
-                        class="text-primary-400 text-sm font-medium"
-                    >
-                        {{ $t("pages.dashboard.viewAll") }}
-                    </NuxtLink>
-                </div>
-                <div v-if="maintenanceTasks?.length" class="space-y-2">
-                    <div
-                        v-for="task in maintenanceTasks"
-                        :key="task.id"
-                        class="bg-surface-raised flex items-center justify-between gap-3 rounded-lg p-3"
-                    >
-                        <div class="flex items-center gap-3">
-                            <Icon name="lucide:wrench" class="text-fg-faint h-4 w-4" />
+                        <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <span class="text-fg text-sm font-medium">
-                                    {{ task.description || task.type }}
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.enclosures.fields.species") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">{{ enclosure.species || "—" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.enclosures.fields.room") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">
+                                    {{ enclosure.room || $t("pages.enclosures.noRoom") }}
+                                </dd>
+                            </div>
+                            <div
+                                v-if="enclosure.lengthCm || enclosure.widthCm || enclosure.heightCm"
+                            >
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.enclosures.fields.dimensions") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">
+                                    {{ enclosure.lengthCm ?? "—" }} ×
+                                    {{ enclosure.widthCm ?? "—" }} ×
+                                    {{ enclosure.heightCm ?? "—" }} cm
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.enclosures.fields.active") }}
+                                </dt>
+                                <dd class="mt-1">
+                                    <span
+                                        :class="
+                                            enclosure.active
+                                                ? 'bg-green-500/10 text-green-400'
+                                                : 'bg-amber-500/10 text-amber-400'
+                                        "
+                                        class="rounded-md px-2 py-0.5 text-xs font-medium"
+                                    >
+                                        {{
+                                            enclosure.active
+                                                ? $t("pages.enclosures.active")
+                                                : $t("pages.enclosures.inactive")
+                                        }}
+                                    </span>
+                                </dd>
+                            </div>
+                            <div v-if="enclosure.description" class="sm:col-span-2">
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.enclosures.fields.description") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">{{ enclosure.description }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Inhabitants Tab -->
+                <div v-if="activeTab === 'inhabitants'" class="space-y-6">
+                    <!-- Pets -->
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.enclosures.petsInEnclosure") }}
+                            </h2>
+                            <NuxtLink to="/pets" class="text-primary-400 text-sm font-medium">
+                                {{ $t("pages.dashboard.viewAll") }}
+                            </NuxtLink>
+                        </div>
+                        <div v-if="enclosure.pets?.length" class="space-y-2">
+                            <NuxtLink
+                                v-for="pet in enclosure.pets"
+                                :key="pet.id"
+                                :to="`/pets/${pet.id}`"
+                                class="bg-surface-raised hover:bg-surface-hover flex items-center gap-3 rounded-lg p-3 transition-colors"
+                            >
+                                <Icon name="lucide:heart" class="text-primary-400 h-4 w-4" />
+                                <span class="text-fg text-sm font-medium">{{ pet.name }}</span>
+                                <span class="text-fg-faint text-xs">
+                                    {{ pet.species }}
+                                    <template v-if="pet.morph"> · {{ pet.morph }}</template>
+                                    <template v-if="pet.gender"> · {{ pet.gender }}</template>
                                 </span>
-                                <p class="text-fg-faint text-xs">
-                                    <template v-if="task.nextDueAt">
-                                        {{ new Date(task.nextDueAt).toLocaleDateString() }}
-                                    </template>
-                                    <template v-if="task.recurring">
-                                        · {{ $t("pages.maintenance.recurring") }}
-                                    </template>
+                            </NuxtLink>
+                        </div>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.enclosures.noPets") }}
+                        </p>
+                    </div>
+
+                    <!-- Sensors -->
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.enclosures.sensorsInEnclosure") }}
+                            </h2>
+                            <NuxtLink to="/sensors" class="text-primary-400 text-sm font-medium">
+                                {{ $t("pages.dashboard.viewAll") }}
+                            </NuxtLink>
+                        </div>
+                        <div
+                            v-if="enclosure.sensors?.length"
+                            class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                        >
+                            <NuxtLink
+                                v-for="sensor in enclosure.sensors"
+                                :key="sensor.id"
+                                :to="`/sensors/${sensor.id}`"
+                                class="bg-surface-raised hover:bg-surface-hover rounded-lg p-3 transition-colors"
+                            >
+                                <div class="flex items-center gap-2">
+                                    <Icon
+                                        name="lucide:thermometer"
+                                        class="h-4 w-4 text-green-400"
+                                    />
+                                    <span class="text-fg text-sm font-medium">{{
+                                        sensor.name
+                                    }}</span>
+                                    <span
+                                        v-if="!sensor.active"
+                                        class="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-400"
+                                    >
+                                        {{ $t("pages.enclosures.inactive") }}
+                                    </span>
+                                </div>
+                                <p class="text-fg-faint mt-1 text-xs">
+                                    {{ sensor.type }} · {{ sensor.unit }}
                                 </p>
+                            </NuxtLink>
+                        </div>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.enclosures.noSensors") }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Maintenance Tab -->
+                <div v-if="activeTab === 'maintenance'" class="space-y-6">
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-fg font-semibold">
+                                    {{ $t("pages.enclosures.maintenanceTasks") }}
+                                </h2>
+                                <span
+                                    v-if="overdueCount > 0"
+                                    class="rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                                >
+                                    {{
+                                        $t("pages.enclosures.overdueTasksCount", {
+                                            n: overdueCount,
+                                        })
+                                    }}
+                                </span>
+                            </div>
+                            <NuxtLink
+                                :to="`/maintenance`"
+                                class="text-primary-400 text-sm font-medium"
+                            >
+                                {{ $t("pages.dashboard.viewAll") }}
+                            </NuxtLink>
+                        </div>
+                        <div v-if="maintenanceTasks?.length" class="space-y-2">
+                            <div
+                                v-for="task in maintenanceTasks"
+                                :key="task.id"
+                                class="bg-surface-raised flex items-center justify-between gap-3 rounded-lg p-3"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <Icon name="lucide:wrench" class="text-fg-faint h-4 w-4" />
+                                    <div>
+                                        <span class="text-fg text-sm font-medium">
+                                            {{ task.description || task.type }}
+                                        </span>
+                                        <p class="text-fg-faint text-xs">
+                                            <template v-if="task.nextDueAt">
+                                                {{ new Date(task.nextDueAt).toLocaleDateString() }}
+                                            </template>
+                                            <template v-if="task.recurring">
+                                                · {{ $t("pages.maintenance.recurring") }}
+                                            </template>
+                                        </p>
+                                    </div>
+                                </div>
+                                <span
+                                    v-if="
+                                        task.nextDueAt &&
+                                        new Date(task.nextDueAt) < new Date() &&
+                                        !task.completedAt
+                                    "
+                                    class="shrink-0 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                                >
+                                    {{ $t("pages.maintenance.overdue") }}
+                                </span>
                             </div>
                         </div>
-                        <span
-                            v-if="task.nextDueAt && new Date(task.nextDueAt) < new Date() && !task.completedAt"
-                            class="shrink-0 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
-                        >
-                            {{ $t("pages.maintenance.overdue") }}
-                        </span>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.enclosures.noMaintenanceTasks") }}
+                        </p>
                     </div>
                 </div>
-                <p v-else class="text-fg-muted text-sm">
-                    {{ $t("pages.enclosures.noMaintenanceTasks") }}
-                </p>
-            </div>
+            </UiTabs>
         </template>
 
         <!-- Edit Modal -->
@@ -375,6 +407,14 @@ const enclosureId = route.params.id as string;
 
 definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "enclosures" });
 
+// ── Tabs ──
+const activeTab = ref("info");
+const enclosureTabs = computed(() => [
+    { key: "info", label: t("pages.enclosures.tabs.info"), icon: "lucide:info" },
+    { key: "inhabitants", label: t("pages.enclosures.tabs.inhabitants"), icon: "lucide:heart" },
+    { key: "maintenance", label: t("pages.enclosures.tabs.maintenance"), icon: "lucide:wrench" },
+]);
+
 const enclosureTypes = ["TERRARIUM", "VIVARIUM", "AQUARIUM", "PALUDARIUM", "RACK", "OTHER"];
 
 // ── Data ─────────────────────────────────────────────────
@@ -394,9 +434,7 @@ useHead({ title: () => enclosure.value?.name ?? t("pages.enclosures.title") });
 const { data: maintenanceTasks } = useQuery({
     queryKey: ["maintenance-tasks", enclosureId],
     queryFn: () =>
-        api.get<MaintenanceTaskItem[]>(
-            `/api/enclosure-maintenance?enclosureId=${enclosureId}`,
-        ),
+        api.get<MaintenanceTaskItem[]>(`/api/enclosure-maintenance?enclosureId=${enclosureId}`),
 });
 
 const overdueCount = computed(

@@ -29,9 +29,8 @@ vi.mock("@/modules/sheddings/shedding-analysis.service.js", () => ({
     }),
 }));
 
-const { getWeekEvents, getWeekEventsForEmail, getOptedInUsers } = await import(
-    "../weekly-planner.service.js"
-);
+const { getWeekEvents, getWeekEventsForEmail, getOptedInUsers } =
+    await import("../weekly-planner.service.js");
 
 const USER_ID = "user_123";
 const MONDAY = new Date("2026-04-13T00:00:00.000Z"); // A Monday
@@ -108,18 +107,16 @@ describe("getWeekEvents", () => {
 
     it("places vet follow-up visits on the correct day", async () => {
         const nextAppointment = new Date("2026-04-16T10:00:00Z"); // Thursday
-        mockPrisma.vetVisit.findMany
-            .mockResolvedValueOnce([])
-            .mockResolvedValueOnce([
-                {
-                    id: "vet_2",
-                    nextAppointment,
-                    isAppointment: false,
-                    reason: "Follow-up",
-                    pet: { name: "Scales" },
-                    veterinarian: { name: "Dr. Herp", clinicName: null },
-                },
-            ]);
+        mockPrisma.vetVisit.findMany.mockResolvedValueOnce([]).mockResolvedValueOnce([
+            {
+                id: "vet_2",
+                nextAppointment,
+                isAppointment: false,
+                reason: "Follow-up",
+                pet: { name: "Scales" },
+                veterinarian: { name: "Dr. Herp", clinicName: null },
+            },
+        ]);
 
         const days = await getWeekEvents(USER_ID, MONDAY);
         const thursday = days[3];
@@ -191,6 +188,35 @@ describe("getWeekEvents", () => {
         expect(monday.events[0].meta.isOverdue).toBe(true);
     });
 
+    it("marks mid-week tasks as overdue when they are past today", async () => {
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - 1); // yesterday
+
+        mockPrisma.maintenanceTask.findMany.mockResolvedValueOnce([
+            {
+                id: "task_midweek",
+                type: "WATER_CHANGE",
+                description: "Change water",
+                nextDueAt: pastDate,
+                completedAt: null,
+                recurring: true,
+                enclosure: { name: "Main" },
+            },
+        ]);
+
+        // Use a weekStart that is before pastDate so the task falls "within" the week
+        const weekStart = new Date(pastDate);
+        weekStart.setDate(weekStart.getDate() - 2);
+        weekStart.setUTCHours(0, 0, 0, 0);
+
+        const days = await getWeekEvents(USER_ID, weekStart);
+        const allEvents = days.flatMap((d) => d.events);
+        const maintenanceEvents = allEvents.filter((e) => e.type === "maintenance");
+
+        expect(maintenanceEvents).toHaveLength(1);
+        expect(maintenanceEvents[0].meta.isOverdue).toBe(true);
+    });
+
     it("sorts events by type within a day", async () => {
         mockPrisma.maintenanceTask.findMany.mockResolvedValueOnce([
             {
@@ -237,9 +263,8 @@ describe("getWeekEvents", () => {
             },
         ]);
 
-        const { computeFeedingStatus } = await import(
-            "@/modules/feeding-reminders/feeding-reminders.service.js"
-        );
+        const { computeFeedingStatus } =
+            await import("@/modules/feeding-reminders/feeding-reminders.service.js");
         vi.mocked(computeFeedingStatus).mockReturnValueOnce({
             status: "no_schedule",
             daysSinceLastFeeding: null,

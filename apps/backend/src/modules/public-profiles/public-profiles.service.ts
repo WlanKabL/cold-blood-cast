@@ -47,7 +47,8 @@ const SLUG_MAX_LENGTH = 60;
 function validateSlug(slug: string): string | null {
     if (slug.length < SLUG_MIN_LENGTH) return `Slug must be at least ${SLUG_MIN_LENGTH} characters`;
     if (slug.length > SLUG_MAX_LENGTH) return `Slug must be at most ${SLUG_MAX_LENGTH} characters`;
-    if (!SLUG_PATTERN.test(slug)) return "Slug must contain only lowercase letters, numbers, and hyphens";
+    if (!SLUG_PATTERN.test(slug))
+        return "Slug must contain only lowercase letters, numbers, and hyphens";
     if (slug.includes("--")) return "Slug must not contain consecutive hyphens";
     return null;
 }
@@ -86,7 +87,10 @@ export async function createProfile(userId: string, input: CreateProfileInput) {
     // Check if profile already exists
     const existing = await prisma.publicProfile.findUnique({ where: { petId: input.petId } });
     if (existing) {
-        throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_ALREADY_EXISTS, "This pet already has a public profile");
+        throw badRequest(
+            ErrorCodes.E_PUBLIC_PROFILE_ALREADY_EXISTS,
+            "This pet already has a public profile",
+        );
     }
 
     // Handle slug
@@ -95,8 +99,11 @@ export async function createProfile(userId: string, input: CreateProfileInput) {
         const error = validateSlug(input.customSlug);
         if (error) throw badRequest(ErrorCodes.E_VALIDATION_ERROR, error);
 
-        const slugTaken = await prisma.publicProfile.findUnique({ where: { slug: input.customSlug } });
-        if (slugTaken) throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_SLUG_TAKEN, "This slug is already taken");
+        const slugTaken = await prisma.publicProfile.findUnique({
+            where: { slug: input.customSlug },
+        });
+        if (slugTaken)
+            throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_SLUG_TAKEN, "This slug is already taken");
 
         slug = input.customSlug;
     } else {
@@ -138,7 +145,8 @@ export async function updateProfile(petId: string, userId: string, input: Update
         if (error) throw badRequest(ErrorCodes.E_VALIDATION_ERROR, error);
 
         const slugTaken = await prisma.publicProfile.findUnique({ where: { slug: input.slug } });
-        if (slugTaken) throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_SLUG_TAKEN, "This slug is already taken");
+        if (slugTaken)
+            throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_SLUG_TAKEN, "This slug is already taken");
     }
 
     return prisma.publicProfile.update({
@@ -173,8 +181,14 @@ export async function getPublicPetData(slug: string) {
             pet: {
                 include: {
                     photos: {
-                        include: { upload: { select: { id: true, url: true, originalName: true } } },
-                        orderBy: [{ isProfilePicture: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+                        include: {
+                            upload: { select: { id: true, url: true, originalName: true } },
+                        },
+                        orderBy: [
+                            { isProfilePicture: "desc" },
+                            { sortOrder: "asc" },
+                            { createdAt: "desc" },
+                        ],
                     },
                     feedings: {
                         orderBy: { fedAt: "desc" },
@@ -201,10 +215,14 @@ export async function getPublicPetData(slug: string) {
     }
 
     // Increment views (fire and forget)
-    prisma.publicProfile.update({
-        where: { slug },
-        data: { views: { increment: 1 } },
-    }).catch(() => { /* ignore view counter errors */ });
+    prisma.publicProfile
+        .update({
+            where: { slug },
+            data: { views: { increment: 1 } },
+        })
+        .catch(() => {
+            /* ignore view counter errors */
+        });
 
     // Assemble public data based on visibility toggles
     const { pet } = profile;

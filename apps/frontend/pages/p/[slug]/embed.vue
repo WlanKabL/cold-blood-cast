@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-base min-h-dvh p-4">
+    <div class="public-page-bg bg-base min-h-dvh p-4">
         <!-- Loading -->
         <div v-if="loading" class="flex min-h-[200px] items-center justify-center">
             <Icon name="lucide:loader-2" class="text-fg-faint h-6 w-6 animate-spin" />
@@ -15,14 +15,14 @@
         </div>
 
         <!-- Compact Profile Card -->
-        <div v-else class="space-y-4">
+        <div v-else class="animate-fade-in relative z-10 space-y-4">
             <!-- Header -->
             <div class="flex items-center gap-3">
                 <img
                     v-if="profilePhotoUrl"
                     :src="profilePhotoUrl"
                     :alt="petData.name"
-                    class="h-14 w-14 rounded-xl object-cover ring-1 ring-white/10"
+                    class="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-white/10"
                 />
                 <div
                     v-else
@@ -41,7 +41,7 @@
             </div>
 
             <!-- Bio -->
-            <p v-if="petData.bio" class="text-fg-muted text-sm leading-relaxed">
+            <p v-if="petData.bio" class="text-fg-muted text-sm leading-relaxed whitespace-pre-line">
                 {{ petData.bio }}
             </p>
 
@@ -61,7 +61,7 @@
             <div class="grid grid-cols-3 gap-2">
                 <div
                     v-if="petData.weightRecords.length"
-                    class="glass-card rounded-lg p-2.5 text-center"
+                    class="public-card rounded-lg p-2.5 text-center"
                 >
                     <p class="text-fg text-lg font-bold">
                         {{ petData.weightRecords[0].weightGrams }}g
@@ -72,7 +72,7 @@
                 </div>
                 <div
                     v-if="petData.feedings.length"
-                    class="glass-card rounded-lg p-2.5 text-center"
+                    class="public-card rounded-lg p-2.5 text-center"
                 >
                     <p class="text-fg text-lg font-bold">{{ petData.feedings.length }}</p>
                     <p class="text-fg-faint text-[10px] uppercase">
@@ -81,7 +81,7 @@
                 </div>
                 <div
                     v-if="petData.sheddings.length"
-                    class="glass-card rounded-lg p-2.5 text-center"
+                    class="public-card rounded-lg p-2.5 text-center"
                 >
                     <p class="text-fg text-lg font-bold">{{ petData.sheddings.length }}</p>
                     <p class="text-fg-faint text-[10px] uppercase">
@@ -95,7 +95,7 @@
                 :href="fullProfileUrl"
                 target="_blank"
                 rel="noopener"
-                class="text-primary-400 flex items-center justify-center gap-1 text-xs font-medium"
+                class="text-primary-400 hover:text-primary-300 flex items-center justify-center gap-1 text-xs font-medium transition-colors"
             >
                 {{ $t("publicProfile.viewFullProfile") }}
                 <Icon name="lucide:external-link" class="h-3 w-3" />
@@ -106,7 +106,12 @@
                 <Icon name="lucide:paw-print" class="text-primary-400 h-2.5 w-2.5" />
                 <p class="text-fg-faint text-[10px]">
                     {{ $t("publicProfile.poweredBy") }}
-                    <a href="/" target="_blank" rel="noopener" class="text-primary-400 font-semibold">
+                    <a
+                        href="/"
+                        target="_blank"
+                        rel="noopener"
+                        class="text-primary-400 font-semibold"
+                    >
                         KeeperLog
                     </a>
                 </p>

@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-7xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.pets.title") }}
@@ -14,7 +16,7 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="animate-fade-in-up flex flex-col gap-3 delay-75 sm:flex-row sm:items-center">
             <UiTextInput
                 v-model="searchQuery"
                 :placeholder="$t('pages.pets.search')"
@@ -50,13 +52,13 @@
         <!-- Pet Grid -->
         <div
             v-else-if="filteredPets?.length"
-            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            class="animate-fade-in-up grid grid-cols-1 gap-4 delay-150 sm:grid-cols-2 lg:grid-cols-3"
         >
             <NuxtLink
                 v-for="pet in filteredPets"
                 :key="pet.id"
                 :to="`/pets/${pet.id}`"
-                class="glass-card group rounded-xl p-5 transition-all hover:ring-1 hover:ring-white/10"
+                class="glass-card group rounded-xl p-5 transition-all hover:shadow-lg hover:ring-1 hover:shadow-black/5 hover:ring-white/10"
             >
                 <!-- Header: Avatar + Name + Gender Badge -->
                 <div class="flex items-start gap-3">
@@ -84,7 +86,7 @@
                                 v-if="pet.gender && pet.gender !== 'UNKNOWN'"
                                 class="bg-primary-500/10 text-primary-400 shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
                             >
-                                {{ pet.gender }}
+                                {{ $t(`common.gender.${pet.gender}`) }}
                             </span>
                         </div>
                         <p class="text-fg-faint mt-0.5 text-sm">{{ pet.species }}</p>
@@ -170,7 +172,9 @@
                 />
                 <UiTextInput v-model="form.morph" :label="$t('pages.pets.fields.morph')" />
                 <UiSelect v-model="form.gender" :label="$t('pages.pets.fields.gender')">
-                    <option v-for="g in genderOptions" :key="g" :value="g">{{ g }}</option>
+                    <option v-for="g in genderOptions" :key="g" :value="g">
+                        {{ $t(`common.gender.${g}`) }}
+                    </option>
                 </UiSelect>
                 <UiTextInput
                     v-model="form.birthDate"

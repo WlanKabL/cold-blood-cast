@@ -86,11 +86,15 @@ describe("getProfileByPetId", () => {
 
     it("throws when profile not found", async () => {
         mockPrisma.publicProfile.findUnique.mockResolvedValue(null);
-        await expect(getProfileByPetId("pet-99", "user-1")).rejects.toThrow("Public profile not found");
+        await expect(getProfileByPetId("pet-99", "user-1")).rejects.toThrow(
+            "Public profile not found",
+        );
     });
 
     it("throws when profile belongs to another user", async () => {
-        mockPrisma.publicProfile.findUnique.mockResolvedValue(makeProfile({ userId: "other-user" }));
+        mockPrisma.publicProfile.findUnique.mockResolvedValue(
+            makeProfile({ userId: "other-user" }),
+        );
         await expect(getProfileByPetId("pet-1", "user-1")).rejects.toThrow("Not your profile");
     });
 });
@@ -162,9 +166,9 @@ describe("createProfile", () => {
     it("throws when custom slug is too short", async () => {
         mockPrisma.pet.findUnique.mockResolvedValue(makePet());
         mockPrisma.publicProfile.findUnique.mockResolvedValueOnce(null);
-        await expect(
-            createProfile("user-1", { petId: "pet-1", customSlug: "ab" }),
-        ).rejects.toThrow("at least 3 characters");
+        await expect(createProfile("user-1", { petId: "pet-1", customSlug: "ab" })).rejects.toThrow(
+            "at least 3 characters",
+        );
     });
 
     it("throws when custom slug has invalid characters", async () => {
@@ -222,9 +226,9 @@ describe("updateProfile", () => {
         mockPrisma.publicProfile.findUnique
             .mockResolvedValueOnce(profile)
             .mockResolvedValueOnce(makeProfile({ slug: "taken-slug" })); // slug taken
-        await expect(
-            updateProfile("pet-1", "user-1", { slug: "taken-slug" }),
-        ).rejects.toThrow("slug is already taken");
+        await expect(updateProfile("pet-1", "user-1", { slug: "taken-slug" })).rejects.toThrow(
+            "slug is already taken",
+        );
     });
 
     it("skips slug check when slug is unchanged", async () => {
@@ -332,7 +336,11 @@ describe("getPublicPetData", () => {
                         caption: "Profile pic",
                         tags: ["cute"],
                         takenAt: new Date("2025-06-01"),
-                        upload: { id: "upload-1", url: "/uploads/photo1.jpg", originalName: "photo.jpg" },
+                        upload: {
+                            id: "upload-1",
+                            url: "/uploads/photo1.jpg",
+                            originalName: "photo.jpg",
+                        },
                     },
                 ],
                 feedings: [
@@ -467,7 +475,9 @@ describe("getPublicPhoto", () => {
             showPhotos: true,
             petId: "pet-1",
         });
-        await expect(getPublicPhoto("monty-python", "photo-1")).rejects.toThrow("Profile not found");
+        await expect(getPublicPhoto("monty-python", "photo-1")).rejects.toThrow(
+            "Profile not found",
+        );
     });
 
     it("throws when showPhotos is disabled", async () => {
@@ -476,7 +486,9 @@ describe("getPublicPhoto", () => {
             showPhotos: false,
             petId: "pet-1",
         });
-        await expect(getPublicPhoto("monty-python", "photo-1")).rejects.toThrow("Profile not found");
+        await expect(getPublicPhoto("monty-python", "photo-1")).rejects.toThrow(
+            "Profile not found",
+        );
     });
 
     it("throws when profile not found", async () => {

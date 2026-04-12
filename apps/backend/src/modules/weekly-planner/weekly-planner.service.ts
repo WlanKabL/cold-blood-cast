@@ -24,10 +24,7 @@ export interface PlannerDay {
 
 // ── Public API ───────────────────────────────────────────
 
-export async function getWeekEvents(
-    userId: string,
-    weekStart: Date,
-): Promise<PlannerDay[]> {
+export async function getWeekEvents(userId: string, weekStart: Date): Promise<PlannerDay[]> {
     const days: PlannerDay[] = [];
     for (let i = 0; i < 7; i++) {
         const d = new Date(weekStart);
@@ -317,8 +314,10 @@ async function collectMaintenanceEvents(
         },
     });
 
+    const now = new Date();
+
     return tasks.map((task) => {
-        const isOverdue = task.nextDueAt && task.nextDueAt < weekStart && !task.completedAt;
+        const isOverdue = task.nextDueAt && task.nextDueAt < now && !task.completedAt;
         const eventDate = isOverdue ? weekStart : (task.nextDueAt ?? weekStart);
 
         return {

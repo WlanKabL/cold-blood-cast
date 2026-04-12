@@ -274,9 +274,9 @@ describe("updateMaintenanceTask", () => {
     it("throws not found when task belongs to another user", async () => {
         mockPrisma.maintenanceTask.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
 
-        await expect(
-            updateMaintenanceTask(TASK_ID, USER_ID, { description: "X" }),
-        ).rejects.toThrow("Maintenance task not found");
+        await expect(updateMaintenanceTask(TASK_ID, USER_ID, { description: "X" })).rejects.toThrow(
+            "Maintenance task not found",
+        );
     });
 });
 

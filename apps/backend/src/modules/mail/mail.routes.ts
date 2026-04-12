@@ -603,9 +603,10 @@ export async function emailAdminRoutes(app: FastifyInstance): Promise<void> {
             locale,
         });
 
-        const subject = locale === "de"
-            ? `[Test] Wochenplaner – ${weekLabel}`
-            : `[Test] Weekly Digest – ${weekLabel}`;
+        const subject =
+            locale === "de"
+                ? `[Test] Wochenplaner – ${weekLabel}`
+                : `[Test] Weekly Digest – ${weekLabel}`;
 
         const sent = await sendMail({
             to: admin.email,

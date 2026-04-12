@@ -4,12 +4,19 @@ import { mockPublicPetData, mockPublicPetDataMinimal } from "./helpers/fixtures"
 /**
  * Mock the public pet data endpoint for embed pages.
  */
-async function mockPublicPetApi(page: import("@playwright/test").Page, slug: string, data: unknown) {
+async function mockPublicPetApi(
+    page: import("@playwright/test").Page,
+    slug: string,
+    data: unknown,
+) {
     await page.route("**/api/auth/refresh", (route) =>
         route.fulfill({
             status: 401,
             contentType: "application/json",
-            body: JSON.stringify({ success: false, error: { code: "E_UNAUTHORIZED", message: "No session" } }),
+            body: JSON.stringify({
+                success: false,
+                error: { code: "E_UNAUTHORIZED", message: "No session" },
+            }),
         }),
     );
     await page.route("**/api/auth/platform-status", (route) =>
@@ -46,7 +53,10 @@ async function mockPublicPetNotFound(page: import("@playwright/test").Page, slug
         route.fulfill({
             status: 401,
             contentType: "application/json",
-            body: JSON.stringify({ success: false, error: { code: "E_UNAUTHORIZED", message: "No session" } }),
+            body: JSON.stringify({
+                success: false,
+                error: { code: "E_UNAUTHORIZED", message: "No session" },
+            }),
         }),
     );
     await page.route("**/api/auth/platform-status", (route) =>
@@ -149,9 +159,9 @@ test.describe("Public Profile Embed", () => {
 
         await page.goto("/p/monty-the-snake/embed");
 
-        await expect(
-            page.getByText(/view full profile|vollständiges profil/i),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/view full profile|vollständiges profil/i)).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("full profile link points to /p/slug", async ({ page }) => {
@@ -159,7 +169,9 @@ test.describe("Public Profile Embed", () => {
 
         await page.goto("/p/monty-the-snake/embed");
 
-        const link = page.locator("a").filter({ hasText: /view full profile|vollständiges profil/i });
+        const link = page
+            .locator("a")
+            .filter({ hasText: /view full profile|vollständiges profil/i });
         await expect(link).toBeVisible({ timeout: 15_000 });
         await expect(link).toHaveAttribute("href", /\/p\/monty-the-snake/);
     });

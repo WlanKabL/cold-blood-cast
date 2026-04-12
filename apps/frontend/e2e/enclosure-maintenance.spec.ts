@@ -168,19 +168,15 @@ test.describe("Enclosure Maintenance — Enclosure Detail Section", () => {
             sensors: [],
         });
         await mockGet(page, "/api/enclosures", mockEnclosures);
-        await mockGet(
-            page,
-            "/api/enclosure-maintenance?enclosureId=enc_001",
-            mockMaintenanceTasks,
-        );
+        await mockGet(page, "/api/enclosure-maintenance?enclosureId=enc_001", mockMaintenanceTasks);
     });
 
     test("shows maintenance section on enclosure detail", async ({ page }) => {
         await page.goto("/enclosures/enc_001");
 
-        await expect(
-            page.getByText(/maintenance tasks|wartungsaufgaben/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/maintenance tasks|wartungsaufgaben/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("displays task type or description", async ({ page }) => {

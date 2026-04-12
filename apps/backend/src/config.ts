@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { CorsOptions } from "cors";
+import type { FastifyCorsOptions } from "@fastify/cors";
 
 const envSchema = z.object({
     PORT: z.coerce.number().default(3001),
@@ -46,7 +46,7 @@ export interface AppEnv {
     NODE_ENV: string;
     DATABASE_URL: string;
     CORS_ORIGINS: string;
-    CORS_OPTIONS: CorsOptions;
+    CORS_OPTIONS: FastifyCorsOptions;
     FRONTEND_URL: string;
     JWT_ACCESS_SECRET: string;
     JWT_REFRESH_SECRET: string;
@@ -85,7 +85,7 @@ export function loadEnv(): AppEnv {
         parsed.CORS_ORIGINS.trim() === "*"
             ? "*"
             : parsed.CORS_ORIGINS.split(",").map((s) => s.trim());
-    const corsOptions: CorsOptions = { origin: origins };
+    const corsOptions: FastifyCorsOptions = { origin: origins };
 
     _env = {
         PORT: parsed.PORT,

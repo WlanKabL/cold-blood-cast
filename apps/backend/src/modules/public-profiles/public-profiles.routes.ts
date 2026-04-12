@@ -75,7 +75,11 @@ export async function publicProfileRoutes(app: FastifyInstance) {
         authApp.post("/", async (request, reply) => {
             const result = CreateProfileSchema.safeParse(request.body);
             if (!result.success) {
-                throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid profile data", result.error.flatten());
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Invalid profile data",
+                    result.error.flatten(),
+                );
             }
             const data = await createProfile(request.userId, result.data);
             return reply.status(201).send({ success: true, data });
@@ -85,17 +89,24 @@ export async function publicProfileRoutes(app: FastifyInstance) {
         authApp.patch("/:petId", async (request: FastifyRequest<{ Params: { petId: string } }>) => {
             const result = UpdateProfileSchema.safeParse(request.body);
             if (!result.success) {
-                throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid profile data", result.error.flatten());
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Invalid profile data",
+                    result.error.flatten(),
+                );
             }
             const data = await updateProfile(request.params.petId, request.userId, result.data);
             return { success: true, data };
         });
 
         // DELETE /:petId — delete public profile
-        authApp.delete("/:petId", async (request: FastifyRequest<{ Params: { petId: string } }>, reply) => {
-            await deleteProfile(request.params.petId, request.userId);
-            return reply.status(204).send();
-        });
+        authApp.delete(
+            "/:petId",
+            async (request: FastifyRequest<{ Params: { petId: string } }>, reply) => {
+                await deleteProfile(request.params.petId, request.userId);
+                return reply.status(204).send();
+            },
+        );
 
         // GET /slug-check/:slug — check slug availability
         authApp.get(
@@ -112,13 +123,10 @@ export async function publicProfileRoutes(app: FastifyInstance) {
 
 export async function publicPetRoutes(app: FastifyInstance) {
     // GET /:slug — public pet profile data
-    app.get(
-        "/:slug",
-        async (request: FastifyRequest<{ Params: { slug: string } }>) => {
-            const data = await getPublicPetData(request.params.slug);
-            return { success: true, data };
-        },
-    );
+    app.get("/:slug", async (request: FastifyRequest<{ Params: { slug: string } }>) => {
+        const data = await getPublicPetData(request.params.slug);
+        return { success: true, data };
+    });
 
     // GET /:slug/photos/:photoId — serve photo publicly
     app.get(

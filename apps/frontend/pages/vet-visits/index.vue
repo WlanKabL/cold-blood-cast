@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.vetVisits.title") }}
@@ -14,7 +16,7 @@
         </div>
 
         <!-- Cost Summary -->
-        <div v-if="costs" class="glass-card rounded-xl p-5">
+        <div v-if="costs" class="glass-card stat-card animate-fade-in-up rounded-xl p-5 delay-75">
             <div class="flex items-center gap-3">
                 <div
                     class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400"
@@ -68,7 +70,7 @@
         </div>
 
         <!-- List -->
-        <div v-else-if="visits?.length" class="space-y-2">
+        <div v-else-if="visits?.length" class="animate-fade-in-up space-y-2 delay-200">
             <NuxtLink
                 v-for="visit in visits"
                 :key="visit.id"

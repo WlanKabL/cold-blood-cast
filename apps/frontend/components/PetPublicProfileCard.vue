@@ -8,9 +8,7 @@
             <span
                 v-if="profile"
                 :class="
-                    profile.active
-                        ? 'bg-green-500/10 text-green-400'
-                        : 'bg-white/5 text-fg-faint'
+                    profile.active ? 'bg-green-500/10 text-green-400' : 'text-fg-faint bg-white/5'
                 "
                 class="rounded-md px-2 py-0.5 text-xs font-medium"
             >
@@ -84,11 +82,7 @@
                     {{ $t("pages.pets.publicProfile.slug") }}
                 </label>
                 <div class="flex items-center gap-2">
-                    <UiTextInput
-                        v-model="slugInput"
-                        class="flex-1"
-                        :placeholder="profile.slug"
-                    />
+                    <UiTextInput v-model="slugInput" class="flex-1" :placeholder="profile.slug" />
                     <UiButton
                         size="sm"
                         :loading="updating"
@@ -140,7 +134,9 @@
                             <span class="text-fg text-sm">{{ toggle.label }}</span>
                         </div>
                         <UiToggle
-                            :model-value="(profile as Record<string, unknown>)[toggle.key] as boolean"
+                            :model-value="
+                                (profile as Record<string, unknown>)[toggle.key] as boolean
+                            "
                             :loading="updating"
                             @update:model-value="
                                 (val: boolean) => handleUpdate({ [toggle.key]: val })
@@ -214,7 +210,7 @@
                     {{ $t("pages.pets.publicProfile.embedDescription") }}
                 </p>
                 <div class="bg-surface-raised rounded-lg p-3">
-                    <code class="text-primary-400 break-all text-xs">{{ embedCode }}</code>
+                    <code class="text-primary-400 text-xs break-all">{{ embedCode }}</code>
                 </div>
                 <UiButton icon="lucide:copy" @click="copyEmbed">
                     {{ embedCopied ? $t("common.copied") : $t("common.copy") }}
@@ -293,9 +289,7 @@ const qrCanvas = ref<HTMLCanvasElement>();
 
 const frontendUrl = config.public.appBaseURL || window.location.origin;
 
-const publicUrl = computed(() =>
-    profile.value ? `${frontendUrl}/p/${profile.value.slug}` : "",
-);
+const publicUrl = computed(() => (profile.value ? `${frontendUrl}/p/${profile.value.slug}` : ""));
 
 const embedUrl = computed(() =>
     profile.value ? `${frontendUrl}/p/${profile.value.slug}/embed` : "",
@@ -345,10 +339,7 @@ const visibilityToggles = computed(() => [
 ]);
 
 // ── Data ─────────────────────────────────────────────────
-const {
-    data: profile,
-    isLoading: loading,
-} = useQuery({
+const { data: profile, isLoading: loading } = useQuery({
     queryKey: ["public-profile", props.petId],
     queryFn: async () => {
         try {

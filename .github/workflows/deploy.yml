@@ -1,0 +1,130 @@
+name: Deploy
+
+on:
+    workflow_dispatch:
+        inputs:
+            ref:
+                description: "Branch or tag to deploy (used for build)"
+                required: true
+                default: "main"
+                type: string
+            image_tag:
+                description: "Docker image tag to deploy (e.g. 1.0.0, latest). If empty, builds fresh from ref. Use an older tag to rollback."
+                required: false
+                default: ""
+                type: string
+            environment:
+                description: "Target environment"
+                required: true
+                default: "production"
+                type: choice
+                options:
+                    - production
+
+concurrency:
+    group: deploy-${{ inputs.environment }}
+    cancel-in-progress: false
+
+env:
+    REGISTRY: ghcr.io
+    BACKEND_IMAGE: ghcr.io/wlankabl/cold-blood-cast/backend
+    FRONTEND_IMAGE: ghcr.io/wlankabl/cold-blood-cast/frontend
+
+jobs:
+    build-and-push:
+        name: Build & Push Images
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        if: ${{ inputs.image_tag == '' }}
+        environment: ${{ inputs.environment }}
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
+
+            - name: Log in to GHCR
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Docker meta (backend)
+              id: meta-backend
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.BACKEND_IMAGE }}
+                  tags: |
+                      type=sha,prefix=
+                      type=raw,value=latest
+
+            - name: Build & push backend
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: apps/backend/Dockerfile
+                  push: true
+                  tags: ${{ steps.meta-backend.outputs.tags }}
+                  labels: ${{ steps.meta-backend.outputs.labels }}
+                  cache-from: type=gha,scope=backend
+                  cache-to: type=gha,mode=max,scope=backend
+
+            - name: Docker meta (frontend)
+              id: meta-frontend
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.FRONTEND_IMAGE }}
+                  tags: |
+                      type=sha,prefix=
+                      type=raw,value=latest
+
+            - name: Build & push frontend
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: apps/frontend/Dockerfile
+                  push: true
+                  tags: ${{ steps.meta-frontend.outputs.tags }}
+                  labels: ${{ steps.meta-frontend.outputs.labels }}
+                  build-args: |
+                      BASE_URL=${{ secrets.BASE_URL }}
+                      API_BASE_URL=${{ secrets.API_BASE_URL }}
+                      SITE_URL=${{ secrets.SITE_URL }}
+                  cache-from: type=gha,scope=frontend
+                  cache-to: type=gha,mode=max,scope=frontend
+
+    deploy:
+        name: Deploy to ${{ inputs.environment }}
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        needs: build-and-push
+        if: ${{ !cancelled() && (needs.build-and-push.result == 'success' || needs.build-and-push.result == 'skipped') }}
+        environment: ${{ inputs.environment }}
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
+
+            - name: Run deploy script
+              env:
+                  ACTION: deploy
+                  DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+                  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+                  DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+                  DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+                  GHCR_USER: ${{ secrets.GHCR_USER }}
+                  GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+                  DOTENV_RAW: ${{ secrets.DOTENV }}
+                  BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
+                  FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
+                  DEPLOY_TAG: ${{ inputs.image_tag || 'latest' }}
+                  COMPOSE_FILE: docker-compose.${{ inputs.environment }}.yml
+              run: bash .github/scripts/deploy.sh

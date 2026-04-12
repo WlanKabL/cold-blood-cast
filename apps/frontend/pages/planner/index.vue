@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-7xl space-y-6 p-6">
         <!-- Page Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.planner.title") }}
@@ -48,27 +50,30 @@
             <!-- Week Summary Stats -->
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div class="glass-card rounded-xl p-4">
-                    <p class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                    <p class="text-fg-faint text-xs font-medium tracking-wider uppercase">
                         {{ $t("pages.planner.stats.total") }}
                     </p>
                     <p class="text-fg mt-1 text-2xl font-bold">{{ totalEvents }}</p>
                 </div>
                 <div class="glass-card rounded-xl p-4">
-                    <p class="text-xs font-medium uppercase tracking-wider text-red-400">
+                    <p class="text-xs font-medium tracking-wider text-red-400 uppercase">
                         {{ $t("pages.planner.stats.overdue") }}
                     </p>
-                    <p class="mt-1 text-2xl font-bold" :class="overdueCount > 0 ? 'text-red-400' : 'text-fg'">
+                    <p
+                        class="mt-1 text-2xl font-bold"
+                        :class="overdueCount > 0 ? 'text-red-400' : 'text-fg'"
+                    >
                         {{ overdueCount }}
                     </p>
                 </div>
                 <div class="glass-card rounded-xl p-4">
-                    <p class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                    <p class="text-fg-faint text-xs font-medium tracking-wider uppercase">
                         {{ $t("pages.planner.stats.busiest") }}
                     </p>
                     <p class="text-fg mt-1 text-sm font-semibold">{{ busiestDayLabel || "—" }}</p>
                 </div>
                 <div class="glass-card rounded-xl p-4">
-                    <p class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                    <p class="text-fg-faint text-xs font-medium tracking-wider uppercase">
                         {{ $t("pages.planner.stats.types") }}
                     </p>
                     <div class="mt-1.5 flex items-center gap-2">
@@ -81,7 +86,9 @@
                                 {{ t.count }}
                             </span>
                         </template>
-                        <span v-if="activeTypeCounts.length === 0" class="text-fg-faint text-sm">—</span>
+                        <span v-if="activeTypeCounts.length === 0" class="text-fg-faint text-sm"
+                            >—</span
+                        >
                     </div>
                 </div>
             </div>
@@ -98,12 +105,16 @@
                         >
                             <div
                                 class="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl"
-                                :class="isToday(day.date) ? 'bg-primary-500 text-white' : 'bg-surface text-fg'"
+                                :class="
+                                    isToday(day.date)
+                                        ? 'bg-primary-500 text-white'
+                                        : 'bg-surface text-fg'
+                                "
                             >
-                                <span class="text-[10px] font-semibold uppercase leading-none">
+                                <span class="text-[10px] leading-none font-semibold uppercase">
                                     {{ formatDayName(day.date) }}
                                 </span>
-                                <span class="text-lg font-bold leading-none">
+                                <span class="text-lg leading-none font-bold">
                                     {{ formatDayNumber(day.date) }}
                                 </span>
                             </div>
@@ -113,14 +124,20 @@
                                     :class="isToday(day.date) ? 'text-primary-400' : 'text-fg'"
                                 >
                                     {{ formatFullDate(day.date) }}
-                                    <span v-if="isToday(day.date)" class="text-primary-400 ml-1.5 text-xs font-normal">
+                                    <span
+                                        v-if="isToday(day.date)"
+                                        class="text-primary-400 ml-1.5 text-xs font-normal"
+                                    >
                                         {{ $t("pages.planner.todayBadge") }}
                                     </span>
                                 </p>
                                 <p class="text-fg-faint text-xs">
-                                    {{ day.events.length > 0
-                                        ? $t("pages.planner.eventCount", { n: day.events.length })
-                                        : $t("pages.planner.noTasks")
+                                    {{
+                                        day.events.length > 0
+                                            ? $t("pages.planner.eventCount", {
+                                                  n: day.events.length,
+                                              })
+                                            : $t("pages.planner.noTasks")
                                     }}
                                 </p>
                             </div>
@@ -132,7 +149,11 @@
                                 v-for="event in day.events"
                                 :key="event.id"
                                 class="glass-card flex w-full items-start gap-3 rounded-xl p-4 text-left transition-all hover:ring-1 hover:ring-white/10"
-                                :class="selectedEvent?.id === event.id ? 'ring-1 ring-primary-500/40' : ''"
+                                :class="
+                                    selectedEvent?.id === event.id
+                                        ? 'ring-primary-500/40 ring-1'
+                                        : ''
+                                "
                                 @click="selectEvent(event, day.date)"
                             >
                                 <div
@@ -143,12 +164,18 @@
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-2">
-                                        <p class="text-fg text-sm font-semibold">{{ event.title }}</p>
+                                        <p class="text-fg text-sm font-semibold">
+                                            {{ resolveEventTitle(event) }}
+                                        </p>
                                         <span
                                             class="rounded-full px-2 py-0.5 text-[10px] font-medium"
                                             :class="eventBadgeClass(event.type)"
                                         >
-                                            {{ $t(`pages.planner.legend.${eventTypeKey(event.type)}`) }}
+                                            {{
+                                                $t(
+                                                    `pages.planner.legend.${eventTypeKey(event.type)}`,
+                                                )
+                                            }}
                                         </span>
                                         <span
                                             v-if="event.meta?.isOverdue"
@@ -161,25 +188,36 @@
                                     <p v-if="event.detail" class="text-fg-muted mt-0.5 text-xs">
                                         {{ event.detail }}
                                     </p>
-                                    <p v-if="event.petName || event.enclosureName" class="text-fg-faint mt-1 flex items-center gap-3 text-xs">
+                                    <p
+                                        v-if="event.petName || event.enclosureName"
+                                        class="text-fg-faint mt-1 flex items-center gap-3 text-xs"
+                                    >
                                         <span v-if="event.petName" class="flex items-center gap-1">
                                             <Icon name="lucide:heart" class="h-3 w-3" />
                                             {{ event.petName }}
                                         </span>
-                                        <span v-if="event.enclosureName" class="flex items-center gap-1">
+                                        <span
+                                            v-if="event.enclosureName"
+                                            class="flex items-center gap-1"
+                                        >
                                             <Icon name="lucide:box" class="h-3 w-3" />
                                             {{ event.enclosureName }}
                                         </span>
                                     </p>
                                 </div>
-                                <Icon name="lucide:chevron-right" class="text-fg-faint mt-1 h-4 w-4 shrink-0" />
+                                <Icon
+                                    name="lucide:chevron-right"
+                                    class="text-fg-faint mt-1 h-4 w-4 shrink-0"
+                                />
                             </button>
                         </div>
 
                         <!-- Empty Day -->
                         <div v-else class="ml-15">
                             <div class="border-line rounded-xl border border-dashed px-4 py-3">
-                                <p class="text-fg-faint text-xs">{{ $t("pages.planner.noTasks") }}</p>
+                                <p class="text-fg-faint text-xs">
+                                    {{ $t("pages.planner.noTasks") }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -196,17 +234,24 @@
                                         class="flex h-10 w-10 items-center justify-center rounded-lg"
                                         :class="eventIconBgClass(selectedEvent.type)"
                                     >
-                                        <Icon :name="eventIcon(selectedEvent.type)" class="h-5 w-5" />
+                                        <Icon
+                                            :name="eventIcon(selectedEvent.type)"
+                                            class="h-5 w-5"
+                                        />
                                     </div>
                                     <div>
                                         <h3 class="text-fg text-[16px] font-semibold">
-                                            {{ selectedEvent.title }}
+                                            {{ resolveEventTitle(selectedEvent) }}
                                         </h3>
                                         <span
                                             class="rounded-full px-2 py-0.5 text-[10px] font-medium"
                                             :class="eventBadgeClass(selectedEvent.type)"
                                         >
-                                            {{ $t(`pages.planner.legend.${eventTypeKey(selectedEvent.type)}`) }}
+                                            {{
+                                                $t(
+                                                    `pages.planner.legend.${eventTypeKey(selectedEvent.type)}`,
+                                                )
+                                            }}
                                         </span>
                                     </div>
                                 </div>
@@ -221,76 +266,116 @@
                             <!-- Details List -->
                             <dl class="space-y-3">
                                 <div v-if="selectedEventDate">
-                                    <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                    <dt
+                                        class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                    >
                                         {{ $t("pages.planner.detail.date") }}
                                     </dt>
                                     <dd class="text-fg mt-0.5 text-sm">{{ selectedEventDate }}</dd>
                                 </div>
                                 <div v-if="selectedEvent.detail">
-                                    <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                    <dt
+                                        class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                    >
                                         {{ $t("pages.planner.detail.info") }}
                                     </dt>
-                                    <dd class="text-fg mt-0.5 text-sm">{{ selectedEvent.detail }}</dd>
+                                    <dd class="text-fg mt-0.5 text-sm">
+                                        {{ selectedEvent.detail }}
+                                    </dd>
                                 </div>
                                 <div v-if="selectedEvent.petName">
-                                    <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                    <dt
+                                        class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                    >
                                         {{ $t("pages.planner.detail.pet") }}
                                     </dt>
-                                    <dd class="text-fg mt-0.5 text-sm">{{ selectedEvent.petName }}</dd>
+                                    <dd class="text-fg mt-0.5 text-sm">
+                                        {{ selectedEvent.petName }}
+                                    </dd>
                                 </div>
                                 <div v-if="selectedEvent.enclosureName">
-                                    <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                    <dt
+                                        class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                    >
                                         {{ $t("pages.planner.detail.enclosure") }}
                                     </dt>
-                                    <dd class="text-fg mt-0.5 text-sm">{{ selectedEvent.enclosureName }}</dd>
+                                    <dd class="text-fg mt-0.5 text-sm">
+                                        {{ selectedEvent.enclosureName }}
+                                    </dd>
                                 </div>
 
                                 <!-- Type-specific meta -->
                                 <template v-if="selectedEvent.type === 'feeding'">
                                     <div v-if="selectedEvent.meta?.status">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.status") }}
                                         </dt>
                                         <dd class="mt-0.5">
                                             <span
                                                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
-                                                :class="feedingStatusClass(selectedEvent.meta.status as string)"
+                                                :class="
+                                                    feedingStatusClass(
+                                                        selectedEvent.meta.status as string,
+                                                    )
+                                                "
                                             >
-                                                {{ $t(`pages.planner.detail.feedingStatus.${selectedEvent.meta.status}`) }}
+                                                {{
+                                                    $t(
+                                                        `pages.planner.detail.feedingStatus.${selectedEvent.meta.status}`,
+                                                    )
+                                                }}
                                             </span>
                                         </dd>
                                     </div>
                                     <div v-if="selectedEvent.meta?.intervalMin">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.interval") }}
                                         </dt>
                                         <dd class="text-fg mt-0.5 text-sm">
-                                            {{ selectedEvent.meta.intervalMin }}–{{ selectedEvent.meta.intervalMax }} {{ $t("pages.planner.detail.days") }}
+                                            {{ selectedEvent.meta.intervalMin }}–{{
+                                                selectedEvent.meta.intervalMax
+                                            }}
+                                            {{ $t("pages.planner.detail.days") }}
                                         </dd>
                                     </div>
                                 </template>
 
                                 <template v-if="selectedEvent.type === 'vet_visit'">
                                     <div v-if="selectedEvent.meta?.vetName">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.veterinarian") }}
                                         </dt>
                                         <dd class="text-fg mt-0.5 text-sm">
                                             {{ selectedEvent.meta.vetName }}
-                                            <span v-if="selectedEvent.meta.clinicName" class="text-fg-muted">
+                                            <span
+                                                v-if="selectedEvent.meta.clinicName"
+                                                class="text-fg-muted"
+                                            >
                                                 · {{ selectedEvent.meta.clinicName }}
                                             </span>
                                         </dd>
                                     </div>
                                     <div v-if="selectedEvent.meta?.reason">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.reason") }}
                                         </dt>
-                                        <dd class="text-fg mt-0.5 text-sm">{{ selectedEvent.meta.reason }}</dd>
+                                        <dd class="text-fg mt-0.5 text-sm">
+                                            {{ selectedEvent.meta.reason }}
+                                        </dd>
                                     </div>
                                     <div v-if="selectedEvent.meta?.isFollowUp">
                                         <dd class="mt-0.5">
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-400">
+                                            <span
+                                                class="inline-flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-400"
+                                            >
                                                 <Icon name="lucide:repeat" class="h-3 w-3" />
                                                 {{ $t("pages.planner.detail.followUp") }}
                                             </span>
@@ -300,46 +385,66 @@
 
                                 <template v-if="selectedEvent.type === 'shedding'">
                                     <div v-if="selectedEvent.meta?.averageInterval">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.avgCycle") }}
                                         </dt>
                                         <dd class="text-fg mt-0.5 text-sm">
-                                            ~{{ selectedEvent.meta.averageInterval }} {{ $t("pages.planner.detail.days") }}
+                                            ~{{ selectedEvent.meta.averageInterval }}
+                                            {{ $t("pages.planner.detail.days") }}
                                         </dd>
                                     </div>
                                     <div v-if="selectedEvent.meta?.trend">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.trend") }}
                                         </dt>
                                         <dd class="text-fg mt-0.5 text-sm capitalize">
-                                            {{ $t(`pages.planner.detail.trends.${selectedEvent.meta.trend}`) }}
+                                            {{
+                                                $t(
+                                                    `pages.planner.detail.trends.${selectedEvent.meta.trend}`,
+                                                )
+                                            }}
                                         </dd>
                                     </div>
                                 </template>
 
                                 <template v-if="selectedEvent.type === 'maintenance'">
                                     <div v-if="selectedEvent.meta?.maintenanceType">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.taskType") }}
                                         </dt>
                                         <dd class="text-fg mt-0.5 text-sm">
-                                            {{ $t(`pages.maintenance.types.${selectedEvent.meta.maintenanceType}`) }}
+                                            {{
+                                                $t(
+                                                    `pages.maintenance.types.${selectedEvent.meta.maintenanceType}`,
+                                                )
+                                            }}
                                         </dd>
                                     </div>
                                     <div v-if="selectedEvent.meta?.recurring !== undefined">
-                                        <dt class="text-fg-faint text-xs font-medium uppercase tracking-wider">
+                                        <dt
+                                            class="text-fg-faint text-xs font-medium tracking-wider uppercase"
+                                        >
                                             {{ $t("pages.planner.detail.schedule") }}
                                         </dt>
                                         <dd class="text-fg mt-0.5 text-sm">
-                                            {{ selectedEvent.meta.recurring
-                                                ? $t("pages.maintenance.recurring")
-                                                : $t("pages.maintenance.oneTime")
+                                            {{
+                                                selectedEvent.meta.recurring
+                                                    ? $t("pages.maintenance.recurring")
+                                                    : $t("pages.maintenance.oneTime")
                                             }}
                                         </dd>
                                     </div>
                                     <div v-if="selectedEvent.meta?.isOverdue">
                                         <dd>
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400">
+                                            <span
+                                                class="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                                            >
                                                 <Icon name="lucide:alert-circle" class="h-3 w-3" />
                                                 {{ $t("pages.planner.overdue") }}
                                             </span>
@@ -361,13 +466,20 @@
 
                         <!-- No Selection Hint -->
                         <div v-else class="glass-card rounded-xl p-6 text-center">
-                            <Icon name="lucide:pointer" class="text-fg-faint mx-auto mb-3 h-8 w-8" />
-                            <p class="text-fg-muted text-sm">{{ $t("pages.planner.detail.hint") }}</p>
+                            <Icon
+                                name="lucide:pointer"
+                                class="text-fg-faint mx-auto mb-3 h-8 w-8"
+                            />
+                            <p class="text-fg-muted text-sm">
+                                {{ $t("pages.planner.detail.hint") }}
+                            </p>
                         </div>
 
                         <!-- Legend -->
                         <div class="glass-card rounded-xl p-4">
-                            <p class="text-fg-faint mb-2.5 text-xs font-medium uppercase tracking-wider">
+                            <p
+                                class="text-fg-faint mb-2.5 text-xs font-medium tracking-wider uppercase"
+                            >
                                 {{ $t("pages.planner.legendTitle") }}
                             </p>
                             <div class="space-y-2">
@@ -376,7 +488,10 @@
                                     :key="type.key"
                                     class="flex items-center gap-2 text-xs"
                                 >
-                                    <div class="flex h-6 w-6 items-center justify-center rounded" :class="type.bgClass">
+                                    <div
+                                        class="flex h-6 w-6 items-center justify-center rounded"
+                                        :class="type.bgClass"
+                                    >
                                         <Icon :name="type.icon" class="h-3.5 w-3.5" />
                                     </div>
                                     <span class="text-fg-muted">{{ $t(type.label) }}</span>
@@ -432,40 +547,72 @@
                             <dd class="text-fg font-medium">{{ selectedEvent.petName }}</dd>
                         </div>
                         <div v-if="selectedEvent.enclosureName" class="flex justify-between">
-                            <dt class="text-fg-muted">{{ $t("pages.planner.detail.enclosure") }}</dt>
+                            <dt class="text-fg-muted">
+                                {{ $t("pages.planner.detail.enclosure") }}
+                            </dt>
                             <dd class="text-fg font-medium">{{ selectedEvent.enclosureName }}</dd>
                         </div>
 
                         <!-- Feeding meta -->
-                        <div v-if="selectedEvent.type === 'feeding' && selectedEvent.meta?.status" class="flex justify-between">
+                        <div
+                            v-if="selectedEvent.type === 'feeding' && selectedEvent.meta?.status"
+                            class="flex justify-between"
+                        >
                             <dt class="text-fg-muted">{{ $t("pages.planner.detail.status") }}</dt>
                             <dd>
                                 <span
                                     class="rounded-full px-2 py-0.5 text-xs font-medium"
                                     :class="feedingStatusClass(selectedEvent.meta.status as string)"
                                 >
-                                    {{ $t(`pages.planner.detail.feedingStatus.${selectedEvent.meta.status}`) }}
+                                    {{
+                                        $t(
+                                            `pages.planner.detail.feedingStatus.${selectedEvent.meta.status}`,
+                                        )
+                                    }}
                                 </span>
                             </dd>
                         </div>
 
                         <!-- Vet meta -->
-                        <div v-if="selectedEvent.type === 'vet_visit' && selectedEvent.meta?.vetName" class="flex justify-between">
-                            <dt class="text-fg-muted">{{ $t("pages.planner.detail.veterinarian") }}</dt>
+                        <div
+                            v-if="selectedEvent.type === 'vet_visit' && selectedEvent.meta?.vetName"
+                            class="flex justify-between"
+                        >
+                            <dt class="text-fg-muted">
+                                {{ $t("pages.planner.detail.veterinarian") }}
+                            </dt>
                             <dd class="text-fg font-medium">{{ selectedEvent.meta.vetName }}</dd>
                         </div>
 
                         <!-- Shedding meta -->
-                        <div v-if="selectedEvent.type === 'shedding' && selectedEvent.meta?.averageInterval" class="flex justify-between">
+                        <div
+                            v-if="
+                                selectedEvent.type === 'shedding' &&
+                                selectedEvent.meta?.averageInterval
+                            "
+                            class="flex justify-between"
+                        >
                             <dt class="text-fg-muted">{{ $t("pages.planner.detail.avgCycle") }}</dt>
-                            <dd class="text-fg font-medium">~{{ selectedEvent.meta.averageInterval }}d</dd>
+                            <dd class="text-fg font-medium">
+                                ~{{ selectedEvent.meta.averageInterval }}d
+                            </dd>
                         </div>
 
                         <!-- Maintenance meta -->
-                        <div v-if="selectedEvent.type === 'maintenance' && selectedEvent.meta?.maintenanceType" class="flex justify-between">
+                        <div
+                            v-if="
+                                selectedEvent.type === 'maintenance' &&
+                                selectedEvent.meta?.maintenanceType
+                            "
+                            class="flex justify-between"
+                        >
                             <dt class="text-fg-muted">{{ $t("pages.planner.detail.taskType") }}</dt>
                             <dd class="text-fg font-medium">
-                                {{ $t(`pages.maintenance.types.${selectedEvent.meta.maintenanceType}`) }}
+                                {{
+                                    $t(
+                                        `pages.maintenance.types.${selectedEvent.meta.maintenanceType}`,
+                                    )
+                                }}
                             </dd>
                         </div>
                     </dl>
@@ -582,15 +729,12 @@ const {
 });
 
 // ── Summary Stats ──
-const totalEvents = computed(() =>
-    days.value?.reduce((sum, d) => sum + d.events.length, 0) ?? 0,
-);
+const totalEvents = computed(() => days.value?.reduce((sum, d) => sum + d.events.length, 0) ?? 0);
 
-const overdueCount = computed(() =>
-    days.value?.reduce(
-        (sum, d) => sum + d.events.filter((e) => e.meta?.isOverdue).length,
+const overdueCount = computed(
+    () =>
+        days.value?.reduce((sum, d) => sum + d.events.filter((e) => e.meta?.isOverdue).length, 0) ??
         0,
-    ) ?? 0,
 );
 
 const busiestDayLabel = computed(() => {
@@ -723,6 +867,19 @@ function eventTypeKey(type: string): string {
     return keys[type] ?? type;
 }
 
+function resolveEventTitle(event: PlannerEvent): string {
+    if (event.type === "maintenance" && event.meta?.maintenanceType) {
+        const typeKey = `pages.maintenance.types.${event.meta.maintenanceType}`;
+        const localized = t(typeKey);
+        if (localized !== typeKey) {
+            return event.title !== event.meta.maintenanceType
+                ? `${event.title} — ${localized}`
+                : localized;
+        }
+    }
+    return event.title;
+}
+
 function feedingStatusClass(status: string): string {
     const classes: Record<string, string> = {
         ok: "bg-green-500/10 text-green-400",
@@ -733,9 +890,29 @@ function feedingStatusClass(status: string): string {
 }
 
 const eventTypes = [
-    { key: "feeding", bgClass: "bg-amber-500/10 text-amber-400", icon: "lucide:utensils", label: "pages.planner.legend.feeding" },
-    { key: "vet_visit", bgClass: "bg-teal-500/10 text-teal-400", icon: "lucide:stethoscope", label: "pages.planner.legend.vetVisit" },
-    { key: "shedding", bgClass: "bg-violet-500/10 text-violet-400", icon: "lucide:layers", label: "pages.planner.legend.shedding" },
-    { key: "maintenance", bgClass: "bg-blue-500/10 text-blue-400", icon: "lucide:wrench", label: "pages.planner.legend.maintenance" },
+    {
+        key: "feeding",
+        bgClass: "bg-amber-500/10 text-amber-400",
+        icon: "lucide:utensils",
+        label: "pages.planner.legend.feeding",
+    },
+    {
+        key: "vet_visit",
+        bgClass: "bg-teal-500/10 text-teal-400",
+        icon: "lucide:stethoscope",
+        label: "pages.planner.legend.vetVisit",
+    },
+    {
+        key: "shedding",
+        bgClass: "bg-violet-500/10 text-violet-400",
+        icon: "lucide:layers",
+        label: "pages.planner.legend.shedding",
+    },
+    {
+        key: "maintenance",
+        bgClass: "bg-blue-500/10 text-blue-400",
+        icon: "lucide:wrench",
+        label: "pages.planner.legend.maintenance",
+    },
 ];
 </script>

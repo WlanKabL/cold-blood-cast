@@ -1,305 +1,376 @@
 <template>
-    <div class="space-y-6">
-        <h1 class="text-fg text-2xl font-bold tracking-tight">{{ $t("nav.settings") }}</h1>
+    <div class="mx-auto max-w-7xl space-y-6 p-6">
+        <h1 class="animate-fade-in-up text-fg text-2xl font-bold tracking-tight">
+            {{ $t("nav.settings") }}
+        </h1>
 
-        <!-- Appearance -->
-        <div class="glass-card p-6">
-            <h2 class="text-fg mb-4 text-[15px] font-semibold">
-                {{ $t("pages.settings.appearance") }}
-            </h2>
-            <div class="space-y-4">
-                <!-- Theme -->
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-fg text-[13px] font-medium">
-                            {{ $t("pages.settings.theme") }}
-                        </p>
-                        <p class="text-fg-muted text-[12px]">
-                            {{
-                                settings.isDarkMode
-                                    ? $t("pages.settings.darkMode")
-                                    : $t("pages.settings.lightMode")
-                            }}
-                        </p>
+        <UiTabs v-model="activeTab" :tabs="settingsTabs">
+            <!-- General Tab -->
+            <div v-if="activeTab === 'general'" class="space-y-6">
+                <!-- Appearance -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.appearance") }}
+                    </h2>
+                    <div class="space-y-4">
+                        <!-- Theme -->
+                        <div
+                            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div>
+                                <p class="text-fg text-[13px] font-medium">
+                                    {{ $t("pages.settings.theme") }}
+                                </p>
+                                <p class="text-fg-muted text-[12px]">
+                                    {{
+                                        settings.isDarkMode
+                                            ? $t("pages.settings.darkMode")
+                                            : $t("pages.settings.lightMode")
+                                    }}
+                                </p>
+                            </div>
+                            <button
+                                class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg rounded-xl border px-4 py-2 text-[13px] transition-all duration-200"
+                                @click="settings.toggleTheme()"
+                            >
+                                <Icon
+                                    :name="settings.isDarkMode ? 'lucide:sun' : 'lucide:moon'"
+                                    class="mr-2 inline h-4 w-4"
+                                />
+                                {{
+                                    settings.isDarkMode
+                                        ? $t("pages.settings.lightMode")
+                                        : $t("pages.settings.darkMode")
+                                }}
+                            </button>
+                        </div>
+
+                        <!-- Language -->
+                        <div
+                            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div>
+                                <p class="text-fg text-[13px] font-medium">
+                                    {{ $t("pages.settings.language") }}
+                                </p>
+                                <p class="text-fg-muted text-[12px]">
+                                    {{ settings.currentLocale === "de" ? "Deutsch" : "English" }}
+                                </p>
+                            </div>
+                            <button
+                                class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg rounded-xl border px-4 py-2 text-[13px] transition-all duration-200"
+                                @click="toggleLocale"
+                            >
+                                {{ settings.currentLocale === "en" ? "Deutsch" : "English" }}
+                            </button>
+                        </div>
                     </div>
-                    <button
-                        class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg rounded-xl border px-4 py-2 text-[13px] transition-all duration-200"
-                        @click="settings.toggleTheme()"
-                    >
-                        <Icon
-                            :name="settings.isDarkMode ? 'lucide:sun' : 'lucide:moon'"
-                            class="mr-2 inline h-4 w-4"
-                        />
-                        {{
-                            settings.isDarkMode
-                                ? $t("pages.settings.lightMode")
-                                : $t("pages.settings.darkMode")
-                        }}
-                    </button>
                 </div>
 
-                <!-- Language -->
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-fg text-[13px] font-medium">
-                            {{ $t("pages.settings.language") }}
+                <!-- Account Info -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.account") }}
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-[13px]">
+                            <span class="text-fg-muted">{{ $t("pages.settings.username") }}</span>
+                            <span class="text-fg">{{ authStore.user?.username }}</span>
+                        </div>
+                        <div class="flex justify-between text-[13px]">
+                            <span class="text-fg-muted">{{ $t("pages.settings.email") }}</span>
+                            <span class="text-fg">{{ authStore.user?.email }}</span>
+                        </div>
+
+                        <!-- Display Name -->
+                        <div class="border-line border-t pt-4">
+                            <label class="text-fg mb-1.5 block text-[13px] font-medium">
+                                {{ $t("pages.settings.displayName") }}
+                            </label>
+                            <p class="text-fg-muted mb-3 text-[12px]">
+                                {{ $t("pages.settings.displayNameHint") }}
+                            </p>
+                            <div class="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                                <input
+                                    v-model="displayName"
+                                    type="text"
+                                    maxlength="64"
+                                    :placeholder="
+                                        authStore.user?.username ?? $t('pages.settings.displayName')
+                                    "
+                                    class="border-line bg-surface text-fg focus:border-accent flex-1 rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
+                                />
+                                <button
+                                    :disabled="savingProfile || !displayNameChanged"
+                                    class="bg-accent hover:bg-accent/90 shrink-0 self-start rounded-xl px-5 py-2.5 text-[13px] font-medium text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                                    @click="saveDisplayName"
+                                >
+                                    <Icon
+                                        v-if="savingProfile"
+                                        name="lucide:loader-2"
+                                        class="mr-1.5 inline h-4 w-4 animate-spin"
+                                    />
+                                    {{
+                                        savingProfile
+                                            ? $t("pages.settings.saving")
+                                            : $t("pages.settings.save")
+                                    }}
+                                </button>
+                            </div>
+                            <p v-if="profileSuccess" class="mt-2 text-[12px] text-green-500">
+                                <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
+                                {{ $t("pages.settings.displayNameSaved") }}
+                            </p>
+                            <p v-if="profileError" class="mt-2 text-[12px] text-red-500">
+                                {{ profileError }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.notifications") }}
+                    </h2>
+                    <div class="space-y-4">
+                        <div
+                            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div>
+                                <p class="text-fg text-[13px] font-medium">
+                                    {{ $t("pages.settings.weeklyDigest") }}
+                                </p>
+                                <p class="text-fg-muted text-[12px]">
+                                    {{ $t("pages.settings.weeklyDigestHint") }}
+                                </p>
+                            </div>
+                            <button
+                                :disabled="savingDigest"
+                                class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                                @click="toggleWeeklyDigest"
+                            >
+                                <Icon
+                                    v-if="savingDigest"
+                                    name="lucide:loader-2"
+                                    class="mr-1.5 inline h-4 w-4 animate-spin"
+                                />
+                                <Icon
+                                    v-else
+                                    :name="weeklyDigestEnabled ? 'lucide:bell-off' : 'lucide:bell'"
+                                    class="mr-1.5 inline h-4 w-4"
+                                />
+                                {{
+                                    weeklyDigestEnabled
+                                        ? $t("pages.settings.weeklyDigestDisable")
+                                        : $t("pages.settings.weeklyDigestEnable")
+                                }}
+                            </button>
+                        </div>
+                        <p v-if="digestSuccess" class="text-[12px] text-green-500">
+                            <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
+                            {{ $t("pages.settings.weeklyDigestSaved") }}
                         </p>
-                        <p class="text-fg-muted text-[12px]">
-                            {{ settings.currentLocale === "de" ? "Deutsch" : "English" }}
+                        <p v-if="digestError" class="text-[12px] text-red-500">
+                            {{ digestError }}
                         </p>
                     </div>
-                    <button
-                        class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg rounded-xl border px-4 py-2 text-[13px] transition-all duration-200"
-                        @click="toggleLocale"
-                    >
-                        {{ settings.currentLocale === "en" ? "Deutsch" : "English" }}
-                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Account Info -->
-        <div class="glass-card p-6">
-            <h2 class="text-fg mb-4 text-[15px] font-semibold">
-                {{ $t("pages.settings.account") }}
-            </h2>
-            <div class="space-y-4">
-                <div class="flex justify-between text-[13px]">
-                    <span class="text-fg-muted">{{ $t("pages.settings.username") }}</span>
-                    <span class="text-fg">{{ authStore.user?.username }}</span>
-                </div>
-                <div class="flex justify-between text-[13px]">
-                    <span class="text-fg-muted">{{ $t("pages.settings.email") }}</span>
-                    <span class="text-fg">{{ authStore.user?.email }}</span>
+            <!-- Security Tab -->
+            <div v-if="activeTab === 'security'" class="space-y-6">
+                <!-- Password Reset -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.security") }}
+                    </h2>
+                    <div class="space-y-4">
+                        <div
+                            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div>
+                                <p class="text-fg text-[13px] font-medium">
+                                    {{ $t("pages.settings.password") }}
+                                </p>
+                                <p class="text-fg-muted text-[12px]">
+                                    {{ $t("pages.settings.passwordHint") }}
+                                </p>
+                            </div>
+                            <button
+                                :disabled="resetSending || resetSent"
+                                class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                                @click="requestPasswordChange"
+                            >
+                                <Icon
+                                    v-if="resetSending"
+                                    name="lucide:loader-2"
+                                    class="mr-1.5 inline h-4 w-4 animate-spin"
+                                />
+                                <Icon
+                                    v-else-if="resetSent"
+                                    name="lucide:check"
+                                    class="mr-1.5 inline h-4 w-4 text-green-500"
+                                />
+                                <Icon v-else name="lucide:mail" class="mr-1.5 inline h-4 w-4" />
+                                {{
+                                    resetSent
+                                        ? $t("pages.settings.resetSent")
+                                        : resetSending
+                                          ? $t("pages.settings.resetSending")
+                                          : $t("pages.settings.resetRequest")
+                                }}
+                            </button>
+                        </div>
+                        <p v-if="resetSent" class="text-[12px] text-green-500">
+                            <Icon name="lucide:info" class="mr-1 inline h-3.5 w-3.5" />
+                            {{ $t("pages.settings.resetSentHint") }}
+                        </p>
+                        <p v-if="resetError" class="text-[12px] text-red-500">
+                            {{ resetError }}
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Display Name -->
-                <div class="border-line border-t pt-4">
-                    <label class="text-fg mb-1.5 block text-[13px] font-medium">
-                        {{ $t("pages.settings.displayName") }}
-                    </label>
-                    <p class="text-fg-muted mb-3 text-[12px]">
-                        {{ $t("pages.settings.displayNameHint") }}
-                    </p>
-                    <div class="flex flex-col gap-2 sm:flex-row sm:gap-3">
-                        <input
-                            v-model="displayName"
-                            type="text"
-                            maxlength="64"
-                            :placeholder="
-                                authStore.user?.username ?? $t('pages.settings.displayName')
-                            "
-                            class="border-line bg-surface text-fg focus:border-accent flex-1 rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
-                        />
+                <!-- Cookie Preferences -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.cookiePreferences") }}
+                    </h2>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-fg text-[13px] font-medium">
+                                {{ $t("pages.settings.cookiePreferencesLabel") }}
+                            </p>
+                            <p class="text-fg-muted text-[12px]">
+                                {{ $t("pages.settings.cookiePreferencesHint") }}
+                            </p>
+                        </div>
                         <button
-                            :disabled="savingProfile || !displayNameChanged"
-                            class="bg-accent hover:bg-accent/90 shrink-0 self-start rounded-xl px-5 py-2.5 text-[13px] font-medium text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-                            @click="saveDisplayName"
+                            class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] font-medium transition-all duration-200 sm:self-auto"
+                            @click="revokeCookieConsent"
+                        >
+                            <Icon name="lucide:cookie" class="mr-1.5 inline h-4 w-4" />
+                            {{ $t("pages.settings.cookieRevoke") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Tab -->
+            <div v-if="activeTab === 'privacy'" class="space-y-6">
+                <!-- Data & Privacy (GDPR Export) -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.dataPrivacy") }}
+                    </h2>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-fg text-[13px] font-medium">
+                                {{ $t("pages.settings.exportData") }}
+                            </p>
+                            <p class="text-fg-muted text-[12px]">
+                                {{ $t("pages.settings.exportDataHint") }}
+                            </p>
+                        </div>
+                        <button
+                            :disabled="
+                                exportRequesting ||
+                                exportStatus?.status === 'pending' ||
+                                exportStatus?.status === 'processing'
+                            "
+                            class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                            @click="showExportDialog = true"
                         >
                             <Icon
-                                v-if="savingProfile"
+                                v-if="exportRequesting || exportStatus?.status === 'processing'"
                                 name="lucide:loader-2"
                                 class="mr-1.5 inline h-4 w-4 animate-spin"
                             />
+                            <Icon
+                                v-else-if="exportStatus?.status === 'ready'"
+                                name="lucide:check"
+                                class="mr-1.5 inline h-4 w-4 text-green-400"
+                            />
+                            <Icon v-else name="lucide:download" class="mr-1.5 inline h-4 w-4" />
                             {{
-                                savingProfile
-                                    ? $t("pages.settings.saving")
-                                    : $t("pages.settings.save")
+                                exportStatus?.status === "processing" ||
+                                exportStatus?.status === "pending"
+                                    ? $t("pages.settings.exportDataExporting")
+                                    : exportStatus?.status === "ready"
+                                      ? $t("pages.settings.exportDataReady")
+                                      : $t("pages.settings.exportData")
                             }}
                         </button>
                     </div>
-                    <p v-if="profileSuccess" class="mt-2 text-[12px] text-green-500">
-                        <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
-                        {{ $t("pages.settings.displayNameSaved") }}
-                    </p>
-                    <p v-if="profileError" class="mt-2 text-[12px] text-red-500">
-                        {{ profileError }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifications -->
-        <div class="glass-card p-6">
-            <h2 class="text-fg mb-4 text-[15px] font-semibold">
-                {{ $t("pages.settings.notifications") }}
-            </h2>
-            <div class="space-y-4">
-                <!-- Weekly Care Digest -->
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-fg text-[13px] font-medium">
-                            {{ $t("pages.settings.weeklyDigest") }}
-                        </p>
-                        <p class="text-fg-muted text-[12px]">
-                            {{ $t("pages.settings.weeklyDigestHint") }}
-                        </p>
-                    </div>
-                    <button
-                        :disabled="savingDigest"
-                        class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-                        @click="toggleWeeklyDigest"
+                    <p
+                        v-if="exportStatus?.status === 'ready' && exportStatus.expiresAt"
+                        class="mt-3 text-[12px] text-green-500"
                     >
-                        <Icon
-                            v-if="savingDigest"
-                            name="lucide:loader-2"
-                            class="mr-1.5 inline h-4 w-4 animate-spin"
-                        />
-                        <Icon
-                            v-else
-                            :name="weeklyDigestEnabled ? 'lucide:bell-off' : 'lucide:bell'"
-                            class="mr-1.5 inline h-4 w-4"
-                        />
-                        {{
-                            weeklyDigestEnabled
-                                ? $t("pages.settings.weeklyDigestDisable")
-                                : $t("pages.settings.weeklyDigestEnable")
-                        }}
-                    </button>
-                </div>
-                <p v-if="digestSuccess" class="text-[12px] text-green-500">
-                    <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
-                    {{ $t("pages.settings.weeklyDigestSaved") }}
-                </p>
-                <p v-if="digestError" class="text-[12px] text-red-500">
-                    {{ digestError }}
-                </p>
-            </div>
-        </div>
-
-        <!-- Security -->
-        <div class="glass-card p-6">
-            <h2 class="text-fg mb-4 text-[15px] font-semibold">
-                {{ $t("pages.settings.security") }}
-            </h2>
-            <div class="space-y-4">
-                <!-- Password Reset -->
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-fg text-[13px] font-medium">
-                            {{ $t("pages.settings.password") }}
-                        </p>
-                        <p class="text-fg-muted text-[12px]">
-                            {{ $t("pages.settings.passwordHint") }}
-                        </p>
-                    </div>
-                    <button
-                        :disabled="resetSending || resetSent"
-                        class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-                        @click="requestPasswordChange"
+                        <Icon name="lucide:info" class="mr-1 inline h-3.5 w-3.5" />
+                        {{ $t("pages.settings.exportReadyHint") }}
+                    </p>
+                    <p
+                        v-if="exportStatus?.status === 'failed'"
+                        class="mt-3 text-[12px] text-red-500"
                     >
-                        <Icon
-                            v-if="resetSending"
-                            name="lucide:loader-2"
-                            class="mr-1.5 inline h-4 w-4 animate-spin"
-                        />
-                        <Icon
-                            v-else-if="resetSent"
-                            name="lucide:check"
-                            class="mr-1.5 inline h-4 w-4 text-green-500"
-                        />
-                        <Icon v-else name="lucide:mail" class="mr-1.5 inline h-4 w-4" />
-                        {{
-                            resetSent
-                                ? $t("pages.settings.resetSent")
-                                : resetSending
-                                  ? $t("pages.settings.resetSending")
-                                  : $t("pages.settings.resetRequest")
-                        }}
-                    </button>
+                        <Icon name="lucide:alert-circle" class="mr-1 inline h-3.5 w-3.5" />
+                        {{ $t("pages.settings.exportFailed") }}
+                    </p>
+                    <p v-if="exportError" class="mt-3 text-[12px] text-red-500">
+                        {{ exportError }}
+                    </p>
                 </div>
-                <p v-if="resetSent" class="text-[12px] text-green-500">
-                    <Icon name="lucide:info" class="mr-1 inline h-3.5 w-3.5" />
-                    {{ $t("pages.settings.resetSentHint") }}
-                </p>
-                <p v-if="resetError" class="text-[12px] text-red-500">
-                    {{ resetError }}
-                </p>
-            </div>
-        </div>
 
-        <!-- Cookie Preferences -->
-        <div class="glass-card p-6">
-            <h2 class="text-fg mb-4 text-[15px] font-semibold">
-                {{ $t("pages.settings.cookiePreferences") }}
-            </h2>
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-fg text-[13px] font-medium">
-                        {{ $t("pages.settings.cookiePreferencesLabel") }}
+                <!-- Danger Zone -->
+                <div class="glass-card border border-red-500/20 p-6">
+                    <h2 class="mb-4 text-[15px] font-semibold text-red-400">
+                        {{ $t("pages.settings.dangerZone") }}
+                    </h2>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-fg text-[13px] font-medium">
+                                {{ $t("pages.settings.deleteAccount") }}
+                            </p>
+                            <p class="text-fg-muted text-[12px]">
+                                {{ $t("pages.settings.deleteAccountHint") }}
+                            </p>
+                        </div>
+                        <button
+                            :disabled="deleteSending || deleteSent"
+                            class="shrink-0 self-start rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-2 text-[13px] font-medium text-red-400 transition-all duration-200 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                            @click="showDeleteDialog = true"
+                        >
+                            <Icon
+                                v-if="deleteSending"
+                                name="lucide:loader-2"
+                                class="mr-1.5 inline h-4 w-4 animate-spin"
+                            />
+                            <Icon
+                                v-else-if="deleteSent"
+                                name="lucide:check"
+                                class="mr-1.5 inline h-4 w-4"
+                            />
+                            <Icon v-else name="lucide:trash-2" class="mr-1.5 inline h-4 w-4" />
+                            {{
+                                deleteSent
+                                    ? $t("pages.settings.deleteEmailSent")
+                                    : deleteSending
+                                      ? $t("pages.settings.deleteSending")
+                                      : $t("pages.settings.deleteAccount")
+                            }}
+                        </button>
+                    </div>
+                    <p v-if="deleteSent" class="mt-3 text-[12px] text-green-500">
+                        <Icon name="lucide:info" class="mr-1 inline h-3.5 w-3.5" />
+                        {{ $t("pages.settings.deleteEmailSentHint") }}
                     </p>
-                    <p class="text-fg-muted text-[12px]">
-                        {{ $t("pages.settings.cookiePreferencesHint") }}
+                    <p v-if="deleteError" class="mt-3 text-[12px] text-red-500">
+                        {{ deleteError }}
                     </p>
                 </div>
-                <button
-                    class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] font-medium transition-all duration-200 sm:self-auto"
-                    @click="revokeCookieConsent"
-                >
-                    <Icon name="lucide:cookie" class="mr-1.5 inline h-4 w-4" />
-                    {{ $t("pages.settings.cookieRevoke") }}
-                </button>
             </div>
-        </div>
-
-        <!-- Data & Privacy (GDPR Export) -->
-        <div class="glass-card p-6">
-            <h2 class="text-fg mb-4 text-[15px] font-semibold">
-                {{ $t("pages.settings.dataPrivacy") }}
-            </h2>
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-fg text-[13px] font-medium">
-                        {{ $t("pages.settings.exportData") }}
-                    </p>
-                    <p class="text-fg-muted text-[12px]">
-                        {{ $t("pages.settings.exportDataHint") }}
-                    </p>
-                </div>
-                <button
-                    :disabled="
-                        exportRequesting ||
-                        exportStatus?.status === 'pending' ||
-                        exportStatus?.status === 'processing'
-                    "
-                    class="border-line text-fg-dim hover:bg-surface-hover hover:text-fg shrink-0 self-start rounded-xl border px-4 py-2 text-[13px] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-                    @click="showExportDialog = true"
-                >
-                    <Icon
-                        v-if="exportRequesting || exportStatus?.status === 'processing'"
-                        name="lucide:loader-2"
-                        class="mr-1.5 inline h-4 w-4 animate-spin"
-                    />
-                    <Icon
-                        v-else-if="exportStatus?.status === 'ready'"
-                        name="lucide:check"
-                        class="mr-1.5 inline h-4 w-4 text-green-400"
-                    />
-                    <Icon v-else name="lucide:download" class="mr-1.5 inline h-4 w-4" />
-                    {{
-                        exportStatus?.status === "processing" || exportStatus?.status === "pending"
-                            ? $t("pages.settings.exportDataExporting")
-                            : exportStatus?.status === "ready"
-                              ? $t("pages.settings.exportDataReady")
-                              : $t("pages.settings.exportData")
-                    }}
-                </button>
-            </div>
-            <p
-                v-if="exportStatus?.status === 'ready' && exportStatus.expiresAt"
-                class="mt-3 text-[12px] text-green-500"
-            >
-                <Icon name="lucide:info" class="mr-1 inline h-3.5 w-3.5" />
-                {{ $t("pages.settings.exportReadyHint") }}
-            </p>
-            <p v-if="exportStatus?.status === 'failed'" class="mt-3 text-[12px] text-red-500">
-                <Icon name="lucide:alert-circle" class="mr-1 inline h-3.5 w-3.5" />
-                {{ $t("pages.settings.exportFailed") }}
-            </p>
-            <p v-if="exportError" class="mt-3 text-[12px] text-red-500">
-                {{ exportError }}
-            </p>
-        </div>
+        </UiTabs>
 
         <!-- Export Data Confirmation Dialog -->
         <Teleport to="body">
@@ -363,54 +434,6 @@
             </div>
         </Teleport>
 
-        <!-- Danger Zone -->
-        <div class="glass-card border border-red-500/20 p-6">
-            <h2 class="mb-4 text-[15px] font-semibold text-red-400">
-                {{ $t("pages.settings.dangerZone") }}
-            </h2>
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-fg text-[13px] font-medium">
-                        {{ $t("pages.settings.deleteAccount") }}
-                    </p>
-                    <p class="text-fg-muted text-[12px]">
-                        {{ $t("pages.settings.deleteAccountHint") }}
-                    </p>
-                </div>
-                <button
-                    :disabled="deleteSending || deleteSent"
-                    class="shrink-0 self-start rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-2 text-[13px] font-medium text-red-400 transition-all duration-200 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-                    @click="showDeleteDialog = true"
-                >
-                    <Icon
-                        v-if="deleteSending"
-                        name="lucide:loader-2"
-                        class="mr-1.5 inline h-4 w-4 animate-spin"
-                    />
-                    <Icon
-                        v-else-if="deleteSent"
-                        name="lucide:check"
-                        class="mr-1.5 inline h-4 w-4"
-                    />
-                    <Icon v-else name="lucide:trash-2" class="mr-1.5 inline h-4 w-4" />
-                    {{
-                        deleteSent
-                            ? $t("pages.settings.deleteEmailSent")
-                            : deleteSending
-                              ? $t("pages.settings.deleteSending")
-                              : $t("pages.settings.deleteAccount")
-                    }}
-                </button>
-            </div>
-            <p v-if="deleteSent" class="mt-3 text-[12px] text-green-500">
-                <Icon name="lucide:info" class="mr-1 inline h-3.5 w-3.5" />
-                {{ $t("pages.settings.deleteEmailSentHint") }}
-            </p>
-            <p v-if="deleteError" class="mt-3 text-[12px] text-red-500">
-                {{ deleteError }}
-            </p>
-        </div>
-
         <!-- Delete Account Confirmation Dialog -->
         <UiConfirmDialog
             :show="showDeleteDialog"
@@ -455,6 +478,14 @@ const api = useApi();
 const queryClient = useQueryClient();
 
 useHead({ title: () => t("nav.settings") });
+
+// ── Tabs ──
+const activeTab = ref("general");
+const settingsTabs = computed(() => [
+    { key: "general", label: t("pages.settings.tabs.general"), icon: "lucide:settings" },
+    { key: "security", label: t("pages.settings.tabs.security"), icon: "lucide:shield" },
+    { key: "privacy", label: t("pages.settings.tabs.privacy"), icon: "lucide:lock" },
+]);
 
 // ── Locale Toggle ──
 function toggleLocale() {
@@ -518,7 +549,10 @@ async function toggleWeeklyDigest() {
         );
 
         if (authStore.user) {
-            authStore.user = { ...authStore.user, weeklyReportEnabled: json.user.weeklyReportEnabled };
+            authStore.user = {
+                ...authStore.user,
+                weeklyReportEnabled: json.user.weeklyReportEnabled,
+            };
         }
         digestSuccess.value = true;
         setTimeout(() => {

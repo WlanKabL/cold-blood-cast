@@ -5,13 +5,20 @@ import { mockPublicPetData, mockPublicPetDataMinimal } from "./helpers/fixtures"
  * Mock the public pet data endpoint (no auth required).
  * Also mocks auth endpoints to return 401 — public pages don't need auth.
  */
-async function mockPublicPetApi(page: import("@playwright/test").Page, slug: string, data: unknown) {
+async function mockPublicPetApi(
+    page: import("@playwright/test").Page,
+    slug: string,
+    data: unknown,
+) {
     // Auth endpoints — public pages still trigger refresh attempts
     await page.route("**/api/auth/refresh", (route) =>
         route.fulfill({
             status: 401,
             contentType: "application/json",
-            body: JSON.stringify({ success: false, error: { code: "E_UNAUTHORIZED", message: "No session" } }),
+            body: JSON.stringify({
+                success: false,
+                error: { code: "E_UNAUTHORIZED", message: "No session" },
+            }),
         }),
     );
     await page.route("**/api/auth/platform-status", (route) =>
@@ -50,7 +57,10 @@ async function mockPublicPetNotFound(page: import("@playwright/test").Page, slug
         route.fulfill({
             status: 401,
             contentType: "application/json",
-            body: JSON.stringify({ success: false, error: { code: "E_UNAUTHORIZED", message: "No session" } }),
+            body: JSON.stringify({
+                success: false,
+                error: { code: "E_UNAUTHORIZED", message: "No session" },
+            }),
         }),
     );
     await page.route("**/api/auth/platform-status", (route) =>
@@ -90,7 +100,9 @@ test.describe("Public Profile Page", () => {
 
         await page.goto("/p/monty-the-snake");
 
-        await expect(page.getByText("Corn Snake", { exact: true })).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText("Corn Snake", { exact: true })).toBeVisible({
+            timeout: 15_000,
+        });
         await expect(page.getByText("Amel")).toBeVisible();
     });
 

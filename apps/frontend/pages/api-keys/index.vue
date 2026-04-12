@@ -1,6 +1,8 @@
 <template>
     <div class="space-y-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.apiKeys.title") }}

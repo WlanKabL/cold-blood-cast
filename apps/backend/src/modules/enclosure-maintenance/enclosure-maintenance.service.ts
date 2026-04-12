@@ -14,9 +14,7 @@ export async function listMaintenanceTasks(
         where: {
             userId,
             ...(options.enclosureId ? { enclosureId: options.enclosureId } : {}),
-            ...(options.overdue
-                ? { nextDueAt: { lt: now }, completedAt: null }
-                : {}),
+            ...(options.overdue ? { nextDueAt: { lt: now }, completedAt: null } : {}),
         },
         include: {
             enclosure: { select: { id: true, name: true } },

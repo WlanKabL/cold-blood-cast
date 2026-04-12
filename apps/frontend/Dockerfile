@@ -9,6 +9,12 @@ COPY apps/frontend/package.json apps/frontend/
 RUN pnpm install --frozen-lockfile
 
 FROM base AS build
+ARG BASE_URL=http://localhost:3000
+ARG API_BASE_URL=http://localhost:3001
+ARG SITE_URL=http://localhost:3000
+ENV BASE_URL=${BASE_URL}
+ENV API_BASE_URL=${API_BASE_URL}
+ENV SITE_URL=${SITE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY --from=deps /app/apps/frontend/node_modules ./apps/frontend/node_modules

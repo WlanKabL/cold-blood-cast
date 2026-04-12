@@ -1,6 +1,4 @@
-import type {
-    AnnouncementType,
-} from "./enums.js";
+import type { AnnouncementType } from "./enums.js";
 
 // ─── Auth ────────────────────────────────────────────────────
 

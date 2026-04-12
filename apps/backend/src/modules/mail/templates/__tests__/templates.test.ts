@@ -374,9 +374,7 @@ describe("weeklyCareDigestTemplate", () => {
                 { type: "feeding", title: "Feed Monty", detail: "2 mice", petName: "Monty" },
             ]),
             makeDay("2026-04-14"),
-            makeDay("2026-04-15", [
-                { type: "vet_visit", title: "Checkup", detail: "Annual exam" },
-            ]),
+            makeDay("2026-04-15", [{ type: "vet_visit", title: "Checkup", detail: "Annual exam" }]),
             makeDay("2026-04-16"),
             makeDay("2026-04-17", [
                 { type: "maintenance", title: "Clean terrarium" },
@@ -509,9 +507,7 @@ describe("weeklyCareDigestTemplate", () => {
     it("renders with zero events across all days", () => {
         const data: WeeklyCareDigestData = {
             ...baseData,
-            days: Array.from({ length: 7 }, (_, i) =>
-                makeDay(`2026-04-${13 + i}`),
-            ),
+            days: Array.from({ length: 7 }, (_, i) => makeDay(`2026-04-${13 + i}`)),
         };
         const html = weeklyCareDigestTemplate(data);
         expect(html).toContain("<!DOCTYPE html");

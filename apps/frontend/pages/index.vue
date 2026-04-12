@@ -1,17 +1,5 @@
 <template>
     <div class="landing relative min-h-dvh bg-gray-950 text-white">
-        <!-- ═══ Background layers ═══ -->
-        <div class="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-            <div
-                class="bg-primary-600/[0.07] absolute top-0 left-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/3 rounded-full blur-[120px]"
-            />
-            <div
-                class="absolute right-0 bottom-0 h-[600px] w-[800px] translate-x-1/4 translate-y-1/4 rounded-full bg-violet-600/[0.05] blur-[100px]"
-            />
-            <div class="dot-grid absolute inset-0 opacity-[0.03]" />
-            <div class="noise absolute inset-0 opacity-[0.025]" />
-        </div>
-
         <!-- ═══ Navigation ═══ -->
         <nav
             class="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
@@ -31,15 +19,12 @@
                         $t("landing.nav.features")
                     }}</a>
                     <a
-                        href="#monitoring"
+                        href="#how-it-works"
                         class="text-sm text-gray-400 transition hover:text-white"
-                        >{{ $t("landing.nav.monitoring") }}</a
+                        >{{ $t("landing.nav.howItWorks") }}</a
                     >
-                    <a href="#alerts" class="text-sm text-gray-400 transition hover:text-white">{{
-                        $t("landing.nav.alerts")
-                    }}</a>
-                    <a href="#carelog" class="text-sm text-gray-400 transition hover:text-white">{{
-                        $t("landing.nav.careLog")
+                    <a href="#keepers" class="text-sm text-gray-400 transition hover:text-white">{{
+                        $t("landing.nav.forKeepers")
                     }}</a>
                 </div>
                 <div class="flex items-center gap-3">
@@ -74,151 +59,136 @@
             </div>
         </nav>
 
-        <!-- ═══ Hero ═══ -->
-        <section class="relative z-10 mx-auto max-w-7xl px-6 pt-36 pb-32 text-center md:pt-48">
-            <div
-                class="hero-enter mb-8 inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-4 py-1.5 text-sm"
-            >
-                <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-                <span class="text-gray-400">{{ $t("landing.hero.badge") }}</span>
-            </div>
-
-            <h1
-                class="hero-enter hero-delay-1 mx-auto max-w-5xl text-5xl leading-[1.08] font-bold tracking-tight md:text-7xl lg:text-8xl"
-            >
-                <span class="block text-white">{{ $t("landing.hero.titleLine1") }}</span>
-                <span class="mt-2 block">
-                    <span class="text-gray-500">{{ $t("landing.hero.titleLine2") }}</span>
-                    <span
-                        class="relative inline-flex h-[1.15em] items-end overflow-hidden align-bottom"
-                    >
-                        <Transition name="word-slide" mode="out-in">
-                            <span
-                                :key="activeWord"
-                                class="from-primary-400 to-primary-300 inline-block bg-linear-to-r bg-clip-text text-transparent"
-                            >
-                                {{ activeWord }}
-                            </span>
-                        </Transition>
-                    </span>
-                </span>
-            </h1>
-
-            <p
-                class="hero-enter hero-delay-2 mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-gray-400 md:text-xl"
-            >
-                {{ $t("landing.hero.subtitle") }}
-            </p>
-
-            <div
-                class="hero-enter hero-delay-3 mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
-            >
-                <NuxtLink
-                    to="/register"
-                    class="group bg-primary-500 shadow-primary-500/20 hover:shadow-primary-500/30 relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-4 font-semibold text-white shadow-lg transition-all hover:brightness-110"
-                >
-                    {{ $t("landing.hero.primaryCta") }}
-                    <Icon
-                        name="lucide:arrow-right"
-                        class="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    />
-                </NuxtLink>
-                <a
-                    href="#monitoring"
-                    class="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-8 py-4 font-medium text-gray-300 transition hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white"
-                >
-                    {{ $t("landing.hero.secondaryCta") }}
-                </a>
-            </div>
-
-            <div
-                class="hero-enter hero-delay-3 mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-600 md:gap-8"
-            >
-                <span class="flex items-center gap-1.5">
-                    <Icon name="lucide:shield-check" class="h-3.5 w-3.5" />
-                    {{ $t("landing.trust.encrypted") }}
-                </span>
-                <span class="flex items-center gap-1.5">
-                    <Icon name="lucide:gift" class="h-3.5 w-3.5" />
-                    {{ $t("landing.trust.openSource") }}
-                </span>
-                <span class="flex items-center gap-1.5">
-                    <Icon name="lucide:zap" class="h-3.5 w-3.5" />
-                    {{ $t("landing.trust.fast") }}
-                </span>
-            </div>
-
-            <!-- Dashboard Preview -->
-            <div data-reveal class="relative mx-auto mt-24 max-w-5xl">
+        <!-- ═══ Hero — Full-bleed bg image ═══ -->
+        <section class="relative z-10 min-h-dvh overflow-hidden">
+            <div class="absolute inset-0 z-0" aria-hidden="true">
+                <img src="/bg1.png" alt="" class="h-full w-full object-cover" loading="eager" />
+                <div class="absolute inset-0 bg-gray-950/70" />
                 <div
-                    class="absolute -inset-px rounded-2xl bg-linear-to-b from-white/[0.08] to-transparent"
+                    class="absolute inset-0 bg-linear-to-b from-gray-950/40 via-transparent to-gray-950"
                 />
-                <div
-                    class="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gray-900/80 shadow-2xl shadow-black/40 backdrop-blur-sm"
-                    style="transition: transform 0.2s ease-out"
-                    @mousemove="handleTiltMove"
-                    @mouseleave="handleTiltLeave"
+            </div>
+
+            <div class="relative z-10 mx-auto max-w-7xl px-6 pt-36 pb-32 text-center md:pt-48">
+                <h1
+                    class="hero-enter hero-delay-1 mx-auto max-w-5xl text-5xl leading-[1.08] font-bold tracking-tight md:text-7xl lg:text-8xl"
                 >
-                    <div
-                        class="flex items-center gap-2 border-b border-white/[0.04] bg-white/[0.02] px-4 py-3"
+                    <span class="block text-white drop-shadow-lg">{{
+                        $t("landing.hero.titleLine1")
+                    }}</span>
+                    <span class="mt-2 block text-gray-400">{{
+                        $t("landing.hero.titleLine2")
+                    }}</span>
+                    <span class="mt-2 block">
+                        <span
+                            class="relative inline-flex h-[1.15em] items-end overflow-hidden align-bottom"
+                        >
+                            <Transition name="word-slide" mode="out-in">
+                                <span
+                                    :key="activeWord"
+                                    class="from-primary-400 to-primary-300 inline-block bg-linear-to-r bg-clip-text text-transparent drop-shadow-lg"
+                                >
+                                    {{ activeWord }}
+                                </span>
+                            </Transition>
+                        </span>
+                    </span>
+                </h1>
+
+                <p
+                    class="hero-enter hero-delay-2 mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-gray-300 md:text-xl"
+                >
+                    {{ $t("landing.hero.subtitle") }}
+                </p>
+
+                <div
+                    class="hero-enter hero-delay-3 mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+                >
+                    <NuxtLink
+                        to="/register"
+                        class="group bg-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-4 font-semibold text-white shadow-xl transition-all hover:brightness-110"
                     >
-                        <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                        <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                        <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                        <span class="ml-3 text-xs text-gray-600">{{
-                            $t("landing.preview.dashboardBar")
-                        }}</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <div class="rounded-xl border border-white/[0.04] bg-white/[0.02] p-4">
-                                <p class="text-xs text-gray-600">
-                                    {{ $t("landing.preview.warmSide") }}
-                                </p>
-                                <p class="mt-1 text-xl font-bold text-emerald-400">31.2°C</p>
-                            </div>
-                            <div class="rounded-xl border border-white/[0.04] bg-white/[0.02] p-4">
-                                <p class="text-xs text-gray-600">
-                                    {{ $t("landing.preview.coolSide") }}
-                                </p>
-                                <p class="mt-1 text-xl font-bold text-white">24.8°C</p>
-                            </div>
-                            <div class="rounded-xl border border-white/[0.04] bg-white/[0.02] p-4">
-                                <p class="text-xs text-gray-600">
-                                    {{ $t("landing.preview.humidity") }}
-                                </p>
-                                <p class="mt-1 text-xl font-bold text-white">52%</p>
-                            </div>
-                            <div class="rounded-xl border border-white/[0.04] bg-white/[0.02] p-4">
-                                <p class="text-xs text-gray-600">
-                                    {{ $t("landing.preview.enclosures") }}
-                                </p>
-                                <p class="text-primary-400 mt-1 text-xl font-bold">3</p>
+                        {{ $t("landing.hero.primaryCta") }}
+                        <Icon
+                            name="lucide:arrow-right"
+                            class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                        />
+                    </NuxtLink>
+                    <a
+                        href="#features"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-8 py-4 font-medium text-gray-200 backdrop-blur-md transition hover:border-white/[0.2] hover:bg-white/[0.1] hover:text-white"
+                    >
+                        {{ $t("landing.hero.secondaryCta") }}
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ Feature Previews — visual cards with images ═══ -->
+        <section id="features" class="relative z-10 py-24 md:py-32">
+            <div class="mx-auto max-w-7xl px-6">
+                <div data-reveal class="text-center">
+                    <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
+                        {{ $t("landing.features.label") }}
+                    </p>
+                    <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+                        {{ $t("landing.features.title") }}
+                    </h2>
+                    <p class="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
+                        {{ $t("landing.features.subtitle") }}
+                    </p>
+                </div>
+
+                <div class="mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2">
+                    <div
+                        v-for="(feature, i) in featureItems"
+                        :key="feature.key"
+                        data-reveal
+                        :data-reveal-delay="(i % 4) + 1"
+                        class="group overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] transition-all duration-300 hover:border-white/[0.1] hover:bg-white/[0.04]"
+                    >
+                        <div class="relative h-48 overflow-hidden bg-gray-900/50">
+                            <img
+                                :src="feature.image"
+                                :alt="$t(`landing.features.${feature.key}.title`)"
+                                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                loading="lazy"
+                            />
+                            <div
+                                class="absolute inset-0 bg-linear-to-t from-gray-950/80 to-transparent"
+                            />
+                            <div
+                                class="absolute bottom-4 left-4 inline-flex rounded-xl p-2.5"
+                                :class="feature.bgClass"
+                            >
+                                <Icon
+                                    :name="feature.icon"
+                                    class="h-5 w-5"
+                                    :class="feature.iconClass"
+                                />
                             </div>
                         </div>
-                        <!-- Sensor trend visualization -->
-                        <div
-                            class="flex h-32 items-end gap-1 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
-                        >
-                            <div
-                                v-for="(bar, i) in sensorTrend"
-                                :key="i"
-                                class="sensor-bar w-full rounded-sm"
-                                :class="bar.c"
-                                :style="{
-                                    height: bar.h,
-                                    animationDelay: `${1.2 + i * 0.05}s`,
-                                }"
-                            />
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold">
+                                {{ $t(`landing.features.${feature.key}.title`) }}
+                            </h3>
+                            <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                                {{ $t(`landing.features.${feature.key}.desc`) }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ═══ How It Works ═══ -->
-        <section class="relative z-10 border-y border-white/[0.04] py-24 md:py-32">
-            <div class="mx-auto max-w-7xl px-6">
+        <!-- ═══ How It Works — with bg2 image strip ═══ -->
+        <section id="how-it-works" class="relative z-10 overflow-hidden py-24 md:py-32">
+            <div class="absolute inset-0 z-0" aria-hidden="true">
+                <img src="/bg2.png" alt="" class="h-full w-full object-cover" loading="lazy" />
+                <div class="absolute inset-0 bg-gray-950/80" />
+            </div>
+
+            <div class="relative z-10 mx-auto max-w-7xl px-6">
                 <div data-reveal class="text-center">
                     <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
                         {{ $t("landing.howItWorks.label") }}
@@ -230,7 +200,7 @@
 
                 <div class="relative mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
                     <div
-                        class="absolute top-6 right-[16.6%] left-[16.6%] hidden h-px bg-linear-to-r from-transparent via-white/[0.06] to-transparent md:block"
+                        class="absolute top-6 right-[16.6%] left-[16.6%] hidden h-px bg-linear-to-r from-transparent via-white/[0.1] to-transparent md:block"
                         aria-hidden="true"
                     />
 
@@ -246,11 +216,11 @@
                         >
                             0{{ i + 1 }}
                         </div>
-                        <Icon :name="step.icon" class="mx-auto mb-3 h-5 w-5 text-gray-500" />
+                        <Icon :name="step.icon" class="mx-auto mb-3 h-5 w-5 text-gray-400" />
                         <h3 class="text-lg font-semibold">
                             {{ $t(`landing.howItWorks.${step.key}.title`) }}
                         </h3>
-                        <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                        <p class="mt-2 text-sm leading-relaxed text-gray-400">
                             {{ $t(`landing.howItWorks.${step.key}.desc`) }}
                         </p>
                     </div>
@@ -258,333 +228,82 @@
             </div>
         </section>
 
-        <!-- ═══ Problem Section ═══ -->
-        <section class="relative z-10 py-24 md:py-32">
+        <!-- ═══ Why Keepers Love It ═══ -->
+        <section id="keepers" class="relative z-10 py-24 md:py-32">
             <div class="mx-auto max-w-7xl px-6">
                 <div data-reveal class="text-center">
-                    <p class="text-sm font-semibold tracking-widest text-red-400/80 uppercase">
-                        {{ $t("landing.problem.label") }}
+                    <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
+                        {{ $t("landing.keepers.label") }}
                     </p>
                     <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-                        {{ $t("landing.problem.title") }}
+                        {{ $t("landing.keepers.title") }}
                     </h2>
                 </div>
 
                 <div class="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
                     <div
-                        v-for="(item, i) in problemItems"
+                        v-for="(item, i) in keeperBenefits"
                         :key="item.key"
                         data-reveal
                         :data-reveal-delay="i + 1"
-                        class="card-base group p-8 transition-all duration-300 hover:border-red-500/10 hover:bg-white/[0.03]"
-                    >
-                        <div
-                            class="mb-5 inline-flex rounded-xl bg-red-500/[0.08] p-3 transition-transform duration-300 group-hover:scale-105"
-                        >
-                            <Icon :name="item.icon" class="h-6 w-6 text-red-400/80" />
-                        </div>
-                        <h3 class="text-lg font-semibold">
-                            {{ $t(`landing.problem.${item.key}.title`) }}
-                        </h3>
-                        <p class="mt-3 text-sm leading-relaxed text-gray-500">
-                            {{ $t(`landing.problem.${item.key}.desc`) }}
-                        </p>
-                    </div>
-                </div>
-
-                <div data-reveal class="mt-16 text-center">
-                    <p
-                        class="from-primary-400 to-primary-300 inline-block bg-linear-to-r bg-clip-text text-xl font-semibold text-transparent md:text-2xl"
-                    >
-                        {{ $t("landing.problem.transition") }}
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ Deep Dive: Sensor Monitoring ═══ -->
-        <section
-            id="monitoring"
-            class="relative z-10 border-y border-white/[0.04] bg-white/[0.01] py-24 md:py-32"
-        >
-            <div class="mx-auto max-w-7xl px-6">
-                <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-                    <div data-reveal="left">
-                        <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
-                            {{ $t("landing.monitoring.label") }}
-                        </p>
-                        <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-                            {{ $t("landing.monitoring.title") }}
-                        </h2>
-                        <p class="mt-6 text-lg leading-relaxed text-gray-400">
-                            {{ $t("landing.monitoring.desc") }}
-                        </p>
-                        <ul class="mt-8 space-y-4">
-                            <li v-for="n in 4" :key="n" class="flex items-start gap-3">
-                                <Icon
-                                    name="lucide:check"
-                                    class="text-primary-400 mt-0.5 h-4 w-4 shrink-0"
-                                />
-                                <span class="text-gray-300">{{
-                                    $t(`landing.monitoring.point${n}`)
-                                }}</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div data-reveal="right" class="relative">
-                        <div
-                            class="preview-card"
-                            @mousemove="handleTiltMove"
-                            @mouseleave="handleTiltLeave"
-                        >
-                            <div
-                                class="flex items-center gap-2 border-b border-white/[0.04] bg-white/[0.02] px-4 py-3"
-                            >
-                                <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                                <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                                <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                                <span class="ml-3 text-xs text-gray-600">{{
-                                    $t("landing.preview.sensorBar")
-                                }}</span>
-                            </div>
-                            <div class="p-6">
-                                <div class="space-y-4">
-                                    <div
-                                        class="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
-                                    >
-                                        <div class="flex items-center gap-3">
-                                            <Icon
-                                                name="lucide:thermometer"
-                                                class="h-5 w-5 text-orange-400"
-                                            />
-                                            <span class="text-sm text-gray-300">{{
-                                                $t("landing.preview.warmSide")
-                                            }}</span>
-                                        </div>
-                                        <span class="text-lg font-bold text-emerald-400"
-                                            >31.2°C</span
-                                        >
-                                    </div>
-                                    <div
-                                        class="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
-                                    >
-                                        <div class="flex items-center gap-3">
-                                            <Icon
-                                                name="lucide:thermometer"
-                                                class="h-5 w-5 text-blue-400"
-                                            />
-                                            <span class="text-sm text-gray-300">{{
-                                                $t("landing.preview.coolSide")
-                                            }}</span>
-                                        </div>
-                                        <span class="text-lg font-bold text-white">24.8°C</span>
-                                    </div>
-                                    <div
-                                        class="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] p-4"
-                                    >
-                                        <div class="flex items-center gap-3">
-                                            <Icon
-                                                name="lucide:droplets"
-                                                class="h-5 w-5 text-cyan-400"
-                                            />
-                                            <span class="text-sm text-gray-300">{{
-                                                $t("landing.preview.humidity")
-                                            }}</span>
-                                        </div>
-                                        <span class="text-lg font-bold text-white">52%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ Deep Dive: Alerts ═══ -->
-        <section id="alerts" class="relative z-10 py-24 md:py-32">
-            <div class="mx-auto max-w-7xl px-6">
-                <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-                    <div data-reveal="right" class="order-2 lg:order-1">
-                        <div
-                            class="preview-card"
-                            @mousemove="handleTiltMove"
-                            @mouseleave="handleTiltLeave"
-                        >
-                            <div
-                                class="flex items-center gap-2 border-b border-white/[0.04] bg-white/[0.02] px-4 py-3"
-                            >
-                                <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                                <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                                <div class="h-3 w-3 rounded-full bg-white/[0.08]" />
-                                <span class="ml-3 text-xs text-gray-600">{{
-                                    $t("landing.preview.alertsBar")
-                                }}</span>
-                            </div>
-                            <div class="space-y-3 p-6">
-                                <div
-                                    class="flex items-center gap-3 rounded-xl border border-red-500/10 bg-red-500/[0.04] p-4"
-                                >
-                                    <Icon
-                                        name="lucide:alert-triangle"
-                                        class="h-5 w-5 shrink-0 text-red-400"
-                                    />
-                                    <div>
-                                        <p class="text-sm font-medium text-red-300">
-                                            {{ $t("landing.preview.temperature") }} &lt; 22°C
-                                        </p>
-                                        <p class="text-xs text-gray-500">Telegram → @keeper</p>
-                                    </div>
-                                </div>
-                                <div
-                                    class="flex items-center gap-3 rounded-xl border border-amber-500/10 bg-amber-500/[0.04] p-4"
-                                >
-                                    <Icon
-                                        name="lucide:alert-circle"
-                                        class="h-5 w-5 shrink-0 text-amber-400"
-                                    />
-                                    <div>
-                                        <p class="text-sm font-medium text-amber-300">
-                                            {{ $t("landing.preview.humidity") }} &gt; 70%
-                                        </p>
-                                        <p class="text-xs text-gray-500">Telegram → @keeper</p>
-                                    </div>
-                                </div>
-                                <div
-                                    class="flex items-center gap-3 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.04] p-4"
-                                >
-                                    <Icon
-                                        name="lucide:check-circle"
-                                        class="h-5 w-5 shrink-0 text-emerald-400"
-                                    />
-                                    <div>
-                                        <p class="text-sm font-medium text-emerald-300">
-                                            All sensors OK
-                                        </p>
-                                        <p class="text-xs text-gray-500">Last check: 2 min ago</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-reveal="left" class="order-1 lg:order-2">
-                        <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
-                            {{ $t("landing.alertsDeep.label") }}
-                        </p>
-                        <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-                            {{ $t("landing.alertsDeep.title") }}
-                        </h2>
-                        <p class="mt-6 text-lg leading-relaxed text-gray-400">
-                            {{ $t("landing.alertsDeep.desc") }}
-                        </p>
-                        <ul class="mt-8 space-y-4">
-                            <li v-for="n in 4" :key="n" class="flex items-start gap-3">
-                                <Icon
-                                    name="lucide:check"
-                                    class="text-primary-400 mt-0.5 h-4 w-4 shrink-0"
-                                />
-                                <span class="text-gray-300">{{
-                                    $t(`landing.alertsDeep.point${n}`)
-                                }}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ Features Grid ═══ -->
-        <section
-            id="features"
-            class="relative z-10 border-y border-white/[0.04] bg-white/[0.01] py-24 md:py-32"
-        >
-            <div class="mx-auto max-w-7xl px-6">
-                <div data-reveal class="text-center">
-                    <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
-                        {{ $t("landing.features.label") }}
-                    </p>
-                    <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-                        {{ $t("landing.features.title") }}
-                    </h2>
-                    <p class="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
-                        {{ $t("landing.features.subtitle") }}
-                    </p>
-                </div>
-
-                <div class="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
-                    <div
-                        v-for="(feature, i) in featureItems"
-                        :key="feature.key"
-                        data-reveal
-                        :data-reveal-delay="(i % 4) + 1"
-                        class="card-base group p-8 transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.03]"
+                        class="card-base group hover:border-primary-500/10 p-8 transition-all duration-300 hover:bg-white/[0.03]"
                     >
                         <div
                             class="mb-5 inline-flex rounded-xl p-3 transition-transform duration-300 group-hover:scale-105"
-                            :class="feature.bgClass"
+                            :class="item.bgClass"
                         >
-                            <Icon :name="feature.icon" class="h-6 w-6" :class="feature.iconClass" />
+                            <Icon :name="item.icon" class="h-6 w-6" :class="item.iconClass" />
                         </div>
                         <h3 class="text-lg font-semibold">
-                            {{ $t(`landing.features.${feature.key}.title`) }}
+                            {{ $t(`landing.keepers.${item.key}.title`) }}
                         </h3>
                         <p class="mt-3 text-sm leading-relaxed text-gray-500">
-                            {{ $t(`landing.features.${feature.key}.desc`) }}
+                            {{ $t(`landing.keepers.${item.key}.desc`) }}
                         </p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ═══ Comparison ═══ -->
-        <section class="relative z-10 py-24 md:py-32">
-            <div class="mx-auto max-w-7xl px-6">
-                <div data-reveal class="text-center">
-                    <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
-                        {{ $t("landing.comparison.label") }}
-                    </p>
-                    <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-                        {{ $t("landing.comparison.title") }}
-                    </h2>
-                </div>
+        <!-- ═══ Works With Your Setup ═══ -->
+        <section class="relative z-10 overflow-hidden py-24 md:py-32">
+            <div class="absolute inset-0 z-0" aria-hidden="true">
+                <img src="/bg3.png" alt="" class="h-full w-full object-cover" loading="lazy" />
+                <div class="absolute inset-0 bg-gray-950/75" />
+            </div>
 
-                <div class="mx-auto mt-16 max-w-4xl space-y-6">
-                    <div
-                        v-for="(item, i) in comparisonItems"
-                        :key="item"
-                        data-reveal
-                        :data-reveal-delay="(i % 4) + 1"
-                        class="grid grid-cols-1 gap-4 md:grid-cols-2"
-                    >
-                        <div class="card-base flex items-start gap-4 border-red-500/10 p-6">
-                            <Icon name="lucide:x" class="mt-0.5 h-5 w-5 shrink-0 text-red-400/60" />
-                            <div>
-                                <p
-                                    class="text-xs font-semibold tracking-wider text-red-400/60 uppercase"
-                                >
-                                    {{ $t("landing.comparison.without") }}
-                                </p>
-                                <p class="mt-2 text-sm leading-relaxed text-gray-400">
-                                    {{ $t(`landing.comparison.${item}.bad`) }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="card-base flex items-start gap-4 border-emerald-500/10 p-6">
-                            <Icon
-                                name="lucide:check"
-                                class="mt-0.5 h-5 w-5 shrink-0 text-emerald-400"
-                            />
-                            <div>
-                                <p
-                                    class="text-xs font-semibold tracking-wider text-emerald-400 uppercase"
-                                >
-                                    {{ $t("landing.comparison.with") }}
-                                </p>
-                                <p class="mt-2 text-sm leading-relaxed text-gray-300">
-                                    {{ $t(`landing.comparison.${item}.good`) }}
-                                </p>
+            <div class="relative z-10 mx-auto max-w-7xl px-6">
+                <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+                    <div data-reveal="left">
+                        <p class="text-primary-400 text-sm font-semibold tracking-widest uppercase">
+                            {{ $t("landing.setup.label") }}
+                        </p>
+                        <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+                            {{ $t("landing.setup.title") }}
+                        </h2>
+                        <p class="mt-6 text-lg leading-relaxed text-gray-300">
+                            {{ $t("landing.setup.desc") }}
+                        </p>
+                    </div>
+
+                    <div data-reveal="right" class="relative">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div
+                                v-for="tech in techStack"
+                                :key="tech.key"
+                                class="card-base flex items-center gap-3 p-4 backdrop-blur-sm"
+                            >
+                                <Icon
+                                    :name="tech.icon"
+                                    class="h-6 w-6 shrink-0"
+                                    :class="tech.color"
+                                />
+                                <div>
+                                    <p class="text-sm font-medium text-gray-200">{{ tech.name }}</p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $t(`landing.setup.tech.${tech.key}`) }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -593,12 +312,16 @@
         </section>
 
         <!-- ═══ Social Proof ═══ -->
-        <section class="relative z-10 border-y border-white/[0.04] py-16">
-            <div class="mx-auto max-w-7xl px-6">
+        <section class="relative z-10 overflow-hidden py-16">
+            <div class="absolute inset-0 z-0" aria-hidden="true">
+                <img src="/bg4.png" alt="" class="h-full w-full object-cover" loading="lazy" />
+                <div class="absolute inset-0 bg-gray-950/80" />
+            </div>
+            <div class="relative z-10 mx-auto max-w-7xl px-6">
                 <div data-reveal class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
                     <div v-for="stat in socialStats" :key="stat.key">
                         <p class="text-primary-400 text-3xl font-bold">{{ stat.value }}</p>
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-gray-400">
                             {{ $t(`landing.social.${stat.key}`) }}
                         </p>
                     </div>
@@ -606,20 +329,27 @@
             </div>
         </section>
 
-        <!-- ═══ CTA ═══ -->
-        <section class="relative z-10 py-24 md:py-32">
-            <div class="mx-auto max-w-3xl px-6 text-center">
+        <!-- ═══ CTA — with bg5 background ═══ -->
+        <section class="relative z-10 overflow-hidden py-24 md:py-32">
+            <div class="absolute inset-0 z-0" aria-hidden="true">
+                <img src="/bg5.png" alt="" class="h-full w-full object-cover" loading="lazy" />
+                <div class="absolute inset-0 bg-gray-950/70" />
+                <div
+                    class="absolute inset-0 bg-linear-to-b from-gray-950 via-transparent to-gray-950"
+                />
+            </div>
+            <div class="relative z-10 mx-auto max-w-3xl px-6 text-center">
                 <div data-reveal>
                     <h2 class="text-4xl font-bold tracking-tight md:text-5xl">
                         {{ $t("landing.cta.title") }}
                     </h2>
-                    <p class="mt-6 text-lg text-gray-400">
+                    <p class="mt-6 text-lg text-gray-300">
                         {{ $t("landing.cta.subtitle") }}
                     </p>
                     <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <NuxtLink
                             to="/register"
-                            class="group bg-primary-500 shadow-primary-500/20 hover:shadow-primary-500/30 relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-4 font-semibold text-white shadow-lg transition-all hover:brightness-110"
+                            class="group bg-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-4 font-semibold text-white shadow-xl transition-all hover:brightness-110"
                         >
                             {{ $t("landing.cta.button") }}
                             <Icon
@@ -657,13 +387,13 @@
                                 }}</a>
                             </li>
                             <li>
-                                <a href="#monitoring" class="transition hover:text-white">{{
-                                    $t("landing.nav.monitoring")
+                                <a href="#how-it-works" class="transition hover:text-white">{{
+                                    $t("landing.nav.howItWorks")
                                 }}</a>
                             </li>
                             <li>
-                                <a href="#alerts" class="transition hover:text-white">{{
-                                    $t("landing.nav.alerts")
+                                <a href="#keepers" class="transition hover:text-white">{{
+                                    $t("landing.nav.forKeepers")
                                 }}</a>
                             </li>
                         </ul>
@@ -753,89 +483,78 @@ const activeWord = computed(() => t(`landing.hero.${heroWordKeys[activeWordIdx.v
 
 // ── Data ─────────────────────────────────────────────────────
 const howItWorksSteps = [
-    { key: "connect", icon: "lucide:cable" },
-    { key: "monitor", icon: "lucide:activity" },
-    { key: "alert", icon: "lucide:bell-ring" },
+    { key: "register", icon: "lucide:user-plus" },
+    { key: "setup", icon: "lucide:settings" },
+    { key: "relax", icon: "lucide:coffee" },
 ];
 
-const problemItems = [
-    { key: "manual", icon: "lucide:thermometer" },
-    { key: "blind", icon: "lucide:eye-off" },
-    { key: "emergency", icon: "lucide:alert-triangle" },
+const keeperBenefits = [
+    {
+        key: "peace",
+        icon: "lucide:heart",
+        bgClass: "bg-primary-500/[0.08]",
+        iconClass: "text-primary-400",
+    },
+    {
+        key: "history",
+        icon: "lucide:clock",
+        bgClass: "bg-cyan-500/[0.08]",
+        iconClass: "text-cyan-400",
+    },
+    {
+        key: "privacy",
+        icon: "lucide:shield-check",
+        bgClass: "bg-amber-500/[0.08]",
+        iconClass: "text-amber-400",
+    },
 ];
 
-const comparisonItems = ["manual", "blind", "care", "emergency"];
+const techStack = [
+    { key: "pi", name: "Raspberry Pi", icon: "lucide:cpu", color: "text-emerald-400" },
+    { key: "dht", name: "DHT22 / BME280", icon: "lucide:thermometer", color: "text-orange-400" },
+    { key: "ha", name: "Home Assistant", icon: "lucide:home", color: "text-cyan-400" },
+    { key: "telegram", name: "Telegram", icon: "lucide:send", color: "text-blue-400" },
+    { key: "ws", name: "WebSockets", icon: "lucide:zap", color: "text-amber-400" },
+    { key: "local", name: "Local Storage", icon: "lucide:hard-drive", color: "text-purple-400" },
+];
 
 const featureItems = [
     {
         key: "sensors",
         icon: "lucide:cpu",
-        bgClass: "bg-cyan-500/[0.08]",
+        bgClass: "bg-cyan-500/[0.15] backdrop-blur-sm",
         iconClass: "text-cyan-400",
+        image: "/features/feature-sensors.png",
     },
     {
         key: "alerts",
         icon: "lucide:bell-ring",
-        bgClass: "bg-red-500/[0.08]",
+        bgClass: "bg-red-500/[0.15] backdrop-blur-sm",
         iconClass: "text-red-400",
+        image: "/features/feature-alerts.png",
     },
     {
         key: "careLog",
         icon: "lucide:book-open",
-        bgClass: "bg-emerald-500/[0.08]",
+        bgClass: "bg-emerald-500/[0.15] backdrop-blur-sm",
         iconClass: "text-emerald-400",
+        image: "/features/feature-carelog.png",
     },
     {
         key: "dashboard",
         icon: "lucide:layout-dashboard",
-        bgClass: "bg-primary-500/[0.08]",
+        bgClass: "bg-primary-500/[0.15] backdrop-blur-sm",
         iconClass: "text-primary-400",
+        image: "/features/feature-dashboard.png",
     },
 ];
 
 const socialStats = [
-    { key: "sensors", value: "500+" },
-    { key: "enclosures", value: "200+" },
-    { key: "alerts", value: "10K+" },
-    { key: "uptime", value: "99.9%" },
+    { key: "enclosures", value: "∞" },
+    { key: "sensors", value: "∞" },
+    { key: "monitoring", value: "24/7" },
+    { key: "alerts", value: "<1 min" },
 ];
-
-const sensorTrend = [
-    { h: "60%", c: "bg-emerald-500/40" },
-    { h: "62%", c: "bg-emerald-500/40" },
-    { h: "58%", c: "bg-emerald-500/40" },
-    { h: "65%", c: "bg-emerald-500/40" },
-    { h: "63%", c: "bg-emerald-500/40" },
-    { h: "55%", c: "bg-amber-500/30" },
-    { h: "60%", c: "bg-emerald-500/40" },
-    { h: "62%", c: "bg-emerald-500/40" },
-    { h: "48%", c: "bg-red-500/30" },
-    { h: "52%", c: "bg-amber-500/30" },
-    { h: "58%", c: "bg-emerald-500/40" },
-    { h: "61%", c: "bg-emerald-500/40" },
-    { h: "64%", c: "bg-emerald-500/40" },
-    { h: "60%", c: "bg-emerald-500/40" },
-    { h: "57%", c: "bg-emerald-500/40" },
-    { h: "62%", c: "bg-emerald-500/40" },
-    { h: "65%", c: "bg-emerald-500/40" },
-    { h: "63%", c: "bg-emerald-500/40" },
-];
-
-// ── 3D Tilt ──────────────────────────────────────────────────
-function handleTiltMove(e: MouseEvent) {
-    if (window.innerWidth < 768) return;
-    const el = e.currentTarget as HTMLElement;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    const tiltX = (y - 0.5) * -6;
-    const tiltY = (x - 0.5) * 6;
-    el.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.01, 1.01, 1)`;
-}
-
-function handleTiltLeave(e: MouseEvent) {
-    (e.currentTarget as HTMLElement).style.transform = "";
-}
 
 // ── Lifecycle ────────────────────────────────────────────────
 let revealObserver: IntersectionObserver | null = null;
@@ -887,17 +606,6 @@ function revokeCookieConsent() {
 </script>
 
 <style scoped>
-.dot-grid {
-    background-image: radial-gradient(circle, rgb(255 255 255) 1px, transparent 1px);
-    background-size: 24px 24px;
-}
-
-.noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 256px 256px;
-}
-
 .card-base {
     border-radius: 1rem;
     border: 1px solid rgb(255 255 255 / 0.04);
@@ -920,19 +628,6 @@ function revokeCookieConsent() {
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-}
-
-.preview-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 1rem;
-    border: 1px solid rgb(255 255 255 / 0.06);
-    background: rgb(255 255 255 / 0.02);
-    box-shadow:
-        0 0 0 1px rgb(255 255 255 / 0.02),
-        0 20px 50px -12px rgb(0 0 0 / 0.4);
-    transition: transform 0.2s ease-out;
-    will-change: transform;
 }
 
 .hero-enter {
@@ -973,19 +668,6 @@ function revokeCookieConsent() {
     opacity: 0;
     transform: translateY(-50%);
     filter: blur(4px);
-}
-
-.sensor-bar {
-    animation: barGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    transform-origin: bottom;
-}
-@keyframes barGrow {
-    from {
-        transform: scaleY(0);
-    }
-    to {
-        transform: scaleY(1);
-    }
 }
 
 [data-reveal] {
@@ -1040,9 +722,6 @@ function revokeCookieConsent() {
     }
     .hero-enter {
         opacity: 1;
-        animation: none;
-    }
-    .sensor-bar {
         animation: none;
     }
 }

@@ -1,0 +1,80 @@
+# Production Docker Compose — uses pre-built images from GHCR.
+# Used by the CD pipeline. Do NOT build images locally with this file.
+#
+# Required environment variables (set via .env or export):
+#   BACKEND_IMAGE  — e.g. ghcr.io/wlankabl/cold-blood-cast/backend:latest
+#   FRONTEND_IMAGE — e.g. ghcr.io/wlankabl/cold-blood-cast/frontend:latest
+#   DB_PASSWORD    — PostgreSQL password
+
+services:
+    postgres:
+        image: postgres:16-alpine
+        container_name: cbc-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: coldblood
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: coldbloodcast
+        ports:
+            - "127.0.0.1:5432:5432"
+        volumes:
+            - ${DATA_DIR:-./data}/postgres:/var/lib/postgresql/data
+        networks:
+            - internal
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U coldblood"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+    backend:
+        image: ${BACKEND_IMAGE:-ghcr.io/wlankabl/cold-blood-cast/backend:latest}
+        container_name: cbc-backend
+        restart: unless-stopped
+        env_file:
+            - .env
+        environment:
+            DATABASE_URL: postgresql://coldblood:${DB_PASSWORD}@postgres:5432/coldbloodcast?schema=public
+            PORT: "3001"
+            NODE_ENV: production
+        ports:
+            - "3001:3001"
+        volumes:
+            - ${UPLOADS_DIR:-./uploads}:/app/uploads
+        networks:
+            - internal
+            - web
+        depends_on:
+            postgres:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 60s
+
+    frontend:
+        image: ${FRONTEND_IMAGE:-ghcr.io/wlankabl/cold-blood-cast/frontend:latest}
+        container_name: cbc-frontend
+        restart: unless-stopped
+        environment:
+            PORT: "3000"
+        ports:
+            - "3000:3000"
+        networks:
+            - web
+        depends_on:
+            - backend
+        healthcheck:
+            test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
+
+networks:
+    internal:
+        driver: bridge
+    web:
+        driver: bridge

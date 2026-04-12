@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.veterinarians.title") }}

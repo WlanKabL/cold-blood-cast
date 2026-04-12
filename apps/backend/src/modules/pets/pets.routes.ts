@@ -14,8 +14,8 @@ const PetBaseSchema = z.object({
     acquisitionDate: z.coerce.date().optional(),
     notes: z.string().max(2000).optional(),
     imageUrl: z.string().url().optional(),
-    feedingIntervalMinDays: z.number().int().min(1).max(365).optional().nullable(),
-    feedingIntervalMaxDays: z.number().int().min(1).max(365).optional().nullable(),
+    feedingIntervalMinDays: z.number().int().min(1).max(365).optional().nullable().transform((v) => v ?? undefined),
+    feedingIntervalMaxDays: z.number().int().min(1).max(365).optional().nullable().transform((v) => v ?? undefined),
 });
 
 const feedingIntervalRefine = (data: {
@@ -29,7 +29,7 @@ const feedingIntervalRefine = (data: {
 };
 const feedingIntervalMessage = {
     message: "Min interval must be less than or equal to max interval",
-    path: ["feedingIntervalMinDays"] as const,
+    path: ["feedingIntervalMinDays"],
 };
 
 const CreatePetSchema = PetBaseSchema.refine(feedingIntervalRefine, feedingIntervalMessage);

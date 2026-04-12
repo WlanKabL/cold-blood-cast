@@ -2,156 +2,112 @@
     "landing": {
         "nav": {
             "features": "Features",
-            "monitoring": "Monitoring",
-            "alerts": "Alerts",
-            "careLog": "Care Log",
+            "howItWorks": "How It Works",
+            "forKeepers": "For Keepers",
             "login": "Sign In",
             "getStarted": "Get Started"
         },
         "hero": {
-            "badge": "Free & Open Source — Runs on your Raspberry Pi",
-            "titleLine1": "Stop Worrying.",
-            "titleLine2": "Start ",
-            "word1": "Monitoring.",
-            "word2": "Tracking.",
-            "word3": "Knowing.",
-            "subtitle": "Your terrarium tells a story. KeeperLog reads it for you — real-time sensors, automated alerts, and a care journal to keep your reptile safe and healthy.",
+            "titleLine1": "Your reptiles.",
+            "titleLine2": "Taken care of.",
+            "word1": "Always.",
+            "word2": "Effortlessly.",
+            "word3": "Reliably.",
+            "subtitle": "KeeperLog is the all-in-one companion for reptile keepers who care. Monitor your enclosures, track feedings and sheds, and get a heads-up when something needs attention.",
             "primaryCta": "Get Started",
-            "secondaryCta": "See How It Works"
-        },
-        "preview": {
-            "temperature": "Temperature",
-            "humidity": "Humidity",
-            "dashboardBar": "KeeperLog Dashboard",
-            "sensorBar": "Sensor Readings",
-            "alertsBar": "Alert Rules",
-            "careLogBar": "Care Journal",
-            "warmSide": "Warm Side",
-            "coolSide": "Cool Side",
-            "enclosures": "Enclosures",
-            "activeSensors": "Active Sensors",
-            "lastFeeding": "Last Feeding",
-            "nextShedding": "Next Shedding"
-        },
-        "problem": {
-            "label": "The reality",
-            "title": "This is how most keepers lose control",
-            "manual": {
-                "title": "Manual Monitoring",
-                "desc": "You check your terrarium twice a day, but have no idea what happens at night — temperature drops, humidity spikes, heater failures go unnoticed."
-            },
-            "blind": {
-                "title": "Flying Blind",
-                "desc": "You have no historical data. Was yesterday's humidity spike normal? Did the hot spot drop below safe levels last week? You'll never know."
-            },
-            "emergency": {
-                "title": "Emergencies Undetected",
-                "desc": "A sensor failure or heater malfunction could put your animal at risk for hours before you notice."
-            },
-            "transition": "There's a better way."
+            "secondaryCta": "See What's Inside"
         },
         "features": {
-            "label": "And there's more",
-            "title": "Built for every part of your husbandry",
-            "subtitle": "Sensors, alerts, feeding logs, shedding tracking — everything a responsible keeper needs, none of the complexity.",
+            "label": "What's inside",
+            "title": "Everything a keeper needs",
+            "subtitle": "From live sensor data to a complete care journal — KeeperLog covers your daily routine without getting in the way.",
             "sensors": {
-                "title": "Multi-Sensor Support",
-                "desc": "Connect DHT22, BME280, and other sensors via GPIO or Home Assistant. Monitor temperature, humidity, and pressure in real time."
+                "title": "Sensors & Climate",
+                "desc": "Hook up your DHT22, BME280, or pull data from Home Assistant. Temperature, humidity, pressure — always visible, always logged."
             },
             "alerts": {
-                "title": "Telegram Alerts",
-                "desc": "Get notified instantly when conditions go out of safe range. Set thresholds per sensor and receive alerts on your phone."
+                "title": "Smart Alerts",
+                "desc": "Set safe ranges for your enclosures and get a Telegram ping when something's off. No spam, just the stuff that matters."
             },
             "careLog": {
                 "title": "Care Journal",
-                "desc": "Log feedings, sheddings, and weight measurements. Track your reptile's health over time with searchable records."
+                "desc": "Feedings, sheds, weight — log it all in seconds. Look back anytime and see the full picture of your animal's health."
             },
             "dashboard": {
                 "title": "Live Dashboard",
-                "desc": "See all your enclosures, sensors, and pet status at a glance. Real-time data via WebSockets — no refresh needed."
+                "desc": "One screen, all your enclosures. Real-time data via WebSockets — no reloading, no waiting."
             }
         },
-        "monitoring": {
-            "label": "Sensor Monitoring",
-            "title": "Every reading. Every minute. One place.",
-            "desc": "KeeperLog polls your sensors continuously and stores every reading. See current values, historical trends, and spot anomalies before they become emergencies.",
-            "point1": "Real-time temperature & humidity from DHT22 and BME280 sensors",
-            "point2": "Home Assistant integration for additional sensor sources",
-            "point3": "Historical data stored locally — review trends over days, weeks, months",
-            "point4": "WebSocket-powered live updates on your dashboard"
-        },
-        "alertsDeep": {
-            "label": "Alert System",
-            "title": "Never miss a critical condition",
-            "desc": "Define safe ranges for each sensor. When temperature drops too low or humidity spikes too high, KeeperLog sends you an alert via Telegram — instantly.",
-            "point1": "Per-sensor thresholds with configurable min/max values",
-            "point2": "Telegram notifications with cooldown to prevent spam",
-            "point3": "Alert history to review past incidents",
-            "point4": "Works 24/7 — even when you're asleep"
-        },
-        "comparison": {
-            "label": "The difference",
-            "title": "Before and after KeeperLog",
-            "without": "Without KeeperLog",
-            "with": "With KeeperLog",
-            "manual": {
-                "bad": "Checking thermometers twice a day and hoping nothing changed overnight",
-                "good": "Continuous monitoring with alerts the moment something goes wrong"
+        "keepers": {
+            "label": "Why keepers love it",
+            "title": "Less stress, more keeping",
+            "peace": {
+                "title": "Peace of Mind",
+                "desc": "Go to sleep knowing your enclosures are watched. If something goes off, you'll know — even at 3 AM."
             },
-            "blind": {
-                "bad": "No historical data — you can't tell if conditions are trending in the wrong direction",
-                "good": "Full sensor logs with historical charts and trend analysis"
+            "history": {
+                "title": "Full History",
+                "desc": "Every feeding, every shed, every sensor reading — logged and searchable. No more 'when was the last time I…?'"
             },
-            "care": {
-                "bad": "Trying to remember when you last fed, when the last shed was, relying on memory",
-                "good": "Complete digital care journal with feeding, shedding, and weight records"
-            },
-            "emergency": {
-                "bad": "Discovering a heater failure hours later when the enclosure is already dangerously cold",
-                "good": "Instant Telegram alerts the moment readings leave the safe range"
+            "privacy": {
+                "title": "Your Data, Secured",
+                "desc": "Encrypted storage, strict access controls, and no third-party tracking. Your animals' data stays yours."
             }
-        },
-        "cta": {
-            "title": "Your terrarium deserves better monitoring.",
-            "subtitle": "Join keepers who stopped guessing and started knowing. Free, open source, runs on your Pi.",
-            "button": "Get Started",
-            "docs": "Read the Docs"
         },
         "howItWorks": {
-            "label": "How it works",
-            "title": "From hardware to dashboard in three steps",
-            "connect": {
-                "title": "Connect",
-                "desc": "Wire up your DHT22 or BME280 sensors to a Raspberry Pi. KeeperLog auto-detects connected sensors on startup."
+            "label": "Getting started",
+            "title": "Up and running in minutes",
+            "register": {
+                "title": "Sign Up",
+                "desc": "Create your free account in seconds. No credit card, no setup hassle — just sign up and you're in."
             },
-            "monitor": {
-                "title": "Monitor",
-                "desc": "Sensor data is polled automatically and displayed on a live dashboard. Every reading is logged for historical review."
+            "setup": {
+                "title": "Set Up",
+                "desc": "Add your enclosures, register your animals, set your alert thresholds. Five minutes, tops."
             },
-            "alert": {
-                "title": "Stay Safe",
-                "desc": "Set alert thresholds and connect Telegram. If conditions go out of range, you'll know within seconds."
+            "relax": {
+                "title": "Relax",
+                "desc": "That's it. KeeperLog monitors around the clock, logs everything, and pings you when it matters. You do the keeping — we handle the rest."
+            }
+        },
+        "setup": {
+            "label": "Your setup, your rules",
+            "title": "Works with what you have",
+            "desc": "KeeperLog fits into whatever hardware you're already running. No proprietary ecosystem, no vendor lock-in — just plug in and go.",
+            "tech": {
+                "pi": "Runs on Pi 3, 4 & 5",
+                "dht": "GPIO or I²C sensors",
+                "ha": "Pull any HA entity",
+                "telegram": "Instant mobile alerts",
+                "ws": "Live data, no polling",
+                "local": "Everything stays local"
             }
         },
         "trust": {
-            "encrypted": "Runs locally on your Pi",
-            "openSource": "Free & open source",
-            "fast": "Setup in 10 minutes"
+            "encrypted": "Encrypted & secure",
+            "openSource": "Built for keepers",
+            "fast": "Setup in 5 minutes"
         },
         "social": {
-            "sensors": "Sensors Monitored",
-            "enclosures": "Enclosures Tracked",
-            "alerts": "Alerts Sent",
-            "uptime": "Uptime"
+            "enclosures": "Unlimited Enclosures",
+            "sensors": "Unlimited Sensors",
+            "monitoring": "Monitoring",
+            "alerts": "Alert Response"
+        },
+        "cta": {
+            "title": "Ready to level up your keeping?",
+            "subtitle": "Join keepers who stopped guessing and started knowing. Sign up and see the difference.",
+            "button": "Get Started"
         },
         "footer": {
-            "tagline": "Your terrarium monitoring system — sensors, alerts, and care journal in one place.",
+            "tagline": "The all-in-one tool for reptile keepers — sensors, alerts, and care journal in one place.",
             "product": "Product",
             "resources": "Resources",
             "docs": "Documentation",
-            "legal": "Legal"
+            "legal": "Legal",
+            "copyright": "© {year} KeeperLog. All rights reserved."
         },
-        "pageTitle": "Terrarium Monitoring & Alerts"
+        "pageTitle": "KeeperLog — For Reptile Keepers"
     },
     "cookie": {
         "message": "We use cookies to keep you logged in and improve your experience.",
@@ -776,7 +732,12 @@
             "predictedOverdue": "{days}d overdue",
             "avgCycle": "avg. {days}d cycle",
             "overdueMaintenance": "Overdue Maintenance",
-            "noOverdueMaintenance": "All maintenance tasks are up to date"
+            "noOverdueMaintenance": "All maintenance tasks are up to date",
+            "tabs": {
+                "overview": "Overview",
+                "schedule": "Schedule",
+                "maintenance": "Maintenance"
+            }
         },
         "enclosures": {
             "title": "Enclosures",
@@ -796,6 +757,11 @@
             "maintenanceTasks": "Maintenance Tasks",
             "noMaintenanceTasks": "No maintenance tasks for this enclosure",
             "overdueTasksCount": "{n} overdue task(s)",
+            "tabs": {
+                "info": "Info",
+                "inhabitants": "Inhabitants",
+                "maintenance": "Maintenance"
+            },
             "confirmDelete": "Delete this enclosure? All linked sensors will be unlinked. This cannot be undone.",
             "deleted": "Enclosure deleted",
             "saved": "Enclosure saved",
@@ -973,6 +939,12 @@
                 "delete": "Delete Public Profile",
                 "deleteConfirmTitle": "Delete Public Profile",
                 "deleteConfirmMessage": "Remove the public page for this pet? The URL will stop working immediately."
+            },
+            "tabs": {
+                "overview": "Overview",
+                "care": "Care",
+                "health": "Health",
+                "activity": "Activity"
             }
         },
         "sensors": {
@@ -1214,7 +1186,12 @@
             "deleteDialogItem2": "All settings, API keys, and care records",
             "deleteDialogItem3": "Your account and all personal data",
             "deleteDialogConfirmHint": "You will receive an email with a confirmation link. Final deletion requires your password.",
-            "deleteDialogConfirm": "Send Confirmation Email"
+            "deleteDialogConfirm": "Send Confirmation Email",
+            "tabs": {
+                "general": "General",
+                "security": "Security",
+                "privacy": "Privacy"
+            }
         },
         "confirmDelete": {
             "title": "Confirm Account Deletion",
@@ -1399,6 +1376,11 @@
                 "dropzoneHint": "Images (JPEG, PNG, GIF, WebP, AVIF) and PDF files",
                 "uploading": "Uploading...",
                 "editLabel": "Edit Label",
+                "tabs": {
+                    "info": "Info",
+                    "documents": "Documents",
+                    "followUps": "Follow-Ups"
+                },
                 "visitOn": "Visit on {date}",
                 "appointmentOn": "Appointment on {date}",
                 "notSet": "Not set"

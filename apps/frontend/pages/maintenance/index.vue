@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-7xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.maintenance.title") }}
@@ -16,7 +18,7 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="animate-fade-in-up flex flex-col gap-3 delay-75 sm:flex-row sm:items-center">
             <UiTextInput
                 v-model="searchQuery"
                 :placeholder="$t('pages.maintenance.search')"
@@ -62,7 +64,7 @@
             <div
                 v-for="task in filteredTasks"
                 :key="task.id"
-                class="glass-card group rounded-xl p-5 transition-all hover:ring-1 hover:ring-white/10"
+                class="glass-card group rounded-xl p-5 transition-all hover:shadow-lg hover:ring-1 hover:shadow-black/5 hover:ring-white/10"
             >
                 <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
@@ -106,7 +108,10 @@
                         <Icon name="lucide:calendar" class="h-3.5 w-3.5" />
                         {{ formatDueStatus(task) }}
                     </span>
-                    <span v-if="task.recurring && task.intervalDays" class="flex items-center gap-1.5">
+                    <span
+                        v-if="task.recurring && task.intervalDays"
+                        class="flex items-center gap-1.5"
+                    >
                         <Icon name="lucide:repeat" class="h-3.5 w-3.5" />
                         {{ $t("pages.maintenance.every", { n: task.intervalDays }) }}
                     </span>
@@ -182,10 +187,7 @@
                     </option>
                 </UiSelect>
 
-                <UiSelect
-                    v-model="form.type"
-                    :label="$t('pages.maintenance.fields.type')"
-                >
+                <UiSelect v-model="form.type" :label="$t('pages.maintenance.fields.type')">
                     <option v-for="mt in maintenanceTypes" :key="mt" :value="mt">
                         {{ $t(`pages.maintenance.types.${mt}`) }}
                     </option>

@@ -10,13 +10,13 @@ import {
     deletePetDocument,
 } from "./pet-documents.service.js";
 
-const categoryValues = Object.values(PetDocumentCategory) as [string, ...string[]];
+const categoryValues = Object.values(PetDocumentCategory) as string[];
 
 const UpdateDocumentSchema = z.object({
-    category: z.enum(categoryValues).optional(),
+    category: z.nativeEnum(PetDocumentCategory).optional(),
     label: z.string().max(200).optional(),
     notes: z.string().max(2000).optional(),
-    documentDate: z.string().datetime({ offset: true }).optional().nullable(),
+    documentDate: z.string().datetime({ offset: true }).optional().nullable().transform((v) => v ?? undefined),
 });
 
 export async function petDocumentRoutes(app: FastifyInstance) {

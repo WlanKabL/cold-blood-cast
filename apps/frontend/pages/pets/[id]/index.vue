@@ -1,7 +1,7 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Back + Header -->
-        <div class="flex items-center gap-3">
+        <div class="animate-fade-in-up flex items-center gap-3">
             <NuxtLink
                 to="/pets"
                 class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors"
@@ -51,485 +51,564 @@
         </div>
 
         <template v-else-if="pet">
-            <!-- Info Card -->
-            <div class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.details") }}</h2>
-                    <span
-                        v-if="pet.enclosure"
-                        class="bg-primary-500/10 text-primary-400 rounded-md px-2 py-0.5 text-xs font-medium"
-                    >
-                        {{ pet.enclosure.name }}
-                    </span>
-                </div>
-                <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.pets.fields.species") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">{{ pet.species }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.pets.fields.morph") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">{{ pet.morph || "—" }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.pets.fields.gender") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">{{ pet.gender || "—" }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.pets.fields.birthDate") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">
-                            {{ pet.birthDate ? new Date(pet.birthDate).toLocaleDateString() : "—" }}
-                        </dd>
-                    </div>
-                    <div v-if="pet.notes" class="sm:col-span-2">
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.pets.fields.notes") }}
-                        </dt>
-                        <dd class="text-fg mt-1 text-sm">{{ pet.notes }}</dd>
-                    </div>
-                    <div
-                        v-if="pet.feedingIntervalMinDays && pet.feedingIntervalMaxDays"
-                        class="sm:col-span-2"
-                    >
-                        <dt class="text-fg-faint text-xs font-medium uppercase">
-                            {{ $t("pages.pets.feedingSchedule") }}
-                        </dt>
-                        <dd class="text-fg mt-1 flex items-center gap-3 text-sm">
+            <!-- Tabs -->
+            <UiTabs v-model="activeTab" :tabs="petTabs">
+                <!-- Overview Tab -->
+                <div v-if="activeTab === 'overview'" class="space-y-6">
+                    <!-- Info Card -->
+                    <div class="glass-card-accent rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">{{ $t("pages.pets.details") }}</h2>
                             <span
-                                >{{ pet.feedingIntervalMinDays }}–{{ pet.feedingIntervalMaxDays }}
-                                {{
-                                    $t("pages.pets.fields.feedingIntervalMinDays")
-                                        .split("(")[1]
-                                        ?.replace(")", "") || "days"
-                                }}</span
+                                v-if="pet.enclosure"
+                                class="bg-primary-500/10 text-primary-400 rounded-md px-2 py-0.5 text-xs font-medium"
                             >
-                            <span
-                                v-if="feedingStatus"
-                                :class="feedingStatusBadgeClass(feedingStatus.status)"
-                                class="rounded-md px-2 py-0.5 text-xs font-medium"
-                            >
-                                {{ feedingStatusLabel(feedingStatus.status) }}
-                                <template v-if="feedingStatus.daysSinceLastFeeding !== null">
-                                    · {{ feedingStatus.daysSinceLastFeeding }}d
-                                </template>
+                                {{ pet.enclosure.name }}
                             </span>
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-
-            <!-- Photos Preview -->
-            <div v-if="authStore.hasFeature('photos')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">
-                        {{ $t("pages.pets.photos.title") }}
-                        <span
-                            v-if="pet._count.photos"
-                            class="text-fg-faint ml-1 text-sm font-normal"
-                        >
-                            ({{ pet._count.photos }})
-                        </span>
-                    </h2>
-                    <NuxtLink
-                        :to="`/pets/${petId}/photos`"
-                        class="text-primary-400 text-sm font-medium"
-                    >
-                        {{ $t("pages.pets.photos.viewGallery") }}
-                    </NuxtLink>
-                </div>
-                <div v-if="pet._count.photos" class="flex items-center gap-4">
-                    <img
-                        v-if="pet.photos.length"
-                        :src="resolveUrl(pet.photos[0].upload.url)"
-                        :alt="pet.name"
-                        class="h-20 w-20 rounded-xl object-cover ring-1 ring-white/10"
-                    />
-                    <div
-                        v-else
-                        class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl"
-                    >
-                        <Icon name="lucide:images" class="text-fg-faint h-8 w-8" />
-                    </div>
-                    <div>
-                        <p class="text-fg text-sm">
-                            {{ $t("pages.pets.photos.photoCount", { count: pet._count.photos }) }}
-                        </p>
-                        <NuxtLink
-                            :to="`/pets/${petId}/photos`"
-                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
-                        >
-                            <Icon name="lucide:images" class="h-3.5 w-3.5" />
-                            {{ $t("pages.pets.photos.viewGallery") }}
-                        </NuxtLink>
-                    </div>
-                </div>
-                <div v-else class="flex items-center gap-3">
-                    <div
-                        class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl"
-                    >
-                        <Icon name="lucide:image" class="text-fg-faint h-8 w-8" />
-                    </div>
-                    <div>
-                        <p class="text-fg-muted text-sm">{{ $t("pages.pets.photos.empty") }}</p>
-                        <NuxtLink
-                            :to="`/pets/${petId}/photos`"
-                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
-                        >
-                            <Icon name="lucide:upload" class="h-3.5 w-3.5" />
-                            {{ $t("pages.pets.photos.upload") }}
-                        </NuxtLink>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Documents -->
-            <div v-if="authStore.hasFeature('pet_documents')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">
-                        {{ $t("pages.pets.documents.title") }}
-                        <span
-                            v-if="pet._count.documents"
-                            class="text-fg-faint ml-1 text-sm font-normal"
-                        >
-                            ({{ pet._count.documents }})
-                        </span>
-                    </h2>
-                    <NuxtLink
-                        :to="`/pets/${petId}/documents`"
-                        class="text-primary-400 text-sm font-medium"
-                    >
-                        {{ $t("pages.pets.documents.viewDocuments") }}
-                    </NuxtLink>
-                </div>
-                <div v-if="pet._count.documents" class="flex items-center gap-3">
-                    <div
-                        class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl"
-                    >
-                        <Icon name="lucide:file-text" class="text-primary-400 h-5 w-5" />
-                    </div>
-                    <div>
-                        <p class="text-fg text-sm">
-                            {{
-                                $t("pages.pets.documents.documentCount", {
-                                    count: pet._count.documents,
-                                })
-                            }}
-                        </p>
-                        <NuxtLink
-                            :to="`/pets/${petId}/documents`"
-                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
-                        >
-                            <Icon name="lucide:folder-open" class="h-3.5 w-3.5" />
-                            {{ $t("pages.pets.documents.viewDocuments") }}
-                        </NuxtLink>
-                    </div>
-                </div>
-                <div v-else class="flex items-center gap-3">
-                    <div
-                        class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl"
-                    >
-                        <Icon name="lucide:file-text" class="text-fg-faint h-5 w-5" />
-                    </div>
-                    <div>
-                        <p class="text-fg-muted text-sm">{{ $t("pages.pets.documents.empty") }}</p>
-                        <NuxtLink
-                            :to="`/pets/${petId}/documents`"
-                            class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
-                        >
-                            <Icon name="lucide:upload" class="h-3.5 w-3.5" />
-                            {{ $t("pages.pets.documents.upload") }}
-                        </NuxtLink>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Feedings -->
-            <div v-if="authStore.hasFeature('feedings')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentFeedings") }}</h2>
-                    <NuxtLink to="/feedings" class="text-primary-400 text-sm font-medium">{{
-                        $t("pages.dashboard.viewAll")
-                    }}</NuxtLink>
-                </div>
-                <div v-if="feedings?.length" class="space-y-2">
-                    <div
-                        v-for="feeding in feedings"
-                        :key="feeding.id"
-                        class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
-                    >
-                        <div class="flex items-center gap-3">
-                            <Icon name="lucide:utensils" class="h-4 w-4 text-amber-400" />
-                            <span class="text-fg text-sm">{{ feeding.foodType }}</span>
-                            <span v-if="feeding.foodSize" class="text-fg-faint text-xs"
-                                >({{ feeding.foodSize }})</span
+                        </div>
+                        <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.fields.species") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">{{ pet.species }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.fields.morph") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">{{ pet.morph || "—" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.fields.gender") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">{{ pet.gender || "—" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.fields.birthDate") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">
+                                    {{
+                                        pet.birthDate
+                                            ? new Date(pet.birthDate).toLocaleDateString()
+                                            : "—"
+                                    }}
+                                </dd>
+                            </div>
+                            <div v-if="pet.notes" class="sm:col-span-2">
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.fields.notes") }}
+                                </dt>
+                                <dd class="text-fg mt-1 text-sm">{{ pet.notes }}</dd>
+                            </div>
+                            <div
+                                v-if="pet.feedingIntervalMinDays && pet.feedingIntervalMaxDays"
+                                class="sm:col-span-2"
                             >
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.feedingSchedule") }}
+                                </dt>
+                                <dd class="text-fg mt-1 flex items-center gap-3 text-sm">
+                                    <span
+                                        >{{ pet.feedingIntervalMinDays }}–{{
+                                            pet.feedingIntervalMaxDays
+                                        }}
+                                        {{ $t("common.days") }}</span
+                                    >
+                                    <span
+                                        v-if="feedingStatus"
+                                        :class="feedingStatusBadgeClass(feedingStatus.status)"
+                                        class="rounded-md px-2 py-0.5 text-xs font-medium"
+                                    >
+                                        {{ feedingStatusLabel(feedingStatus.status) }}
+                                        <template
+                                            v-if="feedingStatus.daysSinceLastFeeding !== null"
+                                        >
+                                            · {{ feedingStatus.daysSinceLastFeeding }}d
+                                        </template>
+                                    </span>
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <!-- Photos Preview -->
+                    <div v-if="authStore.hasFeature('photos')" class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.photos.title") }}
+                                <span
+                                    v-if="pet._count.photos"
+                                    class="text-fg-faint ml-1 text-sm font-normal"
+                                >
+                                    ({{ pet._count.photos }})
+                                </span>
+                            </h2>
+                            <NuxtLink
+                                :to="`/pets/${petId}/photos`"
+                                class="text-primary-400 text-sm font-medium"
+                            >
+                                {{ $t("pages.pets.photos.viewGallery") }}
+                            </NuxtLink>
                         </div>
-                        <span class="text-fg-faint text-xs">{{
-                            new Date(feeding.fedAt).toLocaleDateString()
-                        }}</span>
-                    </div>
-                </div>
-                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noFeedings") }}</p>
-            </div>
-
-            <!-- Weight History -->
-            <div v-if="authStore.hasFeature('weights')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.weightHistory") }}</h2>
-                    <div class="flex items-center gap-3">
-                        <select
-                            v-model="weightRange"
-                            class="bg-surface-raised text-fg-muted rounded-md border border-white/10 px-2 py-1 text-xs"
-                        >
-                            <option value="30">{{ $t("pages.weights.chart.last30d") }}</option>
-                            <option value="90">{{ $t("pages.weights.chart.last90d") }}</option>
-                            <option value="365">{{ $t("pages.weights.chart.last1y") }}</option>
-                            <option value="0">{{ $t("pages.weights.chart.allTime") }}</option>
-                        </select>
-                        <NuxtLink to="/weights" class="text-primary-400 text-sm font-medium">{{
-                            $t("pages.dashboard.viewAll")
-                        }}</NuxtLink>
-                    </div>
-                </div>
-
-                <!-- Growth Rate Indicator -->
-                <div v-if="growthRate" class="mb-4 flex flex-wrap items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <Icon
-                            :name="
-                                growthRate.trend === 'up'
-                                    ? 'lucide:trending-up'
-                                    : growthRate.trend === 'down'
-                                      ? 'lucide:trending-down'
-                                      : 'lucide:minus'
-                            "
-                            :class="
-                                growthRate.trend === 'up'
-                                    ? 'text-green-400'
-                                    : growthRate.trend === 'down'
-                                      ? 'text-red-400'
-                                      : 'text-fg-faint'
-                            "
-                            class="h-4 w-4"
-                        />
-                        <span
-                            :class="
-                                growthRate.trend === 'up'
-                                    ? 'text-green-400'
-                                    : growthRate.trend === 'down'
-                                      ? 'text-red-400'
-                                      : 'text-fg-faint'
-                            "
-                            class="text-xs font-medium"
-                        >
-                            {{
-                                $t(
-                                    `pages.weights.chart.trend${growthRate.trend.charAt(0).toUpperCase() + growthRate.trend.slice(1)}`,
-                                )
-                            }}
-                        </span>
-                    </div>
-                    <span class="text-fg-faint text-xs">
-                        {{
-                            $t("pages.weights.chart.perMonth", {
-                                rate: growthRate.avgGramsPerMonth,
-                            })
-                        }}
-                    </span>
-                    <span class="text-fg-faint text-xs">
-                        {{
-                            $t("pages.weights.chart.totalGain", { gain: growthRate.totalGainGrams })
-                        }}
-                    </span>
-                    <span class="text-fg-faint text-xs">
-                        {{ $t("pages.weights.chart.records", { count: growthRate.recordCount }) }}
-                    </span>
-                </div>
-
-                <div v-if="chartSeries?.length">
-                    <ChartsWeightLineChart
-                        :series="chartSeries"
-                        :height="250"
-                        :show-legend="false"
-                    />
-                </div>
-                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
-            </div>
-
-            <!-- Shedding Cycle Analysis -->
-            <div v-if="authStore.hasFeature('sheddings')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">
-                        {{ $t("pages.pets.sheddingCycle") }}
-                        <span
-                            v-if="sheddingAnalysis?.isAnomaly"
-                            class="ml-2 inline-flex items-center gap-1 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
-                        >
-                            <Icon name="lucide:alert-triangle" class="h-3 w-3" />
-                            {{ $t("pages.sheddings.analysis.warning") }}
-                        </span>
-                    </h2>
-                    <NuxtLink to="/sheddings" class="text-primary-400 text-sm font-medium">{{
-                        $t("pages.dashboard.viewAll")
-                    }}</NuxtLink>
-                </div>
-                <template v-if="sheddingAnalysis && sheddingAnalysis.sheddingCount >= 2">
-                    <div class="mb-4 flex flex-wrap items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <Icon name="lucide:calendar-clock" class="text-primary-400 h-4 w-4" />
-                            <span class="text-fg-faint text-xs font-medium uppercase">{{
-                                $t("pages.sheddings.analysis.averageCycle")
-                            }}</span>
-                            <span class="text-fg text-sm font-semibold">{{
-                                $t("pages.sheddings.analysis.averageCycleDays", {
-                                    days: sheddingAnalysis.averageIntervalDays,
-                                })
-                            }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <Icon
-                                :name="
-                                    sheddingAnalysis.trend === 'shortening'
-                                        ? 'lucide:trending-down'
-                                        : sheddingAnalysis.trend === 'lengthening'
-                                          ? 'lucide:trending-up'
-                                          : 'lucide:minus'
-                                "
-                                :class="
-                                    sheddingAnalysis.trend === 'shortening'
-                                        ? 'text-green-400'
-                                        : sheddingAnalysis.trend === 'lengthening'
-                                          ? 'text-amber-400'
-                                          : 'text-fg-faint'
-                                "
-                                class="h-4 w-4"
+                        <div v-if="pet._count.photos" class="flex items-center gap-4">
+                            <img
+                                v-if="pet.photos.length"
+                                :src="resolveUrl(pet.photos[0].upload.url)"
+                                :alt="pet.name"
+                                class="h-20 w-20 rounded-xl object-cover ring-1 ring-white/10"
                             />
-                            <span
-                                :class="
-                                    sheddingAnalysis.trend === 'shortening'
-                                        ? 'text-green-400'
-                                        : sheddingAnalysis.trend === 'lengthening'
-                                          ? 'text-amber-400'
-                                          : 'text-fg-faint'
-                                "
-                                class="text-xs font-medium"
+                            <div
+                                v-else
+                                class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl"
                             >
+                                <Icon name="lucide:images" class="text-fg-faint h-8 w-8" />
+                            </div>
+                            <div>
+                                <p class="text-fg text-sm">
+                                    {{
+                                        $t("pages.pets.photos.photoCount", {
+                                            count: pet._count.photos,
+                                        })
+                                    }}
+                                </p>
+                                <NuxtLink
+                                    :to="`/pets/${petId}/photos`"
+                                    class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                                >
+                                    <Icon name="lucide:images" class="h-3.5 w-3.5" />
+                                    {{ $t("pages.pets.photos.viewGallery") }}
+                                </NuxtLink>
+                            </div>
+                        </div>
+                        <div v-else class="flex items-center gap-3">
+                            <div
+                                class="bg-surface-raised flex h-20 w-20 items-center justify-center rounded-xl"
+                            >
+                                <Icon name="lucide:image" class="text-fg-faint h-8 w-8" />
+                            </div>
+                            <div>
+                                <p class="text-fg-muted text-sm">
+                                    {{ $t("pages.pets.photos.empty") }}
+                                </p>
+                                <NuxtLink
+                                    :to="`/pets/${petId}/photos`"
+                                    class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                                >
+                                    <Icon name="lucide:upload" class="h-3.5 w-3.5" />
+                                    {{ $t("pages.pets.photos.upload") }}
+                                </NuxtLink>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents -->
+                    <div
+                        v-if="authStore.hasFeature('pet_documents')"
+                        class="glass-card rounded-xl p-6"
+                    >
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.documents.title") }}
+                                <span
+                                    v-if="pet._count.documents"
+                                    class="text-fg-faint ml-1 text-sm font-normal"
+                                >
+                                    ({{ pet._count.documents }})
+                                </span>
+                            </h2>
+                            <NuxtLink
+                                :to="`/pets/${petId}/documents`"
+                                class="text-primary-400 text-sm font-medium"
+                            >
+                                {{ $t("pages.pets.documents.viewDocuments") }}
+                            </NuxtLink>
+                        </div>
+                        <div v-if="pet._count.documents" class="flex items-center gap-3">
+                            <div
+                                class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl"
+                            >
+                                <Icon name="lucide:file-text" class="text-primary-400 h-5 w-5" />
+                            </div>
+                            <div>
+                                <p class="text-fg text-sm">
+                                    {{
+                                        $t("pages.pets.documents.documentCount", {
+                                            count: pet._count.documents,
+                                        })
+                                    }}
+                                </p>
+                                <NuxtLink
+                                    :to="`/pets/${petId}/documents`"
+                                    class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                                >
+                                    <Icon name="lucide:folder-open" class="h-3.5 w-3.5" />
+                                    {{ $t("pages.pets.documents.viewDocuments") }}
+                                </NuxtLink>
+                            </div>
+                        </div>
+                        <div v-else class="flex items-center gap-3">
+                            <div
+                                class="bg-surface-raised flex h-12 w-12 items-center justify-center rounded-xl"
+                            >
+                                <Icon name="lucide:file-text" class="text-fg-faint h-5 w-5" />
+                            </div>
+                            <div>
+                                <p class="text-fg-muted text-sm">
+                                    {{ $t("pages.pets.documents.empty") }}
+                                </p>
+                                <NuxtLink
+                                    :to="`/pets/${petId}/documents`"
+                                    class="text-primary-400 mt-1 inline-flex items-center gap-1 text-xs"
+                                >
+                                    <Icon name="lucide:upload" class="h-3.5 w-3.5" />
+                                    {{ $t("pages.pets.documents.upload") }}
+                                </NuxtLink>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Public Profile / Sharing -->
+                    <PetPublicProfileCard :pet-id="petId" />
+                </div>
+
+                <!-- Care Tab -->
+                <div v-if="activeTab === 'care'" class="space-y-6">
+                    <!-- Recent Feedings -->
+                    <div v-if="authStore.hasFeature('feedings')" class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.recentFeedings") }}
+                            </h2>
+                            <NuxtLink to="/feedings" class="text-primary-400 text-sm font-medium">
+                                {{ $t("pages.dashboard.viewAll") }}
+                            </NuxtLink>
+                        </div>
+                        <div v-if="feedings?.length" class="space-y-2">
+                            <div
+                                v-for="feeding in feedings"
+                                :key="feeding.id"
+                                class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <Icon name="lucide:utensils" class="h-4 w-4 text-amber-400" />
+                                    <span class="text-fg text-sm">{{ feeding.foodType }}</span>
+                                    <span v-if="feeding.foodSize" class="text-fg-faint text-xs"
+                                        >({{ feeding.foodSize }})</span
+                                    >
+                                </div>
+                                <span class="text-fg-faint text-xs">{{
+                                    new Date(feeding.fedAt).toLocaleDateString()
+                                }}</span>
+                            </div>
+                        </div>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.pets.noFeedings") }}
+                        </p>
+                    </div>
+
+                    <!-- Weight History -->
+                    <div v-if="authStore.hasFeature('weights')" class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.weightHistory") }}
+                            </h2>
+                            <div class="flex items-center gap-3">
+                                <select
+                                    v-model="weightRange"
+                                    class="bg-surface-raised text-fg-muted rounded-md border border-white/10 px-2 py-1 text-xs"
+                                >
+                                    <option value="30">
+                                        {{ $t("pages.weights.chart.last30d") }}
+                                    </option>
+                                    <option value="90">
+                                        {{ $t("pages.weights.chart.last90d") }}
+                                    </option>
+                                    <option value="365">
+                                        {{ $t("pages.weights.chart.last1y") }}
+                                    </option>
+                                    <option value="0">
+                                        {{ $t("pages.weights.chart.allTime") }}
+                                    </option>
+                                </select>
+                                <NuxtLink
+                                    to="/weights"
+                                    class="text-primary-400 text-sm font-medium"
+                                >
+                                    {{ $t("pages.dashboard.viewAll") }}
+                                </NuxtLink>
+                            </div>
+                        </div>
+
+                        <!-- Growth Rate Indicator -->
+                        <div v-if="growthRate" class="mb-4 flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <Icon
+                                    :name="
+                                        growthRate.trend === 'up'
+                                            ? 'lucide:trending-up'
+                                            : growthRate.trend === 'down'
+                                              ? 'lucide:trending-down'
+                                              : 'lucide:minus'
+                                    "
+                                    :class="
+                                        growthRate.trend === 'up'
+                                            ? 'text-green-400'
+                                            : growthRate.trend === 'down'
+                                              ? 'text-red-400'
+                                              : 'text-fg-faint'
+                                    "
+                                    class="h-4 w-4"
+                                />
+                                <span
+                                    :class="
+                                        growthRate.trend === 'up'
+                                            ? 'text-green-400'
+                                            : growthRate.trend === 'down'
+                                              ? 'text-red-400'
+                                              : 'text-fg-faint'
+                                    "
+                                    class="text-xs font-medium"
+                                >
+                                    {{
+                                        $t(
+                                            `pages.weights.chart.trend${growthRate.trend.charAt(0).toUpperCase() + growthRate.trend.slice(1)}`,
+                                        )
+                                    }}
+                                </span>
+                            </div>
+                            <span class="text-fg-faint text-xs">
                                 {{
-                                    $t(
-                                        `pages.sheddings.analysis.trend${sheddingAnalysis.trend.charAt(0).toUpperCase() + sheddingAnalysis.trend.slice(1)}`,
-                                    )
+                                    $t("pages.weights.chart.perMonth", {
+                                        rate: growthRate.avgGramsPerMonth,
+                                    })
+                                }}
+                            </span>
+                            <span class="text-fg-faint text-xs">
+                                {{
+                                    $t("pages.weights.chart.totalGain", {
+                                        gain: growthRate.totalGainGrams,
+                                    })
+                                }}
+                            </span>
+                            <span class="text-fg-faint text-xs">
+                                {{
+                                    $t("pages.weights.chart.records", {
+                                        count: growthRate.recordCount,
+                                    })
                                 }}
                             </span>
                         </div>
-                        <span v-if="sheddingAnalysis.lastShedDate" class="text-fg-faint text-xs">
-                            {{ $t("pages.sheddings.analysis.lastShed") }}:
-                            {{ new Date(sheddingAnalysis.lastShedDate).toLocaleDateString() }}
-                        </span>
-                        <span
-                            v-if="sheddingAnalysis.predictedNextDate"
-                            class="text-fg-faint text-xs"
-                        >
-                            {{ $t("pages.sheddings.analysis.predicted") }}:
-                            {{ new Date(sheddingAnalysis.predictedNextDate).toLocaleDateString() }}
-                        </span>
-                        <span class="text-fg-faint text-xs">
-                            {{
-                                $t("pages.sheddings.analysis.records", {
-                                    count: sheddingAnalysis.sheddingCount,
-                                })
-                            }}
-                        </span>
-                    </div>
-                    <ChartsSheddingIntervalChart
-                        :intervals="sheddingAnalysis.intervals"
-                        :average-days="sheddingAnalysis.averageIntervalDays"
-                        :height="200"
-                    />
-                </template>
-                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noSheddingData") }}</p>
-            </div>
 
-            <!-- Recent Vet Visits -->
-            <div v-if="authStore.hasFeature('vet_visits')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">{{ $t("pages.pets.recentVetVisits") }}</h2>
-                    <NuxtLink to="/vet-visits" class="text-primary-400 text-sm font-medium">{{
-                        $t("pages.dashboard.viewAll")
-                    }}</NuxtLink>
+                        <div v-if="chartSeries?.length">
+                            <ChartsWeightLineChart
+                                :series="chartSeries"
+                                :height="250"
+                                :show-legend="false"
+                            />
+                        </div>
+                        <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noWeights") }}</p>
+                    </div>
                 </div>
-                <div v-if="vetVisits?.length" class="space-y-2">
+
+                <!-- Health Tab -->
+                <div v-if="activeTab === 'health'" class="space-y-6">
+                    <!-- Shedding Cycle Analysis -->
+                    <div v-if="authStore.hasFeature('sheddings')" class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.sheddingCycle") }}
+                                <span
+                                    v-if="sheddingAnalysis?.isAnomaly"
+                                    class="ml-2 inline-flex items-center gap-1 rounded-md bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400"
+                                >
+                                    <Icon name="lucide:alert-triangle" class="h-3 w-3" />
+                                    {{ $t("pages.sheddings.analysis.warning") }}
+                                </span>
+                            </h2>
+                            <NuxtLink to="/sheddings" class="text-primary-400 text-sm font-medium">
+                                {{ $t("pages.dashboard.viewAll") }}
+                            </NuxtLink>
+                        </div>
+                        <template v-if="sheddingAnalysis && sheddingAnalysis.sheddingCount >= 2">
+                            <div class="mb-4 flex flex-wrap items-center gap-4">
+                                <div class="flex items-center gap-2">
+                                    <Icon
+                                        name="lucide:calendar-clock"
+                                        class="text-primary-400 h-4 w-4"
+                                    />
+                                    <span class="text-fg-faint text-xs font-medium uppercase">
+                                        {{ $t("pages.sheddings.analysis.averageCycle") }}
+                                    </span>
+                                    <span class="text-fg text-sm font-semibold">
+                                        {{
+                                            $t("pages.sheddings.analysis.averageCycleDays", {
+                                                days: sheddingAnalysis.averageIntervalDays,
+                                            })
+                                        }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <Icon
+                                        :name="
+                                            sheddingAnalysis.trend === 'shortening'
+                                                ? 'lucide:trending-down'
+                                                : sheddingAnalysis.trend === 'lengthening'
+                                                  ? 'lucide:trending-up'
+                                                  : 'lucide:minus'
+                                        "
+                                        :class="
+                                            sheddingAnalysis.trend === 'shortening'
+                                                ? 'text-green-400'
+                                                : sheddingAnalysis.trend === 'lengthening'
+                                                  ? 'text-amber-400'
+                                                  : 'text-fg-faint'
+                                        "
+                                        class="h-4 w-4"
+                                    />
+                                    <span
+                                        :class="
+                                            sheddingAnalysis.trend === 'shortening'
+                                                ? 'text-green-400'
+                                                : sheddingAnalysis.trend === 'lengthening'
+                                                  ? 'text-amber-400'
+                                                  : 'text-fg-faint'
+                                        "
+                                        class="text-xs font-medium"
+                                    >
+                                        {{
+                                            $t(
+                                                `pages.sheddings.analysis.trend${sheddingAnalysis.trend.charAt(0).toUpperCase() + sheddingAnalysis.trend.slice(1)}`,
+                                            )
+                                        }}
+                                    </span>
+                                </div>
+                                <span
+                                    v-if="sheddingAnalysis.lastShedDate"
+                                    class="text-fg-faint text-xs"
+                                >
+                                    {{ $t("pages.sheddings.analysis.lastShed") }}:
+                                    {{
+                                        new Date(sheddingAnalysis.lastShedDate).toLocaleDateString()
+                                    }}
+                                </span>
+                                <span
+                                    v-if="sheddingAnalysis.predictedNextDate"
+                                    class="text-fg-faint text-xs"
+                                >
+                                    {{ $t("pages.sheddings.analysis.predicted") }}:
+                                    {{
+                                        new Date(
+                                            sheddingAnalysis.predictedNextDate,
+                                        ).toLocaleDateString()
+                                    }}
+                                </span>
+                                <span class="text-fg-faint text-xs">
+                                    {{
+                                        $t("pages.sheddings.analysis.records", {
+                                            count: sheddingAnalysis.sheddingCount,
+                                        })
+                                    }}
+                                </span>
+                            </div>
+                            <ChartsSheddingIntervalChart
+                                :intervals="sheddingAnalysis.intervals"
+                                :average-days="sheddingAnalysis.averageIntervalDays"
+                                :height="200"
+                            />
+                        </template>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.pets.noSheddingData") }}
+                        </p>
+                    </div>
+
+                    <!-- Recent Vet Visits -->
                     <div
-                        v-for="visit in vetVisits"
-                        :key="visit.id"
-                        class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
+                        v-if="authStore.hasFeature('vet_visits')"
+                        class="glass-card rounded-xl p-6"
                     >
-                        <div class="flex items-center gap-3">
-                            <Icon name="lucide:stethoscope" class="h-4 w-4 text-teal-400" />
-                            <span class="text-fg text-sm">{{
-                                visit.reason || $t(`pages.vetVisits.types.${visit.visitType}`)
-                            }}</span>
-                            <span v-if="visit.veterinarian" class="text-fg-faint text-xs"
-                                >({{ visit.veterinarian.name }})</span
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.recentVetVisits") }}
+                            </h2>
+                            <NuxtLink to="/vet-visits" class="text-primary-400 text-sm font-medium">
+                                {{ $t("pages.dashboard.viewAll") }}
+                            </NuxtLink>
+                        </div>
+                        <div v-if="vetVisits?.length" class="space-y-2">
+                            <div
+                                v-for="visit in vetVisits"
+                                :key="visit.id"
+                                class="bg-surface-raised flex items-center justify-between rounded-lg p-3"
                             >
+                                <div class="flex items-center gap-3">
+                                    <Icon name="lucide:stethoscope" class="h-4 w-4 text-teal-400" />
+                                    <span class="text-fg text-sm">{{
+                                        visit.reason ||
+                                        $t(`pages.vetVisits.types.${visit.visitType}`)
+                                    }}</span>
+                                    <span v-if="visit.veterinarian" class="text-fg-faint text-xs"
+                                        >({{ visit.veterinarian.name }})</span
+                                    >
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span v-if="visit.costCents" class="text-fg-faint text-xs">{{
+                                        formatVetCost(visit.costCents)
+                                    }}</span>
+                                    <span class="text-fg-faint text-xs">{{
+                                        new Date(visit.visitDate).toLocaleDateString()
+                                    }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span v-if="visit.costCents" class="text-fg-faint text-xs">{{
-                                formatVetCost(visit.costCents)
-                            }}</span>
-                            <span class="text-fg-faint text-xs">{{
-                                new Date(visit.visitDate).toLocaleDateString()
-                            }}</span>
-                        </div>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.pets.noVetVisits") }}
+                        </p>
                     </div>
                 </div>
-                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.noVetVisits") }}</p>
-            </div>
 
-            <!-- Recent Activity / Timeline -->
-            <div v-if="authStore.hasFeature('timeline')" class="glass-card rounded-xl p-6">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-fg font-semibold">
-                        {{ $t("pages.pets.timeline.recentActivity") }}
-                    </h2>
-                    <NuxtLink
-                        :to="`/pets/${petId}/timeline`"
-                        class="text-primary-400 text-sm font-medium"
-                    >
-                        {{ $t("pages.pets.timeline.viewTimeline") }}
-                    </NuxtLink>
-                </div>
-                <div v-if="recentActivity?.length" class="space-y-2">
-                    <div
-                        v-for="event in recentActivity"
-                        :key="event.id"
-                        class="bg-surface-raised flex items-center gap-3 rounded-lg p-3"
-                    >
-                        <Icon
-                            :name="event.icon"
-                            :class="timelineIconClass(event.type)"
-                            class="h-4 w-4"
-                        />
-                        <span class="text-fg min-w-0 flex-1 truncate text-sm">{{
-                            event.title
-                        }}</span>
-                        <span class="text-fg-faint flex-shrink-0 text-xs">{{
-                            new Date(event.date).toLocaleDateString()
-                        }}</span>
+                <!-- Activity Tab -->
+                <div v-if="activeTab === 'activity'" class="space-y-6">
+                    <!-- Recent Activity / Timeline -->
+                    <div v-if="authStore.hasFeature('timeline')" class="glass-card rounded-xl p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="text-fg font-semibold">
+                                {{ $t("pages.pets.timeline.recentActivity") }}
+                            </h2>
+                            <NuxtLink
+                                :to="`/pets/${petId}/timeline`"
+                                class="text-primary-400 text-sm font-medium"
+                            >
+                                {{ $t("pages.pets.timeline.viewTimeline") }}
+                            </NuxtLink>
+                        </div>
+                        <div v-if="recentActivity?.length" class="space-y-2">
+                            <div
+                                v-for="event in recentActivity"
+                                :key="event.id"
+                                class="bg-surface-raised flex items-center gap-3 rounded-lg p-3"
+                            >
+                                <Icon
+                                    :name="event.icon"
+                                    :class="timelineIconClass(event.type)"
+                                    class="h-4 w-4"
+                                />
+                                <span class="text-fg min-w-0 flex-1 truncate text-sm">{{
+                                    event.title
+                                }}</span>
+                                <span class="text-fg-faint shrink-0 text-xs">{{
+                                    new Date(event.date).toLocaleDateString()
+                                }}</span>
+                            </div>
+                        </div>
+                        <p v-else class="text-fg-muted text-sm">
+                            {{ $t("pages.pets.timeline.empty") }}
+                        </p>
                     </div>
                 </div>
-                <p v-else class="text-fg-muted text-sm">{{ $t("pages.pets.timeline.empty") }}</p>
-            </div>
-
-            <!-- Public Profile / Sharing -->
-            <PetPublicProfileCard :pet-id="petId" />
+            </UiTabs>
         </template>
 
         <!-- Edit Modal -->
@@ -558,7 +637,9 @@
                 />
                 <UiTextInput v-model="editForm.morph" :label="$t('pages.pets.fields.morph')" />
                 <UiSelect v-model="editForm.gender" :label="$t('pages.pets.fields.gender')">
-                    <option v-for="g in genderOptions" :key="g" :value="g">{{ g }}</option>
+                    <option v-for="g in genderOptions" :key="g" :value="g">
+                        {{ $t(`common.gender.${g}`) }}
+                    </option>
                 </UiSelect>
                 <UiTextInput
                     v-model="editForm.birthDate"
@@ -744,6 +825,15 @@ const resolveUrl = useResolveUrl();
 
 const petId = route.params.id as string;
 const genderOptions = ["MALE", "FEMALE", "UNKNOWN"];
+
+const activeTab = ref("overview");
+
+const petTabs = computed(() => [
+    { key: "overview", label: t("pages.pets.tabs.overview"), icon: "lucide:info" },
+    { key: "care", label: t("pages.pets.tabs.care"), icon: "lucide:utensils" },
+    { key: "health", label: t("pages.pets.tabs.health"), icon: "lucide:heart-pulse" },
+    { key: "activity", label: t("pages.pets.tabs.activity"), icon: "lucide:activity" },
+]);
 
 definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "pets" });
 

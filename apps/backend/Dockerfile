@@ -25,10 +25,14 @@ COPY --from=build /app/packages/shared/package.json ./packages/shared/
 COPY --from=build /app/apps/backend/dist ./apps/backend/dist
 COPY --from=build /app/apps/backend/package.json ./apps/backend/
 COPY --from=build /app/apps/backend/node_modules ./apps/backend/node_modules
+COPY --from=build /app/apps/backend/prisma ./apps/backend/prisma
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/pnpm-workspace.yaml ./
 COPY --from=build /app/package.json ./
 
+COPY apps/backend/entrypoint.sh /app/apps/backend/entrypoint.sh
+RUN chmod +x /app/apps/backend/entrypoint.sh
+
 WORKDIR /app/apps/backend
 EXPOSE 3001
-CMD ["node", "dist/index.js"]
+ENTRYPOINT ["./entrypoint.sh"]

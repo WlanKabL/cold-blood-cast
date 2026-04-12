@@ -1,7 +1,7 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Back + Header -->
-        <div class="flex items-center gap-3">
+        <div class="animate-fade-in-up flex items-center gap-3">
             <NuxtLink
                 to="/sensors"
                 class="text-fg-faint hover:text-fg-muted rounded-lg p-1.5 transition-colors"

@@ -47,6 +47,7 @@ import {
 } from "@/modules/enclosure-maintenance/index.js";
 import { weeklyPlannerRoutes } from "@/modules/weekly-planner/index.js";
 import { publicProfileRoutes, publicPetRoutes } from "@/modules/public-profiles/index.js";
+import { dataExportRoutes } from "@/modules/data-export/index.js";
 import {
     startWeeklyPlannerScheduler,
     stopWeeklyPlannerScheduler,
@@ -83,6 +84,7 @@ async function main() {
         credentials: true,
         methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Impersonate-User"],
+        exposedHeaders: ["Content-Disposition"],
     });
 
     await app.register(cookie, {
@@ -296,6 +298,7 @@ async function main() {
     await app.register(weeklyPlannerRoutes, { prefix: "/api/planner" });
     await app.register(publicProfileRoutes, { prefix: "/api/public-profiles" });
     await app.register(publicPetRoutes, { prefix: "/api/public/pets" });
+    await app.register(dataExportRoutes, { prefix: "/api/data-export" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {

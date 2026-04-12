@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-7xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.sensors.title") }}
@@ -14,7 +16,7 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="animate-fade-in-up flex flex-col gap-3 delay-75 sm:flex-row sm:items-center">
             <UiTextInput
                 v-model="searchQuery"
                 :placeholder="$t('pages.sensors.search')"

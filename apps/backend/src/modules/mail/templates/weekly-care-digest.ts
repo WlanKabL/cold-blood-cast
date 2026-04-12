@@ -49,7 +49,15 @@ const EVENT_TYPE_COLORS: Record<string, string> = {
 };
 
 const DAY_NAMES_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const DAY_NAMES_DE = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const DAY_NAMES_DE = [
+    "Sonntag",
+    "Montag",
+    "Dienstag",
+    "Mittwoch",
+    "Donnerstag",
+    "Freitag",
+    "Samstag",
+];
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -101,9 +109,10 @@ function daySection(day: PlannerDay, locale: string): string {
     const formatted = formatDate(day.date, locale);
     const isDE = locale === "de";
     const eventCount = day.events.length;
-    const countLabel = eventCount > 0
-        ? `<span style="color:${COLOR.faint};font-size:11px;font-weight:400;margin-left:8px;">(${eventCount})</span>`
-        : "";
+    const countLabel =
+        eventCount > 0
+            ? `<span style="color:${COLOR.faint};font-size:11px;font-weight:400;margin-left:8px;">(${eventCount})</span>`
+            : "";
 
     const header = `<div style="font-size:13px;font-weight:700;color:${COLOR.text};padding:10px 12px;text-transform:uppercase;letter-spacing:0.5px;">${name}, ${formatted}${countLabel}</div>`;
 
@@ -147,9 +156,10 @@ function summaryStats(days: PlannerDay[], locale: string): string {
         })
         .join("");
 
-    const overdueHtml = overdue > 0
-        ? `<div style="margin-top:8px;"><span style="color:${COLOR.danger};font-size:12px;font-weight:600;">⚠ ${overdue} ${isDE ? "überfällig" : "overdue"}</span></div>`
-        : "";
+    const overdueHtml =
+        overdue > 0
+            ? `<div style="margin-top:8px;"><span style="color:${COLOR.danger};font-size:12px;font-weight:600;">⚠ ${overdue} ${isDE ? "überfällig" : "overdue"}</span></div>`
+            : "";
 
     return `<div style="background:${COLOR.bg};border:1px solid ${COLOR.cardBorder};border-radius:10px;padding:16px;margin-bottom:20px;">
     <div style="font-size:28px;font-weight:700;color:${COLOR.text};line-height:1;">${total}</div>
@@ -164,9 +174,7 @@ function summaryStats(days: PlannerDay[], locale: string): string {
 export function weeklyCareDigestTemplate(data: WeeklyCareDigestData): string {
     const isDE = data.locale === "de";
 
-    const heading = isDE
-        ? `Dein Wochenplan 📋`
-        : `Your Weekly Plan 📋`;
+    const heading = isDE ? `Dein Wochenplan 📋` : `Your Weekly Plan 📋`;
 
     const intro = isDE
         ? `Hey <strong style="color:${COLOR.text};">${data.username}</strong>, hier ist dein Pflegeplan für die Woche <strong style="color:${COLOR.text};">${data.weekLabel}</strong>.`

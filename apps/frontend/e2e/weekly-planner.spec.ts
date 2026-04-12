@@ -87,9 +87,9 @@ test.describe("Weekly Planner — Page", () => {
     test("shows page title", async ({ page }) => {
         await page.goto("/planner");
 
-        await expect(
-            page.getByText(/weekly care planner|wochenplaner/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/weekly care planner|wochenplaner/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("displays 7 day columns", async ({ page }) => {

@@ -157,6 +157,26 @@
     }
 }
 
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 @keyframes gradient {
     0%,
     100% {
@@ -199,8 +219,28 @@
     }
 }
 
+@keyframes subtle-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
 .animate-fade-in-up {
     animation: fade-in-up 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out forwards;
     opacity: 0;
 }
 
@@ -221,6 +261,58 @@
     animation: float 3s ease-in-out infinite;
 }
 
+.animate-subtle-pulse {
+    animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+/* ─── Stagger Delays ─── */
+.delay-75 {
+    animation-delay: 75ms;
+}
+.delay-150 {
+    animation-delay: 150ms;
+}
+.delay-200 {
+    animation-delay: 200ms;
+}
+.delay-300 {
+    animation-delay: 300ms;
+}
+.delay-400 {
+    animation-delay: 400ms;
+}
+.delay-500 {
+    animation-delay: 500ms;
+}
+.delay-600 {
+    animation-delay: 600ms;
+}
+.delay-700 {
+    animation-delay: 700ms;
+}
+
+/* ─── Page Background ─── */
+.page-bg {
+    position: relative;
+}
+
+.page-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/bg2.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.04;
+    pointer-events: none;
+}
+
+.dark .page-bg::before {
+    opacity: 0.08;
+}
+
 /* ─── Glass Card Base ─── */
 .glass-card {
     background: var(--glass-bg);
@@ -234,6 +326,152 @@
 .glass-card:hover {
     background: var(--glass-hover);
     border-color: var(--glass-border-hover);
+}
+
+/* ─── Glass Card Variants ─── */
+.glass-card-accent {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-top: 2px solid var(--z-brand);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.2s ease;
+}
+
+.glass-card-accent:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+    border-top-color: var(--z-brand);
+}
+
+.glass-card-warm {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-top: 2px solid var(--z-accent);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.2s ease;
+}
+
+.glass-card-warm:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+    border-top-color: var(--z-accent);
+}
+
+/* ─── Section Heading with Accent ─── */
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--z-brand);
+}
+
+/* ─── Stat Card: subtle lift on hover ─── */
+.stat-card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.dark .stat-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Subtle Brand Glow ─── */
+.glow-brand {
+    box-shadow: 0 0 20px rgba(138, 156, 74, 0.08);
+}
+
+.dark .glow-brand {
+    box-shadow: 0 0 20px rgba(166, 183, 106, 0.06);
+}
+
+/* ─── Public Profile Page Background ─── */
+.public-page-bg {
+    position: relative;
+    min-height: 100dvh;
+}
+
+.public-page-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url("/bg5.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.dark .public-page-bg::before {
+    opacity: 0.12;
+}
+
+.public-page-bg::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(ellipse at 50% 0%, var(--z-brand-soft) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.dark .public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(138, 156, 74, 0.06) 0%, transparent 50%);
+}
+
+/* ─── Public Profile Hero Card ─── */
+.profile-hero-card {
+    position: relative;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    overflow: hidden;
+}
+
+.profile-hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--z-brand-soft) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.dark .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(138, 156, 74, 0.08) 0%, transparent 50%);
+}
+
+/* ─── Public Profile Section Card ─── */
+.public-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.25s ease;
+}
+
+.public-card:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.dark .public-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* ─── Smooth transitions ─── */

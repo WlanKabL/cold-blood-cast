@@ -62,9 +62,9 @@ test.describe("Public Profile Management — No Profile", () => {
 
         await page.goto(`/pets/${petId}`);
 
-        await expect(
-            page.getByRole("button", { name: /create|erstellen|public/i }),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByRole("button", { name: /create|erstellen|public/i })).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("creates profile on button click", async ({ page }) => {
@@ -144,9 +144,9 @@ test.describe("Public Profile Management — Profile Exists", () => {
 
         await page.goto(`/pets/${petId}`);
 
-        await expect(
-            page.getByRole("button", { name: /embed|einbetten/i }),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByRole("button", { name: /embed|einbetten/i })).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows QR code button", async ({ page }) => {
@@ -155,9 +155,7 @@ test.describe("Public Profile Management — Profile Exists", () => {
 
         await page.goto(`/pets/${petId}`);
 
-        await expect(
-            page.getByRole("button", { name: /qr/i }),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByRole("button", { name: /qr/i })).toBeVisible({ timeout: 15_000 });
     });
 
     test("opens embed code modal on click", async ({ page }) => {
@@ -191,9 +189,9 @@ test.describe("Public Profile Management — Profile Exists", () => {
 
         await page.goto(`/pets/${petId}`);
 
-        await expect(
-            page.getByRole("button", { name: /delete|löschen/i }),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByRole("button", { name: /delete|löschen/i })).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("delete button shows confirmation dialog", async ({ page }) => {

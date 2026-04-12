@@ -124,8 +124,7 @@ async function sendMaintenanceReminders(): Promise<number> {
 
         const html = maintenanceReminderTemplate(data);
 
-        const subject =
-            group.locale === "de" ? "Wartungs-Erinnerung" : "Maintenance Reminder";
+        const subject = group.locale === "de" ? "Wartungs-Erinnerung" : "Maintenance Reminder";
 
         const ok = await sendMail({
             to: group.email,

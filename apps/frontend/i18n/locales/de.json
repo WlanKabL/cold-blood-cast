@@ -2,156 +2,112 @@
     "landing": {
         "nav": {
             "features": "Features",
-            "monitoring": "Überwachung",
-            "alerts": "Alarme",
-            "careLog": "Pflegebuch",
+            "howItWorks": "So geht's",
+            "forKeepers": "Für Halter",
             "login": "Anmelden",
             "getStarted": "Loslegen"
         },
         "hero": {
-            "badge": "Kostenlos & Open Source — Läuft auf deinem Raspberry Pi",
-            "titleLine1": "Keine Sorgen mehr.",
-            "titleLine2": "Einfach ",
-            "word1": "Überwachen.",
-            "word2": "Tracken.",
-            "word3": "Wissen.",
-            "subtitle": "Dein Terrarium erzählt eine Geschichte. KeeperLog liest sie für dich — Echtzeit-Sensoren, automatische Alarme und ein Pflegebuch, damit dein Reptil sicher und gesund bleibt.",
+            "titleLine1": "Deine Reptilien.",
+            "titleLine2": "Bestens versorgt.",
+            "word1": "Immer.",
+            "word2": "Mühelos.",
+            "word3": "Zuverlässig.",
+            "subtitle": "KeeperLog ist der All-in-One-Begleiter für Reptilienhalter, denen ihre Tiere am Herzen liegen. Überwache deine Terrarien, tracke Fütterungen und Häutungen und werde benachrichtigt, wenn etwas deine Aufmerksamkeit braucht.",
             "primaryCta": "Loslegen",
-            "secondaryCta": "So funktioniert's"
-        },
-        "preview": {
-            "temperature": "Temperatur",
-            "humidity": "Luftfeuchtigkeit",
-            "dashboardBar": "KeeperLog Dashboard",
-            "sensorBar": "Sensorwerte",
-            "alertsBar": "Alarmregeln",
-            "careLogBar": "Pflegebuch",
-            "warmSide": "Warmseite",
-            "coolSide": "Kaltseite",
-            "enclosures": "Terrarien",
-            "activeSensors": "Aktive Sensoren",
-            "lastFeeding": "Letzte Fütterung",
-            "nextShedding": "Nächste Häutung"
-        },
-        "problem": {
-            "label": "Die Realität",
-            "title": "So verlieren die meisten Halter die Kontrolle",
-            "manual": {
-                "title": "Manuelle Überwachung",
-                "desc": "Du prüfst dein Terrarium zweimal am Tag, aber weißt nicht, was nachts passiert — Temperaturabfälle, Feuchtigkeitsspitzen, Heizungsausfälle bleiben unbemerkt."
-            },
-            "blind": {
-                "title": "Im Blindflug",
-                "desc": "Du hast keine historischen Daten. War der Feuchtigkeitsanstieg gestern normal? Ist der Hotspot letzte Woche unter sichere Werte gefallen? Du wirst es nie erfahren."
-            },
-            "emergency": {
-                "title": "Notfälle unentdeckt",
-                "desc": "Ein Sensorausfall oder Heizungsdefekt könnte dein Tier stundenlang gefährden, bevor du es bemerkst."
-            },
-            "transition": "Es geht auch besser."
+            "secondaryCta": "Entdecken"
         },
         "features": {
-            "label": "Und es gibt noch mehr",
-            "title": "Für jeden Aspekt deiner Tierhaltung",
-            "subtitle": "Sensoren, Alarme, Fütterungsprotokolle, Häutungstracking — alles, was ein verantwortungsvoller Halter braucht, ohne Komplexität.",
+            "label": "Was drin steckt",
+            "title": "Alles, was ein Halter braucht",
+            "subtitle": "Von Live-Sensordaten bis zum kompletten Pflegebuch — KeeperLog begleitet deinen Alltag, ohne im Weg zu stehen.",
             "sensors": {
-                "title": "Multi-Sensor-Unterstützung",
-                "desc": "Verbinde DHT22, BME280 und andere Sensoren via GPIO oder Home Assistant. Überwache Temperatur, Luftfeuchtigkeit und Druck in Echtzeit."
+                "title": "Klima & Sensoren",
+                "desc": "Schließ deinen DHT22, BME280 an oder hol dir Daten von Home Assistant. Temperatur, Luftfeuchtigkeit, Druck — immer sichtbar, immer gespeichert."
             },
             "alerts": {
-                "title": "Telegram-Alarme",
-                "desc": "Werde sofort benachrichtigt, wenn Bedingungen den sicheren Bereich verlassen. Setze Schwellenwerte pro Sensor und erhalte Alarme auf deinem Handy."
+                "title": "Smarte Alarme",
+                "desc": "Setz sichere Bereiche für deine Terrarien und bekomm eine Telegram-Nachricht, wenn was nicht stimmt. Kein Spam, nur das Wichtige."
             },
             "careLog": {
                 "title": "Pflegebuch",
-                "desc": "Protokolliere Fütterungen, Häutungen und Gewichtsmessungen. Verfolge die Gesundheit deines Reptils über die Zeit mit durchsuchbaren Einträgen."
+                "desc": "Fütterungen, Häutungen, Gewicht — alles in Sekunden protokolliert. Schau jederzeit zurück und sieh das ganze Bild."
             },
             "dashboard": {
                 "title": "Live-Dashboard",
-                "desc": "Sieh alle deine Terrarien, Sensoren und Tierstatus auf einen Blick. Echtzeit-Daten via WebSockets — kein Neuladen nötig."
+                "desc": "Ein Bildschirm, alle Terrarien. Echtzeit-Daten via WebSockets — kein Neuladen, kein Warten."
             }
         },
-        "monitoring": {
-            "label": "Sensorüberwachung",
-            "title": "Jeder Messwert. Jede Minute. An einem Ort.",
-            "desc": "KeeperLog pollt deine Sensoren kontinuierlich und speichert jeden Messwert. Sieh aktuelle Werte, historische Trends und erkenne Anomalien, bevor sie zum Notfall werden.",
-            "point1": "Echtzeit Temperatur & Luftfeuchtigkeit von DHT22 und BME280 Sensoren",
-            "point2": "Home Assistant Integration für zusätzliche Sensorquellen",
-            "point3": "Historische Daten lokal gespeichert — Trends über Tage, Wochen, Monate prüfen",
-            "point4": "WebSocket-basierte Live-Updates auf deinem Dashboard"
-        },
-        "alertsDeep": {
-            "label": "Alarmsystem",
-            "title": "Verpasse nie einen kritischen Zustand",
-            "desc": "Definiere sichere Bereiche für jeden Sensor. Wenn die Temperatur zu stark fällt oder die Feuchtigkeit zu hoch steigt, sendet dir KeeperLog sofort einen Alarm via Telegram.",
-            "point1": "Pro-Sensor-Schwellenwerte mit konfigurierbaren Min/Max-Werten",
-            "point2": "Telegram-Benachrichtigungen mit Cooldown gegen Spam",
-            "point3": "Alarmverlauf zur Überprüfung vergangener Vorfälle",
-            "point4": "Funktioniert 24/7 — auch wenn du schläfst"
-        },
-        "comparison": {
-            "label": "Der Unterschied",
-            "title": "Vorher und nachher mit KeeperLog",
-            "without": "Ohne KeeperLog",
-            "with": "Mit KeeperLog",
-            "manual": {
-                "bad": "Thermometer zweimal am Tag prüfen und hoffen, dass sich nachts nichts geändert hat",
-                "good": "Kontinuierliche Überwachung mit Alarmen, sobald etwas schiefgeht"
+        "keepers": {
+            "label": "Warum Halter es lieben",
+            "title": "Weniger Stress, mehr Haltung",
+            "peace": {
+                "title": "Ruhe im Kopf",
+                "desc": "Geh schlafen und weiß, dass deine Terrarien überwacht werden. Wenn was schiefgeht, erfährst du es — auch um 3 Uhr nachts."
             },
-            "blind": {
-                "bad": "Keine historischen Daten — du erkennst nicht, ob sich Bedingungen in die falsche Richtung entwickeln",
-                "good": "Vollständige Sensorprotokolle mit historischen Diagrammen und Trendanalyse"
+            "history": {
+                "title": "Lückenlose Historie",
+                "desc": "Jede Fütterung, jede Häutung, jeder Messwert — protokolliert und durchsuchbar. Kein ‚Wann hab ich nochmal…?' mehr."
             },
-            "care": {
-                "bad": "Versuchen sich zu erinnern, wann die letzte Fütterung war, wann die letzte Häutung — auf Erinnerung verlassen",
-                "good": "Vollständiges digitales Pflegebuch mit Fütterungs-, Häutungs- und Gewichtsprotokollen"
-            },
-            "emergency": {
-                "bad": "Einen Heizungsausfall erst Stunden später bemerken, wenn das Terrarium schon gefährlich kalt ist",
-                "good": "Sofortige Telegram-Alarme, sobald Messwerte den sicheren Bereich verlassen"
+            "privacy": {
+                "title": "Deine Daten, geschützt",
+                "desc": "Verschlüsselte Speicherung, strikte Zugriffskontrollen und kein Third-Party-Tracking. Die Daten deiner Tiere bleiben deine."
             }
-        },
-        "cta": {
-            "title": "Dein Terrarium verdient bessere Überwachung.",
-            "subtitle": "Schließ dich Haltern an, die aufgehört haben zu raten und angefangen haben zu wissen. Kostenlos, Open Source, läuft auf deinem Pi.",
-            "button": "Loslegen",
-            "docs": "Dokumentation lesen"
         },
         "howItWorks": {
-            "label": "So funktioniert's",
-            "title": "Von Hardware zum Dashboard in drei Schritten",
-            "connect": {
-                "title": "Verbinden",
-                "desc": "Schließe deine DHT22 oder BME280 Sensoren an einen Raspberry Pi an. KeeperLog erkennt verbundene Sensoren automatisch beim Start."
+            "label": "Los geht's",
+            "title": "In Minuten startklar",
+            "register": {
+                "title": "Registrieren",
+                "desc": "Erstell dein kostenloses Konto in Sekunden. Keine Kreditkarte, kein Aufwand — einfach anmelden und los."
             },
-            "monitor": {
-                "title": "Überwachen",
-                "desc": "Sensordaten werden automatisch abgefragt und auf einem Live-Dashboard angezeigt. Jeder Messwert wird für spätere Auswertung gespeichert."
+            "setup": {
+                "title": "Einrichten",
+                "desc": "Lege deine Terrarien an, füge deine Tiere hinzu, setz deine Alarmschwellen. Dauert maximal fünf Minuten."
             },
-            "alert": {
-                "title": "Sicher bleiben",
-                "desc": "Setze Alarmschwellen und verbinde Telegram. Wenn Bedingungen den Bereich verlassen, weißt du es in Sekunden."
+            "relax": {
+                "title": "Zurücklehnen",
+                "desc": "Das war's. KeeperLog überwacht rund um die Uhr, protokolliert alles und meldet sich, wenn's wichtig ist. Du machst die Haltung — wir den Rest."
+            }
+        },
+        "setup": {
+            "label": "Dein Setup, deine Regeln",
+            "title": "Funktioniert mit dem, was du hast",
+            "desc": "KeeperLog passt sich an deine vorhandene Hardware an. Kein proprietäres Ökosystem, kein Vendor Lock-in — einfach anschließen und los.",
+            "tech": {
+                "pi": "Läuft auf Pi 3, 4 & 5",
+                "dht": "GPIO- oder I²C-Sensoren",
+                "ha": "Jede HA-Entität nutzbar",
+                "telegram": "Sofortige Handy-Alarme",
+                "ws": "Live-Daten, kein Polling",
+                "local": "Alles bleibt lokal"
             }
         },
         "trust": {
-            "encrypted": "Läuft lokal auf deinem Pi",
-            "openSource": "Kostenlos & Open Source",
-            "fast": "Setup in 10 Minuten"
+            "encrypted": "Verschlüsselt & sicher",
+            "openSource": "Gemacht für Halter",
+            "fast": "Setup in 5 Minuten"
         },
         "social": {
-            "sensors": "Sensoren überwacht",
-            "enclosures": "Terrarien getrackt",
-            "alerts": "Alarme gesendet",
-            "uptime": "Verfügbarkeit"
+            "enclosures": "Unbegrenzt Terrarien",
+            "sensors": "Unbegrenzt Sensoren",
+            "monitoring": "Überwachung",
+            "alerts": "Alarmzeit"
+        },
+        "cta": {
+            "title": "Bereit, deine Haltung aufs nächste Level zu bringen?",
+            "subtitle": "Schließ dich Haltern an, die aufgehört haben zu raten und angefangen haben zu wissen. Meld dich an und sieh den Unterschied.",
+            "button": "Loslegen"
         },
         "footer": {
-            "tagline": "Dein Terrarium-Überwachungssystem — Sensoren, Alarme und Pflegebuch an einem Ort.",
+            "tagline": "Das All-in-One-Tool für Reptilienhalter — Sensoren, Alarme und Pflegebuch an einem Ort.",
             "product": "Produkt",
             "resources": "Ressourcen",
             "docs": "Dokumentation",
-            "legal": "Rechtliches"
+            "legal": "Rechtliches",
+            "copyright": "© {year} KeeperLog. Alle Rechte vorbehalten."
         },
-        "pageTitle": "Terrarium-Überwachung & Alarme"
+        "pageTitle": "KeeperLog — Für Reptilienhalter"
     },
     "cookie": {
         "message": "Wir verwenden Cookies, um dich angemeldet zu halten und dein Erlebnis zu verbessern.",
@@ -776,7 +732,12 @@
             "predictedOverdue": "{days}T überfällig",
             "avgCycle": "Ø {days}T Zyklus",
             "overdueMaintenance": "Überfällige Wartung",
-            "noOverdueMaintenance": "Alle Wartungsaufgaben sind aktuell"
+            "noOverdueMaintenance": "Alle Wartungsaufgaben sind aktuell",
+            "tabs": {
+                "overview": "Übersicht",
+                "schedule": "Termine",
+                "maintenance": "Wartung"
+            }
         },
         "enclosures": {
             "title": "Terrarien",
@@ -796,6 +757,11 @@
             "maintenanceTasks": "Wartungsaufgaben",
             "noMaintenanceTasks": "Keine Wartungsaufgaben für dieses Terrarium",
             "overdueTasksCount": "{n} überfällige Aufgabe(n)",
+            "tabs": {
+                "info": "Info",
+                "inhabitants": "Bewohner",
+                "maintenance": "Wartung"
+            },
             "confirmDelete": "Dieses Terrarium löschen? Alle verknüpften Sensoren werden getrennt. Kann nicht rückgängig gemacht werden.",
             "deleted": "Terrarium gelöscht",
             "saved": "Terrarium gespeichert",
@@ -973,6 +939,12 @@
                 "delete": "Öffentliches Profil löschen",
                 "deleteConfirmTitle": "Öffentliches Profil löschen",
                 "deleteConfirmMessage": "Öffentliche Seite für dieses Tier entfernen? Die URL wird sofort ungültig."
+            },
+            "tabs": {
+                "overview": "Übersicht",
+                "care": "Pflege",
+                "health": "Gesundheit",
+                "activity": "Aktivität"
             }
         },
         "sensors": {
@@ -1214,7 +1186,12 @@
             "deleteDialogItem2": "Alle Einstellungen, API-Schlüssel und Pflegeeinträge",
             "deleteDialogItem3": "Dein Konto und alle persönlichen Daten",
             "deleteDialogConfirmHint": "Du erhältst eine E-Mail mit einem Bestätigungslink. Die endgültige Löschung erfordert dein Passwort.",
-            "deleteDialogConfirm": "Bestätigungs-E-Mail senden"
+            "deleteDialogConfirm": "Bestätigungs-E-Mail senden",
+            "tabs": {
+                "general": "Allgemein",
+                "security": "Sicherheit",
+                "privacy": "Datenschutz"
+            }
         },
         "confirmDelete": {
             "title": "Kontolöschung bestätigen",
@@ -1399,6 +1376,11 @@
                 "dropzoneHint": "Bilder (JPEG, PNG, GIF, WebP, AVIF) und PDF-Dateien",
                 "uploading": "Wird hochgeladen...",
                 "editLabel": "Bezeichnung bearbeiten",
+                "tabs": {
+                    "info": "Info",
+                    "documents": "Dokumente",
+                    "followUps": "Nachsorge"
+                },
                 "visitOn": "Besuch am {date}",
                 "appointmentOn": "Termin am {date}",
                 "notSet": "Nicht angegeben"

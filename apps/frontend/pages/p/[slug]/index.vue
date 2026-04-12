@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-base min-h-dvh">
+    <div class="public-page-bg bg-base">
         <!-- Guest Controls (theme/language) -->
         <LayoutGuestControls />
 
@@ -11,7 +11,7 @@
         <!-- Error / Not Found -->
         <div
             v-else-if="!petData"
-            class="flex min-h-dvh flex-col items-center justify-center px-4 text-center"
+            class="relative z-10 flex min-h-dvh flex-col items-center justify-center px-4 text-center"
         >
             <Icon name="lucide:shield-x" class="text-fg-faint mb-4 h-16 w-16" />
             <h1 class="text-fg mb-2 text-2xl font-bold">{{ $t("publicProfile.notFound") }}</h1>
@@ -22,44 +22,62 @@
         </div>
 
         <!-- Profile -->
-        <div v-else class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-            <!-- Header -->
-            <div class="mb-8 flex items-start gap-5">
-                <img
-                    v-if="profilePhotoUrl"
-                    :src="profilePhotoUrl"
-                    :alt="petData.name"
-                    class="h-24 w-24 rounded-2xl object-cover ring-2 ring-white/10 sm:h-32 sm:w-32"
-                />
+        <div v-else class="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:py-14">
+            <!-- Hero Header Card -->
+            <div class="profile-hero-card animate-fade-in-up mb-8 p-6 sm:p-8">
                 <div
-                    v-else
-                    class="bg-surface-raised flex h-24 w-24 items-center justify-center rounded-2xl sm:h-32 sm:w-32"
+                    class="relative z-10 flex flex-col items-center gap-5 sm:flex-row sm:items-start"
                 >
-                    <Icon name="lucide:paw-print" class="text-fg-faint h-10 w-10" />
-                </div>
-                <div class="min-w-0 flex-1 pt-1">
-                    <h1 class="text-fg text-2xl font-bold tracking-tight sm:text-3xl">
-                        {{ petData.name }}
-                    </h1>
-                    <div class="text-fg-muted mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                        <span v-if="petData.species">{{ petData.species }}</span>
-                        <span v-if="petData.morph" class="text-fg-faint">·</span>
-                        <span v-if="petData.morph">{{ petData.morph }}</span>
-                        <span v-if="petData.gender && petData.gender !== 'UNKNOWN'" class="text-fg-faint">·</span>
-                        <span v-if="petData.gender && petData.gender !== 'UNKNOWN'">
-                            {{ $t(`publicProfile.gender.${petData.gender}`) }}
-                        </span>
+                    <img
+                        v-if="profilePhotoUrl"
+                        :src="profilePhotoUrl"
+                        :alt="petData.name"
+                        class="h-28 w-28 rounded-2xl object-cover shadow-xl ring-2 shadow-black/20 ring-white/10 sm:h-32 sm:w-32"
+                    />
+                    <div
+                        v-else
+                        class="bg-surface-raised flex h-28 w-28 items-center justify-center rounded-2xl shadow-xl ring-2 shadow-black/20 ring-white/10 sm:h-32 sm:w-32"
+                    >
+                        <Icon name="lucide:paw-print" class="text-fg-faint h-10 w-10" />
                     </div>
-                    <p v-if="age" class="text-fg-faint mt-1 text-sm">{{ age }}</p>
-                    <p v-if="petData.bio" class="text-fg-muted mt-3 text-sm leading-relaxed">
-                        {{ petData.bio }}
-                    </p>
+                    <div class="min-w-0 flex-1 text-center sm:pt-1 sm:text-left">
+                        <h1 class="text-fg text-2xl font-bold tracking-tight sm:text-3xl">
+                            {{ petData.name }}
+                        </h1>
+                        <div
+                            class="text-fg-muted mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm sm:justify-start"
+                        >
+                            <span
+                                v-if="petData.species"
+                                class="bg-surface-raised rounded-full px-2.5 py-0.5 text-xs font-medium"
+                                >{{ petData.species }}</span
+                            >
+                            <span
+                                v-if="petData.morph"
+                                class="bg-surface-raised rounded-full px-2.5 py-0.5 text-xs font-medium"
+                                >{{ petData.morph }}</span
+                            >
+                            <span
+                                v-if="petData.gender && petData.gender !== 'UNKNOWN'"
+                                class="bg-surface-raised rounded-full px-2.5 py-0.5 text-xs font-medium"
+                            >
+                                {{ $t(`publicProfile.gender.${petData.gender}`) }}
+                            </span>
+                        </div>
+                        <p v-if="age" class="text-fg-faint mt-2 text-sm">{{ age }}</p>
+                        <p
+                            v-if="petData.bio"
+                            class="text-fg-muted mt-3 text-sm leading-relaxed whitespace-pre-line"
+                        >
+                            {{ petData.bio }}
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <!-- Photos Gallery -->
-            <section v-if="petData.photos.length" class="mb-8">
-                <h2 class="text-fg mb-3 text-lg font-semibold">
+            <section v-if="petData.photos.length" class="animate-fade-in-up mb-8 delay-150">
+                <h2 class="section-heading text-fg mb-4 text-lg font-semibold">
                     <Icon name="lucide:image" class="mr-1.5 inline h-4 w-4" />
                     {{ $t("publicProfile.photos") }}
                 </h2>
@@ -67,55 +85,51 @@
                     <button
                         v-for="photo in petData.photos"
                         :key="photo.id"
-                        class="group relative aspect-square overflow-hidden rounded-xl ring-1 ring-white/10 transition-all hover:ring-2 hover:ring-white/20"
+                        class="group relative aspect-square overflow-hidden rounded-xl shadow-md ring-1 ring-white/10 transition-all hover:shadow-lg hover:ring-2 hover:ring-white/20"
                         @click="openLightbox(photo)"
                     >
                         <img
                             :src="photoUrl(photo.id)"
                             :alt="photo.caption || petData.name"
-                            class="h-full w-full object-cover transition-transform group-hover:scale-105"
+                            class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                             loading="lazy"
                         />
                         <div
                             v-if="photo.caption"
-                            class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 p-2"
+                            class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2.5"
                         >
-                            <span class="text-xs text-white/80">{{ photo.caption }}</span>
+                            <span class="text-xs font-medium text-white/90">{{
+                                photo.caption
+                            }}</span>
                         </div>
                     </button>
                 </div>
             </section>
 
             <!-- Weight Chart -->
-            <section v-if="petData.weightRecords.length" class="mb-8">
-                <h2 class="text-fg mb-3 text-lg font-semibold">
+            <section v-if="petData.weightRecords.length" class="animate-fade-in-up mb-8 delay-200">
+                <h2 class="section-heading text-fg mb-4 text-lg font-semibold">
                     <Icon name="lucide:scale" class="mr-1.5 inline h-4 w-4" />
                     {{ $t("publicProfile.weightHistory") }}
                 </h2>
-                <div class="glass-card rounded-xl p-4">
-                    <div class="space-y-2">
+                <div class="public-card glow-brand rounded-xl p-5">
+                    <div class="space-y-3">
                         <div class="flex items-baseline justify-between">
-                            <span class="text-fg text-2xl font-bold">
-                                {{ latestWeight }}g
-                            </span>
+                            <span class="text-fg text-2xl font-bold"> {{ latestWeight }}g </span>
                             <span
                                 v-if="weightChange !== null"
-                                :class="
-                                    weightChange >= 0
-                                        ? 'text-green-400'
-                                        : 'text-red-400'
-                                "
+                                :class="weightChange >= 0 ? 'text-green-400' : 'text-red-400'"
                                 class="text-sm font-medium"
                             >
                                 {{ weightChange >= 0 ? "+" : "" }}{{ weightChange.toFixed(1) }}g
                             </span>
                         </div>
-                        <!-- Simple weight sparkline -->
-                        <div class="flex h-16 items-end gap-0.5">
+                        <!-- Weight sparkline -->
+                        <div class="flex h-20 items-end gap-0.5">
                             <div
                                 v-for="(record, i) in weightSparkline"
                                 :key="i"
-                                class="bg-primary-500/60 flex-1 rounded-t"
+                                class="bg-primary-500/50 hover:bg-primary-400/80 flex-1 rounded-t transition-all duration-200"
                                 :style="{ height: `${record.pct}%` }"
                                 :title="`${record.weight}g — ${new Date(record.date).toLocaleDateString()}`"
                             />
@@ -129,8 +143,8 @@
             </section>
 
             <!-- Recent Feedings -->
-            <section v-if="petData.feedings.length" class="mb-8">
-                <h2 class="text-fg mb-3 text-lg font-semibold">
+            <section v-if="petData.feedings.length" class="animate-fade-in-up mb-8 delay-300">
+                <h2 class="section-heading text-fg mb-4 text-lg font-semibold">
                     <Icon name="lucide:utensils" class="mr-1.5 inline h-4 w-4" />
                     {{ $t("publicProfile.recentFeedings") }}
                 </h2>
@@ -138,7 +152,7 @@
                     <div
                         v-for="(feeding, i) in petData.feedings.slice(0, 10)"
                         :key="i"
-                        class="glass-card flex items-center justify-between rounded-lg px-4 py-3"
+                        class="public-card flex items-center justify-between rounded-xl px-4 py-3"
                     >
                         <div>
                             <span class="text-fg text-sm font-medium">
@@ -167,8 +181,8 @@
             </section>
 
             <!-- Shedding History -->
-            <section v-if="petData.sheddings.length" class="mb-8">
-                <h2 class="text-fg mb-3 text-lg font-semibold">
+            <section v-if="petData.sheddings.length" class="animate-fade-in-up mb-8 delay-400">
+                <h2 class="section-heading text-fg mb-4 text-lg font-semibold">
                     <Icon name="lucide:layers" class="mr-1.5 inline h-4 w-4" />
                     {{ $t("publicProfile.sheddingHistory") }}
                 </h2>
@@ -176,7 +190,7 @@
                     <div
                         v-for="(shed, i) in petData.sheddings.slice(0, 10)"
                         :key="i"
-                        class="glass-card flex items-center justify-between rounded-lg px-4 py-3"
+                        class="public-card flex items-center justify-between rounded-xl px-4 py-3"
                     >
                         <div class="flex items-center gap-2">
                             <Icon
@@ -202,13 +216,15 @@
             </section>
 
             <!-- Footer -->
-            <footer class="border-t border-white/5 pt-6 text-center">
-                <div class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-4 py-2">
+            <footer
+                class="animate-fade-in-up border-line-faint border-t pt-8 text-center delay-500"
+            >
+                <div class="public-card inline-flex items-center gap-1.5 rounded-full px-5 py-2.5">
                     <Icon name="lucide:paw-print" class="text-primary-400 h-3.5 w-3.5" />
                     <span class="text-fg-faint text-xs">{{ $t("publicProfile.poweredBy") }}</span>
                     <NuxtLink
                         to="/"
-                        class="text-primary-400 text-xs font-semibold tracking-tight"
+                        class="text-primary-400 hover:text-primary-300 text-xs font-semibold tracking-tight transition-colors"
                     >
                         KeeperLog
                     </NuxtLink>
@@ -224,7 +240,7 @@
                 @click.self="lightboxPhoto = null"
             >
                 <button
-                    class="absolute right-4 top-4 text-white/60 hover:text-white"
+                    class="absolute top-4 right-4 text-white/60 hover:text-white"
                     @click="lightboxPhoto = null"
                 >
                     <Icon name="lucide:x" class="h-6 w-6" />
@@ -393,9 +409,13 @@ useSeoMeta({
     ogDescription: () =>
         petData.value?.bio ??
         (petData.value?.species
-            ? t("publicProfile.ogDescription", { name: petData.value.name, species: petData.value.species })
+            ? t("publicProfile.ogDescription", {
+                  name: petData.value.name,
+                  species: petData.value.species,
+              })
             : ""),
-    ogImage: () => (petData.value?.profilePhotoId ? photoUrl(petData.value.profilePhotoId) : undefined),
+    ogImage: () =>
+        petData.value?.profilePhotoId ? photoUrl(petData.value.profilePhotoId) : undefined,
     ogType: "profile",
     twitterCard: "summary_large_image",
 });

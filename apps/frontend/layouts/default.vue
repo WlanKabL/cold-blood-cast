@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-base flex h-dvh overflow-hidden">
+    <div class="page-bg bg-base flex h-dvh overflow-hidden">
         <LayoutAppSidebar :is-open="sidebarOpen" @close="sidebarOpen = false" />
 
         <!-- Main area -->
@@ -46,7 +46,7 @@
 
             <!-- Page content -->
             <main class="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
-                <div class="mx-auto max-w-7xl">
+                <div class="animate-fade-in mx-auto max-w-7xl">
                     <slot />
                 </div>
             </main>

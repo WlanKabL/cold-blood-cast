@@ -45,7 +45,4 @@ export {
     maintenanceReminderTemplate,
     type MaintenanceReminderData,
 } from "./maintenance-reminder.js";
-export {
-    weeklyCareDigestTemplate,
-    type WeeklyCareDigestData,
-} from "./weekly-care-digest.js";
+export { weeklyCareDigestTemplate, type WeeklyCareDigestData } from "./weekly-care-digest.js";

@@ -1,7 +1,9 @@
 <template>
     <div class="mx-auto max-w-5xl space-y-6 p-6">
         <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="animate-fade-in-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
                     {{ $t("pages.weights.title") }}
@@ -14,7 +16,7 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="animate-fade-in-up flex flex-wrap items-center gap-3 delay-75">
             <UiSelect v-model="selectedPet" class="w-48">
                 <option value="ALL">{{ $t("pages.weights.allPets") }}</option>
                 <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -43,7 +45,7 @@
         </div>
 
         <!-- List -->
-        <div v-else-if="weights?.length" class="space-y-2">
+        <div v-else-if="weights?.length" class="animate-fade-in-up space-y-2 delay-150">
             <div
                 v-for="w in weights"
                 :key="w.id"

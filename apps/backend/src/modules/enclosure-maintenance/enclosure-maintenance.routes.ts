@@ -99,11 +99,7 @@ export async function enclosureMaintenanceRoutes(app: FastifyInstance) {
                 result.error.flatten(),
             );
         }
-        const data = await updateMaintenanceTask(
-            request.params.id,
-            request.userId,
-            result.data,
-        );
+        const data = await updateMaintenanceTask(request.params.id, request.userId, result.data);
         return { success: true, data };
     });
 
