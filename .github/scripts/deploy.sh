@@ -102,6 +102,9 @@ transfer_files() {
     cat "$COMPOSE_FILE" | ssh deploy-target "cat > $DIR/docker-compose.yml"
     echo "✅ Transferred $COMPOSE_FILE → docker-compose.yml"
 
+    # Remove legacy compose file from previous deploy format
+    ssh deploy-target "rm -f $DIR/docker-compose.prod.yml" 2>/dev/null || true
+
     # Write .env via base64 round-trip (safe binary transport)
     printf '%s' "$DOTENV_RAW" | base64 -w 0 | ssh deploy-target "base64 -d > $DIR/.env"
 
@@ -179,11 +182,20 @@ for i in \$(seq 1 \$RETRIES); do
         docker compose logs --tail=50 backend
         echo "--- Frontend logs ---"
         docker compose logs --tail=50 frontend
+        echo "--- Docker healthcheck details ---"
+        docker inspect --format='{{json .State.Health}}' cbc-backend 2>/dev/null | head -c 500 || true
+        docker inspect --format='{{json .State.Health}}' cbc-frontend 2>/dev/null | head -c 500 || true
         exit 1
     fi
 done
 
 echo "🎉 Deployment verified — all services healthy"
+
+# ── Seed (idempotent — skips existing data) ──
+echo "Running seed..."
+docker compose exec -T backend node dist/config/seed.js 2>&1 || echo "WARN: seed.js returned non-zero exit code"
+echo "Seed complete"
+
 docker image prune -f
 DEPLOY
 }

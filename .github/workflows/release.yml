@@ -1,0 +1,307 @@
+name: Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Release version (e.g. 1.2.0) — leave empty for auto-detect from conventional commits"
+                required: false
+                default: ""
+                type: string
+            ref:
+                description: "Branch or commit to release from"
+                required: true
+                default: "main"
+                type: string
+            auto_deploy:
+                description: "Auto-deploy to production after release?"
+                required: true
+                default: true
+                type: boolean
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+    packages: write
+
+env:
+    REGISTRY: ghcr.io
+    BACKEND_IMAGE: ghcr.io/wlankabl/cold-blood-cast/backend
+    FRONTEND_IMAGE: ghcr.io/wlankabl/cold-blood-cast/frontend
+
+jobs:
+    resolve-version:
+        name: Resolve Version
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        outputs:
+            version: ${{ steps.resolved.outputs.version }}
+            changelog: ${{ steps.resolved.outputs.changelog }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
+                  fetch-depth: 0
+
+            - name: Auto-detect version from conventional commits
+              if: ${{ inputs.version == '' }}
+              id: semver
+              uses: mathieudutour/github-tag-action@v6.2
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  dry_run: true
+                  default_bump: patch
+                  tag_prefix: v
+
+            - name: Generate structured changelog
+              id: changelog
+              run: |
+                  # Get previous tag
+                  PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]' | head -1 || echo "")
+                  echo "Previous tag: ${PREV_TAG:-'(none)'}"
+
+                  BREAKING=""
+                  FEATURES=""
+                  FIXES=""
+                  OTHER=""
+
+                  if [ -n "$PREV_TAG" ]; then
+                    RANGE="${PREV_TAG}..HEAD"
+                  else
+                    RANGE="HEAD~50..HEAD"
+                  fi
+
+                  while IFS= read -r line || [ -n "$line" ]; do
+                    MSG=$(echo "$line" | sed 's/ ([a-f0-9]\{7,\})$//')
+                    HASH=$(echo "$line" | grep -oP '[a-f0-9]{7,}(?=\)$)' || echo "")
+                    SUBJECT=$(echo "$MSG" | sed 's/^- //')
+
+                    if echo "$SUBJECT" | grep -qiE '^(feat|feature)(\(.*\))?!:|BREAKING CHANGE'; then
+                      BREAKING="${BREAKING}\n- ${SUBJECT} (${HASH})"
+                    elif echo "$SUBJECT" | grep -qiE '^(feat|feature)(\(.*\))?:'; then
+                      FEATURES="${FEATURES}\n- ${SUBJECT} (${HASH})"
+                    elif echo "$SUBJECT" | grep -qiE '^fix(\(.*\))?:'; then
+                      FIXES="${FIXES}\n- ${SUBJECT} (${HASH})"
+                    else
+                      OTHER="${OTHER}\n- ${SUBJECT} (${HASH})"
+                    fi
+                  done < <(git log "$RANGE" --pretty=format:"- %s (%h)" --no-merges)
+
+                  # Build structured changelog
+                  CHANGELOG=""
+                  if [ -n "$BREAKING" ]; then
+                    CHANGELOG="${CHANGELOG}## ⚠️ BREAKING\n${BREAKING}\n\n"
+                  fi
+                  if [ -n "$FEATURES" ]; then
+                    CHANGELOG="${CHANGELOG}## ✨ Features\n${FEATURES}\n\n"
+                  fi
+                  if [ -n "$FIXES" ]; then
+                    CHANGELOG="${CHANGELOG}## 🐛 Fixes\n${FIXES}\n\n"
+                  fi
+                  if [ -n "$OTHER" ]; then
+                    CHANGELOG="${CHANGELOG}## 📦 Other\n${OTHER}\n\n"
+                  fi
+
+                  if [ -z "$CHANGELOG" ]; then
+                    CHANGELOG="No conventional commits found since last release."
+                  fi
+
+                  printf '%b' "$CHANGELOG" > /tmp/changelog.md
+                  echo "Generated changelog:"
+                  cat /tmp/changelog.md
+
+            - name: Resolve final version
+              id: resolved
+              run: |
+                  if [ -n "${{ inputs.version }}" ]; then
+                    VERSION="${{ inputs.version }}"
+                    echo "📌 Manual version: $VERSION"
+                  else
+                    VERSION="${{ steps.semver.outputs.new_version }}"
+                    echo "🤖 Auto version: $VERSION (bump: ${{ steps.semver.outputs.release_type }})"
+                  fi
+
+                  # Validate format
+                  if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+                    echo "❌ Invalid version format: '$VERSION'"
+                    echo "   Expected: MAJOR.MINOR.PATCH (e.g. 1.2.0)"
+                    exit 1
+                  fi
+
+                  # Check for duplicate tags
+                  if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+                    echo "❌ Tag v${VERSION} already exists!"
+                    echo "   Use a different version or leave empty for auto-detect"
+                    exit 1
+                  fi
+
+                  # Verify version is greater than latest
+                  LATEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1 | sed 's/^v//' || echo "0.0.0")
+                  echo "Latest release: v${LATEST}"
+
+                  # Compare semver (sort -V handles version comparison)
+                  HIGHEST=$(printf '%s\n%s' "$LATEST" "$VERSION" | sort -V | tail -1)
+                  if [ "$HIGHEST" = "$LATEST" ] && [ "$VERSION" != "$LATEST" ]; then
+                    echo "❌ Version $VERSION is not greater than latest release v${LATEST}"
+                    exit 1
+                  fi
+                  if [ "$VERSION" = "$LATEST" ]; then
+                    echo "❌ Version $VERSION is the same as latest release"
+                    exit 1
+                  fi
+
+                  echo "✅ Version v${VERSION} > v${LATEST}"
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+                  # Store changelog via file + artifact (multiline safe)
+                  CHANGELOG=$(cat /tmp/changelog.md)
+                  {
+                    echo "changelog<<CHANGELOG_EOF"
+                    echo "$CHANGELOG"
+                    echo "CHANGELOG_EOF"
+                  } >> "$GITHUB_OUTPUT"
+
+    build-and-push:
+        name: Build & Push Images
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        needs: resolve-version
+        environment: production
+        env:
+            VERSION: ${{ needs.resolve-version.outputs.version }}
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
+
+            - name: Log in to GHCR
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Docker meta (backend)
+              id: meta-backend
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.BACKEND_IMAGE }}
+                  tags: |
+                      type=raw,value=${{ needs.resolve-version.outputs.version }}
+                      type=raw,value=latest
+
+            - name: Build & push backend
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: apps/backend/Dockerfile
+                  push: true
+                  tags: ${{ steps.meta-backend.outputs.tags }}
+                  labels: ${{ steps.meta-backend.outputs.labels }}
+                  build-args: |
+                      APP_VERSION=${{ needs.resolve-version.outputs.version }}
+                  cache-from: type=gha,scope=backend
+                  cache-to: type=gha,mode=max,scope=backend
+
+            - name: Docker meta (frontend)
+              id: meta-frontend
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.FRONTEND_IMAGE }}
+                  tags: |
+                      type=raw,value=${{ needs.resolve-version.outputs.version }}
+                      type=raw,value=latest
+
+            - name: Build & push frontend
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: apps/frontend/Dockerfile
+                  push: true
+                  tags: ${{ steps.meta-frontend.outputs.tags }}
+                  labels: ${{ steps.meta-frontend.outputs.labels }}
+                  build-args: |
+                      BASE_URL=${{ secrets.BASE_URL }}
+                      API_BASE_URL=${{ secrets.API_BASE_URL }}
+                      SITE_URL=${{ secrets.SITE_URL }}
+                      APP_VERSION=${{ needs.resolve-version.outputs.version }}
+                  cache-from: type=gha,scope=frontend
+                  cache-to: type=gha,mode=max,scope=frontend
+
+    create-release:
+        name: Create GitHub Release
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        needs: [resolve-version, build-and-push]
+        permissions:
+            contents: write
+        env:
+            VERSION: ${{ needs.resolve-version.outputs.version }}
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
+                  fetch-depth: 0
+
+            - name: Create and push tag
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git tag -a "v${{ env.VERSION }}" -m "Release v${{ env.VERSION }}"
+                  git push origin "v${{ env.VERSION }}"
+
+            - name: Write changelog
+              run: |
+                  cat <<'CHANGELOG_EOF' > /tmp/changelog.md
+                  ${{ needs.resolve-version.outputs.changelog }}
+                  CHANGELOG_EOF
+                  echo "Changelog:"
+                  cat /tmp/changelog.md
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: v${{ env.VERSION }}
+                  name: v${{ env.VERSION }}
+                  body_path: /tmp/changelog.md
+                  generate_release_notes: false
+
+    deploy:
+        name: Deploy to Production
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        needs: [resolve-version, build-and-push, create-release]
+        if: ${{ inputs.auto_deploy }}
+        environment: production
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.ref }}
+
+            - name: Run deploy script
+              env:
+                  ACTION: deploy
+                  DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+                  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+                  DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+                  DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+                  GHCR_USER: ${{ secrets.GHCR_USER }}
+                  GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+                  DOTENV_RAW: ${{ secrets.DOTENV }}
+                  BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
+                  FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
+                  DEPLOY_TAG: ${{ needs.resolve-version.outputs.version }}
+                  COMPOSE_FILE: docker-compose.production.yml
+              run: bash .github/scripts/deploy.sh
