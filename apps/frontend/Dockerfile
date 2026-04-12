@@ -1,34 +1,61 @@
-FROM node:22-alpine AS base
-RUN corepack enable && corepack prepare pnpm@10.8.1 --activate
+# ── Build stage ──
+FROM node:22-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
+
 WORKDIR /app
 
-FROM base AS deps
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY packages/shared/package.json packages/shared/
-COPY apps/frontend/package.json apps/frontend/
+# Copy workspace root config
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# Use hoisted node_modules layout (flat like npm → no symlink issues in Docker)
+RUN echo "node-linker=hoisted" > .npmrc
+
+# Copy ALL workspace package.json files (pnpm lockfile needs every member)
+COPY packages/shared/ ./packages/shared/
+COPY apps/frontend/package.json ./apps/frontend/
+COPY apps/backend/package.json ./apps/backend/
+
+# Install all workspace dependencies
 RUN pnpm install --frozen-lockfile
 
-FROM base AS build
+# Build shared package (TS → JS) so Vite can resolve it
+WORKDIR /app/packages/shared
+RUN rm -f tsconfig.tsbuildinfo && pnpm run build
+
+# Copy frontend source
+WORKDIR /app/apps/frontend
+COPY apps/frontend/ ./
+
+# Build-time env vars (baked into the SPA bundle)
 ARG BASE_URL=http://localhost:3300
 ARG API_BASE_URL=http://localhost:3301
 ARG SITE_URL=http://localhost:3300
-ARG APP_VERSION=0.0.0
-ENV BASE_URL=${BASE_URL}
-ENV API_BASE_URL=${API_BASE_URL}
-ENV SITE_URL=${SITE_URL}
-ENV APP_VERSION=${APP_VERSION}
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
-COPY --from=deps /app/apps/frontend/node_modules ./apps/frontend/node_modules
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY packages/shared/ packages/shared/
-COPY apps/frontend/ apps/frontend/
-RUN pnpm --filter @cold-blood-cast/shared build
-RUN pnpm --filter @cold-blood-cast/frontend build
+ARG APP_VERSION=dev
+ENV BASE_URL=$BASE_URL
+ENV API_BASE_URL=$API_BASE_URL
+ENV SITE_URL=$SITE_URL
+ENV APP_VERSION=$APP_VERSION
 
-FROM base AS production
-ENV NODE_ENV=production
-COPY --from=build /app/apps/frontend/.output ./apps/frontend/.output
-WORKDIR /app/apps/frontend
+# Build Nuxt app
+RUN pnpm run build
+
+# ── Production stage ──
+FROM node:22-alpine
+
+WORKDIR /app
+
+# curl for Docker healthcheck probes
+RUN apk add --no-cache curl
+
+# Nuxt .output is self-contained
+COPY --from=builder /app/apps/frontend/.output ./.output
+
+# Non-root user for security
+RUN addgroup -g 1001 -S nodejs && adduser -S coldblood -u 1001 -G nodejs
+RUN chown -R coldblood:nodejs /app
+USER coldblood
+
 EXPOSE 3300
+
 CMD ["node", ".output/server/index.mjs"]
