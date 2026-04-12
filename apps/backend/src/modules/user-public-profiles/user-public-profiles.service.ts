@@ -351,7 +351,7 @@ export async function getPublicUserData(userSlug: string) {
     }
 
     // Increment views fire-and-forget
-    prisma.userPublicProfile
+    void prisma.userPublicProfile
         .update({ where: { slug: userSlug }, data: { views: { increment: 1 } } })
         .catch(() => {});
 

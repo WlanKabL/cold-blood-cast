@@ -67,7 +67,7 @@ export async function logJobRun(
             status,
             startedAt,
             endedAt: new Date(),
-            details: details ?? undefined,
+            details: details as Parameters<typeof prisma.cronJobLog.create>[0]["data"]["details"],
             error: error ?? undefined,
         },
     });

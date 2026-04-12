@@ -1,5 +1,6 @@
 import { type FastifyInstance, type FastifyRequest } from "fastify";
 import { z } from "zod";
+import type { ThemePreset, SocialPlatform } from "@cold-blood-cast/shared";
 import { authGuard, emailVerifiedGuard, requireFeature } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
@@ -58,11 +59,13 @@ const UpdateProfileSchema = z.object({
     showKeeperSince: z.boolean().optional(),
     showBadges: z.boolean().optional(),
     notifyOnComment: z.boolean().optional(),
-    themePreset: z.enum(THEME_PRESETS as [string, ...string[]]).optional(),
+    themePreset: z
+        .enum(THEME_PRESETS as unknown as readonly [ThemePreset, ...ThemePreset[]])
+        .optional(),
 });
 
 const SocialLinkSchema = z.object({
-    platform: z.enum(SOCIAL_PLATFORMS as [string, ...string[]]),
+    platform: z.enum(SOCIAL_PLATFORMS as unknown as readonly [SocialPlatform, ...SocialPlatform[]]),
     url: z.string().url().max(500),
     label: z.string().max(50).optional(),
 });

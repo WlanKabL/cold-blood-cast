@@ -71,10 +71,10 @@ export async function communityPublicRoutes(app: FastifyInstance) {
     );
 
     // ── User Profile Comments ───────────────────────────────
-    app.post(
+    app.post<{ Params: { slug: string } }>(
         "/user/:slug/comments",
         { preHandler: [authGuard] },
-        async (request: FastifyRequest<{ Params: { slug: string } }>) => {
+        async (request) => {
             const bodyResult = AddCommentSchema.safeParse(request.body);
             if (!bodyResult.success) {
                 throw badRequest(
@@ -119,20 +119,20 @@ export async function communityPublicRoutes(app: FastifyInstance) {
     );
 
     // ── Delete Own Comment (user profile) ────────────────────
-    app.delete(
+    app.delete<{ Params: { slug: string; commentId: string } }>(
         "/user/:slug/comments/:commentId",
         { preHandler: [authGuard] },
-        async (request: FastifyRequest<{ Params: { slug: string; commentId: string } }>) => {
+        async (request) => {
             await deleteOwnComment(request.userId, request.params.commentId);
             return { success: true };
         },
     );
 
     // ── Pet Profile Comments (requires userSlug) ─────────────
-    app.post(
+    app.post<{ Params: { userSlug: string; petSlug: string } }>(
         "/pet/:userSlug/:petSlug/comments",
         { preHandler: [authGuard] },
-        async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
+        async (request) => {
             const bodyResult = AddCommentSchema.safeParse(request.body);
             if (!bodyResult.success) {
                 throw badRequest(
@@ -183,14 +183,10 @@ export async function communityPublicRoutes(app: FastifyInstance) {
     );
 
     // ── Delete Own Comment (pet profile) ─────────────────────
-    app.delete(
+    app.delete<{ Params: { userSlug: string; petSlug: string; commentId: string } }>(
         "/pet/:userSlug/:petSlug/comments/:commentId",
         { preHandler: [authGuard] },
-        async (
-            request: FastifyRequest<{
-                Params: { userSlug: string; petSlug: string; commentId: string };
-            }>,
-        ) => {
+        async (request) => {
             await deleteOwnComment(request.userId, request.params.commentId);
             return { success: true };
         },

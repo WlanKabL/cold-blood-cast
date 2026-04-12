@@ -16,6 +16,7 @@ import { stat } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { env } from "@/config/env.js";
 import { decryptFile } from "@/helpers/file-crypto.js";
+import { resolveUserForPetProfile } from "@/modules/user-public-profiles/user-public-profiles.service.js";
 
 // ─── Validation Schemas ──────────────────────────────────────
 
@@ -127,10 +128,7 @@ export async function publicPetRoutes(app: FastifyInstance) {
         "/:userSlug/:petSlug",
         async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
             // Resolve user from UserPublicProfile or username
-            const userProfile =
-                await import("@/modules/user-public-profiles/user-public-profiles.service.js").then(
-                    (m) => m.resolveUserForPetProfile(request.params.userSlug),
-                );
+            const userProfile = await resolveUserForPetProfile(request.params.userSlug);
 
             const data = await getPublicPetDataByUserSlug(userProfile.id, request.params.petSlug);
             return { success: true, data };
@@ -146,10 +144,7 @@ export async function publicPetRoutes(app: FastifyInstance) {
             }>,
             reply,
         ) => {
-            const userProfile =
-                await import("@/modules/user-public-profiles/user-public-profiles.service.js").then(
-                    (m) => m.resolveUserForPetProfile(request.params.userSlug),
-                );
+            const userProfile = await resolveUserForPetProfile(request.params.userSlug);
 
             const upload = await getPublicPhoto(
                 userProfile.id,

@@ -553,7 +553,7 @@ const { get, post, patch, del, put } = useApi();
 const toast = useAppToast();
 const authStore = useAuthStore();
 const config = useRuntimeConfig();
-const apiBase = config.public.apiBase as string;
+const apiBase = config.public.apiBaseURL as string;
 
 const themePresets = ["default", "ocean", "forest", "sunset", "midnight", "desert", "arctic"];
 const platforms = [
