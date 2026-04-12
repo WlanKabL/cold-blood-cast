@@ -1,46 +1,16 @@
 import pino from "pino";
 import { env } from "@/config/env.js";
+import { getBerlinDayInfo, hasJobRunToday, logJobRun } from "@/helpers/scheduler.js";
 import { sendMail } from "@/modules/mail/mail.service.js";
 import { weeklyCareDigestTemplate } from "@/modules/mail/templates/index.js";
 import { getOptedInUsers, getWeekEvents } from "./weekly-planner.service.js";
 
 const logger = pino({ name: "weekly-planner" });
+const JOB_NAME = "weekly-planner";
 const RUN_DAY = 0; // Sunday
 const RUN_HOUR = 18; // 18:00 Berlin time
 
 let schedulerInterval: ReturnType<typeof setInterval> | null = null;
-let lastRunDate: string | null = null;
-
-function getBerlinDayInfo(now: Date): { dateStr: string; hour: number; dayOfWeek: number } {
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Europe/Berlin",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        hour12: false,
-        weekday: "short",
-    });
-
-    const parts = formatter.formatToParts(now);
-    const year = parts.find((p) => p.type === "year")!.value;
-    const month = parts.find((p) => p.type === "month")!.value;
-    const day = parts.find((p) => p.type === "day")!.value;
-    const hour = Number(parts.find((p) => p.type === "hour")!.value);
-    const weekday = parts.find((p) => p.type === "weekday")!.value;
-
-    const dayMap: Record<string, number> = {
-        Sun: 0,
-        Mon: 1,
-        Tue: 2,
-        Wed: 3,
-        Thu: 4,
-        Fri: 5,
-        Sat: 6,
-    };
-
-    return { dateStr: `${year}-${month}-${day}`, hour, dayOfWeek: dayMap[weekday] ?? -1 };
-}
 
 function getNextMonday(now: Date): Date {
     const d = new Date(now);
@@ -118,14 +88,17 @@ export function startWeeklyPlannerScheduler(): void {
             const { dateStr, hour, dayOfWeek } = getBerlinDayInfo(new Date());
 
             if (dayOfWeek !== RUN_DAY || hour !== RUN_HOUR) return;
-            if (lastRunDate === dateStr) return;
+            if (await hasJobRunToday(JOB_NAME, dateStr)) return;
 
-            lastRunDate = dateStr;
+            const startedAt = new Date();
             logger.info("Starting weekly care digest (Sunday 18:00 Berlin)");
 
             const sent = await sendWeeklyDigests();
+
+            await logJobRun(JOB_NAME, "success", startedAt, { emailsSent: sent });
             logger.info({ emailsSent: sent }, "Weekly care digest completed");
         } catch (err) {
+            await logJobRun(JOB_NAME, "error", new Date(), undefined, String(err));
             logger.error({ err }, "Weekly care digest failed");
         } finally {
             running = false;

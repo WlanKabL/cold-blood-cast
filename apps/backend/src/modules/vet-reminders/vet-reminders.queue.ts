@@ -1,34 +1,16 @@
 import pino from "pino";
 import { prisma } from "@/config/database.js";
 import { env } from "@/config/env.js";
+import { getBerlinDayInfo, hasJobRunToday, logJobRun } from "@/helpers/scheduler.js";
 import { sendMail } from "@/modules/mail/mail.service.js";
 import { vetAppointmentReminderTemplate } from "@/modules/mail/templates/index.js";
 import type { VetReminderAppointment } from "@/modules/mail/templates/vet-appointment-reminder.js";
 
 const logger = pino({ name: "vet-reminders" });
+const JOB_NAME = "vet-reminders";
 const RUN_HOUR = 8; // 08:00 Berlin time
 
 let schedulerInterval: ReturnType<typeof setInterval> | null = null;
-let lastRunDate: string | null = null;
-
-function getBerlinDayInfo(now: Date): { dateStr: string; hour: number } {
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Europe/Berlin",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        hour12: false,
-    });
-
-    const parts = formatter.formatToParts(now);
-    const year = parts.find((p) => p.type === "year")!.value;
-    const month = parts.find((p) => p.type === "month")!.value;
-    const day = parts.find((p) => p.type === "day")!.value;
-    const hour = Number(parts.find((p) => p.type === "hour")!.value);
-
-    return { dateStr: `${year}-${month}-${day}`, hour };
-}
 
 interface UserReminderGroup {
     userId: string;
@@ -219,15 +201,17 @@ export function startVetReminderScheduler(): void {
             const { dateStr, hour } = getBerlinDayInfo(new Date());
 
             if (hour !== RUN_HOUR) return;
-            if (lastRunDate === dateStr) return;
+            if (await hasJobRunToday(JOB_NAME, dateStr)) return;
 
-            lastRunDate = dateStr;
+            const startedAt = new Date();
             logger.info("Starting vet reminder check (08:00 Berlin)");
 
             const sent = await sendVetReminders();
 
+            await logJobRun(JOB_NAME, "success", startedAt, { emailsSent: sent });
             logger.info({ emailsSent: sent }, "Vet reminder check completed");
         } catch (err) {
+            await logJobRun(JOB_NAME, "error", new Date(), undefined, String(err));
             logger.error({ err }, "Vet reminder check failed");
         } finally {
             running = false;

@@ -78,6 +78,8 @@ model User {
     petDocuments            PetDocument[]
     maintenanceTasks        MaintenanceTask[]
     publicProfiles          PublicProfile[]
+    userPublicProfile       UserPublicProfile?
+    userBadges              UserBadge[]
 
     @@map("users")
 }
@@ -683,6 +685,7 @@ model Upload {
     petPhotos       PetPhoto[]
     vetVisitDocuments VetVisitDocument[]
     petDocuments    PetDocument[]
+    userPublicProfile UserPublicProfile?
 
     @@map("uploads")
 }
@@ -778,6 +781,7 @@ model Pet {
     vetVisits     VetVisit[]
     documents     PetDocument[]
     publicProfile PublicProfile?
+    userPetOrders UserPetOrder[]
 
     @@index([userId])
     @@index([enclosureId])
@@ -1073,7 +1077,7 @@ model PublicProfile {
     id            String  @id @default(cuid())
     petId         String  @unique @map("pet_id")
     userId        String  @map("user_id")
-    slug          String  @unique
+    slug          String
     active        Boolean @default(false)
     bio           String?
 
@@ -1096,6 +1100,141 @@ model PublicProfile {
     pet           Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
     user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([userId, slug])
     @@index([userId])
     @@map("public_profiles")
+}
+
+// ==========================================
+// User Public Profiles
+// ==========================================
+
+model UserPublicProfile {
+    id              String   @id @default(cuid())
+    userId          String   @unique @map("user_id")
+    slug            String   @unique
+    active          Boolean  @default(false)
+
+    // ── Profil-Infos ─────────────────────────────
+    bio             String?  @db.VarChar(1000)
+    tagline         String?  @db.VarChar(100)
+    location        String?  @db.VarChar(100)
+    keeperSince     DateTime? @map("keeper_since")
+
+    // ── Avatar ───────────────────────────────────
+    avatarUploadId  String?  @unique @map("avatar_upload_id")
+
+    // ── Visibility Toggles ───────────────────────
+    showStats       Boolean  @default(true) @map("show_stats")
+    showPets        Boolean  @default(true) @map("show_pets")
+    showSocialLinks Boolean  @default(true) @map("show_social_links")
+    showLocation    Boolean  @default(true) @map("show_location")
+    showKeeperSince Boolean  @default(true) @map("show_keeper_since")
+    showBadges      Boolean  @default(true) @map("show_badges")
+
+    // ── Theme ────────────────────────────────────
+    themePreset     String   @default("default") @map("theme_preset") @db.VarChar(30)
+
+    // ── Stats ────────────────────────────────────
+    views           Int      @default(0)
+
+    createdAt       DateTime @default(now()) @map("created_at")
+    updatedAt       DateTime @updatedAt @map("updated_at")
+
+    // ── Relations ────────────────────────────────
+    user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    avatarUpload    Upload?          @relation(fields: [avatarUploadId], references: [id], onDelete: SetNull)
+    socialLinks     UserSocialLink[]
+    petOrder        UserPetOrder[]
+
+    @@map("user_public_profiles")
+}
+
+model UserSocialLink {
+    id              String  @id @default(cuid())
+    profileId       String  @map("profile_id")
+    platform        String  @db.VarChar(30)
+    url             String  @db.VarChar(500)
+    label           String? @db.VarChar(50)
+    sortOrder       Int     @default(0) @map("sort_order")
+
+    profile         UserPublicProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    @@index([profileId])
+    @@map("user_social_links")
+}
+
+model UserPetOrder {
+    id          String  @id @default(cuid())
+    profileId   String  @map("profile_id")
+    petId       String  @map("pet_id")
+    sortOrder   Int     @default(0) @map("sort_order")
+
+    profile     UserPublicProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    pet         Pet               @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+    @@unique([profileId, petId])
+    @@index([profileId])
+    @@map("user_pet_order")
+}
+
+// ==========================================
+// Badges & Achievements
+// ==========================================
+
+model Badge {
+    id          String  @id @default(cuid())
+    key         String  @unique
+    nameKey     String  @map("name_key")
+    descKey     String  @map("desc_key")
+    icon        String
+    category    String  @default("general")
+    threshold   Int?
+    sortOrder   Int     @default(0) @map("sort_order")
+
+    userBadges  UserBadge[]
+
+    @@map("badges")
+}
+
+model UserBadge {
+    id        String   @id @default(cuid())
+    userId    String   @map("user_id")
+    badgeId   String   @map("badge_id")
+    earnedAt  DateTime @default(now()) @map("earned_at")
+
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, badgeId])
+    @@map("user_badges")
+}
+
+// ==========================================
+// Community: Likes & Comments
+// ==========================================
+
+model ProfileLike {
+    id          String   @id @default(cuid())
+    profileType String   @map("profile_type") @db.VarChar(10)
+    profileId   String   @map("profile_id")
+    ipHash      String   @map("ip_hash")
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    @@unique([profileType, profileId, ipHash])
+    @@index([profileType, profileId])
+    @@map("profile_likes")
+}
+
+model ProfileComment {
+    id          String   @id @default(cuid())
+    profileType String   @map("profile_type") @db.VarChar(10)
+    profileId   String   @map("profile_id")
+    authorName  String   @map("author_name") @db.VarChar(50)
+    content     String   @db.VarChar(500)
+    approved    Boolean  @default(false)
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    @@index([profileType, profileId])
+    @@map("profile_comments")
 }

@@ -372,3 +372,180 @@ export interface DataExportInfo {
     createdAt: string;
     expiresAt: string | null;
 }
+
+// ─── User Public Profile ─────────────────────────────────────
+
+export type ThemePreset = "default" | "ocean" | "forest" | "sunset" | "midnight" | "desert" | "arctic";
+
+export type SocialPlatform = "instagram" | "youtube" | "tiktok" | "twitter" | "facebook" | "website" | "discord" | "custom";
+
+export interface UserPublicProfileData {
+    id: string;
+    slug: string;
+    active: boolean;
+    bio: string | null;
+    tagline: string | null;
+    location: string | null;
+    keeperSince: string | null;
+    hasAvatar: boolean;
+    showStats: boolean;
+    showPets: boolean;
+    showSocialLinks: boolean;
+    showLocation: boolean;
+    showKeeperSince: boolean;
+    showBadges: boolean;
+    themePreset: ThemePreset;
+    views: number;
+    createdAt: string;
+    socialLinks: UserSocialLinkData[];
+    petOrder: UserPetOrderData[];
+}
+
+export interface UserSocialLinkData {
+    id: string;
+    platform: SocialPlatform;
+    url: string;
+    label: string | null;
+    sortOrder: number;
+}
+
+export interface UserPetOrderData {
+    petId: string;
+    petName: string;
+    hasPublicProfile: boolean;
+    sortOrder: number;
+}
+
+/** Public-facing user profile (for /keeper/:slug) */
+export interface PublicUserData {
+    slug: string;
+    displayName: string | null;
+    username: string;
+    bio: string | null;
+    tagline: string | null;
+    location: string | null;
+    keeperSince: string | null;
+    hasAvatar: boolean;
+    themePreset: ThemePreset;
+    views: number;
+    createdAt: string;
+
+    socialLinks: Array<{
+        platform: string;
+        url: string;
+        label: string | null;
+    }>;
+
+    stats: {
+        petCount: number;
+        totalPhotos: number;
+        totalFeedings: number;
+        totalWeightRecords: number;
+    } | null;
+
+    badges: Array<{
+        key: string;
+        nameKey: string;
+        icon: string;
+        earnedAt: string;
+    }>;
+
+    pets: Array<{
+        id: string;
+        name: string;
+        species: string | null;
+        morph: string | null;
+        profilePhotoUrl: string | null;
+        petSlug: string | null;
+        bio: string | null;
+    }>;
+}
+
+/** Public-facing pet profile via /keeper/:userSlug/p/:petSlug */
+export interface PublicPetData {
+    name: string;
+    bio: string | null;
+    species: string | null;
+    morph: string | null;
+    gender: string | null;
+    birthDate: string | null;
+    acquisitionDate: string | null;
+    profilePhotoId: string | null;
+    photos: Array<{
+        id: string;
+        caption: string | null;
+        tags: string[];
+        isProfilePicture: boolean;
+        takenAt: string;
+    }>;
+    feedings: Array<{
+        feedItem: string | null;
+        foodType: string;
+        foodSize: string | null;
+        quantity: number;
+        accepted: boolean;
+        fedAt: string;
+        notes: string | null;
+    }>;
+    sheddings: Array<{
+        startedAt: string;
+        completedAt: string | null;
+        complete: boolean;
+        quality: string | null;
+        notes: string | null;
+    }>;
+    weightRecords: Array<{
+        weightGrams: number;
+        measuredAt: string;
+    }>;
+    views: number;
+    slug: string;
+    userSlug: string;
+    createdAt: string;
+    likes: number;
+    comments: PublicCommentData[];
+}
+
+export interface PublicCommentData {
+    id: string;
+    authorName: string;
+    content: string;
+    createdAt: string;
+}
+
+// ─── Badges ──────────────────────────────────────────────────
+
+export interface BadgeDefinition {
+    key: string;
+    nameKey: string;
+    descKey: string;
+    icon: string;
+    category: string;
+    threshold: number | null;
+}
+
+export interface UserBadgeData {
+    key: string;
+    nameKey: string;
+    descKey: string;
+    icon: string;
+    category: string;
+    earnedAt: string;
+}
+
+// ─── Community ───────────────────────────────────────────────
+
+export interface ProfileLikeStatus {
+    count: number;
+    liked: boolean;
+}
+
+export interface ProfileCommentForModeration {
+    id: string;
+    profileType: string;
+    profileId: string;
+    authorName: string;
+    content: string;
+    approved: boolean;
+    createdAt: string;
+}

@@ -289,11 +289,21 @@ const qrCanvas = ref<HTMLCanvasElement>();
 
 const frontendUrl = config.public.appBaseURL || window.location.origin;
 
-const publicUrl = computed(() => (profile.value ? `${frontendUrl}/p/${profile.value.slug}` : ""));
+const publicUrl = computed(() => {
+    if (!profile.value) return "";
+    if (userProfileSlug.value) {
+        return `${frontendUrl}/keeper/${userProfileSlug.value}/p/${profile.value.slug}`;
+    }
+    return `${frontendUrl}/p/${profile.value.slug}`;
+});
 
-const embedUrl = computed(() =>
-    profile.value ? `${frontendUrl}/p/${profile.value.slug}/embed` : "",
-);
+const embedUrl = computed(() => {
+    if (!profile.value) return "";
+    if (userProfileSlug.value) {
+        return `${frontendUrl}/keeper/${userProfileSlug.value}/p/${profile.value.slug}/embed`;
+    }
+    return `${frontendUrl}/p/${profile.value.slug}/embed`;
+});
 
 const embedCode = computed(
     () =>
@@ -344,6 +354,18 @@ const { data: profile, isLoading: loading } = useQuery({
     queryFn: async () => {
         try {
             return await api.get<PublicProfile>(`/api/public-profiles/${props.petId}`);
+        } catch {
+            return null;
+        }
+    },
+});
+
+const { data: userProfileSlug } = useQuery({
+    queryKey: ["user-profile-slug"],
+    queryFn: async () => {
+        try {
+            const res = await api.get<{ slug: string }>("/api/user-profile");
+            return res?.slug ?? null;
         } catch {
             return null;
         }

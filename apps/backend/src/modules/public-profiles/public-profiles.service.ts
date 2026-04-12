@@ -22,17 +22,21 @@ function randomSuffix(): string {
     return result;
 }
 
-async function generateUniqueSlug(petName: string): Promise<string> {
+async function generateUniqueSlug(userId: string, petName: string): Promise<string> {
     const base = slugify(petName) || "pet";
 
-    // Try base slug first
-    const exists = await prisma.publicProfile.findUnique({ where: { slug: base } });
+    // Try base slug first (unique within user)
+    const exists = await prisma.publicProfile.findUnique({
+        where: { userId_slug: { userId, slug: base } },
+    });
     if (!exists) return base;
 
     // Append random suffix until unique
     for (let i = 0; i < 10; i++) {
         const candidate = `${base}-${randomSuffix()}`;
-        const taken = await prisma.publicProfile.findUnique({ where: { slug: candidate } });
+        const taken = await prisma.publicProfile.findUnique({
+            where: { userId_slug: { userId, slug: candidate } },
+        });
         if (!taken) return candidate;
     }
 
@@ -93,21 +97,21 @@ export async function createProfile(userId: string, input: CreateProfileInput) {
         );
     }
 
-    // Handle slug
+    // Handle slug (unique per user)
     let slug: string;
     if (input.customSlug) {
         const error = validateSlug(input.customSlug);
         if (error) throw badRequest(ErrorCodes.E_VALIDATION_ERROR, error);
 
         const slugTaken = await prisma.publicProfile.findUnique({
-            where: { slug: input.customSlug },
+            where: { userId_slug: { userId, slug: input.customSlug } },
         });
         if (slugTaken)
             throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_SLUG_TAKEN, "This slug is already taken");
 
         slug = input.customSlug;
     } else {
-        slug = await generateUniqueSlug(pet.name);
+        slug = await generateUniqueSlug(userId, pet.name);
     }
 
     return prisma.publicProfile.create({
@@ -139,12 +143,14 @@ export async function updateProfile(petId: string, userId: string, input: Update
         throw notFound(ErrorCodes.E_PUBLIC_PROFILE_NOT_FOUND, "Public profile not found");
     }
 
-    // Validate custom slug if changing
+    // Validate custom slug if changing (unique per user)
     if (input.slug !== undefined && input.slug !== profile.slug) {
         const error = validateSlug(input.slug);
         if (error) throw badRequest(ErrorCodes.E_VALIDATION_ERROR, error);
 
-        const slugTaken = await prisma.publicProfile.findUnique({ where: { slug: input.slug } });
+        const slugTaken = await prisma.publicProfile.findUnique({
+            where: { userId_slug: { userId, slug: input.slug } },
+        });
         if (slugTaken)
             throw badRequest(ErrorCodes.E_PUBLIC_PROFILE_SLUG_TAKEN, "This slug is already taken");
     }
@@ -164,19 +170,21 @@ export async function deleteProfile(petId: string, userId: string) {
     await prisma.publicProfile.delete({ where: { petId } });
 }
 
-export async function checkSlugAvailability(slug: string) {
+export async function checkSlugAvailability(slug: string, userId: string) {
     const error = validateSlug(slug);
     if (error) return { available: false, reason: error };
 
-    const existing = await prisma.publicProfile.findUnique({ where: { slug } });
+    const existing = await prisma.publicProfile.findUnique({
+        where: { userId_slug: { userId, slug } },
+    });
     return { available: !existing };
 }
 
 // ─── Public Data Access ──────────────────────────────────────
 
-export async function getPublicPetData(slug: string) {
+export async function getPublicPetDataByUserSlug(userId: string, petSlug: string) {
     const profile = await prisma.publicProfile.findUnique({
-        where: { slug },
+        where: { userId_slug: { userId, slug: petSlug } },
         include: {
             pet: {
                 include: {
@@ -217,7 +225,7 @@ export async function getPublicPetData(slug: string) {
     // Increment views (fire and forget)
     prisma.publicProfile
         .update({
-            where: { slug },
+            where: { id: profile.id },
             data: { views: { increment: 1 } },
         })
         .catch(() => {
@@ -279,9 +287,9 @@ export async function getPublicPetData(slug: string) {
     };
 }
 
-export async function getPublicPhoto(slug: string, photoId: string) {
+export async function getPublicPhoto(userId: string, petSlug: string, photoId: string) {
     const profile = await prisma.publicProfile.findUnique({
-        where: { slug },
+        where: { userId_slug: { userId, slug: petSlug } },
         select: { active: true, showPhotos: true, petId: true },
     });
 

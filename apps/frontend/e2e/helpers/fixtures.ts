@@ -913,3 +913,101 @@ export const mockSlugCheck = {
 export const mockSlugCheckTaken = {
     available: false,
 };
+
+// ─── User Public Profile ─────────────────────────────────────
+
+export const mockUserPublicProfile = {
+    slug: "snake-keeper",
+    active: true,
+    bio: "Passionate corn snake keeper from Berlin",
+    tagline: "Keeping reptiles since 2015",
+    location: "Berlin, Germany",
+    keeperSince: "2015-06-01T00:00:00.000Z",
+    hasAvatar: true,
+    avatarUploadId: "upload_avatar_001",
+    themePreset: "default",
+    views: 128,
+    showStats: true,
+    showPets: true,
+    showSocialLinks: true,
+    showLocation: true,
+    showKeeperSince: true,
+    showBadges: true,
+    petOrder: [],
+};
+
+export const mockPublicUserData = {
+    slug: "snake-keeper",
+    displayName: "SnakeKeeper",
+    username: "snakekeeper",
+    bio: "Passionate corn snake keeper from Berlin",
+    tagline: "Keeping reptiles since 2015",
+    location: "Berlin, Germany",
+    keeperSince: "2015-06-01T00:00:00.000Z",
+    hasAvatar: true,
+    themePreset: "default",
+    views: 128,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    socialLinks: [
+        { platform: "instagram", url: "https://instagram.com/snakekeeper", label: "Instagram" },
+        { platform: "youtube", url: "https://youtube.com/@snakekeeper", label: "YouTube" },
+    ],
+    stats: {
+        petCount: 3,
+        totalPhotos: 45,
+        totalFeedings: 120,
+        totalWeightRecords: 30,
+    },
+    badges: [
+        { key: "first_pet", nameKey: "badges.first_pet", icon: "lucide:paw-print", earnedAt: "2024-01-15T00:00:00.000Z" },
+        { key: "photographer", nameKey: "badges.photographer", icon: "lucide:camera", earnedAt: "2024-06-01T00:00:00.000Z" },
+    ],
+    pets: [
+        {
+            id: "pet_001",
+            name: "Monty",
+            species: "Corn Snake",
+            morph: "Amel",
+            profilePhotoId: "photo_001",
+            petSlug: "monty-the-snake",
+            bio: "A friendly corn snake",
+        },
+        {
+            id: "pet_002",
+            name: "Noodle",
+            species: "Corn Snake",
+            morph: "Normal",
+            profilePhotoId: null,
+            petSlug: "noodle",
+            bio: null,
+        },
+    ],
+};
+
+export const mockUserBadges = [
+    {
+        badge: {
+            key: "first_pet",
+            nameKey: "badges.first_pet",
+            descKey: "badges.first_pet_desc",
+            icon: "lucide:paw-print",
+        },
+    },
+    {
+        badge: {
+            key: "first_photo",
+            nameKey: "badges.first_photo",
+            descKey: "badges.first_photo_desc",
+            icon: "lucide:camera",
+        },
+    },
+];
+
+export const mockPendingComments = [
+    {
+        id: "comment_001",
+        authorName: "Visitor",
+        content: "Beautiful snake collection!",
+        createdAt: "2026-04-01T10:00:00.000Z",
+    },
+];

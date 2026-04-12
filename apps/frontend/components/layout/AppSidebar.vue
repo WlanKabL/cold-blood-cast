@@ -296,6 +296,12 @@ function buildNavItems(
 
 const generalNavItems = [
     {
+        to: "/public-profile",
+        icon: "lucide:globe",
+        label: "nav.publicProfile",
+        feature: "user_public_profiles",
+    },
+    {
         to: "/api-keys",
         icon: "lucide:key",
         label: "nav.apiKeys",

@@ -19,7 +19,7 @@ import { resolve } from "node:path";
 //  2. Bump CURRENT_SEED_VERSION to match the new entry's version.
 //  3. Deploy — it applies once, then never again until the next bump.
 
-const CURRENT_SEED_VERSION = 6;
+const CURRENT_SEED_VERSION = 7;
 
 // ─── Shared Data ─────────────────────────────────────────────────────────────
 
@@ -154,6 +154,19 @@ const DEFAULT_FEATURE_FLAGS = [
         name: "Weekly Care Planner",
         category: "care",
         description: "Weekly calendar view and Sunday digest email for upcoming care tasks",
+    },
+    // Sharing
+    {
+        key: "public_profiles",
+        name: "Public Profiles",
+        category: "sharing",
+        description: "Share pet profiles publicly with custom slugs and photo galleries",
+    },
+    {
+        key: "user_public_profiles",
+        name: "User Public Profiles",
+        category: "sharing",
+        description: "Public user profile page with bio, social links, and pet gallery",
     },
     // Alerts & monitoring
     {
@@ -613,6 +626,39 @@ const MIGRATIONS: Migration[] = [
                 "create-only",
             );
             console.log("  → weekly_planner flag assigned to all roles");
+        },
+    },
+
+    // ─────────────────────────────────────── v7: public profile feature flags
+    {
+        version: 7,
+        description: "Add public_profiles and user_public_profiles feature flags to all roles",
+        apply: async (ctx) => {
+            for (const flag of DEFAULT_FEATURE_FLAGS.filter((f) =>
+                ["public_profiles", "user_public_profiles"].includes(f.key),
+            )) {
+                await ctx.prisma.featureFlag.upsert({
+                    where: { key: flag.key },
+                    update: {},
+                    create: { ...flag, enabled: true },
+                });
+            }
+
+            ctx.flags = await ctx.prisma.featureFlag.findMany();
+
+            await applyRoleFlagMapping(
+                ctx,
+                {
+                    FREE: { public_profiles: true, user_public_profiles: true },
+                    BETA_TESTER: { public_profiles: true, user_public_profiles: true },
+                    PREMIUM: { public_profiles: true, user_public_profiles: true },
+                    PRO: { public_profiles: true, user_public_profiles: true },
+                    MODERATOR: { public_profiles: true, user_public_profiles: true },
+                    ADMIN: { public_profiles: true, user_public_profiles: true },
+                },
+                "create-only",
+            );
+            console.log("  → public_profiles + user_public_profiles flags assigned to all roles");
         },
     },
 

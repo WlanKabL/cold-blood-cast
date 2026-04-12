@@ -8,7 +8,7 @@ import {
     updateProfile,
     deleteProfile,
     checkSlugAvailability,
-    getPublicPetData,
+    getPublicPetDataByUserSlug,
     getPublicPhoto,
 } from "./public-profiles.service.js";
 import { resolve, join, normalize } from "node:path";
@@ -112,7 +112,7 @@ export async function publicProfileRoutes(app: FastifyInstance) {
         authApp.get(
             "/slug-check/:slug",
             async (request: FastifyRequest<{ Params: { slug: string } }>) => {
-                const data = await checkSlugAvailability(request.params.slug);
+                const data = await checkSlugAvailability(request.params.slug, request.userId);
                 return { success: true, data };
             },
         );
@@ -122,17 +122,38 @@ export async function publicProfileRoutes(app: FastifyInstance) {
 // ─── Public Routes (no auth, registered at root) ─────────────
 
 export async function publicPetRoutes(app: FastifyInstance) {
-    // GET /:slug — public pet profile data
-    app.get("/:slug", async (request: FastifyRequest<{ Params: { slug: string } }>) => {
-        const data = await getPublicPetData(request.params.slug);
-        return { success: true, data };
-    });
-
-    // GET /:slug/photos/:photoId — serve photo publicly
+    // GET /:userSlug/:petSlug — public pet profile data (new per-user URL)
     app.get(
-        "/:slug/photos/:photoId",
-        async (request: FastifyRequest<{ Params: { slug: string; photoId: string } }>, reply) => {
-            const upload = await getPublicPhoto(request.params.slug, request.params.photoId);
+        "/:userSlug/:petSlug",
+        async (
+            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
+        ) => {
+            // Resolve user from UserPublicProfile or username
+            const userProfile = await import("@/modules/user-public-profiles/user-public-profiles.service.js")
+                .then((m) => m.resolveUserForPetProfile(request.params.userSlug));
+
+            const data = await getPublicPetDataByUserSlug(userProfile.id, request.params.petSlug);
+            return { success: true, data };
+        },
+    );
+
+    // GET /:userSlug/:petSlug/photos/:photoId — serve photo publicly
+    app.get(
+        "/:userSlug/:petSlug/photos/:photoId",
+        async (
+            request: FastifyRequest<{
+                Params: { userSlug: string; petSlug: string; photoId: string };
+            }>,
+            reply,
+        ) => {
+            const userProfile = await import("@/modules/user-public-profiles/user-public-profiles.service.js")
+                .then((m) => m.resolveUserForPetProfile(request.params.userSlug));
+
+            const upload = await getPublicPhoto(
+                userProfile.id,
+                request.params.petSlug,
+                request.params.photoId,
+            );
 
             const uploadDir = resolve(env().UPLOAD_DIR);
             const relativePath = upload.url.replace(/^\/uploads\//, "");

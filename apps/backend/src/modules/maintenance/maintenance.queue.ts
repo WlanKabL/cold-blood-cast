@@ -1,34 +1,13 @@
 import pino from "pino";
 import { env } from "@/config/env.js";
+import { getBerlinDayInfo, hasJobRunToday, logJobRun } from "@/helpers/scheduler.js";
 import { runMaintenance } from "./maintenance.service.js";
 
 const logger = pino({ name: "maintenance" });
+const JOB_NAME = "maintenance";
 const RUN_HOUR = 3; // 03:00 Berlin time
 
 let schedulerInterval: ReturnType<typeof setInterval> | null = null;
-let lastRunDate: string | null = null;
-
-/**
- * Get current Berlin date and hour (handles CET/CEST automatically).
- */
-function getBerlinDayInfo(now: Date): { dateStr: string; hour: number } {
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Europe/Berlin",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        hour12: false,
-    });
-
-    const parts = formatter.formatToParts(now);
-    const year = parts.find((p) => p.type === "year")!.value;
-    const month = parts.find((p) => p.type === "month")!.value;
-    const day = parts.find((p) => p.type === "day")!.value;
-    const hour = Number(parts.find((p) => p.type === "hour")!.value);
-
-    return { dateStr: `${year}-${month}-${day}`, hour };
-}
 
 /**
  * Start a polling scheduler that triggers maintenance daily at 03:00 Berlin time.
@@ -48,12 +27,18 @@ export function startMaintenanceScheduler(): void {
 
             // Only run during the target hour, and only once per day
             if (hour !== RUN_HOUR) return;
-            if (lastRunDate === dateStr) return;
+            if (await hasJobRunToday(JOB_NAME, dateStr)) return;
 
-            lastRunDate = dateStr;
+            const startedAt = new Date();
             logger.info("Starting daily maintenance (03:00 Berlin)");
 
             const result = await runMaintenance();
+
+            await logJobRun(JOB_NAME, "success", startedAt, {
+                encrypted: result.encrypted,
+                orphansRemoved: result.orphansRemoved,
+                retention: result.retention,
+            });
 
             logger.info(
                 {
@@ -64,6 +49,7 @@ export function startMaintenanceScheduler(): void {
                 "Daily maintenance completed",
             );
         } catch (err) {
+            await logJobRun(JOB_NAME, "error", new Date(), undefined, String(err));
             logger.error({ err }, "Maintenance run failed");
         } finally {
             running = false;

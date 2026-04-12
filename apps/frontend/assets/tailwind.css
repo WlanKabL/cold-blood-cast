@@ -431,6 +431,114 @@
     background: radial-gradient(ellipse at 50% 0%, rgba(138, 156, 74, 0.06) 0%, transparent 50%);
 }
 
+/* ─── Theme: Ocean ─── */
+.theme-ocean .public-page-bg::before,
+.theme-ocean.public-page-bg::before {
+    background-image: url("/bg-ocean.png");
+}
+.theme-ocean .public-page-bg::after,
+.theme-ocean.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.18) 0%, transparent 60%);
+}
+.dark .theme-ocean .public-page-bg::after,
+.dark .theme-ocean.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+}
+.theme-ocean .profile-hero-card::before,
+.theme-ocean.public-page-bg .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, transparent 50%);
+}
+
+/* ─── Theme: Forest ─── */
+.theme-forest .public-page-bg::before,
+.theme-forest.public-page-bg::before {
+    background-image: url("/bg-forest.png");
+}
+.theme-forest .public-page-bg::after,
+.theme-forest.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(34, 197, 94, 0.18) 0%, transparent 60%);
+}
+.dark .theme-forest .public-page-bg::after,
+.dark .theme-forest.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+}
+.theme-forest .profile-hero-card::before,
+.theme-forest.public-page-bg .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, transparent 50%);
+}
+
+/* ─── Theme: Sunset ─── */
+.theme-sunset .public-page-bg::before,
+.theme-sunset.public-page-bg::before {
+    background-image: url("/bg-sunset.png");
+}
+.theme-sunset .public-page-bg::after,
+.theme-sunset.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(251, 146, 60, 0.18) 0%, transparent 60%);
+}
+.dark .theme-sunset .public-page-bg::after,
+.dark .theme-sunset.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(251, 146, 60, 0.08) 0%, transparent 50%);
+}
+.theme-sunset .profile-hero-card::before,
+.theme-sunset.public-page-bg .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.12) 0%, transparent 50%);
+}
+
+/* ─── Theme: Midnight ─── */
+.theme-midnight .public-page-bg::before,
+.theme-midnight.public-page-bg::before {
+    background-image: url("/bg-midnight.png");
+}
+.theme-midnight .public-page-bg::after,
+.theme-midnight.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.18) 0%, transparent 60%);
+}
+.dark .theme-midnight .public-page-bg::after,
+.dark .theme-midnight.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+}
+.theme-midnight .profile-hero-card::before,
+.theme-midnight.public-page-bg .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+}
+
+/* ─── Theme: Desert ─── */
+.theme-desert .public-page-bg::before,
+.theme-desert.public-page-bg::before {
+    background-image: url("/bg-desert.png");
+}
+.theme-desert .public-page-bg::after,
+.theme-desert.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.18) 0%, transparent 60%);
+}
+.dark .theme-desert .public-page-bg::after,
+.dark .theme-desert.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 50%);
+}
+.theme-desert .profile-hero-card::before,
+.theme-desert.public-page-bg .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, transparent 50%);
+}
+
+/* ─── Theme: Arctic ─── */
+.theme-arctic .public-page-bg::before,
+.theme-arctic.public-page-bg::before {
+    background-image: url("/bg-arctic.png");
+}
+.theme-arctic .public-page-bg::after,
+.theme-arctic.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(186, 230, 253, 0.25) 0%, transparent 60%);
+}
+.dark .theme-arctic .public-page-bg::after,
+.dark .theme-arctic.public-page-bg::after {
+    background: radial-gradient(ellipse at 50% 0%, rgba(186, 230, 253, 0.08) 0%, transparent 50%);
+}
+.theme-arctic .profile-hero-card::before,
+.theme-arctic.public-page-bg .profile-hero-card::before {
+    background: linear-gradient(135deg, rgba(186, 230, 253, 0.15) 0%, transparent 50%);
+}
+
 /* ─── Public Profile Hero Card ─── */
 .profile-hero-card {
     position: relative;

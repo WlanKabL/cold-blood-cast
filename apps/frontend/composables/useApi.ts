@@ -92,23 +92,26 @@ export function useApi() {
     }
 
     function post<T>(path: string, body?: unknown) {
+        const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
         return request<T>(path, {
             method: "POST",
-            body: body !== undefined ? JSON.stringify(body) : undefined,
+            body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
         });
     }
 
     function put<T>(path: string, body?: unknown) {
+        const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
         return request<T>(path, {
             method: "PUT",
-            body: body !== undefined ? JSON.stringify(body) : undefined,
+            body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
         });
     }
 
     function patch<T>(path: string, body?: unknown) {
+        const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
         return request<T>(path, {
             method: "PATCH",
-            body: body !== undefined ? JSON.stringify(body) : undefined,
+            body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
         });
     }
 

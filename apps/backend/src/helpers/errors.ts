@@ -40,6 +40,18 @@ export const ErrorCodes = {
     E_PUBLIC_PROFILE_ALREADY_EXISTS: "E_PUBLIC_PROFILE_ALREADY_EXISTS",
     E_PUBLIC_PROFILE_INACTIVE: "E_PUBLIC_PROFILE_INACTIVE",
 
+    // ── User Public Profiles ─────────────────────
+    E_USER_PROFILE_NOT_FOUND: "E_USER_PROFILE_NOT_FOUND",
+    E_USER_PROFILE_ALREADY_EXISTS: "E_USER_PROFILE_ALREADY_EXISTS",
+    E_USER_PROFILE_SLUG_TAKEN: "E_USER_PROFILE_SLUG_TAKEN",
+
+    // ── Badges ───────────────────────────────────
+    E_BADGE_NOT_FOUND: "E_BADGE_NOT_FOUND",
+
+    // ── Community ────────────────────────────────
+    E_COMMENT_NOT_FOUND: "E_COMMENT_NOT_FOUND",
+    E_RATE_LIMIT_EXCEEDED: "E_RATE_LIMIT_EXCEEDED",
+
     // ── Veterinarians ────────────────────────────
     E_VETERINARIAN_NOT_FOUND: "E_VETERINARIAN_NOT_FOUND",
 
