@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
     quality:
-        name: Code Quality
+        name: Quality
         uses: ./.github/workflows/quality.yml
 
     test:

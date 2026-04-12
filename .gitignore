@@ -44,6 +44,8 @@ e2e-coverage/
 /apps/frontend/e2e/.auth/
 /apps/frontend/test-results/
 /apps/frontend/playwright-report/
+/apps/frontend/blob-report/
+.playwright-mcp/
 
 # Cache
 .eslintcache
@@ -54,9 +56,6 @@ e2e-coverage/
 prisma/migrations/*.sql.bak
 
 # Temp / debug files
-cookies.txt
-deals.json
-mt5api.json
 
 # Docker
 docker-compose.override.yml

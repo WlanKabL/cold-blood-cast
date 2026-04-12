@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────
-# Cold Blood Cast — Deploy Script
-# Called by deploy.yml. Never run manually.
+# Cold Blood Cast — Shared Deploy Script
+# Called by deploy.yml and release.yml. Never run manually.
 #
 # Required env vars:
 #   DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH
@@ -189,12 +189,12 @@ for i in \$(seq 1 \$RETRIES); do
     fi
 done
 
-echo "🎉 Deployment verified — all services healthy"
-
 # ── Seed (idempotent — skips existing data) ──
 echo "Running seed..."
 docker compose exec -T backend node dist/config/seed.js 2>&1 || echo "WARN: seed.js returned non-zero exit code"
 echo "Seed complete"
+
+echo "🎉 Deployment verified — all services healthy"
 
 docker image prune -f
 DEPLOY

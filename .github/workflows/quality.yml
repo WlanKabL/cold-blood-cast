@@ -5,20 +5,31 @@ on:
 
 jobs:
     quality:
-        name: Lint, Format & Types
+        name: Code Quality
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
 
-            - name: Setup
-              uses: ./.github/actions/setup
+            - name: Generate Prisma client
+              run: pnpm --filter @cold-blood-cast/backend db:generate
+
+            - name: Restore ESLint cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      apps/backend/.eslintcache
+                      apps/frontend/.eslintcache
+                  key: eslint-${{ runner.os }}-${{ hashFiles('**/eslint.config.*') }}-${{ github.sha }}
+                  restore-keys: |
+                      eslint-${{ runner.os }}-${{ hashFiles('**/eslint.config.*') }}-
 
             - name: Prettier check
               run: pnpm format
 
-            - name: ESLint check
+            - name: ESLint
               run: pnpm lint
 
             - name: TypeScript check
