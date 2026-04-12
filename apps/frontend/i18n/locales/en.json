@@ -162,6 +162,7 @@
         "maintenanceMode": "The platform is currently in maintenance mode. Some features may be unavailable.",
         "sending": "Sending...",
         "done": "Done",
+        "fileTooLarge": "File is too large (max. {max})",
         "selectAll": "Select all",
         "deselectAll": "Deselect all",
         "justNow": "Just now",
@@ -195,6 +196,11 @@
             "oct": "Oct",
             "nov": "Nov",
             "dec": "Dec"
+        },
+        "gender": {
+            "MALE": "Male",
+            "FEMALE": "Female",
+            "UNKNOWN": "Unknown"
         }
     },
     "components": {

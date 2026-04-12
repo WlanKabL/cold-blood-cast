@@ -43,6 +43,18 @@ export function num(v: number | undefined | null): number | undefined {
     return v != null && !isNaN(v) ? v : undefined;
 }
 
+const FILE_SIZE_UNITS = ["B", "KB", "MB", "GB"] as const;
+
+/**
+ * Format a byte count into a human-readable string like "2.4 MB".
+ */
+export function formatFileSize(bytes: number): string {
+    if (bytes <= 0) return "0 B";
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), FILE_SIZE_UNITS.length - 1);
+    const value = bytes / 1024 ** i;
+    return `${i === 0 ? value : value.toFixed(1)} ${FILE_SIZE_UNITS[i]}`;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Composable — locale/i18n-aware formatters                        */
 /* ------------------------------------------------------------------ */

@@ -198,6 +198,7 @@
                     <p v-if="selectedFile" class="text-fg mt-2 flex items-center gap-2 text-sm">
                         <Icon name="lucide:file" class="h-4 w-4" />
                         {{ selectedFile.name }}
+                        <span class="text-fg-faint">({{ formatFileSize(selectedFile.size) }})</span>
                         <button
                             type="button"
                             class="text-fg-faint hover:text-red-400"
@@ -317,6 +318,9 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { formatFileSize } from "~/composables/useFormatters";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 interface PetDocument {
     id: string;
@@ -510,6 +514,11 @@ async function extractFileDate(file: File) {
 function handleFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
+    if (file && file.size > MAX_FILE_SIZE) {
+        toast.error(t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }));
+        input.value = "";
+        return;
+    }
     selectedFile.value = file;
     if (file) extractFileDate(file);
 }
@@ -517,6 +526,10 @@ function handleFileSelect(event: Event) {
 function handleDrop(event: DragEvent) {
     const file = event.dataTransfer?.files[0];
     if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+            toast.error(t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }));
+            return;
+        }
         selectedFile.value = file;
         extractFileDate(file);
     }
@@ -554,8 +567,8 @@ const { mutate: uploadMutation, isPending: uploading } = useMutation({
         showUpload.value = false;
         resetUploadForm();
     },
-    onError: () => {
-        toast.error(t("common.error"));
+    onError: (err: Error) => {
+        toast.error(err.message || t("common.error"));
     },
 });
 

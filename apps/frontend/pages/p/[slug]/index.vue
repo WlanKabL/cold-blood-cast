@@ -61,7 +61,7 @@
                                 v-if="petData.gender && petData.gender !== 'UNKNOWN'"
                                 class="bg-surface-raised rounded-full px-2.5 py-0.5 text-xs font-medium"
                             >
-                                {{ $t(`publicProfile.gender.${petData.gender}`) }}
+                                {{ $t(`common.gender.${petData.gender}`) }}
                             </span>
                         </div>
                         <p v-if="age" class="text-fg-faint mt-2 text-sm">{{ age }}</p>

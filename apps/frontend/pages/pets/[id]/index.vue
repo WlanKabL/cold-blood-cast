@@ -17,7 +17,7 @@
                         v-if="pet?.gender && pet.gender !== 'UNKNOWN'"
                         class="bg-primary-500/10 text-primary-400 rounded-md px-2 py-0.5 text-xs font-medium"
                     >
-                        {{ pet.gender }}
+                        {{ $t(`common.gender.${pet.gender}`) }}
                     </span>
                 </div>
                 <p class="text-fg-faint text-sm">
@@ -83,7 +83,7 @@
                                 <dt class="text-fg-faint text-xs font-medium uppercase">
                                     {{ $t("pages.pets.fields.gender") }}
                                 </dt>
-                                <dd class="text-fg mt-1 text-sm">{{ pet.gender || "—" }}</dd>
+                                <dd class="text-fg mt-1 text-sm">{{ pet.gender ? $t(`common.gender.${pet.gender}`) : "—" }}</dd>
                             </div>
                             <div>
                                 <dt class="text-fg-faint text-xs font-medium uppercase">

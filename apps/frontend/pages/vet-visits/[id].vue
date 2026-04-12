@@ -434,6 +434,7 @@
                                 class="text-primary-400 h-6 w-6"
                             />
                             <span class="text-fg text-sm">{{ selectedFile.name }}</span>
+                            <span class="text-fg-faint text-xs">({{ formatFileSize(selectedFile.size) }})</span>
                             <button
                                 type="button"
                                 class="text-fg-faint hover:text-red-400"
@@ -517,6 +518,9 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { formatFileSize } from "~/composables/useFormatters";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 interface VetVisitDocument {
     id: string;
@@ -665,14 +669,25 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 function handleFileSelect(e: Event) {
     const input = e.target as HTMLInputElement;
     if (input.files?.length) {
-        selectedFile.value = input.files[0];
+        const file = input.files[0];
+        if (file.size > MAX_FILE_SIZE) {
+            toast.error(t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }));
+            input.value = "";
+            return;
+        }
+        selectedFile.value = file;
     }
 }
 
 function handleDrop(e: DragEvent) {
     isDragging.value = false;
     if (e.dataTransfer?.files.length) {
-        selectedFile.value = e.dataTransfer.files[0];
+        const file = e.dataTransfer.files[0];
+        if (file.size > MAX_FILE_SIZE) {
+            toast.error(t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }));
+            return;
+        }
+        selectedFile.value = file;
     }
 }
 
@@ -709,8 +724,8 @@ const { mutate: uploadMutation, isPending: uploading } = useMutation({
         toast.success(t("pages.vetVisits.detail.documentUploaded"));
         closeUpload();
     },
-    onError: () => {
-        toast.error(t("common.error"));
+    onError: (err: Error) => {
+        toast.error(err.message || t("common.error"));
     },
 });
 

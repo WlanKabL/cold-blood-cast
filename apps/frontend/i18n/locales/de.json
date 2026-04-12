@@ -162,6 +162,7 @@
         "maintenanceMode": "Die Plattform befindet sich derzeit im Wartungsmodus. Einige Funktionen sind möglicherweise nicht verfügbar.",
         "sending": "Wird gesendet...",
         "done": "Fertig",
+        "fileTooLarge": "Datei ist zu groß (max. {max})",
         "selectAll": "Alle auswählen",
         "deselectAll": "Alle abwählen",
         "justNow": "Gerade eben",
@@ -195,6 +196,11 @@
             "oct": "Okt",
             "nov": "Nov",
             "dec": "Dez"
+        },
+        "gender": {
+            "MALE": "Männlich",
+            "FEMALE": "Weiblich",
+            "UNKNOWN": "Unbekannt"
         }
     },
     "components": {

@@ -149,7 +149,7 @@
                                 <span class="text-fg-faint text-xs">
                                     {{ pet.species }}
                                     <template v-if="pet.morph"> · {{ pet.morph }}</template>
-                                    <template v-if="pet.gender"> · {{ pet.gender }}</template>
+                                    <template v-if="pet.gender"> · {{ $t(`common.gender.${pet.gender}`) }}</template>
                                 </span>
                             </NuxtLink>
                         </div>
