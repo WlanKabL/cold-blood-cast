@@ -1,7 +1,8 @@
 # Public Profile Feature — Kompletter Spec
 
 > User-Level öffentliche Profilseite mit Tier-Galerie, Social Links, Statistiken, Badges und Community-Features.
-> URL: `/u/{slug}` (z.B. `keeperlog.wlankabl.com/u/WlanKabL`)
+> URL: `/keeper/{userSlug}` (z.B. `keeperlog.wlankabl.com/keeper/WlanKabL`)
+> Pet URL: `/keeper/{userSlug}/p/{petSlug}` (z.B. `keeperlog.wlankabl.com/keeper/WlanKabL/p/byte`)
 
 ---
 
@@ -13,6 +14,29 @@ Ein User kann ein öffentliches Profil erstellen, das als persönliche Landingpa
 - Statistiken, Badges, und Community-Features (Likes/Kommentare)
 
 Das Profil existiert **erst nach expliziter Aktivierung** (Opt-in).
+
+### URL-Struktur
+
+```
+/keeper/{userSlug}                    → User Profil-Landingpage
+/keeper/{userSlug}/p/{petSlug}        → Pet Public Profile
+/keeper/{userSlug}/p/{petSlug}/embed  → Pet Embed Widget
+/keeper/{userSlug}/embed              → User Embed Widget
+```
+
+**Wichtig:** Pet-Slugs sind **pro User unique**, nicht global.
+Jeder User kann `/keeper/alice/p/byte` und `/keeper/bob/p/byte` haben.
+
+**Pet Profile ohne User Profile:** `/keeper/WlanKabL/p/byte` funktioniert auch wenn
+der User kein aktives User Public Profile hat. In dem Fall liefert `/keeper/WlanKabL` 
+ein 404 / "Kein öffentliches Profil", aber `/keeper/WlanKabL/p/byte` ist erreichbar
+wenn das Pet ein aktives Public Profile hat.
+
+### Slug-Uniqueness
+
+- **DB:** `PublicProfile.slug` wird von `@@unique` (global) zu `@@unique([userId, slug])` (per-user)
+- **Slug-Check:** Prüft nur innerhalb des eigenen Users auf Duplikate
+- Die alte Route `/p/[slug]` wird **entfernt** (kein Redirect)
 
 ---
 
@@ -65,6 +89,46 @@ model UserPublicProfile {
     @@map("user_public_profiles")
 }
 ```
+
+#### Geändertes Model: `PublicProfile` (Pet Public Profile)
+
+Das bestehende `PublicProfile` Model wird angepasst — **Pet-Slugs werden per-User unique statt global**:
+
+```prisma
+model PublicProfile {
+    id            String  @id @default(cuid())
+    petId         String  @unique @map("pet_id")
+    userId        String  @map("user_id")
+    slug          String                              // ← nicht mehr @unique allein!
+    active        Boolean @default(false)
+    bio           String?
+
+    // ── Visibility Toggles (bleiben gleich) ──────
+    showPhotos    Boolean @default(true) @map("show_photos")
+    showWeight    Boolean @default(true) @map("show_weight")
+    showAge       Boolean @default(true) @map("show_age")
+    showFeedings  Boolean @default(true) @map("show_feedings")
+    showSheddings Boolean @default(true) @map("show_sheddings")
+    showSpecies   Boolean @default(true) @map("show_species")
+    showMorph     Boolean @default(true) @map("show_morph")
+
+    views         Int      @default(0)
+    createdAt     DateTime @default(now()) @map("created_at")
+    updatedAt     DateTime @updatedAt @map("updated_at")
+
+    pet           Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, slug])      // ← NEU: Slug nur pro User unique
+    @@index([userId])
+    @@map("public_profiles")
+}
+```
+
+**Migration-Schritte:**
+1. Drop unique constraint auf `slug` allein
+2. Add composite unique constraint `@@unique([userId, slug])`
+3. Bestehende Slugs bleiben — sie sind de facto bereits per-user unique (jeder User hat eigene Tiere)
 
 #### Neues Model: `UserSocialLink`
 
@@ -155,10 +219,12 @@ Verzeichnis: `apps/backend/src/modules/user-public-profiles/`
 
 | Method | Route | Beschreibung |
 |--------|-------|-------------|
-| `GET` | `/:slug` | Öffentliches User-Profil laden (inkl. Tiere mit Public Profile) |
-| `GET` | `/:slug/avatar` | Avatar-Bild servieren (decrypt + stream) |
+| `GET` | `/:userSlug` | Öffentliches User-Profil laden (inkl. Tiere mit Public Profile) |
+| `GET` | `/:userSlug/avatar` | Avatar-Bild servieren (decrypt + stream) |
+| `GET` | `/:userSlug/pets/:petSlug` | Öffentliches Pet-Profil laden |
+| `GET` | `/:userSlug/pets/:petSlug/photos/:photoId` | Pet-Foto servieren |
 
-#### Response: `GET /api/public/users/:slug`
+#### Response: `GET /api/public/users/:userSlug`
 
 ```typescript
 interface PublicUserData {
@@ -200,11 +266,17 @@ interface PublicUserData {
         species: string | null;
         morph: string | null;
         profilePhotoUrl: string | null;
-        slug: string | null;        // Pet Public Profile slug (für Link)
+        petSlug: string | null;     // Pet Public Profile slug → Link: /keeper/{userSlug}/p/{petSlug}
         bio: string | null;         // Pet Public Profile bio
     }>;
 }
 ```
+
+#### Response: `GET /api/public/users/:userSlug/pets/:petSlug`
+
+Gleiche Struktur wie das bisherige `GET /api/public/pets/:slug`, aber resolved über
+`userId` (via `User.username`) + `slug` (unique per user). Liefert Pet-Daten, Fotos,
+Fütterungen, Häutungen, Gewichte — genau wie bisher.
 
 #### Validierung
 
@@ -259,7 +331,7 @@ const PetOrderSchema = z.array(z.object({
 │                                                     │
 │ ┌─────────────────────────────────────────────────┐ │
 │ │ Status: Aktiv / Inaktiv              [Toggle]   │ │
-│ │ URL: keeperlog.wlankabl.com/u/WlanKabL [📋][↗] │ │
+│ │ URL: keeperlog.wlankabl.com/keeper/WlanKabL [📋][↗] │ │
 │ │ Custom Slug: [_____________] [Speichern]        │ │
 │ └─────────────────────────────────────────────────┘ │
 │                                                     │
@@ -323,11 +395,18 @@ const PetOrderSchema = z.array(z.object({
 
 ---
 
-### 1.4 Frontend — Public Page `/u/[slug]`
+### 1.4 Frontend — Public Pages
 
-**Neue Seite:** `apps/frontend/pages/u/[slug]/index.vue`
+**Neue Seiten:**
+- `apps/frontend/pages/keeper/[slug]/index.vue` → User Profil
+- `apps/frontend/pages/keeper/[slug]/p/[petSlug]/index.vue` → Pet Profil
+- `apps/frontend/pages/keeper/[slug]/p/[petSlug]/embed.vue` → Pet Embed Widget
+- `apps/frontend/pages/keeper/[slug]/embed.vue` → User Embed Widget
 
-#### Layout
+**Pet Profile Card:** `PetPublicProfileCard.vue` zeigt die URL an:
+`keeperlog.wlankabl.com/keeper/{username}/p/{petSlug}` und der Slug-Check prüft nur pro User.
+
+#### Layout User Page `/keeper/[slug]`
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -595,64 +674,71 @@ model ProfileComment {
 
 ## Phase 5 — Embed & QR
 
-### 5.1 Embed Page
+### 5.1 Embed Pages
 
-**Route:** `/u/[slug]/embed`
-- Kompakte Version des Profils für iframes
-- Ähnlich wie `/p/[slug]/embed` für Pet-Profile
+**User Embed:** `/keeper/[slug]/embed`
+- Kompakte Version des User-Profils für iframes
 - `width="400" height="600"` Standard
+
+**Pet Embed:** `/keeper/[slug]/p/[petSlug]/embed`
+- Gleiche Embed-Logik wie bisher, nur neue URL
 
 ### 5.2 QR Code
 
 - Canvas-basiert wie bei Pet Public Profile
 - Download als PNG
-- Enthält URL `https://keeperlog.wlankabl.com/u/{slug}`
+- User QR: `https://keeperlog.wlankabl.com/keeper/{slug}`
+- Pet QR: `https://keeperlog.wlankabl.com/keeper/{userSlug}/p/{petSlug}`
 
 ---
 
 ## Implementierungs-Reihenfolge
 
 ### Sprint 1: Fundament
-1. ✅ Prisma Migration: `UserPublicProfile`, `UserSocialLink`, `UserPetOrder` Models
-2. ✅ Backend Service + Routes (CRUD, Avatar Upload, Social Links, Pet Order)
-3. ✅ Shared Types / Zod Schemas
+1. Prisma Migration: `UserPublicProfile`, `UserSocialLink`, `UserPetOrder` Models
+2. Prisma Migration: `PublicProfile.slug` von global-unique → per-user-unique (`@@unique([userId, slug])`)
+3. Backend Service + Routes (CRUD, Avatar Upload, Social Links, Pet Order)
+4. Backend: Neue öffentliche Routen unter `/api/public/users/:slug/pets/:petSlug`
+5. Shared Types / Zod Schemas
 
 ### Sprint 2: Frontend Management
-4. ✅ `/settings/public-profile` — Management Page (alle Sections)
-5. ✅ Avatar Upload Component
-6. ✅ Social Links Editor
-7. ✅ Drag & Drop Tier-Sortierung
+7. `/settings/public-profile` — Management Page (alle Sections)
+8. Avatar Upload Component
+9. Social Links Editor
+10. Drag & Drop Tier-Sortierung
 
-### Sprint 3: Public Page
-8. ✅ `/u/[slug]` — Public User Page
-9. ✅ Theme Preset CSS/Styles
-10. ✅ Masonry Grid für Tiere
-11. ✅ Responsive Design + Mobile
+### Sprint 3: Public Pages
+11. `/keeper/[slug]` — Public User Page
+12. `/keeper/[slug]/p/[petSlug]` — Pet Public Profile
+13. Theme Preset CSS/Styles
+14. Masonry Grid für Tiere
+15. Responsive Design + Mobile
 
 ### Sprint 4: Cross-Links & Polish
-12. ✅ Sidebar Nav-Eintrag
-13. ✅ Pet-Detail CTA Banner
-14. ✅ /pets Badge-Icons
-15. ✅ Settings Link Card
-16. ✅ QR Code + Embed Code
+16. Sidebar Nav-Eintrag
+17. Pet-Detail CTA Banner
+18. /pets Badge-Icons
+19. Settings Link Card
+20. QR Code + Embed Code (neue URLs)
+21. PetPublicProfileCard.vue — URL-Anzeige + Slug-Check updaten
 
 ### Sprint 5: Badges
-17. Badge Models + Migration
-18. Badge-Check Service
-19. Badge-Anzeige auf Public Profile
-20. Badge-Verwaltung (Admin)
+22. Badge Models + Migration
+23. Badge-Check Service
+24. Badge-Anzeige auf Public Profile
+25. Badge-Verwaltung (Admin)
 
 ### Sprint 6: Community
-21. Likes + Kommentare Models
-22. Public API Endpoints
-23. Moderation UI
-24. Rate Limiting + Spam Protection
+26. Likes + Kommentare Models
+27. Public API Endpoints
+28. Moderation UI
+29. Rate Limiting + Spam Protection
 
 ---
 
 ## Offene Fragen / Entscheidungen
 
-1. **Soll die User-URL `/u/slug` oder `/keeper/slug` heißen?** → `/u/` ist kürzer und QR-freundlicher
+1. ~~**Soll die User-URL `/u/slug` oder `/keeper/slug` heißen?**~~ → **Entschieden: `/keeper/slug`** — passt perfekt zum Branding "KeeperLog"
 2. **Masonry-Library:** `vue-masonry-wall` oder CSS `columns`? → CSS columns ist dependency-frei
 3. **Avatar-Größe:** Max 2MB? 5MB? Crop auf Upload oder serverseitig?
 4. **Kommentar-Spam:** CAPTCHA, Honeypot, oder Owner-Approval-Only?
