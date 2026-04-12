@@ -174,7 +174,9 @@ test.describe("Pet Detail — Page Integration", () => {
         await page.goto(`/pets/${petId}`);
 
         // Use main scoping to avoid matching sidebar link (strict mode violation)
-        const backLink = page.locator("main a[href='/pets'], [class*='max-w'] a[href='/pets']").first();
+        const backLink = page
+            .locator("main a[href='/pets'], [class*='max-w'] a[href='/pets']")
+            .first();
         await expect(backLink).toBeVisible({ timeout: 15_000 });
     });
 
@@ -186,7 +188,9 @@ test.describe("Pet Detail — Page Integration", () => {
         await page.waitForLoadState("networkidle");
 
         // Edit button (pencil icon) and delete button (red trash icon)
-        await expect(page.locator("button.bg-red-500, button[class*='danger']").first()).toBeVisible({ timeout: 15_000 });
+        await expect(
+            page.locator("button.bg-red-500, button[class*='danger']").first(),
+        ).toBeVisible({ timeout: 15_000 });
     });
 
     test("shows recent feedings section", async ({ page }) => {
