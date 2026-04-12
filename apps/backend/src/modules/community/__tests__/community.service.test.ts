@@ -22,6 +22,7 @@ const mockPrisma = {
         delete: vi.fn(),
         update: vi.fn(),
         findMany: vi.fn(),
+        count: vi.fn(),
     },
 };
 
@@ -32,8 +33,13 @@ const {
     getLikeStatus,
     addComment,
     getApprovedComments,
+    deleteOwnComment,
     getPendingComments,
     moderateComment,
+    deleteApprovedComment,
+    adminDeleteComment,
+    adminListComments,
+    getApprovedCommentsForOwner,
 } = await import("../community.service.js");
 
 const PROFILE_ID = "profile_001";
@@ -156,7 +162,7 @@ describe("getLikeStatus", () => {
 // ─── addComment ──────────────────────────────────────────────
 
 describe("addComment", () => {
-    it("creates a comment that requires moderation", async () => {
+    it("creates a comment with approved=true", async () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
@@ -166,19 +172,21 @@ describe("addComment", () => {
             id: "comment_1",
             authorName: "Visitor",
             content: "Nice profile!",
-            approved: false,
+            approved: true,
         });
 
-        const result = await addComment("user", SLUG, "Visitor", "Nice profile!", IP);
+        const result = await addComment("user", SLUG, "user_123", "Visitor", "Nice profile!");
 
-        expect(result.approved).toBe(false);
+        expect(result.approved).toBe(true);
         expect(mockPrisma.profileComment.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 data: expect.objectContaining({
                     profileType: "user",
                     profileId: PROFILE_ID,
+                    authorId: "user_123",
                     authorName: "Visitor",
                     content: "Nice profile!",
+                    approved: true,
                 }),
             }),
         );
@@ -195,7 +203,7 @@ describe("addComment", () => {
         });
 
         await expect(
-            addComment("user", SLUG, "Visitor", "Spam!", IP),
+            addComment("user", SLUG, "user_123", "Visitor", "Spam!"),
         ).rejects.toThrow("wait");
     });
 
@@ -203,7 +211,7 @@ describe("addComment", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue(null);
 
         await expect(
-            addComment("user", "nonexistent", "Visitor", "Hello", IP),
+            addComment("user", "nonexistent", "user_123", "Visitor", "Hello"),
         ).rejects.toThrow("not found");
     });
 });
@@ -301,5 +309,152 @@ describe("moderateComment", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({ userId: "other_user" });
 
         await expect(moderateComment(USER_ID, "c_1", true)).rejects.toThrow("not found");
+    });
+});
+
+// ─── deleteApprovedComment ───────────────────────────────────
+
+describe("deleteApprovedComment", () => {
+    it("deletes a comment when user owns the user profile", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue({
+            id: "c_1",
+            profileType: "user",
+            profileId: PROFILE_ID,
+        });
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({ userId: USER_ID });
+        mockPrisma.profileComment.delete.mockResolvedValue({});
+
+        await deleteApprovedComment(USER_ID, "c_1");
+        expect(mockPrisma.profileComment.delete).toHaveBeenCalledWith({ where: { id: "c_1" } });
+    });
+
+    it("deletes a comment when user owns the pet profile", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue({
+            id: "c_2",
+            profileType: "pet",
+            profileId: "pet_profile_1",
+        });
+        mockPrisma.publicProfile.findUnique.mockResolvedValue({ userId: USER_ID });
+        mockPrisma.profileComment.delete.mockResolvedValue({});
+
+        await deleteApprovedComment(USER_ID, "c_2");
+        expect(mockPrisma.profileComment.delete).toHaveBeenCalledOnce();
+    });
+
+    it("throws when comment not found", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue(null);
+
+        await expect(deleteApprovedComment(USER_ID, "c_nonexistent")).rejects.toThrow("not found");
+    });
+
+    it("throws when user doesn't own the profile", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue({
+            id: "c_1",
+            profileType: "user",
+            profileId: PROFILE_ID,
+        });
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({ userId: "other_user" });
+
+        await expect(deleteApprovedComment(USER_ID, "c_1")).rejects.toThrow("not found");
+    });
+});
+
+// ─── adminDeleteComment ──────────────────────────────────────
+
+describe("adminDeleteComment", () => {
+    it("deletes any comment", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue({ id: "c_1" });
+        mockPrisma.profileComment.delete.mockResolvedValue({});
+
+        await adminDeleteComment("c_1");
+        expect(mockPrisma.profileComment.delete).toHaveBeenCalledWith({ where: { id: "c_1" } });
+    });
+
+    it("throws when comment not found", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue(null);
+
+        await expect(adminDeleteComment("c_nonexistent")).rejects.toThrow("not found");
+    });
+});
+
+// ─── adminListComments ───────────────────────────────────────
+
+describe("adminListComments", () => {
+    it("returns paginated comments", async () => {
+        mockPrisma.profileComment.findMany.mockResolvedValue([
+            { id: "c_1", content: "Hello" },
+        ]);
+        mockPrisma.profileComment.count.mockResolvedValue(1);
+
+        const result = await adminListComments({ page: 1, limit: 10 });
+        expect(result.items).toHaveLength(1);
+        expect(result.total).toBe(1);
+    });
+
+    it("filters by approved status", async () => {
+        mockPrisma.profileComment.findMany.mockResolvedValue([]);
+        mockPrisma.profileComment.count.mockResolvedValue(0);
+
+        await adminListComments({ approved: true });
+        expect(mockPrisma.profileComment.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({ approved: true }),
+            }),
+        );
+    });
+});
+
+// ─── getApprovedCommentsForOwner ─────────────────────────────
+
+describe("getApprovedCommentsForOwner", () => {
+    it("returns approved comments across owned profiles", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({ id: PROFILE_ID });
+        mockPrisma.publicProfile.findMany.mockResolvedValue([{ id: "pet_profile_1" }]);
+        mockPrisma.profileComment.findMany.mockResolvedValue([
+            { id: "c_1", content: "Nice!", approved: true },
+        ]);
+
+        const result = await getApprovedCommentsForOwner(USER_ID);
+        expect(result).toHaveLength(1);
+    });
+
+    it("returns empty when user has no profiles", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue(null);
+        mockPrisma.publicProfile.findMany.mockResolvedValue([]);
+
+        const result = await getApprovedCommentsForOwner(USER_ID);
+        expect(result).toEqual([]);
+    });
+});
+
+// ─── deleteOwnComment ────────────────────────────────────────
+
+describe("deleteOwnComment", () => {
+    it("deletes a comment owned by the user", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue({
+            id: "comment_1",
+            authorId: USER_ID,
+        });
+        mockPrisma.profileComment.delete.mockResolvedValue({});
+
+        await deleteOwnComment(USER_ID, "comment_1");
+        expect(mockPrisma.profileComment.delete).toHaveBeenCalledWith({
+            where: { id: "comment_1" },
+        });
+    });
+
+    it("throws when comment not found", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue(null);
+
+        await expect(deleteOwnComment(USER_ID, "nonexistent")).rejects.toThrow("not found");
+    });
+
+    it("throws when user does not own the comment", async () => {
+        mockPrisma.profileComment.findUnique.mockResolvedValue({
+            id: "comment_1",
+            authorId: "other_user",
+        });
+
+        await expect(deleteOwnComment(USER_ID, "comment_1")).rejects.toThrow("not found");
     });
 });

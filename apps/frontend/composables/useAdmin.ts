@@ -16,6 +16,8 @@ import type {
     PaginatedResponse,
     AdminLegalDocument,
     UpdateLegalDocumentPayload,
+    AdminReport,
+    AdminComment,
 } from "~/types/api";
 
 export function useAdminApi() {
@@ -342,6 +344,40 @@ export function useAdminApi() {
         return post<AdminLegalDocument>(`/api/admin/legal/${key}/toggle`);
     }
 
+    // ── Reports ──────────────────────────────────
+
+    async function listReports(params?: Record<string, string | number>) {
+        const query = params
+            ? `?${new URLSearchParams(
+                  Object.entries(params).map(([k, v]) => [k, String(v)]),
+              ).toString()}`
+            : "";
+        return get<PaginatedResponse<AdminReport>>(`/api/admin/reports${query}`);
+    }
+
+    async function getReportStats() {
+        return get<{ pending: number; reviewed: number; dismissed: number }>("/api/admin/reports/stats");
+    }
+
+    async function resolveReport(reportId: string, data: { status: "reviewed" | "dismissed"; adminNote?: string }) {
+        return patch(`/api/admin/reports/${reportId}`, data);
+    }
+
+    // ── Comments (Admin) ─────────────────────────
+
+    async function listAdminComments(params?: Record<string, string | number>) {
+        const query = params
+            ? `?${new URLSearchParams(
+                  Object.entries(params).map(([k, v]) => [k, String(v)]),
+              ).toString()}`
+            : "";
+        return get<PaginatedResponse<AdminComment>>(`/api/admin/comments${query}`);
+    }
+
+    async function deleteAdminComment(commentId: string) {
+        return del(`/api/admin/comments/${commentId}`);
+    }
+
     return {
         // Users
         listUsers,
@@ -411,5 +447,12 @@ export function useAdminApi() {
         getLegalDocument,
         updateLegalDocument,
         toggleLegalDocumentPublished,
+        // Reports
+        listReports,
+        getReportStats,
+        resolveReport,
+        // Comments (Admin)
+        listAdminComments,
+        deleteAdminComment,
     };
 }

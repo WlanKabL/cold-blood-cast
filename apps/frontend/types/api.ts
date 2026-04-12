@@ -45,3 +45,31 @@ export type {
     DataExportStatus,
     DataExportInfo,
 } from "@cold-blood-cast/shared";
+
+// ── Local admin types (not in shared) ────────────
+
+export interface AdminReport {
+    id: string;
+    targetType: string;
+    targetId: string;
+    targetUrl: string | null;
+    reason: string;
+    description: string | null;
+    reporterName: string | null;
+    status: "pending" | "reviewed" | "dismissed";
+    adminNote: string | null;
+    resolvedAt: string | null;
+    resolvedBy: { id: string; username: string } | null;
+    targetUser: { id: string; username: string; banned: boolean } | null;
+    createdAt: string;
+}
+
+export interface AdminComment {
+    id: string;
+    authorName: string;
+    content: string;
+    approved: boolean;
+    profileType: string;
+    profileId: string;
+    createdAt: string;
+}

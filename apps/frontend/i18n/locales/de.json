@@ -279,7 +279,9 @@
             "notifications": "Benachrichtigungen",
             "auditLog": "Audit-Log",
             "accessRequests": "Zugangsanfragen",
-            "legal": "Rechtliche Dokumente"
+            "legal": "Rechtliche Dokumente",
+            "reports": "Meldungen",
+            "comments": "Kommentare"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -427,6 +429,43 @@
             "title": "Feature Flags",
             "subtitle": "Globale Schalter für Plattform-Features. Diese sind code-definiert und können nicht erstellt oder gelöscht werden.",
             "create": "Flag erstellen"
+        },
+        "reports": {
+            "title": "Meldungen",
+            "empty": "Keine Meldungen gefunden.",
+            "pending": "Ausstehend",
+            "reviewed": "Geprüft",
+            "dismissed": "Abgewiesen",
+            "markReviewed": "Als geprüft markieren",
+            "dismiss": "Abweisen",
+            "adminNotePlaceholder": "Optionale Admin-Notiz...",
+            "resolved": "Meldung bearbeitet",
+            "resolvedBy": "Bearbeitet von",
+            "viewTarget": "Ziel anzeigen",
+            "actions": "Schnellaktionen",
+            "banUser": "Gemeldeten Benutzer sperren",
+            "deleteContent": "Gemeldeten Inhalt löschen",
+            "viewUserAdmin": "Benutzer im Admin-Panel anzeigen",
+            "reporterIp": "Melder-IP-Hash",
+            "banned": "Gesperrt",
+            "userBanned": "Benutzer wurde gesperrt",
+            "contentDeleted": "Inhalt wurde gelöscht",
+            "bannedViaReport": "Über Inhaltsmeldung gesperrt",
+            "type": {
+                "comment": "Kommentar",
+                "user_profile": "Benutzerprofil",
+                "pet_profile": "Tierprofil"
+            }
+        },
+        "comments": {
+            "title": "Kommentare",
+            "empty": "Keine Kommentare gefunden.",
+            "all": "Alle",
+            "approved": "Genehmigt",
+            "pending": "Ausstehend",
+            "delete": "Kommentar löschen",
+            "deleteConfirm": "Diesen Kommentar löschen?",
+            "deleted": "Kommentar gelöscht"
         },
         "announcements": {
             "title": "Ankündigungen",
@@ -1690,12 +1729,13 @@
         "unlike": "Gefällt mir nicht mehr",
         "comments": "Kommentare",
         "addComment": "Kommentar schreiben",
-        "authorName": "Dein Name",
+        "commentingAs": "Kommentieren als {name}",
+        "loginToComment": "Melde dich an, um zu kommentieren",
+        "login": "Anmelden",
         "commentPlaceholder": "Hinterlasse einen netten Kommentar...",
         "submit": "Absenden",
         "pendingModeration": "Dein Kommentar wird geprüft",
         "noComments": "Noch keine Kommentare. Sei der Erste!",
-        "yourName": "Dein Name",
         "writePlaceholder": "Hinterlasse einen netten Kommentar...",
         "send": "Senden",
         "moderate": "Kommentare moderieren",
@@ -1704,6 +1744,33 @@
         "approve": "Genehmigen",
         "reject": "Ablehnen",
         "approved": "Kommentar genehmigt",
-        "rejected": "Kommentar abgelehnt"
+        "rejected": "Kommentar abgelehnt",
+        "approvedComments": "Genehmigte Kommentare",
+        "deleteComment": "Kommentar löschen",
+        "deleteConfirm": "Diesen Kommentar löschen?",
+        "commentDeleted": "Kommentar gelöscht",
+        "notifyOnComment": "E-Mail bei neuen Kommentaren",
+        "notifyOnCommentHint": "Erhalte eine E-Mail, wenn jemand dein Profil kommentiert"
+    },
+    "report": {
+        "title": "Melden",
+        "description": "Melde diesen Inhalt an die Plattform-Administratoren.",
+        "reason": "Grund",
+        "selectReason": "Grund auswählen",
+        "details": "Details",
+        "detailsPlaceholder": "Beschreibe was nicht stimmt (optional)...",
+        "yourName": "Dein Name",
+        "yourNamePlaceholder": "Optional — für Rückfragen",
+        "submit": "Meldung absenden",
+        "reportComment": "Kommentar melden",
+        "reportProfile": "Profil melden",
+        "submitted": "Meldung gesendet. Vielen Dank!",
+        "reasons": {
+            "spam": "Spam",
+            "harassment": "Belästigung",
+            "inappropriate": "Unangemessener Inhalt",
+            "misinformation": "Falschinformation",
+            "other": "Sonstiges"
+        }
     }
 }

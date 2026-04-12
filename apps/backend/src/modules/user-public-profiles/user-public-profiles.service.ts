@@ -148,6 +148,7 @@ interface UpdateProfileInput {
     showLocation?: boolean;
     showKeeperSince?: boolean;
     showBadges?: boolean;
+    notifyOnComment?: boolean;
     themePreset?: ThemePreset;
 }
 

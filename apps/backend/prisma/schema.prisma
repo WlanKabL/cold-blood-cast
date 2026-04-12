@@ -80,6 +80,8 @@ model User {
     publicProfiles          PublicProfile[]
     userPublicProfile       UserPublicProfile?
     userBadges              UserBadge[]
+    resolvedReports         ContentReport[]
+    profileComments         ProfileComment[]
 
     @@map("users")
 }
@@ -1135,6 +1137,9 @@ model UserPublicProfile {
     // ── Theme ────────────────────────────────────
     themePreset     String   @default("default") @map("theme_preset") @db.VarChar(30)
 
+    // ── Notification Preferences ─────────────────
+    notifyOnComment Boolean  @default(false) @map("notify_on_comment")
+
     // ── Stats ────────────────────────────────────
     views           Int      @default(0)
 
@@ -1230,11 +1235,40 @@ model ProfileComment {
     id          String   @id @default(cuid())
     profileType String   @map("profile_type") @db.VarChar(10)
     profileId   String   @map("profile_id")
+    authorId    String?  @map("author_id")
     authorName  String   @map("author_name") @db.VarChar(50)
     content     String   @db.VarChar(500)
     approved    Boolean  @default(false)
     createdAt   DateTime @default(now()) @map("created_at")
 
+    author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
     @@index([profileType, profileId])
+    @@index([authorId])
     @@map("profile_comments")
+}
+
+// ==========================================
+// Content Reports
+// ==========================================
+
+model ContentReport {
+    id            String    @id @default(cuid())
+    targetType    String    @map("target_type") @db.VarChar(20) // "comment", "user_profile", "pet_profile"
+    targetId      String    @map("target_id")
+    targetUrl     String?   @map("target_url") @db.VarChar(500)
+    reason        String    @db.VarChar(100)
+    description   String?   @db.VarChar(1000)
+    reporterName  String?   @map("reporter_name") @db.VarChar(50)
+    status        String    @default("pending") @db.VarChar(20) // "pending", "reviewed", "dismissed"
+    adminNote     String?   @map("admin_note") @db.VarChar(1000)
+    resolvedAt    DateTime? @map("resolved_at")
+    resolvedById  String?   @map("resolved_by_id")
+    createdAt     DateTime  @default(now()) @map("created_at")
+
+    resolvedBy    User?     @relation(fields: [resolvedById], references: [id], onDelete: SetNull)
+
+    @@index([targetType, targetId])
+    @@index([status])
+    @@map("content_reports")
 }

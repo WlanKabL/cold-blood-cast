@@ -186,6 +186,33 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- Notify on Comment Toggle -->
+                    <div class="border-line mt-3 border-t pt-3">
+                        <div
+                            class="flex items-center justify-between rounded-lg px-3 py-2"
+                            :class="form.notifyOnComment ? 'bg-cyan-500/5' : 'bg-surface-sunken/50'"
+                        >
+                            <div>
+                                <span class="text-fg text-[12px]">
+                                    {{ $t("community.notifyOnComment") }}
+                                </span>
+                                <p class="text-fg-faint text-[11px]">
+                                    {{ $t("community.notifyOnCommentHint") }}
+                                </p>
+                            </div>
+                            <button
+                                class="relative ml-2 h-5 w-9 shrink-0 rounded-full transition-colors"
+                                :class="form.notifyOnComment ? 'bg-cyan-500' : 'bg-surface-sunken'"
+                                @click="form.notifyOnComment = !form.notifyOnComment"
+                            >
+                                <span
+                                    class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform"
+                                    :class="form.notifyOnComment ? 'translate-x-4' : ''"
+                                />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -459,16 +486,16 @@
                 </div>
             </div>
 
-            <!-- Comment Moderation -->
-            <div v-if="pendingComments.length > 0" class="glass-card space-y-4 p-6">
+            <!-- Comment Management -->
+            <div v-if="approvedComments.length > 0" class="glass-card space-y-4 p-6">
                 <h2 class="text-fg text-[15px] font-semibold">
-                    {{ $t("community.moderate") }}
-                    <span class="bg-primary-500/10 text-primary-400 ml-2 rounded-full px-2 py-0.5 text-[11px]">
-                        {{ pendingComments.length }}
+                    {{ $t("community.comments") }}
+                    <span class="bg-green-500/10 text-green-400 ml-2 rounded-full px-2 py-0.5 text-[11px]">
+                        {{ approvedComments.length }}
                     </span>
                 </h2>
                 <div
-                    v-for="comment in pendingComments"
+                    v-for="comment in approvedComments"
                     :key="comment.id"
                     class="border-line rounded-xl border p-4"
                 >
@@ -476,25 +503,20 @@
                         <span class="text-fg text-[13px] font-medium">
                             {{ comment.authorName }}
                         </span>
-                        <span class="text-fg-faint text-[11px]">
-                            {{ new Date(comment.createdAt).toLocaleDateString() }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-fg-faint text-[11px]">
+                                {{ new Date(comment.createdAt).toLocaleDateString() }}
+                            </span>
+                            <button
+                                class="text-red-400/60 hover:text-red-400 transition-colors"
+                                :title="$t('community.deleteComment')"
+                                @click="handleDeleteComment(comment.id)"
+                            >
+                                <Icon name="lucide:trash-2" class="h-3.5 w-3.5" />
+                            </button>
+                        </div>
                     </div>
                     <p class="text-fg-muted mt-1 text-[13px]">{{ comment.content }}</p>
-                    <div class="mt-3 flex gap-2">
-                        <button
-                            class="bg-green-500/10 text-green-400 hover:bg-green-500/20 rounded-lg px-3 py-1 text-[12px] transition-colors"
-                            @click="handleModerate(comment.id, true)"
-                        >
-                            {{ $t("community.approve") }}
-                        </button>
-                        <button
-                            class="bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg px-3 py-1 text-[12px] transition-colors"
-                            @click="handleModerate(comment.id, false)"
-                        >
-                            {{ $t("community.reject") }}
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -571,6 +593,7 @@ const profile = ref<{
     showLocation: boolean;
     showKeeperSince: boolean;
     showBadges: boolean;
+    notifyOnComment: boolean;
     petOrder: Array<{
         petId: string;
         petName: string;
@@ -593,11 +616,12 @@ const form = reactive({
     showLocation: true,
     showKeeperSince: true,
     showBadges: true,
+    notifyOnComment: false,
 });
 
 const socialLinks = ref<Array<{ platform: string; url: string; label: string }>>([]);
 const badges = ref<Array<{ badge: { key: string; nameKey: string; descKey: string; icon: string } }>>([]);
-const pendingComments = ref<Array<{ id: string; authorName: string; content: string; createdAt: string }>>([]);
+const approvedComments = ref<Array<{ id: string; authorName: string; content: string; createdAt: string }>>([]);
 
 const THEME_COLORS: Record<string, string> = {
     default: "rgb(138, 156, 74)",
@@ -643,6 +667,7 @@ function syncFormFromProfile(p: NonNullable<typeof profile.value>) {
     form.showLocation = p.showLocation;
     form.showKeeperSince = p.showKeeperSince;
     form.showBadges = p.showBadges;
+    form.notifyOnComment = p.notifyOnComment;
 }
 
 async function loadBadges() {
@@ -654,12 +679,12 @@ async function loadBadges() {
     }
 }
 
-async function loadPendingComments() {
+async function loadApprovedComments() {
     try {
-        const res = await get<typeof pendingComments.value>("/api/comments/pending");
-        pendingComments.value = res ?? [];
+        const res = await get<typeof approvedComments.value>("/api/comments/approved");
+        approvedComments.value = res ?? [];
     } catch {
-        pendingComments.value = [];
+        approvedComments.value = [];
     }
 }
 
@@ -670,7 +695,7 @@ async function loadSocialLinks() {
 
 onMounted(async () => {
     await loadProfile();
-    await Promise.all([loadBadges(), loadPendingComments()]);
+    await Promise.all([loadBadges(), loadApprovedComments()]);
 });
 
 // ─── Actions ─────────────────────────────────────────────────
@@ -707,6 +732,7 @@ async function handleSave() {
             showLocation: form.showLocation,
             showKeeperSince: form.showKeeperSince,
             showBadges: form.showBadges,
+            notifyOnComment: form.notifyOnComment,
         });
 
         // Save social links
@@ -781,11 +807,12 @@ async function handleCheckBadges() {
     isCheckingBadges.value = false;
 }
 
-async function handleModerate(commentId: string, approved: boolean) {
+async function handleDeleteComment(commentId: string) {
+    if (!confirm(t("community.deleteConfirm"))) return;
     try {
-        await patch(`/api/comments/${commentId}`, { approved });
-        toast.success(approved ? t("community.approved") : t("community.rejected"));
-        await loadPendingComments();
+        await del(`/api/comments/${commentId}`);
+        toast.success(t("community.commentDeleted"));
+        await loadApprovedComments();
     } catch (e: unknown) {
         toast.error((e as Error).message);
     }

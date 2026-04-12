@@ -1,1 +1,5 @@
-export { communityPublicRoutes, communityModerationRoutes } from "./community.routes.js";
+export {
+    communityPublicRoutes,
+    communityModerationRoutes,
+    communityAdminRoutes,
+} from "./community.routes.js";

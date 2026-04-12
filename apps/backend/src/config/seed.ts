@@ -297,9 +297,10 @@ const MIGRATIONS: Migration[] = [
                 notify_on_login: "false",
                 notify_on_first_login: "true",
                 notify_on_pending: "true",
-                notify_on_breach: "true",
                 notify_on_server_error: "true",
                 notify_on_sensor_alert: "true",
+                notify_on_new_comment: "true",
+                notify_on_new_report: "true",
             };
             for (const [key, value] of Object.entries(defaultSettings)) {
                 await prisma.systemSetting.upsert({

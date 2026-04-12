@@ -51,6 +51,11 @@ export function useApi() {
             }
         }
 
+        // 204 No Content — no body to parse
+        if (res.status === 204) {
+            return undefined as T;
+        }
+
         const json = (await res.json()) as ApiResponse<T>;
 
         if (!json.success) {

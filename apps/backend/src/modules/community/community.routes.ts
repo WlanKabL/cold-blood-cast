@@ -1,20 +1,27 @@
 import { type FastifyInstance, type FastifyRequest } from "fastify";
 import { z } from "zod";
-import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
+import { authGuard, adminGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
+import { prisma } from "@/config/database.js";
+import { notifyNewComment } from "@/modules/notifications/notification.service.js";
+import { notifyCommentToOwner } from "./community.notify.js";
 import {
     toggleLike,
     getLikeStatus,
     addComment,
     getApprovedComments,
+    deleteOwnComment,
     getPendingComments,
     moderateComment,
+    deleteApprovedComment,
+    getApprovedCommentsForOwner,
+    adminDeleteComment,
+    adminListComments,
 } from "./community.service.js";
 
 // ─── Validation ──────────────────────────────────────────────
 
 const AddCommentSchema = z.object({
-    authorName: z.string().min(1).max(50).trim(),
     content: z.string().min(1).max(500).trim(),
 });
 
@@ -76,6 +83,7 @@ export async function communityPublicRoutes(app: FastifyInstance) {
     // ── User Profile Comments ───────────────────────────────
     app.post(
         "/user/:slug/comments",
+        { preHandler: [authGuard] },
         async (request: FastifyRequest<{ Params: { slug: string } }>) => {
             const bodyResult = AddCommentSchema.safeParse(request.body);
             if (!bodyResult.success) {
@@ -86,13 +94,23 @@ export async function communityPublicRoutes(app: FastifyInstance) {
                 );
             }
 
+            const user = await prisma.user.findUniqueOrThrow({
+                where: { id: request.userId },
+                select: { displayName: true, username: true },
+            });
+            const authorName = user.displayName ?? user.username;
+
             const data = await addComment(
                 "user",
                 request.params.slug,
-                bodyResult.data.authorName,
+                request.userId,
+                authorName,
                 bodyResult.data.content,
-                request.ip,
             );
+
+            notifyNewComment(request.params.slug, authorName);
+            void notifyCommentToOwner("user", request.params.slug, authorName, bodyResult.data.content);
+
             return { success: true, data };
         },
     );
@@ -105,9 +123,20 @@ export async function communityPublicRoutes(app: FastifyInstance) {
         },
     );
 
+    // ── Delete Own Comment (user profile) ────────────────────
+    app.delete(
+        "/user/:slug/comments/:commentId",
+        { preHandler: [authGuard] },
+        async (request: FastifyRequest<{ Params: { slug: string; commentId: string } }>) => {
+            await deleteOwnComment(request.userId, request.params.commentId);
+            return { success: true };
+        },
+    );
+
     // ── Pet Profile Comments (requires userSlug) ─────────────
     app.post(
         "/pet/:userSlug/:petSlug/comments",
+        { preHandler: [authGuard] },
         async (
             request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
         ) => {
@@ -120,14 +149,24 @@ export async function communityPublicRoutes(app: FastifyInstance) {
                 );
             }
 
+            const user = await prisma.user.findUniqueOrThrow({
+                where: { id: request.userId },
+                select: { displayName: true, username: true },
+            });
+            const authorName = user.displayName ?? user.username;
+
             const data = await addComment(
                 "pet",
                 request.params.petSlug,
-                bodyResult.data.authorName,
+                request.userId,
+                authorName,
                 bodyResult.data.content,
-                request.ip,
                 request.params.userSlug,
             );
+
+            notifyNewComment(request.params.petSlug, authorName);
+            void notifyCommentToOwner("pet", request.params.petSlug, authorName, bodyResult.data.content, request.params.userSlug);
+
             return { success: true, data };
         },
     );
@@ -143,6 +182,18 @@ export async function communityPublicRoutes(app: FastifyInstance) {
                 request.params.userSlug,
             );
             return { success: true, data };
+        },
+    );
+
+    // ── Delete Own Comment (pet profile) ─────────────────────
+    app.delete(
+        "/pet/:userSlug/:petSlug/comments/:commentId",
+        { preHandler: [authGuard] },
+        async (
+            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string; commentId: string } }>,
+        ) => {
+            await deleteOwnComment(request.userId, request.params.commentId);
+            return { success: true };
         },
     );
 }
@@ -183,6 +234,60 @@ export async function communityModerationRoutes(app: FastifyInstance) {
             }
 
             return { success: true, data };
+        },
+    );
+
+    // GET /approved — get approved comments for own profiles
+    app.get("/approved", async (request) => {
+        const data = await getApprovedCommentsForOwner(request.userId);
+        return { success: true, data };
+    });
+
+    // DELETE /:commentId — delete an approved comment (owner)
+    app.delete(
+        "/:commentId",
+        async (request: FastifyRequest<{ Params: { commentId: string } }>, reply) => {
+            await deleteApprovedComment(request.userId, request.params.commentId);
+            return reply.status(204).send();
+        },
+    );
+}
+
+// ─── Admin Comment Routes ────────────────────────────────────
+
+export async function communityAdminRoutes(app: FastifyInstance) {
+    app.addHook("onRequest", authGuard);
+    app.addHook("onRequest", emailVerifiedGuard);
+    app.addHook("onRequest", adminGuard);
+
+    // GET / — list all comments (filterable)
+    app.get("/", async (request) => {
+        const q = request.query as Record<string, string>;
+        const result = await adminListComments({
+            approved: q.approved !== undefined ? q.approved === "true" : undefined,
+            page: q.page ? Number(q.page) : undefined,
+            limit: q.limit ? Number(q.limit) : undefined,
+        });
+        return {
+            success: true,
+            data: {
+                items: result.items,
+                meta: {
+                    page: result.page,
+                    perPage: result.limit,
+                    total: result.total,
+                    totalPages: Math.ceil(result.total / result.limit),
+                },
+            },
+        };
+    });
+
+    // DELETE /:commentId — admin delete any comment
+    app.delete(
+        "/:commentId",
+        async (request: FastifyRequest<{ Params: { commentId: string } }>, reply) => {
+            await adminDeleteComment(request.params.commentId);
+            return reply.status(204).send();
         },
     );
 }

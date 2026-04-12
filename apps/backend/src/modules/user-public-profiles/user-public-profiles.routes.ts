@@ -57,6 +57,7 @@ const UpdateProfileSchema = z.object({
     showLocation: z.boolean().optional(),
     showKeeperSince: z.boolean().optional(),
     showBadges: z.boolean().optional(),
+    notifyOnComment: z.boolean().optional(),
     themePreset: z.enum(THEME_PRESETS as [string, ...string[]]).optional(),
 });
 

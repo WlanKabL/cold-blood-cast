@@ -279,7 +279,9 @@
             "notifications": "Notifications",
             "auditLog": "Audit Log",
             "accessRequests": "Access Requests",
-            "legal": "Legal Documents"
+            "legal": "Legal Documents",
+            "reports": "Reports",
+            "comments": "Comments"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -427,6 +429,43 @@
             "title": "Feature Flags",
             "subtitle": "Global kill-switches for platform features. These are code-defined and cannot be created or deleted.",
             "create": "Create Flag"
+        },
+        "reports": {
+            "title": "Reports",
+            "empty": "No reports found.",
+            "pending": "Pending",
+            "reviewed": "Reviewed",
+            "dismissed": "Dismissed",
+            "markReviewed": "Mark as Reviewed",
+            "dismiss": "Dismiss",
+            "adminNotePlaceholder": "Optional admin note...",
+            "resolved": "Report resolved",
+            "resolvedBy": "Resolved by",
+            "viewTarget": "View Target",
+            "actions": "Quick Actions",
+            "banUser": "Ban Reported User",
+            "deleteContent": "Delete Reported Content",
+            "viewUserAdmin": "View User in Admin Panel",
+            "reporterIp": "Reporter IP Hash",
+            "banned": "Banned",
+            "userBanned": "User has been banned",
+            "contentDeleted": "Content has been deleted",
+            "bannedViaReport": "Banned via content report",
+            "type": {
+                "comment": "Comment",
+                "user_profile": "User Profile",
+                "pet_profile": "Pet Profile"
+            }
+        },
+        "comments": {
+            "title": "Comments",
+            "empty": "No comments found.",
+            "all": "All",
+            "approved": "Approved",
+            "pending": "Pending",
+            "delete": "Delete Comment",
+            "deleteConfirm": "Delete this comment?",
+            "deleted": "Comment deleted"
         },
         "announcements": {
             "title": "Announcements",
@@ -1690,12 +1729,13 @@
         "unlike": "Unlike",
         "comments": "Comments",
         "addComment": "Add a Comment",
-        "authorName": "Your Name",
+        "commentingAs": "Commenting as {name}",
+        "loginToComment": "Log in to leave a comment",
+        "login": "Log in",
         "commentPlaceholder": "Leave a nice comment...",
         "submit": "Submit",
         "pendingModeration": "Your comment is pending moderation",
         "noComments": "No comments yet. Be the first!",
-        "yourName": "Your Name",
         "writePlaceholder": "Leave a nice comment...",
         "send": "Send",
         "moderate": "Moderate Comments",
@@ -1704,6 +1744,33 @@
         "approve": "Approve",
         "reject": "Reject",
         "approved": "Comment approved",
-        "rejected": "Comment rejected"
+        "rejected": "Comment rejected",
+        "approvedComments": "Approved Comments",
+        "deleteComment": "Delete Comment",
+        "deleteConfirm": "Delete this comment?",
+        "commentDeleted": "Comment deleted",
+        "notifyOnComment": "Email on new comments",
+        "notifyOnCommentHint": "Receive an email when someone comments on your profile"
+    },
+    "report": {
+        "title": "Report",
+        "description": "Report this content to the platform administrators.",
+        "reason": "Reason",
+        "selectReason": "Select a reason",
+        "details": "Details",
+        "detailsPlaceholder": "Describe what's wrong (optional)...",
+        "yourName": "Your Name",
+        "yourNamePlaceholder": "Optional — for follow-up",
+        "submit": "Submit Report",
+        "reportComment": "Report Comment",
+        "reportProfile": "Report Profile",
+        "submitted": "Report submitted. Thank you!",
+        "reasons": {
+            "spam": "Spam",
+            "harassment": "Harassment",
+            "inappropriate": "Inappropriate Content",
+            "misinformation": "Misinformation",
+            "other": "Other"
+        }
     }
 }

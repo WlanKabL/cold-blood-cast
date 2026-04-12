@@ -1011,3 +1011,168 @@ export const mockPendingComments = [
         createdAt: "2026-04-01T10:00:00.000Z",
     },
 ];
+
+export const mockApprovedComments = [
+    {
+        id: "comment_approved_001",
+        authorName: "Snake Fan",
+        content: "Amazing collection!",
+        createdAt: "2026-03-20T10:00:00.000Z",
+    },
+    {
+        id: "comment_approved_002",
+        authorName: "Reptile Lover",
+        content: "Great care tips!",
+        createdAt: "2026-03-22T10:00:00.000Z",
+    },
+];
+
+// ─── Admin Report Fixtures ──────────────────────────────────
+
+export const mockAdminReports = {
+    items: [
+        {
+            id: "report_001",
+            targetType: "comment",
+            targetId: "comment_target_001",
+            targetUrl: "https://example.com/keeper/snake-keeper",
+            reason: "spam",
+            description: "This is a spam comment",
+            reporterName: "Jane Reporter",
+            status: "pending" as const,
+            adminNote: null,
+            resolvedAt: null,
+            resolvedBy: null,
+            createdAt: "2026-04-10T10:00:00.000Z",
+        },
+        {
+            id: "report_002",
+            targetType: "user_profile",
+            targetId: "user_target_001",
+            targetUrl: "https://example.com/keeper/bad-user",
+            reason: "harassment",
+            description: "Harassing content on the profile",
+            reporterName: null,
+            status: "pending" as const,
+            adminNote: null,
+            resolvedAt: null,
+            resolvedBy: null,
+            createdAt: "2026-04-09T08:00:00.000Z",
+        },
+        {
+            id: "report_003",
+            targetType: "pet_profile",
+            targetId: "pet_target_001",
+            targetUrl: null,
+            reason: "misinformation",
+            description: null,
+            reporterName: "John Doe",
+            status: "pending" as const,
+            adminNote: null,
+            resolvedAt: null,
+            resolvedBy: null,
+            createdAt: "2026-04-08T12:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 20, total: 3, totalPages: 1 },
+};
+
+export const mockAdminReportsReviewed = {
+    items: [
+        {
+            id: "report_004",
+            targetType: "comment",
+            targetId: "comment_target_002",
+            targetUrl: "https://example.com/keeper/some-user",
+            reason: "inappropriate",
+            description: "Offensive language",
+            reporterName: "Alert User",
+            status: "reviewed" as const,
+            adminNote: "Content removed and user warned",
+            resolvedAt: "2026-04-11T14:00:00.000Z",
+            resolvedBy: { id: "usr_admin_001", username: "admin" },
+            createdAt: "2026-04-10T10:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 20, total: 1, totalPages: 1 },
+};
+
+export const mockReportStats = {
+    pending: 3,
+    reviewed: 5,
+    dismissed: 2,
+};
+
+// ─── Admin Comment Fixtures ─────────────────────────────────
+
+export const mockAdminComments = {
+    items: [
+        {
+            id: "admin_comment_001",
+            authorName: "Visitor One",
+            content: "Nice snakes!",
+            approved: true,
+            profileType: "user_profile",
+            profileId: "profile_001",
+            createdAt: "2026-04-05T10:00:00.000Z",
+        },
+        {
+            id: "admin_comment_002",
+            authorName: "Spammer",
+            content: "Buy my stuff at spamsite.com",
+            approved: false,
+            profileType: "pet_profile",
+            profileId: "profile_002",
+            createdAt: "2026-04-06T11:00:00.000Z",
+        },
+        {
+            id: "admin_comment_003",
+            authorName: "Helpful Keeper",
+            content: "Great care routine!",
+            approved: true,
+            profileType: "user_profile",
+            profileId: "profile_003",
+            createdAt: "2026-04-07T09:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 20, total: 3, totalPages: 1 },
+};
+
+export const mockAdminCommentsApproved = {
+    items: [
+        {
+            id: "admin_comment_001",
+            authorName: "Visitor One",
+            content: "Nice snakes!",
+            approved: true,
+            profileType: "user_profile",
+            profileId: "profile_001",
+            createdAt: "2026-04-05T10:00:00.000Z",
+        },
+        {
+            id: "admin_comment_003",
+            authorName: "Helpful Keeper",
+            content: "Great care routine!",
+            approved: true,
+            profileType: "user_profile",
+            profileId: "profile_003",
+            createdAt: "2026-04-07T09:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 20, total: 2, totalPages: 1 },
+};
+
+export const mockAdminCommentsPending = {
+    items: [
+        {
+            id: "admin_comment_002",
+            authorName: "Spammer",
+            content: "Buy my stuff at spamsite.com",
+            approved: false,
+            profileType: "pet_profile",
+            profileId: "profile_002",
+            createdAt: "2026-04-06T11:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 20, total: 1, totalPages: 1 },
+};

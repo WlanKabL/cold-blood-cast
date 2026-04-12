@@ -224,10 +224,22 @@ const EVENTS = [
         icon: "lucide:log-in",
     },
     {
-        key: "notify_on_breach",
-        label: "Account Breach",
-        description: "A prop firm account status changes to BREACHED",
-        icon: "lucide:alert-triangle",
+        key: "notify_on_sensor_alert",
+        label: "Sensor Alert",
+        description: "A sensor reading exceeds a defined threshold",
+        icon: "lucide:thermometer",
+    },
+    {
+        key: "notify_on_new_comment",
+        label: "New Comment",
+        description: "Someone leaves a comment on a public profile",
+        icon: "lucide:message-circle",
+    },
+    {
+        key: "notify_on_new_report",
+        label: "New Report",
+        description: "A content report is submitted",
+        icon: "lucide:flag",
     },
     {
         key: "notify_on_server_error",
@@ -248,7 +260,9 @@ const NOTIFICATION_KEYS: NotificationKey[] = [
     "notify_on_pending",
     "notify_on_first_login",
     "notify_on_login",
-    "notify_on_breach",
+    "notify_on_sensor_alert",
+    "notify_on_new_comment",
+    "notify_on_new_report",
     "notify_on_server_error",
 ];
 

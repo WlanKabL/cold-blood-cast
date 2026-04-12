@@ -11,6 +11,8 @@
 
 import { env } from "@/config/env.js";
 import { getSystemSetting } from "@/modules/admin/settings.service.js";
+import { sendMail } from "@/modules/mail/mail.service.js";
+import { emailLayout, emailHeading, emailText } from "@/modules/mail/templates/components.js";
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -21,7 +23,9 @@ export type NotificationEvent =
     | "pending"
     | "breach"
     | "server_error"
-    | "sensor_alert";
+    | "sensor_alert"
+    | "new_comment"
+    | "new_report";
 
 interface EmbedField {
     name: string;
@@ -46,6 +50,8 @@ const EVENT_COLOR: Record<NotificationEvent, number> = {
     breach: 0xef4444, // red
     server_error: 0x8b5cf6, // purple
     sensor_alert: 0xf97316, // orange
+    new_comment: 0x06b6d4, // cyan
+    new_report: 0xdc2626, // red-600
 };
 
 // ─── Internal senders ────────────────────────────────────────
@@ -113,6 +119,34 @@ async function sendDiscord(payload: NotificationPayload): Promise<void> {
     }
 }
 
+async function sendNotificationEmail(payload: NotificationPayload): Promise<void> {
+    const e = env();
+    const notificationEmail = await getSystemSetting<string>("notification_email", "");
+    if (!notificationEmail) return;
+
+    const fieldsHtml = payload.fields?.length
+        ? payload.fields
+              .map(
+                  (f) =>
+                      `<strong style="color:#e5e5e5;">${f.name}:</strong> ${f.value}`,
+              )
+              .join("<br/>")
+        : "";
+
+    const html = emailLayout(`
+        ${emailHeading(`🔔 ${payload.title}`)}
+        ${payload.description ? emailText(payload.description) : ""}
+        ${fieldsHtml ? emailText(fieldsHtml) : ""}
+        ${emailText(`<span style="color:#a3a08e;font-size:12px;">${new Date().toUTCString()}</span>`, true)}
+    `);
+
+    await sendMail({
+        to: notificationEmail,
+        subject: `[KeeperLog] ${payload.title}`,
+        html,
+    });
+}
+
 // ─── Setting key map ─────────────────────────────────────────
 
 const EVENT_SETTING_KEY: Record<NotificationEvent, string> = {
@@ -123,6 +157,8 @@ const EVENT_SETTING_KEY: Record<NotificationEvent, string> = {
     breach: "notify_on_breach",
     server_error: "notify_on_server_error",
     sensor_alert: "notify_on_sensor_alert",
+    new_comment: "notify_on_new_comment",
+    new_report: "notify_on_new_report",
 };
 
 // ─── Main notify function ─────────────────────────────────────
@@ -142,14 +178,16 @@ export async function notify(
         const eventEnabled = await getSystemSetting<boolean>(eventKey, true);
         if (!eventEnabled) return;
 
-        const [telegramEnabled, discordEnabled] = await Promise.all([
+        const [telegramEnabled, discordEnabled, emailEnabled] = await Promise.all([
             getSystemSetting<boolean>("telegram_enabled", false),
             getSystemSetting<boolean>("discord_enabled", false),
+            getSystemSetting<boolean>("email_notifications_enabled", false),
         ]);
 
         const tasks: Promise<void>[] = [];
         if (telegramEnabled) tasks.push(sendTelegram(payload));
         if (discordEnabled) tasks.push(sendDiscord(payload));
+        if (emailEnabled) tasks.push(sendNotificationEmail(payload));
 
         await Promise.allSettled(tasks);
     } catch (err) {
@@ -249,5 +287,35 @@ export function notifySensorAlert(
             { name: "Current", value: value, inline: true },
             { name: "Threshold", value: threshold, inline: true },
         ],
+    });
+}
+
+export function notifyNewComment(profileName: string, authorName: string, profileUrl?: string): void {
+    const fields: EmbedField[] = [
+        { name: "Profile", value: profileName, inline: true },
+        { name: "Author", value: authorName, inline: true },
+    ];
+    if (profileUrl) fields.push({ name: "URL", value: profileUrl, inline: false });
+
+    void notify("new_comment", {
+        title: "💬 New Comment",
+        description: "Someone left a comment on a public profile.",
+        color: EVENT_COLOR.new_comment,
+        fields,
+    });
+}
+
+export function notifyNewReport(targetType: string, reason: string, targetUrl?: string): void {
+    const fields: EmbedField[] = [
+        { name: "Type", value: targetType, inline: true },
+        { name: "Reason", value: reason, inline: true },
+    ];
+    if (targetUrl) fields.push({ name: "URL", value: targetUrl, inline: false });
+
+    void notify("new_report", {
+        title: "🚩 New Report",
+        description: "Content has been reported by a user.",
+        color: EVENT_COLOR.new_report,
+        fields,
     });
 }

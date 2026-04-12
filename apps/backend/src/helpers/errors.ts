@@ -52,6 +52,9 @@ export const ErrorCodes = {
     E_COMMENT_NOT_FOUND: "E_COMMENT_NOT_FOUND",
     E_RATE_LIMIT_EXCEEDED: "E_RATE_LIMIT_EXCEEDED",
 
+    // ── Reports ──────────────────────────────────
+    E_REPORT_NOT_FOUND: "E_REPORT_NOT_FOUND",
+
     // ── Veterinarians ────────────────────────────
     E_VETERINARIAN_NOT_FOUND: "E_VETERINARIAN_NOT_FOUND",
 

@@ -49,7 +49,8 @@ import { weeklyPlannerRoutes } from "@/modules/weekly-planner/index.js";
 import { publicProfileRoutes, publicPetRoutes } from "@/modules/public-profiles/index.js";
 import { userPublicProfileRoutes, publicUserRoutes } from "@/modules/user-public-profiles/index.js";
 import { badgeRoutes } from "@/modules/badges/index.js";
-import { communityPublicRoutes, communityModerationRoutes } from "@/modules/community/index.js";
+import { communityPublicRoutes, communityModerationRoutes, communityAdminRoutes } from "@/modules/community/index.js";
+import { reportPublicRoutes, reportAdminRoutes } from "@/modules/reports/index.js";
 import { dataExportRoutes } from "@/modules/data-export/index.js";
 import {
     startWeeklyPlannerScheduler,
@@ -307,6 +308,9 @@ async function main() {
     await app.register(badgeRoutes, { prefix: "/api/badges" });
     await app.register(communityPublicRoutes, { prefix: "/api/public/community" });
     await app.register(communityModerationRoutes, { prefix: "/api/comments" });
+    await app.register(communityAdminRoutes, { prefix: "/api/admin/comments" });
+    await app.register(reportPublicRoutes, { prefix: "/api/public/reports" });
+    await app.register(reportAdminRoutes, { prefix: "/api/admin/reports" });
     await app.register(dataExportRoutes, { prefix: "/api/data-export" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──

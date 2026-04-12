@@ -26,8 +26,9 @@ export const NOTIFICATION_SETTING_KEYS = [
     "notify_on_first_login",
     "notify_on_pending",
     "notify_on_server_error",
-    "notify_on_breach",
     "notify_on_sensor_alert",
+    "notify_on_new_comment",
+    "notify_on_new_report",
 ] as const;
 
 export type NotificationSettingKey = (typeof NOTIFICATION_SETTING_KEYS)[number];
