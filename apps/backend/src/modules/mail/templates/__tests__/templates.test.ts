@@ -45,7 +45,7 @@ describe("email components", () => {
         it("includes header and footer", () => {
             const html = emailLayout("");
             expect(html).toContain("KeeperLog");
-            expect(html).toContain("cold-blood-cast.app");
+            expect(html).toContain("localhost:3000");
         });
     });
 
@@ -58,8 +58,8 @@ describe("email components", () => {
             expect(emailHeader()).toContain("cbc.png");
         });
 
-        it("links to cold-blood-cast.app", () => {
-            expect(emailHeader()).toContain("https://cold-blood-cast.app");
+        it("links to base URL from env", () => {
+            expect(emailHeader()).toContain("http://localhost:3000");
         });
     });
 

@@ -15,6 +15,7 @@ import {
 export interface SubscriptionCanceledData {
     username: string;
     endDate: string;
+    baseUrl: string;
 }
 
 export function subscriptionCanceledTemplate(data: SubscriptionCanceledData): string {
@@ -25,7 +26,7 @@ export function subscriptionCanceledTemplate(data: SubscriptionCanceledData): st
         ${emailInfoBox({ text: `Your premium features remain active until <strong style="color:#e5e5e5;">${data.endDate}</strong>. After that, your account will automatically switch to the free plan.` })}
         ${emailDivider()}
         ${emailText("Changed your mind? You can resubscribe anytime before your access expires.")}
-        ${emailButton({ text: "Resubscribe →", href: "https://cold-blood-cast.app/pricing" })}
+        ${emailButton({ text: "Resubscribe →", href: `${data.baseUrl}/pricing` })}
         ${emailDivider()}
         ${emailText("If you have any feedback on how we can improve, we'd love to hear it. Just reply to this email.", true)}
     `);

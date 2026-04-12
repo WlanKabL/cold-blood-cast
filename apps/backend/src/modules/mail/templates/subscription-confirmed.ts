@@ -8,6 +8,7 @@ import { emailLayout, emailHeading, emailText, emailButton, emailDivider } from 
 export interface SubscriptionConfirmedData {
     username: string;
     plan: string;
+    baseUrl: string;
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -25,7 +26,7 @@ export function subscriptionConfirmedTemplate(data: SubscriptionConfirmedData): 
         ${emailHeading("Subscription Confirmed 🎉")}
         ${emailText(`Hey <strong style="color:#e5e5e5;">${data.username}</strong>,`)}
         ${emailText(`Your <strong style="color:#8b5cf6;">${planLabel}</strong> subscription is now active. Thanks for supporting KeeperLog!`)}
-        ${emailButton({ text: "Open Dashboard →", href: "https://cold-blood-cast.app/dashboard" })}
+        ${emailButton({ text: "Open Dashboard →", href: `${data.baseUrl}/dashboard` })}
         ${emailDivider()}
         ${emailText("Here's what's now unlocked for you:", true)}
         ${emailText(

@@ -12,12 +12,26 @@
  *   - Accent:      #8a9c4a (olive) → #d87533 (copper)
  */
 
+import { env } from "@/config.js";
+
 // ── Brand Constants ──────────────────────────────────────────
+
+function getBaseUrl(): string {
+    try {
+        return env().FRONTEND_URL.replace(/\/$/, "");
+    } catch {
+        return "http://localhost:3000";
+    }
+}
 
 const BRAND = {
     name: "KeeperLog",
-    url: "https://cold-blood-cast.app",
-    logo: "https://cold-blood-cast.app/cbc.png",
+    get url() {
+        return getBaseUrl();
+    },
+    get logo() {
+        return `${getBaseUrl()}/cbc.png`;
+    },
     color: {
         bg: "#121208",
         card: "#1a1a0f",
