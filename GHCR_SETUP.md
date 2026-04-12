@@ -47,20 +47,20 @@ This allows `GITHUB_TOKEN` to push images to `ghcr.io/wlankabl/cold-blood-cast/*
 
 #### Infrastructure
 
-| Secret           | Value                                      | Example                        |
-| ---------------- | ------------------------------------------ | ------------------------------ |
-| `DEPLOY_HOST`    | Server IP or hostname                      | `123.45.67.89`                 |
-| `DEPLOY_USER`    | SSH user on the server                     | `deploy`                       |
-| `DEPLOY_SSH_KEY` | Full private SSH key (ed25519 recommended) | `-----BEGIN OPENSSH PRIVATE…`  |
-| `DEPLOY_PATH`    | Absolute path to the project on the server | `/opt/cold-blood-cast`         |
+| Secret           | Value                                      | Example                       |
+| ---------------- | ------------------------------------------ | ----------------------------- |
+| `DEPLOY_HOST`    | Server IP or hostname                      | `123.45.67.89`                |
+| `DEPLOY_USER`    | SSH user on the server                     | `deploy`                      |
+| `DEPLOY_SSH_KEY` | Full private SSH key (ed25519 recommended) | `-----BEGIN OPENSSH PRIVATE…` |
+| `DEPLOY_PATH`    | Absolute path to the project on the server | `/opt/cold-blood-cast`        |
 
 #### Frontend Build Args (baked into SPA at Docker build time)
 
-| Secret         | Value                                | Example                              |
-| -------------- | ------------------------------------ | ------------------------------------ |
-| `BASE_URL`     | Public frontend URL                  | `https://cold-blood-cast.app`        |
-| `API_BASE_URL` | Public backend API URL               | `https://api.cold-blood-cast.app`    |
-| `SITE_URL`     | Same as BASE_URL (used for SEO/meta) | `https://cold-blood-cast.app`        |
+| Secret         | Value                                | Example                           |
+| -------------- | ------------------------------------ | --------------------------------- |
+| `BASE_URL`     | Public frontend URL                  | `https://cold-blood-cast.app`     |
+| `API_BASE_URL` | Public backend API URL               | `https://api.cold-blood-cast.app` |
+| `SITE_URL`     | Same as BASE_URL (used for SEO/meta) | `https://cold-blood-cast.app`     |
 
 #### Environment .env (single secret — entire .env file)
 
@@ -171,12 +171,12 @@ deploy job (runs .github/scripts/deploy.sh)
 
 ## Troubleshooting
 
-| Issue                              | Fix                                                                          |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| `denied: installation not allowed` | Check step 2 — workflow permissions must be read+write                       |
-| `connection refused` on deploy     | Check `DEPLOY_HOST`, `DEPLOY_USER`, and `DEPLOY_SSH_KEY` secrets             |
-| `Permission denied` on file write  | Run `sudo chown -R deploy:deploy /opt/cold-blood-cast` on server             |
-| Images pull fails on server        | Run `docker login ghcr.io` manually, check PAT has `read:packages`           |
-| Backend crashes on start           | Check `DOTENV` has all required vars, check `docker logs cbc-backend`        |
-| Frontend shows old version         | Hard refresh (Ctrl+Shift+R), check if frontend container restarted           |
-| Migration fails                    | Check `docker logs cbc-backend` — entrypoint runs `prisma migrate deploy`    |
+| Issue                              | Fix                                                                       |
+| ---------------------------------- | ------------------------------------------------------------------------- |
+| `denied: installation not allowed` | Check step 2 — workflow permissions must be read+write                    |
+| `connection refused` on deploy     | Check `DEPLOY_HOST`, `DEPLOY_USER`, and `DEPLOY_SSH_KEY` secrets          |
+| `Permission denied` on file write  | Run `sudo chown -R deploy:deploy /opt/cold-blood-cast` on server          |
+| Images pull fails on server        | Run `docker login ghcr.io` manually, check PAT has `read:packages`        |
+| Backend crashes on start           | Check `DOTENV` has all required vars, check `docker logs cbc-backend`     |
+| Frontend shows old version         | Hard refresh (Ctrl+Shift+R), check if frontend container restarted        |
+| Migration fails                    | Check `docker logs cbc-backend` — entrypoint runs `prisma migrate deploy` |

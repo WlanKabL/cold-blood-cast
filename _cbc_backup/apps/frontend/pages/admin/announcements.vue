@@ -241,7 +241,14 @@ async function handleCreate() {
         payload.expiresAt = new Date(createForm.value.expiresAt).toISOString();
     await admin.createAnnouncement(payload);
     showCreate.value = false;
-    createForm.value = { title: "", content: "", type: "info", global: true, startsAt: "", expiresAt: "" };
+    createForm.value = {
+        title: "",
+        content: "",
+        type: "info",
+        global: true,
+        startsAt: "",
+        expiresAt: "",
+    };
     queryClient.invalidateQueries({ queryKey: ["admin", "announcements"] });
 }
 

@@ -61,11 +61,7 @@
             >
                 <div class="w-full max-w-md glass-card p-6 shadow-xl">
                     <h3 class="mb-4 text-lg font-bold text-fg">
-                        {{
-                            editingFlag
-                                ? $t("common.edit")
-                                : $t("admin.feature_flags.create")
-                        }}
+                        {{ editingFlag ? $t("common.edit") : $t("admin.feature_flags.create") }}
                     </h3>
                     <div class="space-y-4">
                         <div>

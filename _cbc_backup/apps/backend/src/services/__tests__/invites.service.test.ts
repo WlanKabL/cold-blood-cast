@@ -117,9 +117,9 @@ describe("invites.service", () => {
         it("throws when code already exists", async () => {
             findUnique.mockResolvedValueOnce({ id: "existing", code: "DUP" });
 
-            await expect(
-                createInviteCode({ code: "DUP", createdBy: "user1" }),
-            ).rejects.toThrow("Invite code already exists");
+            await expect(createInviteCode({ code: "DUP", createdBy: "user1" })).rejects.toThrow(
+                "Invite code already exists",
+            );
         });
     });
 
@@ -140,7 +140,9 @@ describe("invites.service", () => {
         it("throws notFound for non-existent code", async () => {
             findUnique.mockResolvedValueOnce(null);
 
-            await expect(deactivateInviteCode("nonexistent")).rejects.toThrow("Invite code not found");
+            await expect(deactivateInviteCode("nonexistent")).rejects.toThrow(
+                "Invite code not found",
+            );
         });
     });
 
@@ -171,7 +173,13 @@ describe("invites.service", () => {
         });
 
         it("returns false when code is inactive", async () => {
-            findUnique.mockResolvedValueOnce({ id: "1", code: "INACTIVE", active: false, maxUses: 5, uses: 0 });
+            findUnique.mockResolvedValueOnce({
+                id: "1",
+                code: "INACTIVE",
+                active: false,
+                maxUses: 5,
+                uses: 0,
+            });
 
             const result = await validateAndUseInviteCode("INACTIVE", "user1");
 

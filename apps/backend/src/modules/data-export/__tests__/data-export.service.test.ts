@@ -59,9 +59,8 @@ vi.mock("@/modules/audit/audit.service.js", () => ({
 
 // ─── Import SUT ──────────────────────────────────────────────
 
-const { getExportStatus, requestDataExport, downloadExport, cleanupExpiredExports } = await import(
-    "../data-export.service.js"
-);
+const { getExportStatus, requestDataExport, downloadExport, cleanupExpiredExports } =
+    await import("../data-export.service.js");
 
 // ─── Setup ───────────────────────────────────────────────────
 

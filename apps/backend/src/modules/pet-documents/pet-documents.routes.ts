@@ -16,7 +16,12 @@ const UpdateDocumentSchema = z.object({
     category: z.nativeEnum(PetDocumentCategory).optional(),
     label: z.string().max(200).optional(),
     notes: z.string().max(2000).optional(),
-    documentDate: z.string().datetime({ offset: true }).optional().nullable().transform((v) => v ?? undefined),
+    documentDate: z
+        .string()
+        .datetime({ offset: true })
+        .optional()
+        .nullable()
+        .transform((v) => v ?? undefined),
 });
 
 export async function petDocumentRoutes(app: FastifyInstance) {

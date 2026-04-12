@@ -5,11 +5,7 @@ import { createReadStream } from "node:fs";
 import { basename } from "node:path";
 import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { decryptFile } from "@/helpers/file-crypto.js";
-import {
-    getExportStatus,
-    requestDataExport,
-    downloadExport,
-} from "./data-export.service.js";
+import { getExportStatus, requestDataExport, downloadExport } from "./data-export.service.js";
 
 const RequestExportSchema = z.object({
     password: z.string().min(1),

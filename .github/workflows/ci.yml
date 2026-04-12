@@ -19,3 +19,8 @@ jobs:
         name: Tests
         needs: quality
         uses: ./.github/workflows/test.yml
+
+    e2e:
+        name: E2E
+        needs: test
+        uses: ./.github/workflows/e2e.yml

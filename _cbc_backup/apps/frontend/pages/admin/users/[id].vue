@@ -83,16 +83,15 @@
                         >{{ $t("admin.users.email_not_verified") }}</span
                     >
                 </div>
-                <p
-                    v-if="user.banned && user.bannedReason"
-                    class="mt-2 text-xs text-red-400"
-                >
+                <p v-if="user.banned && user.bannedReason" class="mt-2 text-xs text-red-400">
                     {{ $t("admin.users.ban_reason") }}: {{ user.bannedReason }}
                 </p>
 
                 <!-- Email verified toggle -->
                 <div class="mt-4 flex items-center gap-3">
-                    <label class="text-sm font-medium text-fg">{{ $t("admin.users.email_verified") }}</label>
+                    <label class="text-sm font-medium text-fg">{{
+                        $t("admin.users.email_verified")
+                    }}</label>
                     <button
                         class="relative h-6 w-11 rounded-full transition"
                         :class="user.emailVerified ? 'bg-emerald-600' : 'bg-active'"
@@ -170,9 +169,17 @@
                         <div class="flex items-center gap-2">
                             <span
                                 class="rounded-full px-2 py-0.5 text-[11px] font-medium"
-                                :class="uf.enabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'"
+                                :class="
+                                    uf.enabled
+                                        ? 'bg-emerald-500/20 text-emerald-400'
+                                        : 'bg-red-500/20 text-red-400'
+                                "
                             >
-                                {{ uf.enabled ? $t("admin.users.feature_granted") : $t("admin.users.feature_denied") }}
+                                {{
+                                    uf.enabled
+                                        ? $t("admin.users.feature_granted")
+                                        : $t("admin.users.feature_denied")
+                                }}
                             </span>
                             <button
                                 class="rounded-lg border border-line px-2 py-1 text-xs text-fg-muted transition hover:border-amber-500 hover:text-amber-400"
@@ -430,7 +437,9 @@ async function handleToggleFeature(featureFlagId: string, enabled: boolean) {
 
 async function handleAddFeature() {
     if (!selectedFlagId.value) return;
-    await admin.setUserFeature(userId.value, selectedFlagId.value, { enabled: featureFlagEnabled.value });
+    await admin.setUserFeature(userId.value, selectedFlagId.value, {
+        enabled: featureFlagEnabled.value,
+    });
     selectedFlagId.value = "";
     featureFlagEnabled.value = true;
     invalidateUser();

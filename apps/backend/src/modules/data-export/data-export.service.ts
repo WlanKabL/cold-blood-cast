@@ -68,7 +68,11 @@ export async function requestDataExport(userId: string, password: string, ipAddr
         },
         orderBy: { createdAt: "desc" },
     });
-    if (recent) throw badRequest(ErrorCodes.E_EXPORT_COOLDOWN, "Please wait before requesting another export");
+    if (recent)
+        throw badRequest(
+            ErrorCodes.E_EXPORT_COOLDOWN,
+            "Please wait before requesting another export",
+        );
 
     // Create export record
     const token = randomBytes(32).toString("hex");

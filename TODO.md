@@ -123,7 +123,7 @@
 
 #### i18n
 
-- ✅ **1.19** EN + DE keys: pages.pets.photos.* (title, upload, empty, tags, setProfile, takenAt, etc.)
+- ✅ **1.19** EN + DE keys: pages.pets.photos.\* (title, upload, empty, tags, setProfile, takenAt, etc.)
 
 </details>
 
@@ -166,7 +166,7 @@
 
 #### i18n
 
-- ✅ **2.21** EN + DE keys: pages.veterinarians.*, pages.vetVisits.*, dashboard vet widget
+- ✅ **2.21** EN + DE keys: pages.veterinarians._, pages.vetVisits._, dashboard vet widget
 
 ---
 
@@ -202,7 +202,7 @@
 
 #### i18n
 
-- ✅ **3.10** EN + DE keys: pages.weights.chart.*, dashboard weight trends
+- ✅ **3.10** EN + DE keys: pages.weights.chart.\*, dashboard weight trends
 
 ---
 
@@ -236,7 +236,7 @@
 
 #### i18n
 
-- ✅ **4.11** EN + DE keys: sheddingAnalysis.* (averageCycle, predicted, trend, warning, dashboard, pet detail)
+- ✅ **4.11** EN + DE keys: sheddingAnalysis.\* (averageCycle, predicted, trend, warning, dashboard, pet detail)
 
 </details>
 
@@ -271,7 +271,7 @@
 
 #### i18n
 
-- ✅ **5.10** EN + DE keys: pages.pets.timeline.* (title, subtitle, viewTimeline, loadMore, empty, noMore, filters, recentActivity, eventCount)
+- ✅ **5.10** EN + DE keys: pages.pets.timeline.\* (title, subtitle, viewTimeline, loadMore, empty, noMore, filters, recentActivity, eventCount)
 
 </details>
 
@@ -306,7 +306,7 @@
 
 #### i18n
 
-- ✅ **6.13** EN + DE keys: pages.pets.documents.* (title, categories, upload, empty)
+- ✅ **6.13** EN + DE keys: pages.pets.documents.\* (title, categories, upload, empty)
 
 ---
 
@@ -346,7 +346,7 @@
 
 #### i18n
 
-- ✅ **7.17** EN + DE keys: nav.maintenance, pages.maintenance.* (50+ keys — title, types, fields, status, CRUD messages), dashboard overdue keys, enclosure detail maintenance keys
+- ✅ **7.17** EN + DE keys: nav.maintenance, pages.maintenance.\* (50+ keys — title, types, fields, status, CRUD messages), dashboard overdue keys, enclosure detail maintenance keys
 
 </details>
 
@@ -385,7 +385,7 @@
 
 #### i18n
 
-- ✅ **8.17** EN + DE keys: nav.planner, pages.planner.*, pages.settings.weeklyDigest*, email template strings
+- ✅ **8.17** EN + DE keys: nav.planner, pages.planner._, pages.settings.weeklyDigest_, email template strings
 
 ---
 
@@ -418,13 +418,13 @@
 
 - ✅ **9.11** Backend unit tests: 37 tests (CRUD, ownership, slug generation/collision, public data query, visibility toggles, view counter, photo serving, error cases)
 - ✅ **9.12** Playwright E2E: 49 tests across 3 spec files:
-  - `public-profile.spec.ts` (19 tests): full profile page, photo gallery, lightbox, weight chart, feedings, sheddings, SEO, not-found, minimal profile
-  - `public-profile-embed.spec.ts` (14 tests): compact card, stats, photo strip, links, branding, not-found, minimal
-  - `public-profile-management.spec.ts` (16 tests): create/delete flow, slug, badges, toggles, embed modal, QR, view counter
+    - `public-profile.spec.ts` (19 tests): full profile page, photo gallery, lightbox, weight chart, feedings, sheddings, SEO, not-found, minimal profile
+    - `public-profile-embed.spec.ts` (14 tests): compact card, stats, photo strip, links, branding, not-found, minimal
+    - `public-profile-management.spec.ts` (16 tests): create/delete flow, slug, badges, toggles, embed modal, QR, view counter
 
 #### i18n
 
-- ✅ **9.13** EN + DE keys: publicProfile.* (50+ keys — title, share, configure, slug, embed, visibility toggles, powered by, not found, stats, feedings, sheddings, weight)
+- ✅ **9.13** EN + DE keys: publicProfile.\* (50+ keys — title, share, configure, slug, embed, visibility toggles, powered by, not found, stats, feedings, sheddings, weight)
 
 </details>
 
@@ -469,7 +469,7 @@
 
 #### i18n
 
-- 🔲 **10.23** EN + DE keys: pages.medications.*, pages.medicationPlans.*, dashboard medication widget
+- 🔲 **10.23** EN + DE keys: pages.medications._, pages.medicationPlans._, dashboard medication widget
 
 ---
 
@@ -501,7 +501,7 @@
 
 #### i18n
 
-- 🔲 **11.12** EN + DE keys: export.* (generatePdf, generateCsv, exportAll, processing, ready)
+- 🔲 **11.12** EN + DE keys: export.\* (generatePdf, generateCsv, exportAll, processing, ready)
 
 ---
 
@@ -539,7 +539,7 @@
 
 #### i18n
 
-- 🔲 **12.18** EN + DE keys: pages.breeding.*, pages.clutches.*
+- 🔲 **12.18** EN + DE keys: pages.breeding._, pages.clutches._
 
 ---
 
@@ -572,7 +572,7 @@
 
 #### i18n
 
-- 🔲 **13.13** EN + DE keys: pages.dashboard.* (widget-specific labels)
+- 🔲 **13.13** EN + DE keys: pages.dashboard.\* (widget-specific labels)
 
 ---
 

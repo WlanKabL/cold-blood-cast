@@ -53,7 +53,9 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-fg-muted">{{ entry.entity || "—" }}</td>
-                        <td class="px-4 py-3 text-xs text-fg-soft font-mono">{{ entry.ipAddress || "—" }}</td>
+                        <td class="px-4 py-3 text-xs text-fg-soft font-mono">
+                            {{ entry.ipAddress || "—" }}
+                        </td>
                         <td class="px-4 py-3 text-xs text-fg-soft max-w-xs truncate">
                             {{ entry.details ? JSON.stringify(entry.details) : "—" }}
                         </td>

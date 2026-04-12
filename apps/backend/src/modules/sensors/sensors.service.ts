@@ -44,7 +44,10 @@ export async function createSensor(
             type: data.type as "TEMPERATURE" | "HUMIDITY" | "PRESSURE" | "WATER",
             unit: data.unit,
             homeAssistantEntityId: data.homeAssistantEntityId ?? null,
-            limitsJson: data.limitsJson !== undefined ? (data.limitsJson as Prisma.InputJsonValue) : undefined,
+            limitsJson:
+                data.limitsJson !== undefined
+                    ? (data.limitsJson as Prisma.InputJsonValue)
+                    : undefined,
             active: data.active ?? true,
         },
     });
@@ -75,11 +78,14 @@ export async function updateSensor(
     }
     const updateData: Prisma.SensorUncheckedUpdateInput = {};
     if (data.name !== undefined) updateData.name = data.name;
-    if (data.type !== undefined) updateData.type = data.type as "TEMPERATURE" | "HUMIDITY" | "PRESSURE" | "WATER";
+    if (data.type !== undefined)
+        updateData.type = data.type as "TEMPERATURE" | "HUMIDITY" | "PRESSURE" | "WATER";
     if (data.unit !== undefined) updateData.unit = data.unit;
     if (data.enclosureId !== undefined) updateData.enclosureId = data.enclosureId;
-    if (data.homeAssistantEntityId !== undefined) updateData.homeAssistantEntityId = data.homeAssistantEntityId;
-    if (data.limitsJson !== undefined) updateData.limitsJson = data.limitsJson as Prisma.InputJsonValue;
+    if (data.homeAssistantEntityId !== undefined)
+        updateData.homeAssistantEntityId = data.homeAssistantEntityId;
+    if (data.limitsJson !== undefined)
+        updateData.limitsJson = data.limitsJson as Prisma.InputJsonValue;
     if (data.active !== undefined) updateData.active = data.active;
 
     return prisma.sensor.update({ where: { id }, data: updateData });

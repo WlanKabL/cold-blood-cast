@@ -158,7 +158,9 @@ describe("announcements.service", () => {
         it("throws notFound for missing announcement", async () => {
             findUnique.mockResolvedValueOnce(null);
 
-            await expect(updateAnnouncement("missing", { title: "X" })).rejects.toThrow("Announcement not found");
+            await expect(updateAnnouncement("missing", { title: "X" })).rejects.toThrow(
+                "Announcement not found",
+            );
         });
     });
 

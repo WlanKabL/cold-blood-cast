@@ -78,9 +78,8 @@ describe("uploads.service — uploadFile()", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockPrisma.upload.count.mockResolvedValue(0);
-        mockPrisma.upload.create.mockImplementation(
-            ({ data }: { data: Record<string, unknown> }) =>
-                Promise.resolve({ id: "u-1", ...data, createdAt: new Date() }),
+        mockPrisma.upload.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+            Promise.resolve({ id: "u-1", ...data, createdAt: new Date() }),
         );
         vi.mocked(resolveUserLimits).mockResolvedValue({ max_uploads: -1 } as ReturnType<
             typeof resolveUserLimits
@@ -146,7 +145,9 @@ describe("uploads.service — uploadFile()", () => {
         mockPrisma.upload.count.mockResolvedValue(5);
 
         const file = createMockFile();
-        await expect(uploadFile("user-1", file as never, {})).rejects.toThrow("Upload limit reached");
+        await expect(uploadFile("user-1", file as never, {})).rejects.toThrow(
+            "Upload limit reached",
+        );
     });
 
     it("allows unlimited uploads when max_uploads is -1", async () => {
