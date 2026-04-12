@@ -28,9 +28,9 @@ WORKDIR /app/apps/frontend
 COPY apps/frontend/ ./
 
 # Build-time env vars (baked into the SPA bundle)
-ARG BASE_URL=http://localhost:3300
-ARG API_BASE_URL=http://localhost:3301
-ARG SITE_URL=http://localhost:3300
+ARG BASE_URL=http://localhost:3000
+ARG API_BASE_URL=http://localhost:3001
+ARG SITE_URL=http://localhost:3000
 ARG APP_VERSION=dev
 ENV BASE_URL=$BASE_URL
 ENV API_BASE_URL=$API_BASE_URL
@@ -56,6 +56,6 @@ RUN addgroup -g 1001 -S nodejs && adduser -S coldblood -u 1001 -G nodejs
 RUN chown -R coldblood:nodejs /app
 USER coldblood
 
-EXPOSE 3300
+EXPOSE 3000
 
 CMD ["node", ".output/server/index.mjs"]

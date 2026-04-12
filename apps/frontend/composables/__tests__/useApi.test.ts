@@ -4,7 +4,7 @@ import { ApiError, useApi } from "../useApi";
 // ─── Mock Nuxt auto-imports ──────────────────────────────────
 
 vi.stubGlobal("useRuntimeConfig", () => ({
-    public: { apiBaseURL: "http://localhost:3301" },
+    public: { apiBaseURL: "http://localhost:3001" },
 }));
 
 const mockAuthStore = {
@@ -59,7 +59,7 @@ describe("useApi — basic requests", () => {
 
         expect(result).toEqual({ items: [1, 2] });
         expect(mockFetch).toHaveBeenCalledWith(
-            "http://localhost:3301/api/test",
+            "http://localhost:3001/api/test",
             expect.objectContaining({ credentials: "include" }),
         );
     });

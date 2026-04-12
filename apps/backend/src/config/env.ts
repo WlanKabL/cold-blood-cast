@@ -14,7 +14,7 @@ const envSchema = z.object({
     HASH_PEPPER: z.string().min(32),
     HASH_ITERATIONS: z.coerce.number().default(100000),
 
-    CORS_ORIGIN: z.string().default("http://localhost:3300"),
+    CORS_ORIGIN: z.string().default("http://localhost:3000"),
 
     // Frontend URL for email links
     FRONTEND_URL: z.string().url().default("https://cold-blood-cast.app"),

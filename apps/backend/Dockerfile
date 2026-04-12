@@ -64,6 +64,6 @@ RUN chmod +x /entrypoint.sh
 RUN addgroup -g 1001 -S nodejs && adduser -S coldblood -u 1001 -G nodejs
 RUN chown -R coldblood:nodejs /app
 
-EXPOSE 3301
+EXPOSE 3001
 
 ENTRYPOINT ["/entrypoint.sh"]

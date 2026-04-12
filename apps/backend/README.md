@@ -53,7 +53,7 @@ npm install
 
 ```env
 # Port for the HTTP server
-PORT=3301
+PORT=3001
 # Use mock data instead of real data
 # Set to true for development/testing purposes
 # Set to false for production
@@ -97,7 +97,7 @@ PEPPER=your_pepper_here
 
 ## 🔧 REST API Overview
 
-[Swagger Doku](http://localhost:3301/api/docs)
+[Swagger Doku](http://localhost:3001/api/docs)
 
 ---
 
