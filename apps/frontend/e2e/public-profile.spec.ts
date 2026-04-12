@@ -188,7 +188,7 @@ test.describe("Public Profile Page", () => {
         await page.goto("/p/monty-the-snake");
 
         // 3 weight records → 3 sparkline bars
-        const bars = page.locator(".flex.h-16 > div");
+        const bars = page.locator(".flex.h-20 > div");
         await expect(bars).toHaveCount(3, { timeout: 15_000 });
     });
 

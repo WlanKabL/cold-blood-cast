@@ -9,9 +9,9 @@ COPY apps/frontend/package.json apps/frontend/
 RUN pnpm install --frozen-lockfile
 
 FROM base AS build
-ARG BASE_URL=http://localhost:3000
-ARG API_BASE_URL=http://localhost:3001
-ARG SITE_URL=http://localhost:3000
+ARG BASE_URL=http://localhost:3300
+ARG API_BASE_URL=http://localhost:3301
+ARG SITE_URL=http://localhost:3300
 ARG APP_VERSION=0.0.0
 ENV BASE_URL=${BASE_URL}
 ENV API_BASE_URL=${API_BASE_URL}
@@ -30,5 +30,5 @@ FROM base AS production
 ENV NODE_ENV=production
 COPY --from=build /app/apps/frontend/.output ./apps/frontend/.output
 WORKDIR /app/apps/frontend
-EXPOSE 3000
+EXPOSE 3300
 CMD ["node", ".output/server/index.mjs"]

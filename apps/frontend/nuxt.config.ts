@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     spaLoadingTemplate: resolve(__dirname, "./app/spa-loading-template.html"),
     css: ["~/assets/tailwind.css"],
     devtools: { enabled: process.env.NODE_ENV !== "production" },
+    devServer: { port: 3300 },
     experimental: {
         typedPages: true,
     },
@@ -115,8 +116,8 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         public: {
-            baseURL: process.env.BASE_URL || "http://localhost:3000",
-            apiBaseURL: process.env.API_BASE_URL || "http://localhost:3001",
+            baseURL: process.env.BASE_URL || "http://localhost:3300",
+            apiBaseURL: process.env.API_BASE_URL || "http://localhost:3301",
             showPricingNav: process.env.SHOW_PRICING_NAV === "true",
             appVersion: process.env.APP_VERSION || "dev",
         },

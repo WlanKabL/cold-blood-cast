@@ -34,6 +34,7 @@ test.describe("Shedding Analysis — Pet Detail", () => {
     test("shows shedding cycle analysis card", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /health/i }).click();
         await expect(page.getByText(/shedding cycle|häutungszyklus/i).first()).toBeVisible({
             timeout: 15_000,
         });
@@ -42,6 +43,7 @@ test.describe("Shedding Analysis — Pet Detail", () => {
     test("displays average interval", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /health/i }).click();
         // Scope to the shedding cycle card to avoid matching the weight range option
         const sheddingCard = page.locator(".glass-card", {
             hasText: /shedding cycle|häutungszyklus/i,
@@ -53,12 +55,14 @@ test.describe("Shedding Analysis — Pet Detail", () => {
     test("displays trend indicator", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /health/i }).click();
         await expect(page.getByText(/stable|stabil/i).first()).toBeVisible({ timeout: 15_000 });
     });
 
     test("displays shedding count", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /health/i }).click();
         await expect(page.getByText(/4 sheddings|4 häutungen/i).first()).toBeVisible({
             timeout: 15_000,
         });
@@ -69,6 +73,7 @@ test.describe("Shedding Analysis — Pet Detail", () => {
 
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /health/i }).click();
         await expect(page.getByText(/not enough|nicht genügend/i).first()).toBeVisible({
             timeout: 15_000,
         });
@@ -91,6 +96,7 @@ test.describe("Shedding Analysis — Dashboard Widget", () => {
     test("shows upcoming sheddings widget", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /schedule/i }).click();
         await expect(
             page.getByText(/upcoming sheddings|anstehende häutungen/i).first(),
         ).toBeVisible({ timeout: 15_000 });
@@ -106,6 +112,7 @@ test.describe("Shedding Analysis — Dashboard Widget", () => {
     test("shows predicted timing badge", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /schedule/i }).click();
         // "in 5d" or "in 5T" depending on locale
         await expect(page.getByText(/in 5d|in 5T/i).first()).toBeVisible({ timeout: 15_000 });
     });
@@ -122,6 +129,7 @@ test.describe("Shedding Analysis — Dashboard Widget", () => {
 
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /schedule/i }).click();
         await expect(page.getByText(/no sheddings predicted|keine häutungen/i).first()).toBeVisible(
             { timeout: 15_000 },
         );
@@ -148,6 +156,7 @@ test.describe("Shedding Analysis — Anomaly Warning", () => {
 
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /health/i }).click();
         await expect(page.getByText(/overdue|überfällig/i).first()).toBeVisible({
             timeout: 15_000,
         });

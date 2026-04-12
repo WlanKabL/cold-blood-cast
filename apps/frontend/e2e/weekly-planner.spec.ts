@@ -97,9 +97,9 @@ test.describe("Weekly Planner — Page", () => {
 
         await expect(page.getByText("Noodle").first()).toBeVisible({ timeout: 15_000 });
 
-        // Check we have day names visible (Mon, Tue, ... or Mo, Di, ...)
-        const dayCards = page.locator(".glass-card");
-        await expect(dayCards).toHaveCount(7);
+        // Count day header date bubbles (h-12 w-12 circles with day name + number)
+        const dayHeaders = page.locator(".h-12.w-12");
+        await expect(dayHeaders).toHaveCount(7);
     });
 
     test("shows feeding events", async ({ page }) => {
@@ -168,9 +168,10 @@ test.describe("Weekly Planner — Empty State", () => {
     test("shows empty state for all days", async ({ page }) => {
         await page.goto("/planner");
 
-        const emptyMessages = page.getByText(/no tasks|keine aufgaben/i);
-        await expect(emptyMessages.first()).toBeVisible({ timeout: 15_000 });
-        await expect(emptyMessages).toHaveCount(7);
+        // Each empty day renders a dashed-border container with "No tasks" text
+        const emptyDays = page.locator(".border-dashed");
+        await expect(emptyDays.first()).toBeVisible({ timeout: 15_000 });
+        await expect(emptyDays).toHaveCount(7);
     });
 });
 

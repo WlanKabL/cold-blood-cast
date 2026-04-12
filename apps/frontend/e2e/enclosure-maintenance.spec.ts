@@ -135,6 +135,7 @@ test.describe("Enclosure Maintenance — Dashboard Widget", () => {
     test("shows overdue maintenance section", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         await expect(
             page.getByText(/overdue maintenance|überfällige wartung/i).first(),
         ).toBeVisible({ timeout: 15_000 });
@@ -143,6 +144,7 @@ test.describe("Enclosure Maintenance — Dashboard Widget", () => {
     test("displays overdue task details", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         await expect(page.getByText("Desert Terrarium").first()).toBeVisible({ timeout: 15_000 });
     });
 
@@ -151,6 +153,7 @@ test.describe("Enclosure Maintenance — Dashboard Widget", () => {
 
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         await expect(
             page.getByText(/all maintenance tasks are up to date|alle wartungsaufgaben/i).first(),
         ).toBeVisible({ timeout: 15_000 });
@@ -174,6 +177,7 @@ test.describe("Enclosure Maintenance — Enclosure Detail Section", () => {
     test("shows maintenance section on enclosure detail", async ({ page }) => {
         await page.goto("/enclosures/enc_001");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         await expect(page.getByText(/maintenance tasks|wartungsaufgaben/i).first()).toBeVisible({
             timeout: 15_000,
         });
@@ -182,6 +186,7 @@ test.describe("Enclosure Maintenance — Enclosure Detail Section", () => {
     test("displays task type or description", async ({ page }) => {
         await page.goto("/enclosures/enc_001");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         await expect(page.getByText("Full terrarium cleaning").first()).toBeVisible({
             timeout: 15_000,
         });
@@ -190,6 +195,7 @@ test.describe("Enclosure Maintenance — Enclosure Detail Section", () => {
     test("shows overdue count badge", async ({ page }) => {
         await page.goto("/enclosures/enc_001");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         // At least one overdue task badge
         await expect(page.getByText(/overdue|überfällig/i).first()).toBeVisible({
             timeout: 15_000,

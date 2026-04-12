@@ -44,12 +44,14 @@ test.describe("Dashboard", () => {
     test("shows enclosure overview section", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         await expect(page.getByText("Main Vivarium").first()).toBeVisible({ timeout: 15_000 });
     });
 
     test("enclosure card links to detail page", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         const enclosureLink = page.locator("a[href='/enclosures/enc_001']");
         await expect(enclosureLink).toBeVisible({ timeout: 15_000 });
     });
@@ -57,6 +59,7 @@ test.describe("Dashboard", () => {
     test("shows upcoming vet visits section", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /schedule/i }).click();
         // mockUpcomingAppointments has visit_003 with pet Monty
         await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText("Dr. Schmidt").first()).toBeVisible();
@@ -65,6 +68,7 @@ test.describe("Dashboard", () => {
     test("vet visit card links to detail page", async ({ page }) => {
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /schedule/i }).click();
         const vetLink = page.locator("a[href='/vet-visits/visit_003']");
         await expect(vetLink).toBeVisible({ timeout: 15_000 });
     });
@@ -105,6 +109,7 @@ test.describe("Dashboard — Empty State", () => {
 
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /maintenance/i }).click();
         // Empty state for enclosures should show text
         await expect(page.getByText(/no enclosures/i).first()).toBeVisible({ timeout: 15_000 });
     });
@@ -122,6 +127,7 @@ test.describe("Dashboard — Empty State", () => {
 
         await page.goto("/dashboard");
 
+        await page.getByRole("tab", { name: /schedule/i }).click();
         // No upcoming vet visits text
         await expect(page.getByText(/no upcoming/i).first()).toBeVisible({ timeout: 15_000 });
     });

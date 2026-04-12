@@ -97,6 +97,7 @@ test.describe("Activity Timeline — Pet Detail Widget", () => {
     test("shows recent activity section", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /activity/i }).click();
         await expect(page.getByText(/recent activity|letzte aktivität/i).first()).toBeVisible({
             timeout: 15_000,
         });
@@ -105,6 +106,7 @@ test.describe("Activity Timeline — Pet Detail Widget", () => {
     test("shows view timeline link", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /activity/i }).click();
         const timelineLink = page.locator("a[href='/pets/pet_001/timeline']");
         await expect(timelineLink).toBeVisible({ timeout: 15_000 });
     });
@@ -112,6 +114,7 @@ test.describe("Activity Timeline — Pet Detail Widget", () => {
     test("displays recent events", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /activity/i }).click();
         // mockTimelinePreview has "Mouse (Small)" as first event
         const activityCard = page.locator(".glass-card", {
             hasText: /recent activity|letzte aktivität/i,
@@ -125,6 +128,7 @@ test.describe("Activity Timeline — Pet Detail Widget", () => {
 
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /activity/i }).click();
         const activityCard = page.locator(".glass-card", {
             hasText: /recent activity|letzte aktivität/i,
         });

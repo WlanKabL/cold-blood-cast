@@ -147,8 +147,8 @@ INTERVAL=10
 for i in \$(seq 1 \$RETRIES); do
     echo "🔍 Health check attempt \$i/\$RETRIES..."
 
-    BACKEND_HEALTH=\$(curl -sf http://localhost:3001/api/health 2>&1 || echo "FAIL")
-    FRONTEND_STATUS=\$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3000/ 2>&1 || echo "000")
+    BACKEND_HEALTH=\$(curl -sf http://localhost:3301/api/health 2>&1 || echo "FAIL")
+    FRONTEND_STATUS=\$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3300/ 2>&1 || echo "000")
 
     BACKEND_OK=false
     FRONTEND_OK=false
@@ -241,8 +241,8 @@ docker compose up -d
 echo "⏳ Waiting 15s for services to start..."
 sleep 15
 
-BACKEND_HEALTH=\$(curl -sf http://localhost:3001/api/health || echo "FAIL")
-FRONTEND_STATUS=\$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3000/ || echo "000")
+BACKEND_HEALTH=\$(curl -sf http://localhost:3301/api/health || echo "FAIL")
+FRONTEND_STATUS=\$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3300/ || echo "000")
 
 if echo "\$BACKEND_HEALTH" | grep -q '"status":"ok"' && [ "\$FRONTEND_STATUS" = "200" ]; then
     echo "✅ Rollback successful — all services healthy"

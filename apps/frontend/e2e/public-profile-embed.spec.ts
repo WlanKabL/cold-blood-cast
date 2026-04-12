@@ -140,7 +140,7 @@ test.describe("Public Profile Embed", () => {
         await page.goto("/p/monty-the-snake/embed");
 
         // 3 feedings in fixture — the stat grid shows the count
-        const feedingStat = page.locator(".glass-card").filter({ hasText: /feeding|fütterung/i });
+        const feedingStat = page.locator(".public-card").filter({ hasText: /feeding|fütterung/i });
         await expect(feedingStat.getByText("3")).toBeVisible({ timeout: 15_000 });
     });
 
@@ -150,7 +150,7 @@ test.describe("Public Profile Embed", () => {
         await page.goto("/p/monty-the-snake/embed");
 
         // 2 sheddings in fixture
-        const sheddingStat = page.locator(".glass-card").filter({ hasText: /shedding|häutung/i });
+        const sheddingStat = page.locator(".public-card").filter({ hasText: /shedding|häutung/i });
         await expect(sheddingStat.getByText("2")).toBeVisible({ timeout: 15_000 });
     });
 

@@ -6,7 +6,7 @@ import { useAuthStore } from "../useAuthStore";
 // ─── Mock Nuxt auto-imports ──────────────────────────────────
 
 vi.stubGlobal("useRuntimeConfig", () => ({
-    public: { apiBaseURL: "http://localhost:3001" },
+    public: { apiBaseURL: "http://localhost:3301" },
 }));
 
 // Mock fetch

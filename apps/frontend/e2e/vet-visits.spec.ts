@@ -176,6 +176,7 @@ test.describe("Vet Visits — Detail Page", () => {
     test("shows documents with upload button", async ({ page }) => {
         await page.goto("/vet-visits/visit_001");
 
+        await page.getByRole("tab", { name: /documents/i }).click();
         const uploadBtn = page.getByRole("button", { name: /upload|hochladen/i });
         await expect(uploadBtn).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText("Lab results").first()).toBeVisible();
@@ -185,6 +186,7 @@ test.describe("Vet Visits — Detail Page", () => {
     test("opens upload modal", async ({ page }) => {
         await page.goto("/vet-visits/visit_001");
 
+        await page.getByRole("tab", { name: /documents/i }).click();
         await page.getByRole("button", { name: /upload|hochladen/i }).click();
         await expect(page.locator("input[type='file']")).toBeAttached();
     });

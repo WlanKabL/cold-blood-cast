@@ -41,6 +41,7 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("shows weight chart section", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /care/i }).click();
         await expect(page.getByText(/weight history|gewichtsverlauf/i).first()).toBeVisible({
             timeout: 15_000,
         });
@@ -49,6 +50,7 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("displays growth rate indicator", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /care/i }).click();
         // Growth rate: 50 g/month, trend up (Gaining)
         await expect(page.getByText(/50 g/i).first()).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText(/gaining|zunehmend/i).first()).toBeVisible();
@@ -57,6 +59,7 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("shows total weight gain", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /care/i }).click();
         // Total: 250 g
         await expect(page.getByText(/250 g/i).first()).toBeVisible({ timeout: 15_000 });
     });
@@ -64,6 +67,7 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("shows record count", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /care/i }).click();
         // 6 records
         await expect(page.getByText("6").first()).toBeVisible({ timeout: 15_000 });
     });
@@ -71,6 +75,7 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("has date range selector", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /care/i }).click();
         const select = page.locator("select").last();
         await expect(select).toBeVisible({ timeout: 15_000 });
     });
@@ -78,6 +83,7 @@ test.describe("Pet Detail — Weight Chart", () => {
     test("has view all link", async ({ page }) => {
         await page.goto("/pets/pet_001");
 
+        await page.getByRole("tab", { name: /care/i }).click();
         const viewAllLink = page.locator("main a[href='/weights']");
         await expect(viewAllLink).toBeVisible({ timeout: 15_000 });
     });

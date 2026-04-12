@@ -36,5 +36,5 @@ COPY apps/backend/entrypoint.sh /app/apps/backend/entrypoint.sh
 RUN chmod +x /app/apps/backend/entrypoint.sh
 
 WORKDIR /app/apps/backend
-EXPOSE 3001
+EXPOSE 3301
 ENTRYPOINT ["./entrypoint.sh"]

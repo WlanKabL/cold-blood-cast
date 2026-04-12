@@ -35,10 +35,10 @@ services:
             - .env
         environment:
             DATABASE_URL: postgresql://coldblood:${DB_PASSWORD}@postgres:5432/coldbloodcast?schema=public
-            PORT: "3001"
+            PORT: "3301"
             NODE_ENV: production
         ports:
-            - "3301:3001"
+            - "3301:3301"
         volumes:
             - ${UPLOADS_DIR:-./uploads}:/app/uploads
         networks:
@@ -48,7 +48,7 @@ services:
             postgres:
                 condition: service_healthy
         healthcheck:
-            test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
+            test: ["CMD-SHELL", "wget -qO- http://localhost:3301/api/health || exit 1"]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -59,15 +59,15 @@ services:
         container_name: cbc-frontend
         restart: unless-stopped
         environment:
-            PORT: "3000"
+            PORT: "3300"
         ports:
-            - "3300:3000"
+            - "3300:3300"
         networks:
             - web
         depends_on:
             - backend
         healthcheck:
-            test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
+            test: ["CMD-SHELL", "wget -qO- http://localhost:3300/ || exit 1"]
             interval: 10s
             timeout: 5s
             retries: 3

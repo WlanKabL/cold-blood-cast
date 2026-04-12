@@ -173,7 +173,8 @@ test.describe("Pet Detail — Page Integration", () => {
 
         await page.goto(`/pets/${petId}`);
 
-        const backLink = page.locator("a[href='/pets']");
+        // Use main scoping to avoid matching sidebar link (strict mode violation)
+        const backLink = page.locator("main a[href='/pets'], [class*='max-w'] a[href='/pets']").first();
         await expect(backLink).toBeVisible({ timeout: 15_000 });
     });
 
@@ -184,9 +185,8 @@ test.describe("Pet Detail — Page Integration", () => {
         await page.goto(`/pets/${petId}`);
         await page.waitForLoadState("networkidle");
 
-        // The edit and delete buttons are icon-only UiButtons
-        const buttons = page.locator("header button, [class*='glass-card'] button, main button");
-        await expect(buttons.first()).toBeVisible({ timeout: 15_000 });
+        // Edit button (pencil icon) and delete button (red trash icon)
+        await expect(page.locator("button.bg-red-500, button[class*='danger']").first()).toBeVisible({ timeout: 15_000 });
     });
 
     test("shows recent feedings section", async ({ page }) => {
@@ -195,6 +195,7 @@ test.describe("Pet Detail — Page Integration", () => {
 
         await page.goto(`/pets/${petId}`);
 
+        await page.getByRole("tab", { name: /care/i }).click();
         await expect(page.getByText("Mouse").first()).toBeVisible({ timeout: 15_000 });
     });
 });
