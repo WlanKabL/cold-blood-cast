@@ -123,7 +123,7 @@ test.describe("Public Profile Management — Profile Exists", () => {
         await page.goto(`/pets/${petId}`);
 
         // mockPublicProfile has views: 42
-        await expect(page.getByText("42")).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/42 views|42 Aufrufe/i)).toBeVisible({ timeout: 15_000 });
     });
 
     test("shows visibility toggle switches", async ({ page }) => {
