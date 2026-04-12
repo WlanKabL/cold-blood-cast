@@ -65,7 +65,11 @@ export async function listReports(options: ListReportsOptions) {
         userProfileSlugs.length > 0
             ? await prisma.userPublicProfile.findMany({
                   where: { slug: { in: userProfileSlugs } },
-                  select: { slug: true, userId: true, user: { select: { id: true, username: true, banned: true } } },
+                  select: {
+                      slug: true,
+                      userId: true,
+                      user: { select: { id: true, username: true, banned: true } },
+                  },
               })
             : [];
 
@@ -73,7 +77,8 @@ export async function listReports(options: ListReportsOptions) {
 
     const enrichedItems = items.map((item) => ({
         ...item,
-        targetUser: item.targetType === "user_profile" ? (slugToUser.get(item.targetId) ?? null) : null,
+        targetUser:
+            item.targetType === "user_profile" ? (slugToUser.get(item.targetId) ?? null) : null,
     }));
 
     return { items: enrichedItems, total, page, limit };

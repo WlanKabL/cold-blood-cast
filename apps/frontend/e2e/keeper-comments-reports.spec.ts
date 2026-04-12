@@ -164,7 +164,9 @@ test.describe("Keeper Profile — Report System", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        const reportBtn = page.locator("button").filter({ hasText: /report.*profile|profil melden/i });
+        const reportBtn = page
+            .locator("button")
+            .filter({ hasText: /report.*profile|profil melden/i });
         await expect(reportBtn).toBeVisible({ timeout: 15_000 });
     });
 
@@ -218,14 +220,18 @@ test.describe("Keeper Profile — Report System", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        const reportBtn = page.locator("button").filter({ hasText: /report.*profile|profil melden/i });
+        const reportBtn = page
+            .locator("button")
+            .filter({ hasText: /report.*profile|profil melden/i });
         await reportBtn.click({ timeout: 15_000 });
 
         // Modal appears
         await expect(page.locator(".fixed.inset-0.z-50")).toBeVisible({ timeout: 10_000 });
     });
 
-    test("report modal has reason dropdown, description, and reporter name inputs", async ({ page }) => {
+    test("report modal has reason dropdown, description, and reporter name inputs", async ({
+        page,
+    }) => {
         await mockPublicUserApi(page, "snake-keeper", mockPublicUserData);
         await page.route("**/api/public/reports", (route) =>
             route.fulfill({
@@ -237,7 +243,9 @@ test.describe("Keeper Profile — Report System", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        const reportBtn = page.locator("button").filter({ hasText: /report.*profile|profil melden/i });
+        const reportBtn = page
+            .locator("button")
+            .filter({ hasText: /report.*profile|profil melden/i });
         await reportBtn.click({ timeout: 15_000 });
 
         const modal = page.locator(".fixed.inset-0.z-50");
@@ -263,7 +271,9 @@ test.describe("Keeper Profile — Report System", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        const reportBtn = page.locator("button").filter({ hasText: /report.*profile|profil melden/i });
+        const reportBtn = page
+            .locator("button")
+            .filter({ hasText: /report.*profile|profil melden/i });
         await reportBtn.click({ timeout: 15_000 });
 
         const modal = page.locator(".fixed.inset-0.z-50");
@@ -294,7 +304,9 @@ test.describe("Keeper Profile — Report System", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        const reportBtn = page.locator("button").filter({ hasText: /report.*profile|profil melden/i });
+        const reportBtn = page
+            .locator("button")
+            .filter({ hasText: /report.*profile|profil melden/i });
         await reportBtn.click({ timeout: 15_000 });
 
         const modal = page.locator(".fixed.inset-0.z-50");
@@ -373,7 +385,9 @@ test.describe("Keeper Profile — Report System", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        const reportBtn = page.locator("button").filter({ hasText: /report.*profile|profil melden/i });
+        const reportBtn = page
+            .locator("button")
+            .filter({ hasText: /report.*profile|profil melden/i });
         await reportBtn.click({ timeout: 15_000 });
 
         const modal = page.locator(".fixed.inset-0.z-50");

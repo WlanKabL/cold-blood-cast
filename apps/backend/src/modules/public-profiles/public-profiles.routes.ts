@@ -125,12 +125,12 @@ export async function publicPetRoutes(app: FastifyInstance) {
     // GET /:userSlug/:petSlug — public pet profile data (new per-user URL)
     app.get(
         "/:userSlug/:petSlug",
-        async (
-            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
-        ) => {
+        async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
             // Resolve user from UserPublicProfile or username
-            const userProfile = await import("@/modules/user-public-profiles/user-public-profiles.service.js")
-                .then((m) => m.resolveUserForPetProfile(request.params.userSlug));
+            const userProfile =
+                await import("@/modules/user-public-profiles/user-public-profiles.service.js").then(
+                    (m) => m.resolveUserForPetProfile(request.params.userSlug),
+                );
 
             const data = await getPublicPetDataByUserSlug(userProfile.id, request.params.petSlug);
             return { success: true, data };
@@ -146,8 +146,10 @@ export async function publicPetRoutes(app: FastifyInstance) {
             }>,
             reply,
         ) => {
-            const userProfile = await import("@/modules/user-public-profiles/user-public-profiles.service.js")
-                .then((m) => m.resolveUserForPetProfile(request.params.userSlug));
+            const userProfile =
+                await import("@/modules/user-public-profiles/user-public-profiles.service.js").then(
+                    (m) => m.resolveUserForPetProfile(request.params.userSlug),
+                );
 
             const upload = await getPublicPhoto(
                 userProfile.id,

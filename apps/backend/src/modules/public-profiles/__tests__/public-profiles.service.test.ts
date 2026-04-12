@@ -416,14 +416,18 @@ describe("getPublicPetDataByUserSlug", () => {
 
     it("throws when profile not found", async () => {
         mockPrisma.publicProfile.findUnique.mockResolvedValue(null);
-        await expect(getPublicPetDataByUserSlug("user-1", "nope")).rejects.toThrow("Profile not found");
+        await expect(getPublicPetDataByUserSlug("user-1", "nope")).rejects.toThrow(
+            "Profile not found",
+        );
     });
 
     it("throws when profile is inactive", async () => {
         const profile = makeFullProfile();
         profile.active = false;
         mockPrisma.publicProfile.findUnique.mockResolvedValue(profile);
-        await expect(getPublicPetDataByUserSlug("user-1", "monty-python")).rejects.toThrow("Profile not found");
+        await expect(getPublicPetDataByUserSlug("user-1", "monty-python")).rejects.toThrow(
+            "Profile not found",
+        );
     });
 
     it("increments view counter", async () => {
@@ -493,7 +497,9 @@ describe("getPublicPhoto", () => {
 
     it("throws when profile not found", async () => {
         mockPrisma.publicProfile.findUnique.mockResolvedValue(null);
-        await expect(getPublicPhoto("user-1", "nope", "photo-1")).rejects.toThrow("Profile not found");
+        await expect(getPublicPhoto("user-1", "nope", "photo-1")).rejects.toThrow(
+            "Profile not found",
+        );
     });
 
     it("throws when photo not found", async () => {
@@ -503,6 +509,8 @@ describe("getPublicPhoto", () => {
             petId: "pet-1",
         });
         mockPrisma.petPhoto.findFirst.mockResolvedValue(null);
-        await expect(getPublicPhoto("user-1", "monty-python", "photo-99")).rejects.toThrow("Photo not found");
+        await expect(getPublicPhoto("user-1", "monty-python", "photo-99")).rejects.toThrow(
+            "Photo not found",
+        );
     });
 });

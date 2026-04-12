@@ -15,7 +15,7 @@
                 :class="
                     statusFilter === s.value
                         ? s.activeClass
-                        : 'border-line text-fg-dim border hover:bg-surface-hover'
+                        : 'border-line text-fg-dim hover:bg-surface-hover border'
                 "
                 @click="statusFilter = s.value"
             >
@@ -87,7 +87,9 @@
                             >
                                 <Icon name="lucide:user-cog" class="mr-0.5 inline h-3 w-3" />
                                 {{ report.targetUser.username }}
-                                <span v-if="report.targetUser.banned" class="ml-0.5 text-red-400">({{ $t("admin.reports.banned") }})</span>
+                                <span v-if="report.targetUser.banned" class="ml-0.5 text-red-400"
+                                    >({{ $t("admin.reports.banned") }})</span
+                                >
                             </NuxtLink>
                             <a
                                 v-if="report.targetUrl"
@@ -100,10 +102,7 @@
                             </a>
                         </div>
 
-                        <div
-                            v-if="report.resolvedBy"
-                            class="text-fg-faint mt-2 text-[11px]"
-                        >
+                        <div v-if="report.resolvedBy" class="text-fg-faint mt-2 text-[11px]">
                             {{ $t("admin.reports.resolvedBy") }} {{ report.resolvedBy.username }}
                             <span v-if="report.adminNote"> — {{ report.adminNote }}</span>
                         </div>
@@ -139,7 +138,7 @@
                 :class="
                     p === page
                         ? 'bg-primary-500 text-white'
-                        : 'border-line text-fg-dim border hover:bg-surface-hover'
+                        : 'border-line text-fg-dim hover:bg-surface-hover border'
                 "
                 @click="page = p"
             >
@@ -169,13 +168,18 @@
                             v-if="resolveModal.status === 'reviewed' && resolveModal.report"
                             class="mb-4 space-y-2"
                         >
-                            <p class="text-fg-faint text-[11px] font-semibold uppercase tracking-wider">
+                            <p
+                                class="text-fg-faint text-[11px] font-semibold tracking-wider uppercase"
+                            >
                                 {{ $t("admin.reports.actions") }}
                             </p>
 
                             <!-- Ban reported user (for user_profile reports) -->
                             <button
-                                v-if="resolveModal.report.targetType === 'user_profile' && resolveModal.report.targetUser"
+                                v-if="
+                                    resolveModal.report.targetType === 'user_profile' &&
+                                    resolveModal.report.targetUser
+                                "
                                 class="border-line text-fg-dim flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-[12px] hover:border-red-500/40 hover:text-red-400"
                                 :disabled="actionLoading"
                                 @click="handleBanUser(resolveModal.report!.targetUser!.id)"
@@ -197,9 +201,12 @@
 
                             <!-- View user in admin panel -->
                             <NuxtLink
-                                v-if="resolveModal.report.targetType === 'user_profile' && resolveModal.report.targetUser"
+                                v-if="
+                                    resolveModal.report.targetType === 'user_profile' &&
+                                    resolveModal.report.targetUser
+                                "
                                 :to="`/admin/users/${resolveModal.report.targetUser.id}`"
-                                class="border-line text-fg-dim flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-[12px] hover:border-primary-500/40 hover:text-primary-400"
+                                class="border-line text-fg-dim hover:border-primary-500/40 hover:text-primary-400 flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-[12px]"
                             >
                                 <Icon name="lucide:user-cog" class="h-3.5 w-3.5" />
                                 {{ $t("admin.reports.viewUserAdmin") }}

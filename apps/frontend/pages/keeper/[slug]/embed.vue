@@ -59,7 +59,9 @@
                 >
                     <Icon name="lucide:paw-print" class="h-3.5 w-3.5 text-gray-500" />
                     <span class="truncate text-xs font-medium text-gray-200">{{ pet.name }}</span>
-                    <span v-if="pet.species" class="text-[10px] text-gray-500">{{ pet.species }}</span>
+                    <span v-if="pet.species" class="text-[10px] text-gray-500">{{
+                        pet.species
+                    }}</span>
                 </div>
             </div>
 
@@ -99,13 +101,9 @@ const apiBase = config.public.apiBaseURL;
 const loading = ref(true);
 const userData = ref<EmbedUserData | null>(null);
 
-const avatarUrl = computed(() =>
-    `${apiBase}/api/public/users/${encodeURIComponent(slug)}/avatar`,
-);
+const avatarUrl = computed(() => `${apiBase}/api/public/users/${encodeURIComponent(slug)}/avatar`);
 
-const profileUrl = computed(() =>
-    `${window.location.origin}/keeper/${encodeURIComponent(slug)}`,
-);
+const profileUrl = computed(() => `${window.location.origin}/keeper/${encodeURIComponent(slug)}`);
 
 onMounted(async () => {
     try {

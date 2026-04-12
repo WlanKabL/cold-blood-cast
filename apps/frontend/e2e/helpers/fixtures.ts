@@ -959,8 +959,18 @@ export const mockPublicUserData = {
         totalWeightRecords: 30,
     },
     badges: [
-        { key: "first_pet", nameKey: "badges.first_pet", icon: "lucide:paw-print", earnedAt: "2024-01-15T00:00:00.000Z" },
-        { key: "photographer", nameKey: "badges.photographer", icon: "lucide:camera", earnedAt: "2024-06-01T00:00:00.000Z" },
+        {
+            key: "first_pet",
+            nameKey: "badges.first_pet",
+            icon: "lucide:paw-print",
+            earnedAt: "2024-01-15T00:00:00.000Z",
+        },
+        {
+            key: "photographer",
+            nameKey: "badges.photographer",
+            icon: "lucide:camera",
+            earnedAt: "2024-06-01T00:00:00.000Z",
+        },
     ],
     pets: [
         {

@@ -33,28 +33,20 @@ const ModerateCommentSchema = z.object({
 
 export async function communityPublicRoutes(app: FastifyInstance) {
     // ── User Profile Likes ──────────────────────────────────
-    app.post(
-        "/user/:slug/like",
-        async (request: FastifyRequest<{ Params: { slug: string } }>) => {
-            const data = await toggleLike("user", request.params.slug, request.ip);
-            return { success: true, data };
-        },
-    );
+    app.post("/user/:slug/like", async (request: FastifyRequest<{ Params: { slug: string } }>) => {
+        const data = await toggleLike("user", request.params.slug, request.ip);
+        return { success: true, data };
+    });
 
-    app.get(
-        "/user/:slug/like",
-        async (request: FastifyRequest<{ Params: { slug: string } }>) => {
-            const data = await getLikeStatus("user", request.params.slug, request.ip);
-            return { success: true, data };
-        },
-    );
+    app.get("/user/:slug/like", async (request: FastifyRequest<{ Params: { slug: string } }>) => {
+        const data = await getLikeStatus("user", request.params.slug, request.ip);
+        return { success: true, data };
+    });
 
     // ── Pet Profile Likes (requires userSlug for disambiguation) ──
     app.post(
         "/pet/:userSlug/:petSlug/like",
-        async (
-            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
-        ) => {
+        async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
             const data = await toggleLike(
                 "pet",
                 request.params.petSlug,
@@ -67,9 +59,7 @@ export async function communityPublicRoutes(app: FastifyInstance) {
 
     app.get(
         "/pet/:userSlug/:petSlug/like",
-        async (
-            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
-        ) => {
+        async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
             const data = await getLikeStatus(
                 "pet",
                 request.params.petSlug,
@@ -109,7 +99,12 @@ export async function communityPublicRoutes(app: FastifyInstance) {
             );
 
             notifyNewComment(request.params.slug, authorName);
-            void notifyCommentToOwner("user", request.params.slug, authorName, bodyResult.data.content);
+            void notifyCommentToOwner(
+                "user",
+                request.params.slug,
+                authorName,
+                bodyResult.data.content,
+            );
 
             return { success: true, data };
         },
@@ -137,9 +132,7 @@ export async function communityPublicRoutes(app: FastifyInstance) {
     app.post(
         "/pet/:userSlug/:petSlug/comments",
         { preHandler: [authGuard] },
-        async (
-            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
-        ) => {
+        async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
             const bodyResult = AddCommentSchema.safeParse(request.body);
             if (!bodyResult.success) {
                 throw badRequest(
@@ -165,7 +158,13 @@ export async function communityPublicRoutes(app: FastifyInstance) {
             );
 
             notifyNewComment(request.params.petSlug, authorName);
-            void notifyCommentToOwner("pet", request.params.petSlug, authorName, bodyResult.data.content, request.params.userSlug);
+            void notifyCommentToOwner(
+                "pet",
+                request.params.petSlug,
+                authorName,
+                bodyResult.data.content,
+                request.params.userSlug,
+            );
 
             return { success: true, data };
         },
@@ -173,9 +172,7 @@ export async function communityPublicRoutes(app: FastifyInstance) {
 
     app.get(
         "/pet/:userSlug/:petSlug/comments",
-        async (
-            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>,
-        ) => {
+        async (request: FastifyRequest<{ Params: { userSlug: string; petSlug: string } }>) => {
             const data = await getApprovedComments(
                 "pet",
                 request.params.petSlug,
@@ -190,7 +187,9 @@ export async function communityPublicRoutes(app: FastifyInstance) {
         "/pet/:userSlug/:petSlug/comments/:commentId",
         { preHandler: [authGuard] },
         async (
-            request: FastifyRequest<{ Params: { userSlug: string; petSlug: string; commentId: string } }>,
+            request: FastifyRequest<{
+                Params: { userSlug: string; petSlug: string; commentId: string };
+            }>,
         ) => {
             await deleteOwnComment(request.userId, request.params.commentId);
             return { success: true };

@@ -1,11 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mockAuth } from "./helpers/mock-auth";
 import { mockGet } from "./helpers/mock-api";
-import {
-    mockUserPublicProfile,
-    mockUserBadges,
-    mockApprovedComments,
-} from "./helpers/fixtures";
+import { mockUserPublicProfile, mockUserBadges, mockApprovedComments } from "./helpers/fixtures";
 
 // ─── Helper: Mock comment management APIs ────────────────────
 
@@ -124,7 +120,9 @@ test.describe("Comment Management — Notification Toggle", () => {
         await page.goto("/public-profile");
 
         // Expand visibility section
-        const visibilityBtn = page.locator("button").filter({ hasText: /visibility|sichtbarkeit/i });
+        const visibilityBtn = page
+            .locator("button")
+            .filter({ hasText: /visibility|sichtbarkeit/i });
         await visibilityBtn.click({ timeout: 15_000 });
 
         await expect(page.getByText(/notify.*comment|kommentar.*benachrichtig/i)).toBeVisible({
@@ -139,7 +137,9 @@ test.describe("Comment Management — Notification Toggle", () => {
         await page.goto("/public-profile");
 
         // Expand visibility section
-        const visibilityBtn = page.locator("button").filter({ hasText: /visibility|sichtbarkeit/i });
+        const visibilityBtn = page
+            .locator("button")
+            .filter({ hasText: /visibility|sichtbarkeit/i });
         await visibilityBtn.click({ timeout: 15_000 });
 
         // Find the toggle button for notifyOnComment
@@ -147,7 +147,9 @@ test.describe("Comment Management — Notification Toggle", () => {
         await expect(notifyLabel).toBeVisible({ timeout: 15_000 });
 
         // The toggle should be near the label
-        const toggleContainer = notifyLabel.locator("xpath=ancestor::div[contains(@class, 'flex')]");
+        const toggleContainer = notifyLabel.locator(
+            "xpath=ancestor::div[contains(@class, 'flex')]",
+        );
         const toggleBtn = toggleContainer.locator("button").first();
         // Clicking should work without error
         await toggleBtn.click();

@@ -265,9 +265,9 @@ test.describe("Public User Profile Page", () => {
 
         await page.goto("/keeper/snake-keeper");
 
-        await expect(
-            page.getByText("Passionate corn snake keeper from Berlin"),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText("Passionate corn snake keeper from Berlin")).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows location", async ({ page }) => {

@@ -85,9 +85,7 @@ describe("ReportModal", () => {
     it("submit button is disabled when no reason is selected", () => {
         const wrapper = mountModal();
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         expect(submitBtn?.attributes("disabled")).toBeDefined();
     });
 
@@ -96,9 +94,7 @@ describe("ReportModal", () => {
 
         await wrapper.find("select").setValue("spam");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         expect(submitBtn?.attributes("disabled")).toBeUndefined();
     });
 
@@ -130,9 +126,7 @@ describe("ReportModal", () => {
     it("emits close when cancel button is clicked", async () => {
         const wrapper = mountModal();
 
-        const cancelBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("common.cancel"),
-        );
+        const cancelBtn = wrapper.findAll("button").find((b) => b.text().includes("common.cancel"));
         await cancelBtn?.trigger("click");
 
         expect(wrapper.emitted("close")).toBeTruthy();
@@ -161,9 +155,7 @@ describe("ReportModal", () => {
         await wrapper.find("textarea").setValue("This is a test report");
         await wrapper.find('input[type="text"]').setValue("Reporter Name");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         // Wait for async
@@ -189,9 +181,7 @@ describe("ReportModal", () => {
 
         await wrapper.find("select").setValue("spam");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -207,9 +197,7 @@ describe("ReportModal", () => {
         const wrapper = mountModal();
 
         await wrapper.find("select").setValue("spam");
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -225,9 +213,7 @@ describe("ReportModal", () => {
         await wrapper.find("textarea").setValue("some desc");
         await wrapper.find('input[type="text"]').setValue("Some reporter");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -250,9 +236,7 @@ describe("ReportModal", () => {
         const wrapper = mountModal();
         await wrapper.find("select").setValue("spam");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -268,9 +252,7 @@ describe("ReportModal", () => {
         const wrapper = mountModal();
         await wrapper.find("select").setValue("spam");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -286,9 +268,7 @@ describe("ReportModal", () => {
         const wrapper = mountModal({ targetType: "comment", targetId: "comment_001" });
 
         await wrapper.find("select").setValue("spam");
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -304,9 +284,7 @@ describe("ReportModal", () => {
         const wrapper = mountModal({ targetType: "pet_profile", targetId: "pet_001" });
 
         await wrapper.find("select").setValue("inappropriate");
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         await vi.waitFor(() => {
@@ -323,17 +301,16 @@ describe("ReportModal", () => {
     it("disables submit button while submitting", async () => {
         let resolvePromise: (() => void) | undefined;
         fetchMock.mockImplementationOnce(
-            () => new Promise<{ ok: boolean }>((resolve) => {
-                resolvePromise = () => resolve({ ok: true });
-            }),
+            () =>
+                new Promise<{ ok: boolean }>((resolve) => {
+                    resolvePromise = () => resolve({ ok: true });
+                }),
         );
 
         const wrapper = mountModal();
         await wrapper.find("select").setValue("spam");
 
-        const submitBtn = wrapper.findAll("button").find(
-            (b) => b.text().includes("report.submit"),
-        );
+        const submitBtn = wrapper.findAll("button").find((b) => b.text().includes("report.submit"));
         await submitBtn?.trigger("click");
 
         // While submitting, button should be disabled

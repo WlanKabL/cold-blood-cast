@@ -328,11 +328,7 @@
                     <UiButton variant="ghost" @click="showUpload = false">{{
                         $t("common.cancel")
                     }}</UiButton>
-                    <UiButton
-                        type="submit"
-                        :disabled="!selectedFiles.length"
-                        :loading="uploading"
-                    >
+                    <UiButton type="submit" :disabled="!selectedFiles.length" :loading="uploading">
                         {{
                             isMultiUpload
                                 ? $t("pages.pets.photos.uploadCount", {
@@ -622,7 +618,10 @@ const { mutate: uploadMutation, isPending: uploading } = useMutation({
 
         const tags = uploadForm.tags || undefined;
 
-        async function uploadSingleFile(file: File, opts?: { caption?: string; isProfilePicture?: boolean; takenAt?: string }) {
+        async function uploadSingleFile(
+            file: File,
+            opts?: { caption?: string; isProfilePicture?: boolean; takenAt?: string },
+        ) {
             const formData = new FormData();
             if (opts?.caption) formData.append("caption", opts.caption);
             if (tags) formData.append("tags", tags);
@@ -655,8 +654,13 @@ const { mutate: uploadMutation, isPending: uploading } = useMutation({
             for (const file of selectedFiles.value) {
                 let takenAt: string | undefined;
                 try {
-                    const exif = await exifr.parse(file, ["DateTimeOriginal", "DateTimeDigitized", "CreateDate"]);
-                    const date = exif?.DateTimeOriginal ?? exif?.DateTimeDigitized ?? exif?.CreateDate;
+                    const exif = await exifr.parse(file, [
+                        "DateTimeOriginal",
+                        "DateTimeDigitized",
+                        "CreateDate",
+                    ]);
+                    const date =
+                        exif?.DateTimeOriginal ?? exif?.DateTimeDigitized ?? exif?.CreateDate;
                     if (date instanceof Date && !isNaN(date.getTime())) {
                         takenAt = date.toISOString();
                     }

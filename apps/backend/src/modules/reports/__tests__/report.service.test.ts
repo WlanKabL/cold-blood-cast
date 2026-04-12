@@ -15,9 +15,8 @@ const mockPrisma = {
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
-const { createReport, listReports, resolveReport, getReportStats } = await import(
-    "../report.service.js"
-);
+const { createReport, listReports, resolveReport, getReportStats } =
+    await import("../report.service.js");
 
 beforeEach(() => {
     vi.clearAllMocks();
@@ -77,9 +76,7 @@ describe("createReport", () => {
 
 describe("listReports", () => {
     it("returns paginated reports", async () => {
-        mockPrisma.contentReport.findMany.mockResolvedValue([
-            { id: "r_1", status: "pending" },
-        ]);
+        mockPrisma.contentReport.findMany.mockResolvedValue([{ id: "r_1", status: "pending" }]);
         mockPrisma.contentReport.count.mockResolvedValue(1);
 
         const result = await listReports({ page: 1, limit: 10 });
@@ -175,9 +172,9 @@ describe("resolveReport", () => {
 describe("getReportStats", () => {
     it("returns counts by status", async () => {
         mockPrisma.contentReport.count
-            .mockResolvedValueOnce(5)  // pending
+            .mockResolvedValueOnce(5) // pending
             .mockResolvedValueOnce(10) // reviewed
-            .mockResolvedValueOnce(2)  // dismissed
+            .mockResolvedValueOnce(2) // dismissed
             .mockResolvedValueOnce(17); // total
 
         const stats = await getReportStats();

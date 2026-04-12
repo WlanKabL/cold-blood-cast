@@ -126,10 +126,7 @@ async function sendNotificationEmail(payload: NotificationPayload): Promise<void
 
     const fieldsHtml = payload.fields?.length
         ? payload.fields
-              .map(
-                  (f) =>
-                      `<strong style="color:#e5e5e5;">${f.name}:</strong> ${f.value}`,
-              )
+              .map((f) => `<strong style="color:#e5e5e5;">${f.name}:</strong> ${f.value}`)
               .join("<br/>")
         : "";
 
@@ -290,7 +287,11 @@ export function notifySensorAlert(
     });
 }
 
-export function notifyNewComment(profileName: string, authorName: string, profileUrl?: string): void {
+export function notifyNewComment(
+    profileName: string,
+    authorName: string,
+    profileUrl?: string,
+): void {
     const fields: EmbedField[] = [
         { name: "Profile", value: profileName, inline: true },
         { name: "Author", value: authorName, inline: true },

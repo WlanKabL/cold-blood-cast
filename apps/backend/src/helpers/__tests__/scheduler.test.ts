@@ -125,7 +125,9 @@ describe("logJobRun", () => {
         const after = new Date();
 
         const callData = mockCreate.mock.calls[0]![0].data;
-        expect(new Date(callData.endedAt as string).getTime()).toBeGreaterThanOrEqual(before.getTime());
+        expect(new Date(callData.endedAt as string).getTime()).toBeGreaterThanOrEqual(
+            before.getTime(),
+        );
         expect(new Date(callData.endedAt as string).getTime()).toBeLessThanOrEqual(after.getTime());
     });
 });

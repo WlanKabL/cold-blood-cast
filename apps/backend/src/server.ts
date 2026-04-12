@@ -49,7 +49,11 @@ import { weeklyPlannerRoutes } from "@/modules/weekly-planner/index.js";
 import { publicProfileRoutes, publicPetRoutes } from "@/modules/public-profiles/index.js";
 import { userPublicProfileRoutes, publicUserRoutes } from "@/modules/user-public-profiles/index.js";
 import { badgeRoutes } from "@/modules/badges/index.js";
-import { communityPublicRoutes, communityModerationRoutes, communityAdminRoutes } from "@/modules/community/index.js";
+import {
+    communityPublicRoutes,
+    communityModerationRoutes,
+    communityAdminRoutes,
+} from "@/modules/community/index.js";
 import { reportPublicRoutes, reportAdminRoutes } from "@/modules/reports/index.js";
 import { dataExportRoutes } from "@/modules/data-export/index.js";
 import {

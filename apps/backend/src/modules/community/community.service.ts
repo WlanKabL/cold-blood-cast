@@ -35,7 +35,12 @@ function resolveProfileId(profileType: ProfileType, slug: string, userSlug?: str
 
 // ─── Likes ───────────────────────────────────────────────────
 
-export async function toggleLike(profileType: ProfileType, slug: string, ip: string, userSlug?: string) {
+export async function toggleLike(
+    profileType: ProfileType,
+    slug: string,
+    ip: string,
+    userSlug?: string,
+) {
     const profile = await resolveProfileId(profileType, slug, userSlug);
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
@@ -72,7 +77,12 @@ export async function toggleLike(profileType: ProfileType, slug: string, ip: str
     return { liked: true, count };
 }
 
-export async function getLikeStatus(profileType: ProfileType, slug: string, ip: string, userSlug?: string) {
+export async function getLikeStatus(
+    profileType: ProfileType,
+    slug: string,
+    ip: string,
+    userSlug?: string,
+) {
     const profile = await resolveProfileId(profileType, slug, userSlug);
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
@@ -144,7 +154,11 @@ export async function addComment(
     });
 }
 
-export async function getApprovedComments(profileType: ProfileType, slug: string, userSlug?: string) {
+export async function getApprovedComments(
+    profileType: ProfileType,
+    slug: string,
+    userSlug?: string,
+) {
     const profile = await resolveProfileId(profileType, slug, userSlug);
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");

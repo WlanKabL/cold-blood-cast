@@ -26,8 +26,12 @@
                 <div class="min-w-0">
                     <p class="truncate text-sm font-semibold text-white">{{ petData.name }}</p>
                     <div class="flex gap-1.5">
-                        <span v-if="petData.species" class="text-xs text-gray-400">{{ petData.species }}</span>
-                        <span v-if="petData.morph" class="text-xs text-gray-500">· {{ petData.morph }}</span>
+                        <span v-if="petData.species" class="text-xs text-gray-400">{{
+                            petData.species
+                        }}</span>
+                        <span v-if="petData.morph" class="text-xs text-gray-500"
+                            >· {{ petData.morph }}</span
+                        >
                     </div>
                 </div>
             </div>
@@ -106,8 +110,9 @@ const profilePhotoUrl = computed(() =>
     petData.value?.profilePhotoId ? photoUrl(petData.value.profilePhotoId) : "",
 );
 
-const profileUrl = computed(() =>
-    `${window.location.origin}/keeper/${encodeURIComponent(userSlug)}/p/${encodeURIComponent(petSlug)}`,
+const profileUrl = computed(
+    () =>
+        `${window.location.origin}/keeper/${encodeURIComponent(userSlug)}/p/${encodeURIComponent(petSlug)}`,
 );
 
 onMounted(async () => {

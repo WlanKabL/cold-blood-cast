@@ -73,9 +73,9 @@ test.describe("Admin Comments Page", () => {
 
         await page.goto("/admin/comments");
 
-        await expect(
-            page.locator("button").filter({ hasText: /^all$|^alle$/i }),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.locator("button").filter({ hasText: /^all$|^alle$/i })).toBeVisible({
+            timeout: 15_000,
+        });
         await expect(
             page.locator("button").filter({ hasText: /approved|genehmigt/i }),
         ).toBeVisible();

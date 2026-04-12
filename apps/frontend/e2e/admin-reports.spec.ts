@@ -52,7 +52,10 @@ async function mockAdminReportsApi(
                     contentType: "application/json",
                     body: JSON.stringify({
                         success: true,
-                        data: { items: [], meta: { page: 1, perPage: 20, total: 0, totalPages: 1 } },
+                        data: {
+                            items: [],
+                            meta: { page: 1, perPage: 20, total: 0, totalPages: 1 },
+                        },
                     }),
                 });
             }
@@ -144,7 +147,9 @@ test.describe("Admin Reports Page", () => {
 
         // Check for action buttons (check-circle + x-circle icons)
         const reviewBtns = page.locator('[title*="review" i], [title*="überprüf" i]');
-        const dismissBtns = page.locator('[title*="dismiss" i], [title*="abweisen" i], [title*="ablehnen" i]');
+        const dismissBtns = page.locator(
+            '[title*="dismiss" i], [title*="abweisen" i], [title*="ablehnen" i]',
+        );
 
         expect(await reviewBtns.count()).toBeGreaterThanOrEqual(1);
         expect(await dismissBtns.count()).toBeGreaterThanOrEqual(1);
@@ -219,7 +224,9 @@ test.describe("Admin Reports Page", () => {
         await expect(page.getByText("Jane Reporter")).toBeVisible({ timeout: 15_000 });
 
         // Click dismiss button
-        const dismissBtns = page.locator('[title*="dismiss" i], [title*="abweisen" i], [title*="ablehnen" i]');
+        const dismissBtns = page.locator(
+            '[title*="dismiss" i], [title*="abweisen" i], [title*="ablehnen" i]',
+        );
         await dismissBtns.first().click();
 
         const modal = page.locator(".fixed.inset-0.z-50");
@@ -241,7 +248,10 @@ test.describe("Admin Reports Page", () => {
         await expect(modal).toBeVisible({ timeout: 10_000 });
 
         // Cancel
-        await modal.locator("button").filter({ hasText: /cancel|abbrechen/i }).click();
+        await modal
+            .locator("button")
+            .filter({ hasText: /cancel|abbrechen/i })
+            .click();
         await expect(modal).not.toBeVisible({ timeout: 10_000 });
     });
 
@@ -292,7 +302,10 @@ test.describe("Admin Reports Page", () => {
         await modal.locator("textarea").fill("Content reviewed and action taken");
 
         // Confirm
-        await modal.locator("button").filter({ hasText: /confirm|bestätigen/i }).click();
+        await modal
+            .locator("button")
+            .filter({ hasText: /confirm|bestätigen/i })
+            .click();
 
         // Modal should close
         await expect(modal).not.toBeVisible({ timeout: 10_000 });

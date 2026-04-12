@@ -54,7 +54,9 @@
             >
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10"
+                        >
                             <Icon name="lucide:eye-off" class="h-4 w-4 text-amber-400" />
                         </div>
                         <div>
@@ -77,13 +79,12 @@
             </div>
 
             <!-- Published Banner (when active) -->
-            <div
-                v-else
-                class="rounded-xl border border-green-500/30 bg-green-500/5 px-5 py-3"
-            >
+            <div v-else class="rounded-xl border border-green-500/30 bg-green-500/5 px-5 py-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10"
+                        >
                             <Icon name="lucide:globe" class="h-4 w-4 text-green-400" />
                         </div>
                         <div>
@@ -96,7 +97,7 @@
                         </div>
                     </div>
                     <button
-                        class="text-fg-faint hover:text-red-400 text-[12px] transition-colors"
+                        class="text-fg-faint text-[12px] transition-colors hover:text-red-400"
                         @click="form.active = false"
                     >
                         {{ $t("userProfile.unpublish") }}
@@ -218,7 +219,7 @@
 
             <!-- QR Code Panel -->
             <div v-if="showQr" class="glass-card p-6 text-center">
-                <div class="bg-white mx-auto inline-block rounded-xl p-4">
+                <div class="mx-auto inline-block rounded-xl bg-white p-4">
                     <canvas ref="qrCanvas" />
                 </div>
                 <div class="mt-3">
@@ -248,11 +249,7 @@
                             class="h-16 w-16 rounded-full object-cover"
                             alt="Avatar"
                         />
-                        <Icon
-                            v-else
-                            name="lucide:user"
-                            class="text-fg-faint h-8 w-8"
-                        />
+                        <Icon v-else name="lucide:user" class="text-fg-faint h-8 w-8" />
                     </div>
                     <div class="flex gap-2">
                         <label
@@ -385,12 +382,18 @@
                     <div class="relative z-10 flex h-full items-center justify-center p-4">
                         <div class="profile-hero-card w-full max-w-sm p-4">
                             <div class="relative z-10 flex items-center gap-3">
-                                <div class="bg-surface-raised flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-white/10">
+                                <div
+                                    class="bg-surface-raised flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-white/10"
+                                >
                                     <Icon name="lucide:user" class="text-fg-faint h-5 w-5" />
                                 </div>
                                 <div>
                                     <p class="text-fg text-[13px] font-semibold">
-                                        {{ authStore.user?.displayName || authStore.user?.username || "Keeper" }}
+                                        {{
+                                            authStore.user?.displayName ||
+                                            authStore.user?.username ||
+                                            "Keeper"
+                                        }}
                                     </p>
                                     <p v-if="form.tagline" class="text-fg-muted text-[11px] italic">
                                         {{ form.tagline }}
@@ -442,7 +445,7 @@
                         class="bg-surface-sunken border-line text-fg w-32 rounded-lg border px-2 py-1.5 text-[12px]"
                     />
                     <button
-                        class="text-red-400 hover:text-red-300 p-1"
+                        class="p-1 text-red-400 hover:text-red-300"
                         @click="socialLinks.splice(i, 1)"
                     >
                         <Icon name="lucide:trash-2" class="h-4 w-4" />
@@ -490,7 +493,9 @@
             <div v-if="approvedComments.length > 0" class="glass-card space-y-4 p-6">
                 <h2 class="text-fg text-[15px] font-semibold">
                     {{ $t("community.comments") }}
-                    <span class="bg-green-500/10 text-green-400 ml-2 rounded-full px-2 py-0.5 text-[11px]">
+                    <span
+                        class="ml-2 rounded-full bg-green-500/10 px-2 py-0.5 text-[11px] text-green-400"
+                    >
                         {{ approvedComments.length }}
                     </span>
                 </h2>
@@ -508,7 +513,7 @@
                                 {{ new Date(comment.createdAt).toLocaleDateString() }}
                             </span>
                             <button
-                                class="text-red-400/60 hover:text-red-400 transition-colors"
+                                class="text-red-400/60 transition-colors hover:text-red-400"
                                 :title="$t('community.deleteComment')"
                                 @click="handleDeleteComment(comment.id)"
                             >
@@ -522,10 +527,7 @@
 
             <!-- Save / Delete -->
             <div class="flex items-center justify-between">
-                <button
-                    class="text-red-400 hover:text-red-300 text-[13px]"
-                    @click="handleDelete"
-                >
+                <button class="text-[13px] text-red-400 hover:text-red-300" @click="handleDelete">
                     {{ $t("userProfile.deleteProfile") }}
                 </button>
                 <button
@@ -554,7 +556,16 @@ const config = useRuntimeConfig();
 const apiBase = config.public.apiBase as string;
 
 const themePresets = ["default", "ocean", "forest", "sunset", "midnight", "desert", "arctic"];
-const platforms = ["instagram", "youtube", "tiktok", "twitter", "facebook", "website", "discord", "custom"];
+const platforms = [
+    "instagram",
+    "youtube",
+    "tiktok",
+    "twitter",
+    "facebook",
+    "website",
+    "discord",
+    "custom",
+];
 
 const visibilityToggles = [
     { key: "showStats" as const, label: "showStats" },
@@ -620,8 +631,12 @@ const form = reactive({
 });
 
 const socialLinks = ref<Array<{ platform: string; url: string; label: string }>>([]);
-const badges = ref<Array<{ badge: { key: string; nameKey: string; descKey: string; icon: string } }>>([]);
-const approvedComments = ref<Array<{ id: string; authorName: string; content: string; createdAt: string }>>([]);
+const badges = ref<
+    Array<{ badge: { key: string; nameKey: string; descKey: string; icon: string } }>
+>([]);
+const approvedComments = ref<
+    Array<{ id: string; authorName: string; content: string; createdAt: string }>
+>([]);
 
 const THEME_COLORS: Record<string, string> = {
     default: "rgb(138, 156, 74)",
@@ -793,7 +808,10 @@ function addSocialLink() {
 async function handleCheckBadges() {
     isCheckingBadges.value = true;
     try {
-        const res = await post<{ newBadges: string[]; badges: typeof badges.value }>("/api/badges/check", {});
+        const res = await post<{ newBadges: string[]; badges: typeof badges.value }>(
+            "/api/badges/check",
+            {},
+        );
         badges.value = res?.badges ?? [];
         const count = res?.newBadges?.length ?? 0;
         if (count > 0) {

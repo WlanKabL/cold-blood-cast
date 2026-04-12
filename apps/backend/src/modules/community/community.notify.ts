@@ -27,7 +27,9 @@ export async function notifyCommentToOwner(
                 where: { slug },
                 select: {
                     notifyOnComment: true,
-                    user: { select: { email: true, locale: true, displayName: true, username: true } },
+                    user: {
+                        select: { email: true, locale: true, displayName: true, username: true },
+                    },
                 },
             });
             if (!profile?.notifyOnComment) return;
@@ -40,7 +42,9 @@ export async function notifyCommentToOwner(
                 where: { slug: userSlug },
                 select: {
                     notifyOnComment: true,
-                    user: { select: { email: true, locale: true, displayName: true, username: true } },
+                    user: {
+                        select: { email: true, locale: true, displayName: true, username: true },
+                    },
                 },
             });
             if (!userProfile?.notifyOnComment) return;

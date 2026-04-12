@@ -32,9 +32,8 @@ const mockPrisma = {
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
-const { checkAndAwardBadges, getUserBadges, getAllBadgeDefinitions } = await import(
-    "../badges.service.js"
-);
+const { checkAndAwardBadges, getUserBadges, getAllBadgeDefinitions } =
+    await import("../badges.service.js");
 
 const USER_ID = "user_123";
 
@@ -65,9 +64,7 @@ describe("checkAndAwardBadges", () => {
     });
 
     it("does not re-award already earned badges", async () => {
-        mockPrisma.userBadge.findMany.mockResolvedValue([
-            { badge: { key: "first_pet" } },
-        ]);
+        mockPrisma.userBadge.findMany.mockResolvedValue([{ badge: { key: "first_pet" } }]);
         mockPrisma.pet.count.mockResolvedValue(2);
         mockPrisma.petPhoto.count.mockResolvedValue(0);
         mockPrisma.feeding.count.mockResolvedValue(0);

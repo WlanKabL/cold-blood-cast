@@ -375,9 +375,24 @@ export interface DataExportInfo {
 
 // ─── User Public Profile ─────────────────────────────────────
 
-export type ThemePreset = "default" | "ocean" | "forest" | "sunset" | "midnight" | "desert" | "arctic";
+export type ThemePreset =
+    | "default"
+    | "ocean"
+    | "forest"
+    | "sunset"
+    | "midnight"
+    | "desert"
+    | "arctic";
 
-export type SocialPlatform = "instagram" | "youtube" | "tiktok" | "twitter" | "facebook" | "website" | "discord" | "custom";
+export type SocialPlatform =
+    | "instagram"
+    | "youtube"
+    | "tiktok"
+    | "twitter"
+    | "facebook"
+    | "website"
+    | "discord"
+    | "custom";
 
 export interface UserPublicProfileData {
     id: string;

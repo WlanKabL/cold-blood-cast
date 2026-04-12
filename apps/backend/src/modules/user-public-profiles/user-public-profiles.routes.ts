@@ -106,7 +106,11 @@ export async function userPublicProfileRoutes(app: FastifyInstance) {
     app.post("/", async (request, reply) => {
         const result = CreateProfileSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid profile data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid profile data",
+                result.error.flatten(),
+            );
         }
         const data = await createProfile(request.userId, request.username, result.data);
         return reply.status(201).send({ success: true, data });
@@ -116,7 +120,11 @@ export async function userPublicProfileRoutes(app: FastifyInstance) {
     app.patch("/", async (request) => {
         const result = UpdateProfileSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid profile data", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid profile data",
+                result.error.flatten(),
+            );
         }
         const data = await updateProfile(request.userId, result.data);
         return { success: true, data };
@@ -135,10 +143,15 @@ export async function userPublicProfileRoutes(app: FastifyInstance) {
             throw badRequest(ErrorCodes.E_UPLOAD_FAILED, "No file provided");
         }
 
-        const upload = await uploadFile(request.userId, file, {
-            subDir: "avatars",
-            caption: "Profile avatar",
-        }, request.log);
+        const upload = await uploadFile(
+            request.userId,
+            file,
+            {
+                subDir: "avatars",
+                caption: "Profile avatar",
+            },
+            request.log,
+        );
 
         const data = await setAvatar(request.userId, upload.id);
         return reply.status(201).send({ success: true, data });
@@ -154,7 +167,11 @@ export async function userPublicProfileRoutes(app: FastifyInstance) {
     app.put("/social-links", async (request) => {
         const result = SetSocialLinksSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid social links", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid social links",
+                result.error.flatten(),
+            );
         }
         const data = await setSocialLinks(request.userId, result.data.links);
         return { success: true, data };
@@ -164,7 +181,11 @@ export async function userPublicProfileRoutes(app: FastifyInstance) {
     app.put("/pet-order", async (request) => {
         const result = SetPetOrderSchema.safeParse(request.body);
         if (!result.success) {
-            throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid pet order", result.error.flatten());
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid pet order",
+                result.error.flatten(),
+            );
         }
         const data = await setPetOrder(request.userId, result.data.order);
         return { success: true, data };

@@ -22,7 +22,13 @@ export function getBerlinDayInfo(now: Date): { dateStr: string; hour: number; da
     const weekday = parts.find((p) => p.type === "weekday")?.value ?? "";
 
     const dayMap: Record<string, number> = {
-        Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+        Sun: 0,
+        Mon: 1,
+        Tue: 2,
+        Wed: 3,
+        Thu: 4,
+        Fri: 5,
+        Sat: 6,
     };
 
     return { dateStr: `${year}-${month}-${day}`, hour, dayOfWeek: dayMap[weekday] ?? -1 };

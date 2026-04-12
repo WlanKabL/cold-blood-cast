@@ -356,10 +356,15 @@ export function useAdminApi() {
     }
 
     async function getReportStats() {
-        return get<{ pending: number; reviewed: number; dismissed: number }>("/api/admin/reports/stats");
+        return get<{ pending: number; reviewed: number; dismissed: number }>(
+            "/api/admin/reports/stats",
+        );
     }
 
-    async function resolveReport(reportId: string, data: { status: "reviewed" | "dismissed"; adminNote?: string }) {
+    async function resolveReport(
+        reportId: string,
+        data: { status: "reviewed" | "dismissed"; adminNote?: string },
+    ) {
         return patch(`/api/admin/reports/${reportId}`, data);
     }
 

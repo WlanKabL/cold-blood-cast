@@ -15,7 +15,7 @@
                 :class="
                     approvalFilter === f.value
                         ? f.activeClass
-                        : 'border-line text-fg-dim border hover:bg-surface-hover'
+                        : 'border-line text-fg-dim hover:bg-surface-hover border'
                 "
                 @click="approvalFilter = f.value"
             >
@@ -54,7 +54,11 @@
                                         : 'bg-amber-500/15 text-amber-400'
                                 "
                             >
-                                {{ comment.approved ? $t("admin.comments.approved") : $t("admin.comments.pending") }}
+                                {{
+                                    comment.approved
+                                        ? $t("admin.comments.approved")
+                                        : $t("admin.comments.pending")
+                                }}
                             </span>
                         </div>
                         <p class="text-fg-muted mt-1 text-[13px]">{{ comment.content }}</p>
@@ -89,7 +93,7 @@
                 :class="
                     p === page
                         ? 'bg-primary-500 text-white'
-                        : 'border-line text-fg-dim border hover:bg-surface-hover'
+                        : 'border-line text-fg-dim hover:bg-surface-hover border'
                 "
                 @click="page = p"
             >
@@ -111,19 +115,25 @@ const page = ref(1);
 const totalPages = ref(1);
 const approvalFilter = ref<"all" | "approved" | "pending">("all");
 
-const comments = ref<Array<{
-    id: string;
-    authorName: string;
-    content: string;
-    approved: boolean;
-    profileType: string;
-    profileId: string;
-    createdAt: string;
-}>>([]);
+const comments = ref<
+    Array<{
+        id: string;
+        authorName: string;
+        content: string;
+        approved: boolean;
+        profileType: string;
+        profileId: string;
+        createdAt: string;
+    }>
+>([]);
 
 const approvalFilters = [
     { value: "all" as const, label: "all", activeClass: "bg-primary-500/15 text-primary-400" },
-    { value: "approved" as const, label: "approved", activeClass: "bg-green-500/15 text-green-400" },
+    {
+        value: "approved" as const,
+        label: "approved",
+        activeClass: "bg-green-500/15 text-green-400",
+    },
     { value: "pending" as const, label: "pending", activeClass: "bg-amber-500/15 text-amber-400" },
 ];
 

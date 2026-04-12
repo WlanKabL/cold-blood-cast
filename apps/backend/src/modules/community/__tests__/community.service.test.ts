@@ -123,9 +123,7 @@ describe("toggleLike", () => {
     });
 
     it("throws when pet profile is requested without userSlug", async () => {
-        await expect(toggleLike("pet", "pet-slug", IP)).rejects.toThrow(
-            "User slug required",
-        );
+        await expect(toggleLike("pet", "pet-slug", IP)).rejects.toThrow("User slug required");
     });
 });
 
@@ -202,9 +200,9 @@ describe("addComment", () => {
             createdAt: new Date(),
         });
 
-        await expect(
-            addComment("user", SLUG, "user_123", "Visitor", "Spam!"),
-        ).rejects.toThrow("wait");
+        await expect(addComment("user", SLUG, "user_123", "Visitor", "Spam!")).rejects.toThrow(
+            "wait",
+        );
     });
 
     it("throws when profile not found", async () => {
@@ -381,9 +379,7 @@ describe("adminDeleteComment", () => {
 
 describe("adminListComments", () => {
     it("returns paginated comments", async () => {
-        mockPrisma.profileComment.findMany.mockResolvedValue([
-            { id: "c_1", content: "Hello" },
-        ]);
+        mockPrisma.profileComment.findMany.mockResolvedValue([{ id: "c_1", content: "Hello" }]);
         mockPrisma.profileComment.count.mockResolvedValue(1);
 
         const result = await adminListComments({ page: 1, limit: 10 });

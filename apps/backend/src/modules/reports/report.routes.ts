@@ -24,29 +24,26 @@ const ResolveReportSchema = z.object({
 // ─── Public Routes (no auth) ─────────────────────────────────
 
 export async function reportPublicRoutes(app: FastifyInstance) {
-    app.post(
-        "/",
-        async (request: FastifyRequest) => {
-            const bodyResult = CreateReportSchema.safeParse(request.body);
-            if (!bodyResult.success) {
-                throw badRequest(
-                    ErrorCodes.E_VALIDATION_ERROR,
-                    "Invalid report data",
-                    bodyResult.error.flatten(),
-                );
-            }
-
-            const report = await createReport(bodyResult.data);
-
-            notifyNewReport(
-                bodyResult.data.targetType,
-                bodyResult.data.reason,
-                bodyResult.data.targetUrl,
+    app.post("/", async (request: FastifyRequest) => {
+        const bodyResult = CreateReportSchema.safeParse(request.body);
+        if (!bodyResult.success) {
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid report data",
+                bodyResult.error.flatten(),
             );
+        }
 
-            return { success: true, data: { id: report.id } };
-        },
-    );
+        const report = await createReport(bodyResult.data);
+
+        notifyNewReport(
+            bodyResult.data.targetType,
+            bodyResult.data.reason,
+            bodyResult.data.targetUrl,
+        );
+
+        return { success: true, data: { id: report.id } };
+    });
 }
 
 // ─── Admin Routes ────────────────────────────────────────────
@@ -83,26 +80,23 @@ export async function reportAdminRoutes(app: FastifyInstance) {
         return { success: true, data };
     });
 
-    app.patch(
-        "/:reportId",
-        async (request: FastifyRequest<{ Params: { reportId: string } }>) => {
-            const bodyResult = ResolveReportSchema.safeParse(request.body);
-            if (!bodyResult.success) {
-                throw badRequest(
-                    ErrorCodes.E_VALIDATION_ERROR,
-                    "Invalid resolution data",
-                    bodyResult.error.flatten(),
-                );
-            }
-
-            const data = await resolveReport(
-                request.params.reportId,
-                request.userId,
-                bodyResult.data.status,
-                bodyResult.data.adminNote,
+    app.patch("/:reportId", async (request: FastifyRequest<{ Params: { reportId: string } }>) => {
+        const bodyResult = ResolveReportSchema.safeParse(request.body);
+        if (!bodyResult.success) {
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid resolution data",
+                bodyResult.error.flatten(),
             );
+        }
 
-            return { success: true, data };
-        },
-    );
+        const data = await resolveReport(
+            request.params.reportId,
+            request.userId,
+            bodyResult.data.status,
+            bodyResult.data.adminNote,
+        );
+
+        return { success: true, data };
+    });
 }

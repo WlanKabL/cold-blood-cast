@@ -191,17 +191,15 @@ describe("createProfile", () => {
             .mockResolvedValueOnce(null) // no existing profile
             .mockResolvedValueOnce(makeProfile()); // slug taken
 
-        await expect(
-            createProfile(USER_ID, "testuser", { slug: "testkeeper" }),
-        ).rejects.toThrow("slug is already taken");
+        await expect(createProfile(USER_ID, "testuser", { slug: "testkeeper" })).rejects.toThrow(
+            "slug is already taken",
+        );
     });
 
     it("throws when custom slug is invalid", async () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValueOnce(null);
 
-        await expect(
-            createProfile(USER_ID, "testuser", { slug: "AB" }),
-        ).rejects.toThrow();
+        await expect(createProfile(USER_ID, "testuser", { slug: "AB" })).rejects.toThrow();
     });
 });
 
@@ -227,9 +225,9 @@ describe("updateProfile", () => {
             .mockResolvedValueOnce(makeProfile()) // own profile
             .mockResolvedValueOnce(makeProfile({ userId: "other" })); // slug taken
 
-        await expect(
-            updateProfile(USER_ID, { slug: "other-slug" }),
-        ).rejects.toThrow("slug is already taken");
+        await expect(updateProfile(USER_ID, { slug: "other-slug" })).rejects.toThrow(
+            "slug is already taken",
+        );
     });
 
     it("converts keeperSince string to Date", async () => {
@@ -321,7 +319,9 @@ describe("setSocialLinks", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue(null);
 
         await expect(
-            setSocialLinks(USER_ID, [{ platform: "instagram" as const, url: "https://example.com" }]),
+            setSocialLinks(USER_ID, [
+                { platform: "instagram" as const, url: "https://example.com" },
+            ]),
         ).rejects.toThrow("not found");
     });
 

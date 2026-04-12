@@ -66,7 +66,8 @@ async function generateUniqueSlug(username: string): Promise<string> {
 export function validateSlug(slug: string): string | null {
     if (slug.length < SLUG_MIN) return `Slug must be at least ${SLUG_MIN} characters`;
     if (slug.length > SLUG_MAX) return `Slug must be at most ${SLUG_MAX} characters`;
-    if (!SLUG_PATTERN.test(slug)) return "Slug must contain only lowercase letters, numbers, and hyphens";
+    if (!SLUG_PATTERN.test(slug))
+        return "Slug must contain only lowercase letters, numbers, and hyphens";
     if (slug.includes("--")) return "Slug must not contain consecutive hyphens";
     return null;
 }
@@ -114,7 +115,10 @@ interface CreateProfileInput {
 export async function createProfile(userId: string, username: string, input: CreateProfileInput) {
     const existing = await prisma.userPublicProfile.findUnique({ where: { userId } });
     if (existing) {
-        throw badRequest(ErrorCodes.E_USER_PROFILE_ALREADY_EXISTS, "You already have a public profile");
+        throw badRequest(
+            ErrorCodes.E_USER_PROFILE_ALREADY_EXISTS,
+            "You already have a public profile",
+        );
     }
 
     let slug: string;
@@ -123,7 +127,8 @@ export async function createProfile(userId: string, username: string, input: Cre
         if (error) throw badRequest(ErrorCodes.E_VALIDATION_ERROR, error);
 
         const taken = await prisma.userPublicProfile.findUnique({ where: { slug: input.slug } });
-        if (taken) throw badRequest(ErrorCodes.E_USER_PROFILE_SLUG_TAKEN, "This slug is already taken");
+        if (taken)
+            throw badRequest(ErrorCodes.E_USER_PROFILE_SLUG_TAKEN, "This slug is already taken");
 
         slug = input.slug;
     } else {
@@ -163,7 +168,8 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         if (error) throw badRequest(ErrorCodes.E_VALIDATION_ERROR, error);
 
         const taken = await prisma.userPublicProfile.findUnique({ where: { slug: input.slug } });
-        if (taken) throw badRequest(ErrorCodes.E_USER_PROFILE_SLUG_TAKEN, "This slug is already taken");
+        if (taken)
+            throw badRequest(ErrorCodes.E_USER_PROFILE_SLUG_TAKEN, "This slug is already taken");
     }
 
     const { keeperSince, ...rest } = input;
@@ -172,7 +178,11 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
     if (keeperSince !== undefined) {
         if (keeperSince) {
             const parsed = new Date(`${keeperSince}T00:00:00.000Z`);
-            if (isNaN(parsed.getTime()) || parsed.getFullYear() < 1900 || parsed.getFullYear() > 2100) {
+            if (
+                isNaN(parsed.getTime()) ||
+                parsed.getFullYear() < 1900 ||
+                parsed.getFullYear() > 2100
+            ) {
                 throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid keeperSince date");
             }
             keeperSinceData.keeperSince = parsed;
@@ -435,9 +445,10 @@ export async function getPublicUserData(userSlug: string) {
         bio: profile.bio,
         tagline: profile.tagline,
         location: profile.showLocation ? profile.location : null,
-        keeperSince: profile.showKeeperSince && profile.keeperSince
-            ? profile.keeperSince.toISOString()
-            : null,
+        keeperSince:
+            profile.showKeeperSince && profile.keeperSince
+                ? profile.keeperSince.toISOString()
+                : null,
         hasAvatar: !!profile.avatarUploadId,
         themePreset: profile.themePreset as string,
         views: profile.views,
