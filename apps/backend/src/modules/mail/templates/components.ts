@@ -12,7 +12,7 @@
  *   - Accent:      #8a9c4a (olive) → #d87533 (copper)
  */
 
-import { env } from "@/config.js";
+import { env } from "@/config/env.js";
 
 // ── Brand Constants ──────────────────────────────────────────
 
