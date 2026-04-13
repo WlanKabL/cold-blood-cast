@@ -190,8 +190,8 @@
                         <input
                             ref="fileInputRef"
                             type="file"
-                            accept="application/pdf,image/jpeg,image/png,image/gif,image/webp,image/avif"
-                            class="hidden"
+                            accept="application/pdf,image/*"
+                            class="sr-only"
                             @change="handleFileSelect"
                         />
                     </label>

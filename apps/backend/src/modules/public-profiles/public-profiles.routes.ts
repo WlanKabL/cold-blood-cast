@@ -1,6 +1,6 @@
 import { type FastifyInstance, type FastifyRequest } from "fastify";
 import { z } from "zod";
-import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
+import { authGuard, emailVerifiedGuard, requireFeature } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
     getProfileByPetId,
@@ -65,6 +65,7 @@ export async function publicProfileRoutes(app: FastifyInstance) {
     app.register(async (authApp) => {
         authApp.addHook("preHandler", authGuard);
         authApp.addHook("preHandler", emailVerifiedGuard);
+        authApp.addHook("preHandler", requireFeature("public_profiles"));
 
         // GET /:petId — get profile config for a pet
         authApp.get("/:petId", async (request: FastifyRequest<{ Params: { petId: string } }>) => {

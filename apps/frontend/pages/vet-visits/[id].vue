@@ -406,8 +406,8 @@
                         <input
                             ref="fileInputRef"
                             type="file"
-                            class="hidden"
-                            accept="image/jpeg,image/png,image/gif,image/webp,image/avif,application/pdf"
+                            class="sr-only"
+                            accept="image/*,application/pdf"
                             @change="handleFileSelect"
                         />
                         <div

@@ -244,8 +244,8 @@
                         class="from-primary-500/20 to-primary-700/20 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br ring-1 ring-white/10"
                     >
                         <img
-                            v-if="profile.hasAvatar"
-                            :src="`${apiBase}/api/public/users/${profile.slug}/avatar`"
+                            v-if="avatarBlobUrl"
+                            :src="avatarBlobUrl"
                             class="h-16 w-16 rounded-full object-cover"
                             alt="Avatar"
                         />
@@ -259,7 +259,7 @@
                             <input
                                 type="file"
                                 accept="image/*"
-                                class="hidden"
+                                class="sr-only"
                                 @change="handleAvatarUpload"
                             />
                         </label>
@@ -613,6 +613,8 @@ const showQr = ref(false);
 const showVisibility = ref(false);
 const qrCanvas = ref<HTMLCanvasElement | null>(null);
 const createSlug = ref("");
+const avatarCacheBust = ref(Date.now());
+const avatarBlobUrl = ref<string | null>(null);
 
 const profile = ref<{
     slug: string;
@@ -691,11 +693,31 @@ async function loadProfile() {
         profile.value = res;
         if (res) {
             syncFormFromProfile(res);
+            await loadAvatarPreview();
         }
     } catch {
         profile.value = null;
     }
     isLoading.value = false;
+}
+
+async function loadAvatarPreview() {
+    if (avatarBlobUrl.value) {
+        URL.revokeObjectURL(avatarBlobUrl.value);
+        avatarBlobUrl.value = null;
+    }
+    if (!profile.value?.hasAvatar) return;
+    try {
+        const res = await fetch(`${apiBase}/api/user-profile/avatar?v=${avatarCacheBust.value}`, {
+            headers: { Authorization: `Bearer ${authStore.accessToken}` },
+            credentials: "include",
+        });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        avatarBlobUrl.value = URL.createObjectURL(blob);
+    } catch {
+        avatarBlobUrl.value = null;
+    }
 }
 
 function syncFormFromProfile(p: NonNullable<typeof profile.value>) {
@@ -750,6 +772,12 @@ async function loadSocialLinks() {
 onMounted(async () => {
     await loadProfile();
     await Promise.all([loadBadges(), loadApprovedComments(), loadPendingComments()]);
+});
+
+onBeforeUnmount(() => {
+    if (avatarBlobUrl.value) {
+        URL.revokeObjectURL(avatarBlobUrl.value);
+    }
 });
 
 // ─── Actions ─────────────────────────────────────────────────
@@ -822,11 +850,14 @@ async function handleAvatarUpload(e: Event) {
         const formData = new FormData();
         formData.append("file", file);
 
-        const res = await post<{ id: string }>("/api/user-profile/avatar", formData);
+        await post<{ id: string }>("/api/user-profile/avatar", formData);
         toast.success(t("userProfile.saved"));
+        avatarCacheBust.value = Date.now();
         await loadProfile();
     } catch (err: unknown) {
         toast.error((err as Error).message);
+    } finally {
+        input.value = "";
     }
 }
 

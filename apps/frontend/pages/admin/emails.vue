@@ -371,7 +371,7 @@
                 <select
                     v-model="logTemplateFilter"
                     class="border-line bg-base text-fg focus:border-primary-500 rounded-xl border px-3 py-2 text-[13px] focus:outline-none"
-                    @change="loadLog"
+                    @change="debouncedLoadLog"
                 >
                     <option value="">{{ $t("admin.emails.allTemplates") }}</option>
                     <option v-for="tpl in templates" :key="tpl.key" :value="tpl.key">
@@ -381,7 +381,7 @@
                 <select
                     v-model="logStatusFilter"
                     class="border-line bg-base text-fg focus:border-primary-500 rounded-xl border px-3 py-2 text-[13px] focus:outline-none"
-                    @change="loadLog"
+                    @change="debouncedLoadLog"
                 >
                     <option value="">{{ $t("admin.emails.allStatus") }}</option>
                     <option value="sent">{{ $t("admin.emails.statusSent") }}</option>

@@ -48,6 +48,14 @@ const mockPrisma = {
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
+const mockResolveUserFeatures = vi.fn().mockResolvedValue({
+    user_public_profiles: true,
+    public_profiles: true,
+});
+vi.mock("@/modules/admin/feature-flags.service.js", () => ({
+    resolveUserFeatures: mockResolveUserFeatures,
+}));
+
 const {
     validateSlug,
     getOwnProfile,
@@ -481,6 +489,7 @@ describe("getPublicUserAvatar", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             active: true,
             avatarUploadId: "upload_1",
+            userId: USER_ID,
         });
         mockPrisma.upload.findUnique.mockResolvedValue({
             id: "upload_1",
@@ -506,5 +515,32 @@ describe("resolveUserForPetProfile", () => {
         mockPrisma.user.findUnique.mockResolvedValue(null);
 
         await expect(resolveUserForPetProfile("nonexistent")).rejects.toThrow("not found");
+    });
+});
+
+// ─── Feature Flag Enforcement ────────────────────────────────
+
+describe("feature flag enforcement", () => {
+    it("getPublicUserData throws when user_public_profiles is disabled", async () => {
+        const profile = makeProfile({
+            user: { id: USER_ID, username: "test", displayName: "Test" },
+            socialLinks: [],
+            petOrder: [],
+        });
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue(profile);
+        mockResolveUserFeatures.mockResolvedValueOnce({ user_public_profiles: false });
+
+        await expect(getPublicUserData("testkeeper")).rejects.toThrow("not found");
+    });
+
+    it("getPublicUserAvatar throws when user_public_profiles is disabled", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
+            active: true,
+            avatarUploadId: "upload_1",
+            userId: USER_ID,
+        });
+        mockResolveUserFeatures.mockResolvedValueOnce({ user_public_profiles: false });
+
+        await expect(getPublicUserAvatar("testkeeper")).rejects.toThrow("not found");
     });
 });

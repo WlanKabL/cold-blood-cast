@@ -27,7 +27,6 @@ const {
     notifyLogin,
     notifyFirstLogin,
     notifyPendingApproval,
-    notifyAlertBreach,
     notifyServerError,
     notifySensorAlert,
 } = await import("../notification.service.js");
@@ -77,9 +76,9 @@ describe("notification.service — notify()", () => {
     });
 
     it("sends Discord embed with correct payload", async () => {
-        await notify("breach", {
-            title: "Sensor Alert Triggered",
-            color: 0xef4444,
+        await notify("sensor_alert", {
+            title: "Sensor Out of Range",
+            color: 0xf97316,
             fields: [{ name: "Enclosure", value: "Terrarium-1" }],
         });
 
@@ -90,8 +89,8 @@ describe("notification.service — notify()", () => {
 
         const body = JSON.parse((discordCall![1] as RequestInit).body as string);
         expect(body.embeds).toHaveLength(1);
-        expect(body.embeds[0].title).toBe("Sensor Alert Triggered");
-        expect(body.embeds[0].color).toBe(0xef4444);
+        expect(body.embeds[0].title).toBe("Sensor Out of Range");
+        expect(body.embeds[0].color).toBe(0xf97316);
         expect(body.embeds[0].footer.text).toBe("KeeperLog");
     });
 
@@ -183,11 +182,6 @@ describe("notification.service — convenience wrappers", () => {
 
     it("notifyFirstLogin sends first_login event", () => {
         notifyFirstLogin("dave");
-        expect(true).toBe(true);
-    });
-
-    it("notifyAlertBreach sends breach event with sensor details", () => {
-        notifyAlertBreach("eve", "Terrarium-1", "Temperature", "35.2°C", "32°C");
         expect(true).toBe(true);
     });
 

@@ -221,4 +221,17 @@ async function handleDelete(id: string) {
     toast.add({ title: t("admin.accessRequests.requestDeleted"), color: "green", timeout: 3000 });
     await queryClient.invalidateQueries({ queryKey: ["admin-access-requests"] });
 }
+
+function suggestionStatusBadge(status: string): string {
+    switch (status) {
+        case "pending":
+            return "bg-amber-500/15 text-amber-400";
+        case "approved":
+            return "bg-green-500/15 text-green-400";
+        case "rejected":
+            return "bg-red-500/15 text-red-400";
+        default:
+            return "bg-zinc-500/15 text-zinc-400";
+    }
+}
 </script>

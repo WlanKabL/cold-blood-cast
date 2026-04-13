@@ -10,6 +10,7 @@ import {
     deleteProfile,
     setAvatar,
     removeAvatar,
+    getOwnAvatar,
     setSocialLinks,
     setPetOrder,
     checkSlugAvailability,
@@ -164,6 +165,54 @@ export async function userPublicProfileRoutes(app: FastifyInstance) {
     app.delete("/avatar", async (request) => {
         await removeAvatar(request.userId);
         return { success: true };
+    });
+
+    // GET /avatar — serve own avatar (no active/feature check)
+    app.get("/avatar", async (request, reply) => {
+        const upload = await getOwnAvatar(request.userId);
+
+        const uploadDir = resolve(env().UPLOAD_DIR);
+        const relativePath = upload.url.replace(/^\/uploads\//, "");
+        const absPath = normalize(join(uploadDir, relativePath));
+
+        if (!absPath.startsWith(uploadDir)) {
+            return reply.status(403).send({
+                success: false,
+                error: { code: "E_FORBIDDEN", message: "Access denied" },
+            });
+        }
+
+        const ext = absPath.substring(absPath.lastIndexOf(".")).toLowerCase();
+        const contentType = MIME_TYPES[ext] || "application/octet-stream";
+        const encPath = `${absPath}.enc`;
+
+        try {
+            await stat(encPath);
+            const decrypted = await decryptFile(encPath);
+            return reply
+                .header("Content-Type", contentType)
+                .header("Cache-Control", "private, no-cache")
+                .header("X-Content-Type-Options", "nosniff")
+                .send(decrypted);
+        } catch {
+            // Not encrypted — try plaintext
+        }
+
+        try {
+            const fileStat = await stat(absPath);
+            const stream = createReadStream(absPath);
+            return reply
+                .header("Content-Type", contentType)
+                .header("Content-Length", fileStat.size)
+                .header("Cache-Control", "private, no-cache")
+                .header("X-Content-Type-Options", "nosniff")
+                .send(stream);
+        } catch {
+            return reply.status(404).send({
+                success: false,
+                error: { code: "E_NOT_FOUND", message: "Avatar file not found" },
+            });
+        }
     });
 
     // PUT /social-links — replace all social links

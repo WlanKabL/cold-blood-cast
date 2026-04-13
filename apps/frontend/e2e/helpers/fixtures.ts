@@ -1187,3 +1187,675 @@ export const mockAdminCommentsPending = {
     ],
     meta: { page: 1, perPage: 20, total: 1, totalPages: 1 },
 };
+
+// ─── Feeding List Fixtures ─────────────────────────────────
+
+export const mockFeedingsList = [
+    {
+        id: "feeding_010",
+        petId: "pet_001",
+        feedItemId: "fi_001",
+        foodType: "Mouse",
+        foodSize: "Small",
+        quantity: 1,
+        accepted: true,
+        fedAt: "2025-09-10T10:00:00.000Z",
+        notes: null,
+        pet: { id: "pet_001", name: "Monty" },
+        createdAt: "2025-09-10T10:00:00.000Z",
+    },
+    {
+        id: "feeding_011",
+        petId: "pet_001",
+        feedItemId: null,
+        foodType: "Rat",
+        foodSize: "Pinky",
+        quantity: 1,
+        accepted: false,
+        fedAt: "2025-09-03T10:00:00.000Z",
+        notes: "Refused feeding",
+        pet: { id: "pet_001", name: "Monty" },
+        createdAt: "2025-09-03T10:00:00.000Z",
+    },
+    {
+        id: "feeding_012",
+        petId: "pet_002",
+        feedItemId: null,
+        foodType: "Mouse",
+        foodSize: "Medium",
+        quantity: 2,
+        accepted: true,
+        fedAt: "2025-09-08T10:00:00.000Z",
+        notes: null,
+        pet: { id: "pet_002", name: "Slither" },
+        createdAt: "2025-09-08T10:00:00.000Z",
+    },
+];
+
+// ─── Feed Item Fixtures ────────────────────────────────────
+
+export const mockFeedItems = [
+    {
+        id: "fi_001",
+        userId: "usr_test_001",
+        name: "Frozen Mouse",
+        size: "Small",
+        weightGrams: 15,
+        suitablePets: [{ id: "pet_001", name: "Monty" }],
+        _count: { feedings: 5 },
+        createdAt: "2025-01-20T10:00:00.000Z",
+    },
+    {
+        id: "fi_002",
+        userId: "usr_test_001",
+        name: "Frozen Rat",
+        size: "Pinky",
+        weightGrams: 5,
+        suitablePets: [],
+        _count: { feedings: 2 },
+        createdAt: "2025-02-10T10:00:00.000Z",
+    },
+];
+
+// ─── Shedding List Fixtures ────────────────────────────────
+
+export const mockSheddingsList = [
+    {
+        id: "shed_001",
+        petId: "pet_001",
+        startedAt: "2025-09-01T00:00:00.000Z",
+        completedAt: "2025-09-04T00:00:00.000Z",
+        complete: true,
+        quality: "good",
+        notes: "Clean one-piece shed",
+        pet: { id: "pet_001", name: "Monty" },
+        createdAt: "2025-09-01T10:00:00.000Z",
+    },
+    {
+        id: "shed_002",
+        petId: "pet_001",
+        startedAt: "2025-08-01T00:00:00.000Z",
+        completedAt: "2025-08-05T00:00:00.000Z",
+        complete: true,
+        quality: "partial",
+        notes: null,
+        pet: { id: "pet_001", name: "Monty" },
+        createdAt: "2025-08-01T10:00:00.000Z",
+    },
+    {
+        id: "shed_003",
+        petId: "pet_002",
+        startedAt: "2025-09-10T00:00:00.000Z",
+        completedAt: null,
+        complete: false,
+        quality: null,
+        notes: "In blue phase",
+        pet: { id: "pet_002", name: "Slither" },
+        createdAt: "2025-09-10T10:00:00.000Z",
+    },
+];
+
+// ─── Veterinarian Fixture with Visit Counts ────────────────
+
+export const mockVeterinariansWithCounts = [
+    {
+        ...mockVeterinarians[0],
+        _count: { visits: 3 },
+    },
+    {
+        ...mockVeterinarians[1],
+        _count: { visits: 0 },
+    },
+];
+
+// ─── API Keys Fixtures ─────────────────────────────────────
+
+export const mockApiKeys = [
+    {
+        id: "key_001",
+        userId: "usr_test_001",
+        name: "Home Assistant",
+        prefix: "cbc_abc12",
+        scopes: ["sensors:read", "sensors:write"],
+        active: true,
+        lastUsedAt: "2025-09-10T10:00:00.000Z",
+        expiresAt: "2026-09-10T10:00:00.000Z",
+        createdAt: "2025-09-01T10:00:00.000Z",
+    },
+    {
+        id: "key_002",
+        userId: "usr_test_001",
+        name: "Grafana Dashboard",
+        prefix: "cbc_def34",
+        scopes: ["sensors:read"],
+        active: true,
+        lastUsedAt: null,
+        expiresAt: null,
+        createdAt: "2025-08-15T10:00:00.000Z",
+    },
+];
+
+// ─── Enclosure Detail Fixture ──────────────────────────────
+
+export const mockEnclosureDetail = {
+    ...mockEnclosures[0],
+    pets: [
+        {
+            id: "pet_001",
+            name: "Monty",
+            species: "corn_snake",
+            morph: "Amel",
+            gender: "male",
+            imageUrl: null,
+        },
+        {
+            id: "pet_002",
+            name: "Slither",
+            species: "corn_snake",
+            morph: "Normal",
+            gender: "female",
+            imageUrl: null,
+        },
+    ],
+    sensors: [
+        { id: "sensor_001", name: "Hot Side Temp", type: "TEMPERATURE", unit: "°C", active: true },
+    ],
+    parameters: {
+        tempMinC: 24,
+        tempMaxC: 30,
+        tempBasking: 32,
+        humidityMin: 40,
+        humidityMax: 60,
+    },
+};
+
+// ─── Sensor Detail Fixture ─────────────────────────────────
+
+export const mockSensorDetail = {
+    ...mockSensors[0],
+    calibrationOffset: 0,
+    dataSourceType: "MQTT",
+    lastReading: {
+        value: 28.5,
+        timestamp: "2025-09-10T12:00:00.000Z",
+    },
+};
+
+export const mockSensorReadings = [
+    { value: 28.5, timestamp: "2025-09-10T12:00:00.000Z" },
+    { value: 27.8, timestamp: "2025-09-10T11:00:00.000Z" },
+    { value: 26.2, timestamp: "2025-09-10T10:00:00.000Z" },
+    { value: 25.5, timestamp: "2025-09-10T09:00:00.000Z" },
+    { value: 26.8, timestamp: "2025-09-10T08:00:00.000Z" },
+];
+
+// ─── Legal Fixtures ────────────────────────────────────────
+
+export const mockLegalDocuments = [
+    {
+        key: "terms",
+        title: "Terms of Service",
+        titleDe: "Nutzungsbedingungen",
+        published: true,
+    },
+    {
+        key: "privacy",
+        title: "Privacy Policy",
+        titleDe: "Datenschutzerklärung",
+        published: true,
+    },
+    {
+        key: "imprint",
+        title: "Imprint",
+        titleDe: "Impressum",
+        published: true,
+    },
+];
+
+export const mockLegalDocument = {
+    key: "terms",
+    title: "Terms of Service",
+    titleDe: "Nutzungsbedingungen",
+    content: "# Terms of Service\n\nThese are the terms.",
+    contentDe: "# Nutzungsbedingungen\n\nDies sind die Nutzungsbedingungen.",
+    published: true,
+    updatedAt: "2025-06-01T10:00:00.000Z",
+};
+
+// ─── Admin Fixtures ────────────────────────────────────────
+
+export const mockAdminStats = {
+    totalUsers: 42,
+    activeUsers: 38,
+    premiumUsers: 5,
+    bannedUsers: 1,
+    totalEnclosures: 20,
+    totalSensors: 15,
+    totalPets: 30,
+    todayNewUsers: 2,
+    auditLogs: 1250,
+    pendingAccessRequests: 3,
+};
+
+export const mockAdminUserGrowth = Array.from({ length: 30 }, (_, i) => ({
+    date: new Date(2025, 8, i + 1).toISOString().slice(0, 10),
+    count: Math.floor(3 + (i % 5)),
+}));
+
+export const mockAdminUsers = {
+    items: [
+        {
+            id: "usr_test_001",
+            username: "testkeeper",
+            email: "test@coldbloodcast.local",
+            displayName: "Test Keeper",
+            emailVerified: true,
+            banned: false,
+            approved: true,
+            roles: [
+                { role: { id: "role_free", name: "FREE", displayName: "Free", color: "#6b7280" } },
+            ],
+            _count: { enclosures: 1, pets: 2 },
+            createdAt: "2025-01-15T10:00:00.000Z",
+            lastActiveAt: "2025-09-10T10:00:00.000Z",
+        },
+        {
+            id: "usr_admin_001",
+            username: "admin",
+            email: "admin@coldbloodcast.local",
+            displayName: "Admin",
+            emailVerified: true,
+            banned: false,
+            approved: true,
+            roles: [
+                {
+                    role: {
+                        id: "role_admin",
+                        name: "ADMIN",
+                        displayName: "Admin",
+                        color: "#ef4444",
+                    },
+                },
+            ],
+            _count: { enclosures: 0, pets: 0 },
+            createdAt: "2025-01-01T10:00:00.000Z",
+            lastActiveAt: "2025-09-10T12:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 20, total: 2, totalPages: 1 },
+};
+
+export const mockAdminUserDetail = {
+    id: "usr_test_001",
+    username: "testkeeper",
+    email: "test@coldbloodcast.local",
+    displayName: "Test Keeper",
+    emailVerified: true,
+    banned: false,
+    approved: true,
+    createdAt: "2025-01-15T10:00:00.000Z",
+    lastActiveAt: "2025-09-10T10:00:00.000Z",
+    roles: [{ role: { id: "role_free", name: "FREE", displayName: "Free", color: "#6b7280" } }],
+    featureFlags: [],
+    limitOverrides: [],
+    _count: { pets: 2, enclosures: 1, sensors: 3 },
+};
+
+export const mockAdminRoles = [
+    {
+        id: "role_free",
+        name: "FREE",
+        displayName: "Free",
+        description: "Default free tier",
+        color: "#6b7280",
+        priority: 0,
+        isSystem: true,
+        _count: { users: 38 },
+    },
+    {
+        id: "role_premium",
+        name: "PREMIUM",
+        displayName: "Premium",
+        description: "Premium tier with extra features",
+        color: "#f59e0b",
+        priority: 10,
+        isSystem: false,
+        _count: { users: 5 },
+    },
+    {
+        id: "role_admin",
+        name: "ADMIN",
+        displayName: "Admin",
+        description: "Full system access",
+        color: "#ef4444",
+        priority: 100,
+        isSystem: true,
+        _count: { users: 2 },
+    },
+];
+
+export const mockAdminRoleDetail = {
+    ...mockAdminRoles[1],
+    featureFlags: [
+        {
+            featureFlagId: "ff_001",
+            featureFlag: { id: "ff_001", name: "API Access", key: "api_access" },
+            enabled: true,
+        },
+        {
+            featureFlagId: "ff_002",
+            featureFlag: {
+                id: "ff_002",
+                name: "User Public Profiles",
+                key: "user_public_profiles",
+            },
+            enabled: true,
+        },
+    ],
+    limits: [],
+    users: [],
+};
+
+export const mockAdminFeatureFlags = [
+    {
+        id: "ff_dashboard",
+        key: "dashboard",
+        name: "Dashboard",
+        description: "Access to dashboard",
+        category: "core",
+        enabled: true,
+    },
+    {
+        id: "ff_pets",
+        key: "pets",
+        name: "Pets",
+        description: "Pet management",
+        category: "core",
+        enabled: true,
+    },
+    {
+        id: "ff_feedings",
+        key: "feedings",
+        name: "Feedings",
+        description: "Feeding tracking",
+        category: "care",
+        enabled: true,
+    },
+    {
+        id: "ff_sheddings",
+        key: "sheddings",
+        name: "Sheddings",
+        description: "Shedding tracking",
+        category: "care",
+        enabled: false,
+    },
+];
+
+export const mockAdminAnnouncements = [
+    {
+        id: "ann_001",
+        title: "System Update",
+        content: "We will perform maintenance tonight.",
+        type: "info",
+        global: true,
+        active: true,
+        startsAt: "2025-09-01T00:00:00.000Z",
+        expiresAt: "2025-09-30T23:59:59.000Z",
+        createdAt: "2025-09-01T10:00:00.000Z",
+    },
+    {
+        id: "ann_002",
+        title: "New Feature",
+        content: "Public profiles are now available!",
+        type: "success",
+        global: false,
+        active: false,
+        startsAt: null,
+        expiresAt: null,
+        createdAt: "2025-08-15T10:00:00.000Z",
+    },
+];
+
+export const mockAdminInviteCodes = [
+    {
+        id: "inv_001",
+        code: "WELCOME-2025",
+        label: "Beta Testers",
+        active: true,
+        maxUses: 10,
+        uses: 3,
+        email: null,
+        expiresAt: "2026-01-01T00:00:00.000Z",
+        createdAt: "2025-06-01T10:00:00.000Z",
+        usedBy: [
+            { id: "usr_001", username: "user1", usedAt: "2025-06-15T10:00:00.000Z" },
+            { id: "usr_002", username: "user2", usedAt: "2025-07-01T10:00:00.000Z" },
+            { id: "usr_003", username: "user3", usedAt: "2025-08-01T10:00:00.000Z" },
+        ],
+    },
+    {
+        id: "inv_002",
+        code: "VIP-ACCESS",
+        label: null,
+        active: false,
+        maxUses: 1,
+        uses: 1,
+        email: "vip@example.com",
+        expiresAt: null,
+        createdAt: "2025-07-01T10:00:00.000Z",
+        usedBy: [{ id: "usr_004", username: "vipuser", usedAt: "2025-07-10T10:00:00.000Z" }],
+    },
+];
+
+export const mockAdminAuditLog = {
+    items: [
+        {
+            id: "log_001",
+            action: "user.login",
+            entityType: "user",
+            entityId: "usr_test_001",
+            userId: "usr_test_001",
+            ipAddress: "192.168.1.100",
+            details: null,
+            createdAt: "2025-09-10T10:00:00.000Z",
+        },
+        {
+            id: "log_002",
+            action: "pet.create",
+            entityType: "pet",
+            entityId: "pet_001",
+            userId: "usr_test_001",
+            ipAddress: "192.168.1.100",
+            details: { name: "Monty" },
+            createdAt: "2025-09-09T14:00:00.000Z",
+        },
+    ],
+    meta: { page: 1, perPage: 50, total: 2, totalPages: 1 },
+};
+
+export const mockAdminSettings = [
+    {
+        key: "registration_mode",
+        value: "open",
+        label: "Registration Mode",
+        type: "select",
+        updatedAt: "2025-01-01T10:00:00.000Z",
+    },
+    {
+        key: "default_role",
+        value: "role_free",
+        label: "Default Role",
+        type: "select",
+        updatedAt: "2025-01-01T10:00:00.000Z",
+    },
+    {
+        key: "telegram_enabled",
+        value: "true",
+        label: "Telegram Notifications",
+        type: "boolean",
+        updatedAt: "2025-05-01T10:00:00.000Z",
+    },
+    {
+        key: "discord_enabled",
+        value: "false",
+        label: "Discord Notifications",
+        type: "boolean",
+        updatedAt: "2025-05-01T10:00:00.000Z",
+    },
+];
+
+export const mockAdminAccessRequests = [
+    {
+        id: "req_001",
+        email: "newuser1@example.com",
+        reason: "I love reptiles and want to track my snake care",
+        status: "pending" as const,
+        createdAt: "2025-09-08T10:00:00.000Z",
+    },
+    {
+        id: "req_002",
+        email: "newuser2@example.com",
+        reason: "Recommended by a friend",
+        status: "pending" as const,
+        createdAt: "2025-09-09T14:00:00.000Z",
+    },
+];
+
+export const mockAdminLegalDocuments = [
+    {
+        key: "terms",
+        title: "Terms of Service",
+        titleDe: "Nutzungsbedingungen",
+        isPublished: true,
+        hasContent: true,
+        hasContentDe: true,
+        updatedAt: "2025-06-01T10:00:00.000Z",
+    },
+    {
+        key: "privacy",
+        title: "Privacy Policy",
+        titleDe: "Datenschutzerklärung",
+        isPublished: true,
+        hasContent: true,
+        hasContentDe: false,
+        updatedAt: "2025-06-01T10:00:00.000Z",
+    },
+    {
+        key: "imprint",
+        title: "Imprint",
+        titleDe: "Impressum",
+        isPublished: false,
+        hasContent: false,
+        hasContentDe: false,
+        updatedAt: null,
+    },
+];
+
+// ─── Keeper Pet Profile Fixtures ───────────────────────────
+
+export const mockKeeperPetProfile = {
+    name: "Monty",
+    bio: "A friendly corn snake who loves to explore",
+    species: "Corn Snake",
+    morph: "Amel",
+    gender: "MALE",
+    birthDate: "2022-03-10T00:00:00.000Z",
+    photos: [
+        {
+            id: "photo_001",
+            caption: "Basking",
+            tags: ["portrait"],
+            isProfilePicture: true,
+            takenAt: "2025-06-01T10:00:00.000Z",
+        },
+    ],
+    feedings: [
+        {
+            feedItem: "Mouse",
+            foodType: "MOUSE",
+            foodSize: "Adult",
+            quantity: 1,
+            accepted: true,
+            fedAt: "2026-03-01T10:00:00.000Z",
+            notes: null,
+        },
+    ],
+    weightRecords: [{ weightGrams: 450, measuredAt: "2026-03-01T00:00:00.000Z" }],
+    sheddings: [],
+    views: 15,
+    slug: "monty-the-snake",
+    createdAt: "2026-03-01T10:00:00.000Z",
+};
+
+// ─── Admin Notification Settings Fixtures ───────────────────
+
+export const mockAdminNotificationSettings = [
+    { key: "telegram_enabled", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "discord_enabled", value: "false", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_register", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_pending", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_first_login", value: "false", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_login", value: "false", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_sensor_alert", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_new_comment", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_new_report", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+    { key: "notify_on_server_error", value: "true", updatedAt: "2025-05-01T10:00:00.000Z" },
+];
+
+// ─── Admin Email Fixtures ───────────────────────────────────
+
+export const mockAdminEmailTemplates = {
+    templates: [
+        {
+            key: "welcome",
+            name: "Welcome Email",
+            description: "Sent on registration",
+            fields: [{ key: "username", label: "Username", type: "text", required: true }],
+        },
+        {
+            key: "password_reset",
+            name: "Password Reset",
+            description: "Sent for password reset",
+            fields: [{ key: "resetLink", label: "Reset Link", type: "text", required: true }],
+        },
+    ],
+};
+
+export const mockAdminEmailVariables = {
+    system: [
+        { key: "platform_name", description: "Name of the platform", example: "Cold Blood Cast" },
+    ],
+    user: [{ key: "username", description: "User's display name", example: "WlanKabL" }],
+};
+
+export const mockAdminEmailLog = {
+    logs: [
+        {
+            id: "email_001",
+            to: "user@example.com",
+            template: "welcome",
+            subject: "Welcome!",
+            status: "sent",
+            sentAt: "2025-09-10T10:00:00.000Z",
+            user: { username: "TestUser" },
+        },
+        {
+            id: "email_002",
+            to: "admin@example.com",
+            template: "password_reset",
+            subject: "Reset Password",
+            status: "failed",
+            sentAt: "2025-09-09T14:00:00.000Z",
+            error: "SMTP timeout",
+        },
+    ],
+    pagination: { page: 1, limit: 50, total: 2, totalPages: 1 },
+};
+
+// ─── Admin Roles (for settings default_role dropdown) ───────
+
+export const mockAdminRolesSimple = [
+    { id: "role_free", name: "Free", isSystem: true },
+    { id: "role_premium", name: "Premium", isSystem: false },
+    { id: "role_admin", name: "Admin", isSystem: true },
+];

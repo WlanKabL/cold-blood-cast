@@ -19,6 +19,16 @@ const mockPrisma = vi.hoisted(() => ({
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
+const mockResolveUserFeatures = vi.hoisted(() =>
+    vi.fn().mockResolvedValue({
+        public_profiles: true,
+        user_public_profiles: true,
+    }),
+);
+vi.mock("@/modules/admin/feature-flags.service.js", () => ({
+    resolveUserFeatures: mockResolveUserFeatures,
+}));
+
 import {
     getProfileByPetId,
     createProfile,
@@ -511,6 +521,32 @@ describe("getPublicPhoto", () => {
         mockPrisma.petPhoto.findFirst.mockResolvedValue(null);
         await expect(getPublicPhoto("user-1", "monty-python", "photo-99")).rejects.toThrow(
             "Photo not found",
+        );
+    });
+});
+
+// ─── Feature Flag Enforcement ────────────────────────────
+
+describe("feature flag enforcement", () => {
+    it("getPublicPetDataByUserSlug throws when public_profiles is disabled", async () => {
+        mockPrisma.publicProfile.findUnique.mockResolvedValue(makeProfile());
+        mockResolveUserFeatures.mockResolvedValueOnce({ public_profiles: false });
+
+        await expect(getPublicPetDataByUserSlug("user-1", "monty-python")).rejects.toThrow(
+            "Profile not found",
+        );
+    });
+
+    it("getPublicPhoto throws when public_profiles is disabled", async () => {
+        mockPrisma.publicProfile.findUnique.mockResolvedValue({
+            active: true,
+            showPhotos: true,
+            petId: "pet-1",
+        });
+        mockResolveUserFeatures.mockResolvedValueOnce({ public_profiles: false });
+
+        await expect(getPublicPhoto("user-1", "monty-python", "photo-1")).rejects.toThrow(
+            "Profile not found",
         );
     });
 });

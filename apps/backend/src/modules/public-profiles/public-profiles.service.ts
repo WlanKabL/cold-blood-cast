@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound, badRequest, forbidden } from "@/helpers/errors.js";
+import { resolveUserFeatures } from "@/modules/admin/feature-flags.service.js";
 
 // ─── Slug Generation ─────────────────────────────────────────
 
@@ -222,6 +223,12 @@ export async function getPublicPetDataByUserSlug(userId: string, petSlug: string
         throw notFound(ErrorCodes.E_PUBLIC_PROFILE_NOT_FOUND, "Profile not found");
     }
 
+    // Check if profile owner has public_profiles feature enabled
+    const features = await resolveUserFeatures(userId);
+    if (!features["public_profiles"]) {
+        throw notFound(ErrorCodes.E_PUBLIC_PROFILE_NOT_FOUND, "Profile not found");
+    }
+
     // Increment views (fire and forget)
     prisma.publicProfile
         .update({
@@ -294,6 +301,12 @@ export async function getPublicPhoto(userId: string, petSlug: string, photoId: s
     });
 
     if (!profile || !profile.active || !profile.showPhotos) {
+        throw notFound(ErrorCodes.E_PUBLIC_PROFILE_NOT_FOUND, "Profile not found");
+    }
+
+    // Check if profile owner has public_profiles feature enabled
+    const ownerFeatures = await resolveUserFeatures(userId);
+    if (!ownerFeatures["public_profiles"]) {
         throw notFound(ErrorCodes.E_PUBLIC_PROFILE_NOT_FOUND, "Profile not found");
     }
 

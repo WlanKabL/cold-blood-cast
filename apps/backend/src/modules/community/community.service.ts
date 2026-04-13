@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound, badRequest } from "@/helpers/errors.js";
+import { resolveUserFeatures } from "@/modules/admin/feature-flags.service.js";
 
 // ─── Helpers ─────────────────────────────────────────────────
 
@@ -14,7 +15,7 @@ function resolveProfileId(profileType: ProfileType, slug: string, userSlug?: str
     if (profileType === "user") {
         return prisma.userPublicProfile.findUnique({
             where: { slug },
-            select: { id: true, active: true },
+            select: { id: true, active: true, userId: true },
         });
     }
     // Pet profiles: look up via user slug first for disambiguation
@@ -29,8 +30,19 @@ function resolveProfileId(profileType: ProfileType, slug: string, userSlug?: str
                 userPublicProfile: { slug: userSlug },
             },
         },
-        select: { id: true, active: true },
+        select: { id: true, active: true, userId: true },
     });
+}
+
+async function assertProfileFeatureEnabled(
+    profileType: ProfileType,
+    userId: string,
+): Promise<void> {
+    const featureKey = profileType === "user" ? "user_public_profiles" : "public_profiles";
+    const features = await resolveUserFeatures(userId);
+    if (!features[featureKey]) {
+        throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
+    }
 }
 
 // ─── Likes ───────────────────────────────────────────────────
@@ -45,6 +57,7 @@ export async function toggleLike(
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
     }
+    await assertProfileFeatureEnabled(profileType, profile.userId);
 
     const ipHash = hashIp(ip);
 
@@ -87,6 +100,7 @@ export async function getLikeStatus(
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
     }
+    await assertProfileFeatureEnabled(profileType, profile.userId);
 
     const ipHash = hashIp(ip);
 
@@ -123,6 +137,7 @@ export async function addComment(
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
     }
+    await assertProfileFeatureEnabled(profileType, profile.userId);
 
     // Rate limit: max 1 comment per COMMENT_RATE_LIMIT_MINUTES per user per profile
     const recentCutoff = new Date(Date.now() - COMMENT_RATE_LIMIT_MINUTES * 60_000);
@@ -163,6 +178,7 @@ export async function getApprovedComments(
     if (!profile || !profile.active) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
     }
+    await assertProfileFeatureEnabled(profileType, profile.userId);
 
     return prisma.profileComment.findMany({
         where: {

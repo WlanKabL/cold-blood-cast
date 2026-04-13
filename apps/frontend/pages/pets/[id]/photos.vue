@@ -229,9 +229,9 @@
                         <input
                             ref="fileInputRef"
                             type="file"
-                            accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                            accept="image/*"
                             multiple
-                            class="hidden"
+                            class="sr-only"
                             @change="handleFileSelect"
                         />
                     </label>

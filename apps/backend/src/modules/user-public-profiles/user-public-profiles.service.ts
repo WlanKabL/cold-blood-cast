@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound, badRequest, forbidden } from "@/helpers/errors.js";
+import { resolveUserFeatures } from "@/modules/admin/feature-flags.service.js";
 import type { ThemePreset, SocialPlatform } from "@cold-blood-cast/shared";
 
 // ─── Slug Helpers ────────────────────────────────────────────
@@ -350,6 +351,12 @@ export async function getPublicUserData(userSlug: string) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
     }
 
+    // Check if profile owner has user_public_profiles feature enabled
+    const features = await resolveUserFeatures(profile.user.id);
+    if (!features["user_public_profiles"]) {
+        throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Profile not found");
+    }
+
     // Increment views fire-and-forget
     void prisma.userPublicProfile
         .update({ where: { slug: userSlug }, data: { views: { increment: 1 } } })
@@ -474,10 +481,37 @@ export async function getPublicUserData(userSlug: string) {
 export async function getPublicUserAvatar(userSlug: string) {
     const profile = await prisma.userPublicProfile.findUnique({
         where: { slug: userSlug },
-        select: { active: true, avatarUploadId: true },
+        select: { active: true, avatarUploadId: true, userId: true },
     });
 
     if (!profile || !profile.active || !profile.avatarUploadId) {
+        throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Avatar not found");
+    }
+
+    // Check if profile owner has user_public_profiles feature enabled
+    const features = await resolveUserFeatures(profile.userId);
+    if (!features["user_public_profiles"]) {
+        throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Avatar not found");
+    }
+
+    const upload = await prisma.upload.findUnique({
+        where: { id: profile.avatarUploadId },
+    });
+
+    if (!upload) {
+        throw notFound(ErrorCodes.E_NOT_FOUND, "Avatar file not found");
+    }
+
+    return upload;
+}
+
+export async function getOwnAvatar(userId: string) {
+    const profile = await prisma.userPublicProfile.findUnique({
+        where: { userId },
+        select: { avatarUploadId: true },
+    });
+
+    if (!profile || !profile.avatarUploadId) {
         throw notFound(ErrorCodes.E_USER_PROFILE_NOT_FOUND, "Avatar not found");
     }
 

@@ -28,6 +28,14 @@ const mockPrisma = {
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
+const mockResolveUserFeatures = vi.fn().mockResolvedValue({
+    public_profiles: true,
+    user_public_profiles: true,
+});
+vi.mock("@/modules/admin/feature-flags.service.js", () => ({
+    resolveUserFeatures: mockResolveUserFeatures,
+}));
+
 const {
     toggleLike,
     getLikeStatus,
@@ -58,6 +66,7 @@ describe("toggleLike", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileLike.findUnique.mockResolvedValue(null);
         mockPrisma.profileLike.create.mockResolvedValue({});
@@ -74,6 +83,7 @@ describe("toggleLike", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileLike.findUnique.mockResolvedValue({ id: "like_1" });
         mockPrisma.profileLike.delete.mockResolvedValue({});
@@ -105,6 +115,7 @@ describe("toggleLike", () => {
         mockPrisma.publicProfile.findFirst.mockResolvedValue({
             id: "pet_profile_1",
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileLike.findUnique.mockResolvedValue(null);
         mockPrisma.profileLike.create.mockResolvedValue({});
@@ -134,6 +145,7 @@ describe("getLikeStatus", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileLike.findUnique.mockResolvedValue({ id: "like_1" });
         mockPrisma.profileLike.count.mockResolvedValue(5);
@@ -147,6 +159,7 @@ describe("getLikeStatus", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileLike.findUnique.mockResolvedValue(null);
         mockPrisma.profileLike.count.mockResolvedValue(3);
@@ -164,6 +177,7 @@ describe("addComment", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileComment.findFirst.mockResolvedValue(null); // no recent comment
         mockPrisma.profileComment.create.mockResolvedValue({
@@ -194,6 +208,7 @@ describe("addComment", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileComment.findFirst.mockResolvedValue({
             id: "recent_comment",
@@ -221,6 +236,7 @@ describe("getApprovedComments", () => {
         mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
             id: PROFILE_ID,
             active: true,
+            userId: USER_ID,
         });
         mockPrisma.profileComment.findMany.mockResolvedValue([
             { id: "c_1", content: "Great!", approved: true },
@@ -452,5 +468,55 @@ describe("deleteOwnComment", () => {
         });
 
         await expect(deleteOwnComment(USER_ID, "comment_1")).rejects.toThrow("not found");
+    });
+});
+
+// ─── Feature Flag Enforcement ────────────────────────────────
+
+describe("feature flag enforcement", () => {
+    it("toggleLike throws when user_public_profiles is disabled for user profile", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
+            id: PROFILE_ID,
+            active: true,
+            userId: USER_ID,
+        });
+        mockResolveUserFeatures.mockResolvedValueOnce({ user_public_profiles: false });
+
+        await expect(toggleLike("user", SLUG, IP)).rejects.toThrow("not found");
+    });
+
+    it("toggleLike throws when public_profiles is disabled for pet profile", async () => {
+        mockPrisma.publicProfile.findFirst.mockResolvedValue({
+            id: "pet_profile_1",
+            active: true,
+            userId: USER_ID,
+        });
+        mockResolveUserFeatures.mockResolvedValueOnce({ public_profiles: false });
+
+        await expect(toggleLike("pet", "pet-slug", IP, "keeper-slug")).rejects.toThrow("not found");
+    });
+
+    it("addComment throws when user_public_profiles is disabled", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
+            id: PROFILE_ID,
+            active: true,
+            userId: USER_ID,
+        });
+        mockResolveUserFeatures.mockResolvedValueOnce({ user_public_profiles: false });
+
+        await expect(addComment("user", SLUG, "author_1", "Visitor", "Hello")).rejects.toThrow(
+            "not found",
+        );
+    });
+
+    it("getApprovedComments throws when user_public_profiles is disabled", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
+            id: PROFILE_ID,
+            active: true,
+            userId: USER_ID,
+        });
+        mockResolveUserFeatures.mockResolvedValueOnce({ user_public_profiles: false });
+
+        await expect(getApprovedComments("user", SLUG)).rejects.toThrow("not found");
     });
 });

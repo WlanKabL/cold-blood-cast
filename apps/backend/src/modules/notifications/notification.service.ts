@@ -21,7 +21,6 @@ export type NotificationEvent =
     | "login"
     | "first_login"
     | "pending"
-    | "breach"
     | "server_error"
     | "sensor_alert"
     | "new_comment"
@@ -47,7 +46,6 @@ const EVENT_COLOR: Record<NotificationEvent, number> = {
     first_login: 0x22c55e, // green
     login: 0x3b82f6, // blue
     pending: 0xf59e0b, // amber
-    breach: 0xef4444, // red
     server_error: 0x8b5cf6, // purple
     sensor_alert: 0xf97316, // orange
     new_comment: 0x06b6d4, // cyan
@@ -151,7 +149,6 @@ const EVENT_SETTING_KEY: Record<NotificationEvent, string> = {
     login: "notify_on_login",
     first_login: "notify_on_first_login",
     pending: "notify_on_pending",
-    breach: "notify_on_breach",
     server_error: "notify_on_server_error",
     sensor_alert: "notify_on_sensor_alert",
     new_comment: "notify_on_new_comment",
@@ -233,26 +230,6 @@ export function notifyFirstLogin(username: string): void {
         description: "A new user completed their first login.",
         color: EVENT_COLOR.first_login,
         fields: [{ name: "Username", value: username, inline: true }],
-    });
-}
-
-export function notifyAlertBreach(
-    username: string,
-    enclosureName: string,
-    sensorType: string,
-    value: string,
-    threshold: string,
-): void {
-    void notify("breach", {
-        title: "🚨 Sensor Alert Triggered!",
-        color: EVENT_COLOR.breach,
-        fields: [
-            { name: "User", value: username, inline: true },
-            { name: "Enclosure", value: enclosureName, inline: true },
-            { name: "Sensor", value: sensorType, inline: true },
-            { name: "Value", value: value, inline: true },
-            { name: "Threshold", value: threshold, inline: true },
-        ],
     });
 }
 
