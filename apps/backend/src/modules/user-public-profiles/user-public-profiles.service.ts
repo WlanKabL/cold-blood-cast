@@ -528,9 +528,20 @@ export async function getOwnAvatar(userId: string) {
 
 /**
  * Resolve pet profile by userSlug + petSlug.
- * Works even if the user has no active UserPublicProfile.
+ * Tries UserPublicProfile.slug first, then falls back to User.username.
  */
 export async function resolveUserForPetProfile(userSlug: string) {
+    // 1. Try matching against the custom profile slug
+    const profile = await prisma.userPublicProfile.findUnique({
+        where: { slug: userSlug },
+        select: { userId: true, user: { select: { id: true, username: true } } },
+    });
+
+    if (profile) {
+        return profile.user;
+    }
+
+    // 2. Fallback: match against username (backwards-compatible)
     const user = await prisma.user.findUnique({
         where: { username: userSlug },
         select: { id: true, username: true },

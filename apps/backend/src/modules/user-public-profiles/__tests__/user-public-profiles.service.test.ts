@@ -504,14 +504,27 @@ describe("getPublicUserAvatar", () => {
 // ─── resolveUserForPetProfile ────────────────────────────────
 
 describe("resolveUserForPetProfile", () => {
-    it("returns user when found by username", async () => {
+    it("returns user when found by profile slug", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({
+            userId: USER_ID,
+            user: { id: USER_ID, username: "testuser" },
+        });
+
+        const result = await resolveUserForPetProfile("custom-slug");
+        expect(result.id).toBe(USER_ID);
+        expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+    });
+
+    it("falls back to username when no profile slug matches", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue(null);
         mockPrisma.user.findUnique.mockResolvedValue({ id: USER_ID, username: "testuser" });
 
         const result = await resolveUserForPetProfile("testuser");
         expect(result.id).toBe(USER_ID);
     });
 
-    it("throws when user not found", async () => {
+    it("throws when neither profile slug nor username found", async () => {
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue(null);
         mockPrisma.user.findUnique.mockResolvedValue(null);
 
         await expect(resolveUserForPetProfile("nonexistent")).rejects.toThrow("not found");
