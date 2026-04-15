@@ -213,7 +213,7 @@
                             :label="$t('pages.pets.fields.pauseFeedingDuringShed')"
                         />
                         <p class="text-fg-faint mt-1 text-xs">
-                            {{ $t('pages.pets.pauseFeedingDuringShedHint') }}
+                            {{ $t("pages.pets.pauseFeedingDuringShedHint") }}
                         </p>
                     </div>
                 </div>

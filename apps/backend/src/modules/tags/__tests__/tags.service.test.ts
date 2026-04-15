@@ -157,9 +157,7 @@ describe("createTag", () => {
 
         // The service checks `instanceof Prisma.PrismaClientKnownRequestError`
         // We need to test the actual error path — since we mock prisma, we verify the throw
-        await expect(
-            createTag(USER_ID, { name: "healthy", category: "care" }),
-        ).rejects.toThrow();
+        await expect(createTag(USER_ID, { name: "healthy", category: "care" })).rejects.toThrow();
     });
 });
 
@@ -184,17 +182,13 @@ describe("updateTag", () => {
     it("throws not found for other user's tag", async () => {
         mockPrisma.tag.findUnique.mockResolvedValue(makeTag({ userId: "other_user" }));
 
-        await expect(updateTag("tag_1", USER_ID, { name: "x" })).rejects.toThrow(
-            "Tag not found",
-        );
+        await expect(updateTag("tag_1", USER_ID, { name: "x" })).rejects.toThrow("Tag not found");
     });
 
     it("throws not found for missing tag", async () => {
         mockPrisma.tag.findUnique.mockResolvedValue(null);
 
-        await expect(updateTag("tag_1", USER_ID, { name: "x" })).rejects.toThrow(
-            "Tag not found",
-        );
+        await expect(updateTag("tag_1", USER_ID, { name: "x" })).rejects.toThrow("Tag not found");
     });
 
     it("sets color to null when empty string passed", async () => {

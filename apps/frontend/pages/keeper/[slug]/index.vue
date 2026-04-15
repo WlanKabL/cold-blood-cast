@@ -618,7 +618,9 @@ useHead({
                         url: `${config.public.baseURL}/keeper/${encodeURIComponent(slug)}`,
                         ...(d.hasAvatar ? { image: avatarUrl.value } : {}),
                         ...(d.tagline || d.bio ? { description: d.tagline || d.bio } : {}),
-                        ...(d.location ? { address: { "@type": "PostalAddress", addressLocality: d.location } } : {}),
+                        ...(d.location
+                            ? { address: { "@type": "PostalAddress", addressLocality: d.location } }
+                            : {}),
                     },
                 });
             },

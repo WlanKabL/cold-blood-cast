@@ -35,7 +35,7 @@
                     </p>
                     <NuxtLink
                         to="/vet-visits/costs"
-                        class="mt-1 inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                        class="mt-1 inline-flex items-center gap-1 text-xs text-emerald-400 transition-colors hover:text-emerald-300"
                     >
                         <Icon name="lucide:bar-chart-3" class="h-3.5 w-3.5" />
                         {{ $t("pages.vetVisits.costs.title") }}

@@ -117,7 +117,9 @@
                                     {{ feedingStatusLabel(fs.status) }}
                                 </span>
                             </div>
-                            <div class="text-fg-faint mt-2 flex items-center justify-between text-xs">
+                            <div
+                                class="text-fg-faint mt-2 flex items-center justify-between text-xs"
+                            >
                                 <span>
                                     <template v-if="fs.daysSinceLastFeeding === null">
                                         {{ $t("pages.dashboard.neverFed") }}
@@ -522,10 +524,7 @@
                     required
                 />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton
-                        variant="ghost"
-                        @click="showQuickFeeding = false"
-                    >
+                    <UiButton variant="ghost" @click="showQuickFeeding = false">
                         {{ $t("common.cancel") }}
                     </UiButton>
                     <UiButton type="submit" :loading="quickFeedPending">
@@ -557,10 +556,7 @@
                     required
                 />
                 <div class="flex justify-end gap-2 pt-2">
-                    <UiButton
-                        variant="ghost"
-                        @click="showQuickWeight = false"
-                    >
+                    <UiButton variant="ghost" @click="showQuickWeight = false">
                         {{ $t("common.cancel") }}
                     </UiButton>
                     <UiButton type="submit" :loading="quickWeightPending">

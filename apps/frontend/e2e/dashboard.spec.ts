@@ -262,12 +262,15 @@ test.describe("Dashboard — Quick Actions", () => {
 
         await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
 
-        await page.getByTitle(/quick log feeding|schnell fütterung/i).first().click();
+        await page
+            .getByTitle(/quick log feeding|schnell fütterung/i)
+            .first()
+            .click();
 
         // Modal should appear with pet name
-        await expect(
-            page.getByText(/monty/i, { exact: false }).first(),
-        ).toBeVisible({ timeout: 5_000 });
+        await expect(page.getByText(/monty/i, { exact: false }).first()).toBeVisible({
+            timeout: 5_000,
+        });
     });
 
     test("opens quick weight modal", async ({ page }) => {
@@ -285,11 +288,14 @@ test.describe("Dashboard — Quick Actions", () => {
 
         await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
 
-        await page.getByTitle(/quick log weight|schnell gewicht/i).first().click();
+        await page
+            .getByTitle(/quick log weight|schnell gewicht/i)
+            .first()
+            .click();
 
         // Modal should appear with weight input
-        await expect(
-            page.getByText(/monty/i, { exact: false }).first(),
-        ).toBeVisible({ timeout: 5_000 });
+        await expect(page.getByText(/monty/i, { exact: false }).first()).toBeVisible({
+            timeout: 5_000,
+        });
     });
 });

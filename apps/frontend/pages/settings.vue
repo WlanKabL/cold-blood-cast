@@ -260,7 +260,9 @@
                             <input
                                 v-model="usernameForm.password"
                                 type="password"
-                                :placeholder="$t('pages.settings.usernameChange.passwordPlaceholder')"
+                                :placeholder="
+                                    $t('pages.settings.usernameChange.passwordPlaceholder')
+                                "
                                 class="border-line bg-surface text-fg focus:border-accent w-full rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
                                 @keydown.enter="submitUsernameChange"
                             />
@@ -272,7 +274,9 @@
                             </p>
                             <span v-else />
                             <button
-                                :disabled="usernameChanging || !usernameFormValid || usernameRateLimited"
+                                :disabled="
+                                    usernameChanging || !usernameFormValid || usernameRateLimited
+                                "
                                 class="bg-accent hover:bg-accent/90 shrink-0 rounded-xl px-5 py-2.5 text-[13px] font-medium text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
                                 @click="submitUsernameChange"
                             >
@@ -354,7 +358,11 @@
                     <div v-else class="space-y-3">
                         <p class="text-fg-muted text-[12px]">
                             <Icon name="lucide:mail" class="mr-1 inline h-3.5 w-3.5" />
-                            {{ $t("pages.settings.emailChange.codeSentTo", { email: emailForm.newEmail }) }}
+                            {{
+                                $t("pages.settings.emailChange.codeSentTo", {
+                                    email: emailForm.newEmail,
+                                })
+                            }}
                         </p>
                         <div>
                             <label class="text-fg-dim mb-1 block text-[12px] font-medium">

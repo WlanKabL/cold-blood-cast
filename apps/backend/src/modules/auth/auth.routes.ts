@@ -410,22 +410,18 @@ export async function authRoutes(app: FastifyInstance) {
     );
 
     // ── POST /api/auth/confirm-email-change ──────
-    app.post(
-        "/confirm-email-change",
-        { preHandler: [authGuard] },
-        async (request, reply) => {
-            const parsed = confirmEmailChangeSchema.safeParse(request.body);
-            if (!parsed.success) {
-                throw badRequest(
-                    ErrorCodes.E_VALIDATION_ERROR,
-                    "Validation failed",
-                    parsed.error.format(),
-                );
-            }
+    app.post("/confirm-email-change", { preHandler: [authGuard] }, async (request, reply) => {
+        const parsed = confirmEmailChangeSchema.safeParse(request.body);
+        if (!parsed.success) {
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Validation failed",
+                parsed.error.format(),
+            );
+        }
 
-            const result = await confirmEmailChange(request.userId, parsed.data);
+        const result = await confirmEmailChange(request.userId, parsed.data);
 
-            return reply.send({ success: true, data: result });
-        },
-    );
+        return reply.send({ success: true, data: result });
+    });
 }

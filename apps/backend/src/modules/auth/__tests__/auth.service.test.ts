@@ -704,9 +704,7 @@ describe("confirmAccountDeletion", () => {
 // ═══════════════════════════════════════════════════════════════
 describe("changeUsername", () => {
     it("changes username when password is correct and cooldown passed", async () => {
-        mockPrisma.user.findUnique.mockResolvedValue(
-            makeUser({ usernameChangedAt: null }),
-        );
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser({ usernameChangedAt: null }));
         mockVerifyPassword.mockResolvedValue(true);
         mockPrisma.user.findFirst.mockResolvedValue(null);
         mockPrisma.user.update.mockResolvedValue({ username: "newname" });
@@ -735,20 +733,16 @@ describe("changeUsername", () => {
     });
 
     it("throws E_USERNAME_CHANGE_RATE_LIMITED when within cooldown", async () => {
-        mockPrisma.user.findUnique.mockResolvedValue(
-            makeUser({ usernameChangedAt: new Date() }),
-        );
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser({ usernameChangedAt: new Date() }));
         mockVerifyPassword.mockResolvedValue(true);
 
-        await expect(
-            changeUsername(USER_ID, { newUsername: "x", password: "pw" }),
-        ).rejects.toThrow(/changed once/i);
+        await expect(changeUsername(USER_ID, { newUsername: "x", password: "pw" })).rejects.toThrow(
+            /changed once/i,
+        );
     });
 
     it("throws when username is already taken", async () => {
-        mockPrisma.user.findUnique.mockResolvedValue(
-            makeUser({ usernameChangedAt: null }),
-        );
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser({ usernameChangedAt: null }));
         mockVerifyPassword.mockResolvedValue(true);
         mockPrisma.user.findFirst.mockResolvedValue({ id: "other_user" });
 
@@ -763,9 +757,7 @@ describe("changeUsername", () => {
 // ═══════════════════════════════════════════════════════════════
 describe("requestEmailChange", () => {
     it("stores pending email and sends verification code", async () => {
-        mockPrisma.user.findUnique.mockResolvedValue(
-            makeUser({ email: "old@example.com" }),
-        );
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser({ email: "old@example.com" }));
         mockVerifyPassword.mockResolvedValue(true);
         mockPrisma.user.findFirst.mockResolvedValue(null);
         mockPrisma.user.update.mockResolvedValue({});
@@ -794,9 +786,7 @@ describe("requestEmailChange", () => {
     });
 
     it("throws when new email is already taken", async () => {
-        mockPrisma.user.findUnique.mockResolvedValue(
-            makeUser({ email: "old@example.com" }),
-        );
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser({ email: "old@example.com" }));
         mockVerifyPassword.mockResolvedValue(true);
         mockPrisma.user.findFirst.mockResolvedValue({ id: "other_user" });
 
@@ -847,9 +837,9 @@ describe("confirmEmailChange", () => {
             }),
         );
 
-        await expect(
-            confirmEmailChange(USER_ID, { code: "000000" }),
-        ).rejects.toThrow(/invalid|code/i);
+        await expect(confirmEmailChange(USER_ID, { code: "000000" })).rejects.toThrow(
+            /invalid|code/i,
+        );
     });
 
     it("throws E_EMAIL_CHANGE_CODE_EXPIRED for expired code", async () => {
@@ -861,8 +851,6 @@ describe("confirmEmailChange", () => {
             }),
         );
 
-        await expect(
-            confirmEmailChange(USER_ID, { code: "123456" }),
-        ).rejects.toThrow(/expired/i);
+        await expect(confirmEmailChange(USER_ID, { code: "123456" })).rejects.toThrow(/expired/i);
     });
 });

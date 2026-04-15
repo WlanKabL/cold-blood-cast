@@ -356,10 +356,7 @@ export async function getVetCosts(
 
 // ─── Monthly Cost Breakdown ──────────────────────────────────
 
-export async function getVetCostsMonthly(
-    userId: string,
-    opts?: { petId?: string; year?: number },
-) {
+export async function getVetCostsMonthly(userId: string, opts?: { petId?: string; year?: number }) {
     const year = opts?.year ?? new Date().getFullYear();
     const where: Record<string, unknown> = {
         userId,

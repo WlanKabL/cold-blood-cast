@@ -3,7 +3,13 @@ import { ErrorCodes, notFound } from "@/helpers/errors.js";
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type TimelineEventType = "feeding" | "shedding" | "weight" | "vet_visit" | "photo" | "husbandry_note";
+export type TimelineEventType =
+    | "feeding"
+    | "shedding"
+    | "weight"
+    | "vet_visit"
+    | "photo"
+    | "husbandry_note";
 
 export interface TimelineEvent {
     id: string;
@@ -288,7 +294,14 @@ export async function getTimeline(
             : Promise.resolve([]),
     ]);
 
-    const allEvents = normalizeEvents(feedings, sheddings, weights, vetVisits, photos, husbandryNotes);
+    const allEvents = normalizeEvents(
+        feedings,
+        sheddings,
+        weights,
+        vetVisits,
+        photos,
+        husbandryNotes,
+    );
     const total = allEvents.length;
     const start = (page - 1) * limit;
     const paged = allEvents.slice(start, start + limit);

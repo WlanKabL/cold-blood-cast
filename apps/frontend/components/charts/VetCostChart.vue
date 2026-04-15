@@ -69,9 +69,7 @@ const chartData = computed<ChartData<"bar">>(() => {
     const datasets = petNames.map((petName, i) => {
         const color = COLORS[i % COLORS.length];
         const data = months.map((month) => {
-            const entry = props.entries.find(
-                (e) => e.month === month && e.petName === petName,
-            );
+            const entry = props.entries.find((e) => e.month === month && e.petName === petName);
             return entry ? entry.totalCents / 100 : 0;
         });
         return {

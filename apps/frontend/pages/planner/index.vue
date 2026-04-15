@@ -225,8 +225,10 @@
                                 </div>
                                 <div class="flex shrink-0 items-center gap-1">
                                     <button
-                                        v-if="event.type === 'feeding' || event.type === 'maintenance'"
-                                        class="text-fg-faint hover:text-green-400 rounded-lg p-1.5 transition-colors hover:bg-green-500/10"
+                                        v-if="
+                                            event.type === 'feeding' || event.type === 'maintenance'
+                                        "
+                                        class="text-fg-faint rounded-lg p-1.5 transition-colors hover:bg-green-500/10 hover:text-green-400"
                                         :title="$t('pages.planner.quickComplete')"
                                         @click.stop="quickComplete(event)"
                                     >

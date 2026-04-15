@@ -32,9 +32,7 @@ beforeEach(() => {
 
 describe("listHusbandryNotes", () => {
     it("returns notes for the user with default options", async () => {
-        const notes = [
-            { id: "n1", petId: "p1", type: "observation", title: "Active at night" },
-        ];
+        const notes = [{ id: "n1", petId: "p1", type: "observation", title: "Active at night" }];
         mockPrisma.husbandryNote.findMany.mockResolvedValue(notes);
 
         const result = await listHusbandryNotes("user1", { limit: 50 });
@@ -207,9 +205,7 @@ describe("updateHusbandryNote", () => {
     it("throws not found when note does not exist", async () => {
         mockPrisma.husbandryNote.findUnique.mockResolvedValue(null);
 
-        await expect(updateHusbandryNote("n1", "user1", { title: "X" })).rejects.toThrow(
-            AppError,
-        );
+        await expect(updateHusbandryNote("n1", "user1", { title: "X" })).rejects.toThrow(AppError);
     });
 
     it("throws not found when note belongs to another user", async () => {
@@ -218,9 +214,7 @@ describe("updateHusbandryNote", () => {
             pet: { userId: "other-user" },
         });
 
-        await expect(updateHusbandryNote("n1", "user1", { title: "X" })).rejects.toThrow(
-            AppError,
-        );
+        await expect(updateHusbandryNote("n1", "user1", { title: "X" })).rejects.toThrow(AppError);
     });
 });
 

@@ -81,9 +81,7 @@ export default defineEventHandler(async (event) => {
                     name,
                     url,
                     image,
-                    ...(user.tagline || user.bio
-                        ? { description: user.tagline || user.bio }
-                        : {}),
+                    ...(user.tagline || user.bio ? { description: user.tagline || user.bio } : {}),
                     ...(user.location
                         ? { address: { "@type": "PostalAddress", addressLocality: user.location } }
                         : {}),

@@ -77,7 +77,12 @@
                                 : $t("pages.sheddings.inProgress")
                         }}
                     </span>
-                    <span v-if="shed.quality" :class="qualityBadgeClass(shed.quality)" class="rounded-md px-2 py-0.5 text-xs font-medium">{{ qualityLabel(shed.quality) }}</span>
+                    <span
+                        v-if="shed.quality"
+                        :class="qualityBadgeClass(shed.quality)"
+                        class="rounded-md px-2 py-0.5 text-xs font-medium"
+                        >{{ qualityLabel(shed.quality) }}</span
+                    >
                     <UiButton
                         variant="ghost"
                         icon="lucide:pencil"
@@ -132,21 +137,31 @@
                     }}</label>
                 </div>
                 <div>
-                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{ $t('pages.sheddings.fields.quality') }}</label>
+                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{
+                        $t("pages.sheddings.fields.quality")
+                    }}</label>
                     <div class="flex flex-wrap gap-2">
                         <button
                             v-for="preset in qualityPresets"
                             :key="preset"
                             type="button"
                             class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-                            :class="form.quality === preset ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40' : 'bg-white/5 text-fg-muted hover:bg-white/10'"
+                            :class="
+                                form.quality === preset
+                                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40'
+                                    : 'text-fg-muted bg-white/5 hover:bg-white/10'
+                            "
                             @click="form.quality = form.quality === preset ? '' : preset"
                         >
                             {{ qualityLabel(preset) }}
                         </button>
                     </div>
                 </div>
-                <UiTextarea v-model="form.notes" :label="$t('pages.sheddings.fields.notes')" :placeholder="$t('pages.sheddings.fields.notesPlaceholder')" />
+                <UiTextarea
+                    v-model="form.notes"
+                    :label="$t('pages.sheddings.fields.notes')"
+                    :placeholder="$t('pages.sheddings.fields.notesPlaceholder')"
+                />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showCreate = false">{{
                         $t("common.cancel")
@@ -182,21 +197,31 @@
                     }}</label>
                 </div>
                 <div>
-                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{ $t('pages.sheddings.fields.quality') }}</label>
+                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{
+                        $t("pages.sheddings.fields.quality")
+                    }}</label>
                     <div class="flex flex-wrap gap-2">
                         <button
                             v-for="preset in qualityPresets"
                             :key="preset"
                             type="button"
                             class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-                            :class="editForm.quality === preset ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40' : 'bg-white/5 text-fg-muted hover:bg-white/10'"
+                            :class="
+                                editForm.quality === preset
+                                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40'
+                                    : 'text-fg-muted bg-white/5 hover:bg-white/10'
+                            "
                             @click="editForm.quality = editForm.quality === preset ? '' : preset"
                         >
                             {{ qualityLabel(preset) }}
                         </button>
                     </div>
                 </div>
-                <UiTextarea v-model="editForm.notes" :label="$t('pages.sheddings.fields.notes')" :placeholder="$t('pages.sheddings.fields.notesPlaceholder')" />
+                <UiTextarea
+                    v-model="editForm.notes"
+                    :label="$t('pages.sheddings.fields.notes')"
+                    :placeholder="$t('pages.sheddings.fields.notesPlaceholder')"
+                />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showEdit = false">{{
                         $t("common.cancel")

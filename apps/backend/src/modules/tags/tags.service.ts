@@ -98,11 +98,7 @@ export async function listGlobalTags() {
     });
 }
 
-export async function createGlobalTag(data: {
-    name: string;
-    category: string;
-    color?: string;
-}) {
+export async function createGlobalTag(data: { name: string; category: string; color?: string }) {
     const normalizedName = data.name.trim();
 
     try {

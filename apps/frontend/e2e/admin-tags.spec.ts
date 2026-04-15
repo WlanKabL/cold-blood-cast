@@ -42,9 +42,9 @@ test.describe("Admin Tags", () => {
     test("loads admin tags page with title", async ({ page }) => {
         await page.goto("/admin/tags");
 
-        await expect(
-            page.getByText(/global tags|globale tags/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/global tags|globale tags/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("displays tags grouped by category", async ({ page }) => {
@@ -101,8 +101,8 @@ test.describe("Admin Tags — Empty State", () => {
 
         await page.goto("/admin/tags");
 
-        await expect(
-            page.getByText(/no.*tag|keine.*tag/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/no.*tag|keine.*tag/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 });

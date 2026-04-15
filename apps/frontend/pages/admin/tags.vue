@@ -43,11 +43,7 @@
 
         <!-- Grouped by category -->
         <template v-else>
-            <div
-                v-for="[category, categoryTags] in groupedTags"
-                :key="category"
-                class="space-y-3"
-            >
+            <div v-for="[category, categoryTags] in groupedTags" :key="category" class="space-y-3">
                 <h2 class="text-fg-faint text-[13px] font-semibold tracking-wider uppercase">
                     {{ $t(`admin.tags.categories.${category}`) }}
                 </h2>
@@ -86,7 +82,11 @@
         </template>
 
         <!-- Create / Edit Modal -->
-        <UiModal :show="showForm" :title="editingTag ? $t('admin.tags.edit') : $t('admin.tags.create')" @close="showForm = false">
+        <UiModal
+            :show="showForm"
+            :title="editingTag ? $t('admin.tags.edit') : $t('admin.tags.create')"
+            @close="showForm = false"
+        >
             <form class="space-y-4" @submit.prevent="handleSave">
                 <div>
                     <label class="text-fg-muted mb-1 block text-xs font-medium">
@@ -140,7 +140,11 @@
         </UiModal>
 
         <!-- Delete confirmation -->
-        <UiModal :show="showDelete" :title="$t('admin.tags.confirmDelete')" @close="showDelete = false">
+        <UiModal
+            :show="showDelete"
+            :title="$t('admin.tags.confirmDelete')"
+            @close="showDelete = false"
+        >
             <p class="text-fg-muted text-sm">
                 {{ $t("admin.tags.confirmDeleteMsg", { name: deletingTag?.name }) }}
             </p>
@@ -170,15 +174,7 @@ const admin = useAdminApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
 
-const CATEGORIES = [
-    "general",
-    "care",
-    "monitoring",
-    "vet",
-    "maintenance",
-    "media",
-    "organization",
-];
+const CATEGORIES = ["general", "care", "monitoring", "vet", "maintenance", "media", "organization"];
 
 const { data: tags, isLoading: loading } = useQuery({
     queryKey: ["admin-tags"],
@@ -200,10 +196,7 @@ const groupedTags = computed(() => {
         })
         .map(
             ([cat, catTags]) =>
-                [cat, [...catTags].sort((a, b) => a.name.localeCompare(b.name))] as [
-                    string,
-                    Tag[],
-                ],
+                [cat, [...catTags].sort((a, b) => a.name.localeCompare(b.name))] as [string, Tag[]],
         );
 });
 
@@ -234,9 +227,7 @@ const { mutate: saveTag, isPending: saving } = useMutation({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
         showForm.value = false;
-        toast.success(
-            editingTag.value ? t("admin.tags.saved") : t("admin.tags.created"),
-        );
+        toast.success(editingTag.value ? t("admin.tags.saved") : t("admin.tags.created"));
     },
 });
 

@@ -741,7 +741,13 @@ describe("getVetCostsMonthly", () => {
 
         expect(result).toEqual([
             { month: "2024-03", petId: PET_ID, petName: "Monty", totalCents: 5000, visitCount: 2 },
-            { month: "2024-03", petId: "pet_other", petName: "Slinky", totalCents: 5000, visitCount: 1 },
+            {
+                month: "2024-03",
+                petId: "pet_other",
+                petName: "Slinky",
+                totalCents: 5000,
+                visitCount: 1,
+            },
             { month: "2024-06", petId: PET_ID, petName: "Monty", totalCents: 1000, visitCount: 1 },
         ]);
     });
@@ -796,7 +802,13 @@ describe("getVetCostsMonthly", () => {
         const result = await getVetCostsMonthly(USER_ID, { year: 2024 });
 
         expect(result).toEqual([
-            { month: "2024-01", petId: "deleted_pet", petName: "Unknown", totalCents: 1000, visitCount: 1 },
+            {
+                month: "2024-01",
+                petId: "deleted_pet",
+                petName: "Unknown",
+                totalCents: 1000,
+                visitCount: 1,
+            },
         ]);
     });
 });

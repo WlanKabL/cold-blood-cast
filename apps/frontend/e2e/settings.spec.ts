@@ -57,21 +57,25 @@ test.describe("Settings — Security Tab", () => {
         await page.goto("/settings");
 
         // Click the security tab
-        await page.getByText(/security|sicherheit/i).first().click();
+        await page
+            .getByText(/security|sicherheit/i)
+            .first()
+            .click();
 
-        await expect(
-            page.getByText(/change username|benutzername ändern/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/change username|benutzername ändern/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows username input and password field", async ({ page }) => {
         await page.goto("/settings");
 
-        await page.getByText(/security|sicherheit/i).first().click();
+        await page
+            .getByText(/security|sicherheit/i)
+            .first()
+            .click();
 
-        await expect(
-            page.getByPlaceholder("testkeeper").first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByPlaceholder("testkeeper").first()).toBeVisible({ timeout: 15_000 });
         await expect(
             page.getByPlaceholder(/current password|aktuelles passwort/i).first(),
         ).toBeVisible();
@@ -80,30 +84,37 @@ test.describe("Settings — Security Tab", () => {
     test("shows email change section", async ({ page }) => {
         await page.goto("/settings");
 
-        await page.getByText(/security|sicherheit/i).first().click();
+        await page
+            .getByText(/security|sicherheit/i)
+            .first()
+            .click();
 
-        await expect(
-            page.getByText(/change email|e-mail.*ändern/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/change email|e-mail.*ändern/i).first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows current email in email change section", async ({ page }) => {
         await page.goto("/settings");
 
-        await page.getByText(/security|sicherheit/i).first().click();
+        await page
+            .getByText(/security|sicherheit/i)
+            .first()
+            .click();
 
-        await expect(
-            page.getByText("test@coldbloodcast.local").first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText("test@coldbloodcast.local").first()).toBeVisible({
+            timeout: 15_000,
+        });
     });
 
     test("shows password reset section", async ({ page }) => {
         await page.goto("/settings");
 
-        await page.getByText(/security|sicherheit/i).first().click();
+        await page
+            .getByText(/security|sicherheit/i)
+            .first()
+            .click();
 
-        await expect(
-            page.getByText(/password|passwort/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/password|passwort/i).first()).toBeVisible({ timeout: 15_000 });
     });
 });

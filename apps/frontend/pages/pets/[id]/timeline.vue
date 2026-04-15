@@ -222,7 +222,14 @@ const typeFilters = computed(() => [
     },
 ]);
 
-const activeTypes = ref<EventType[]>(["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"]);
+const activeTypes = ref<EventType[]>([
+    "feeding",
+    "shedding",
+    "weight",
+    "vet_visit",
+    "photo",
+    "husbandry_note",
+]);
 
 function toggleType(type: EventType) {
     const idx = activeTypes.value.indexOf(type);

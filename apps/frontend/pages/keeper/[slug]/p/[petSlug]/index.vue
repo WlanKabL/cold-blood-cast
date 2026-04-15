@@ -721,12 +721,8 @@ useHead({
                         name: p.name,
                         url: profileUrl,
                         ...(p.bio ? { description: p.bio } : {}),
-                        ...(p.profilePhotoId
-                            ? { image: photoUrl(p.profilePhotoId) }
-                            : {}),
-                        ...(p.species
-                            ? { additionalType: p.species }
-                            : {}),
+                        ...(p.profilePhotoId ? { image: photoUrl(p.profilePhotoId) } : {}),
+                        ...(p.species ? { additionalType: p.species } : {}),
                     },
                 });
             },
