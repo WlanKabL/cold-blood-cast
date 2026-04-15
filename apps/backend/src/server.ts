@@ -59,6 +59,7 @@ import { reportPublicRoutes, reportAdminRoutes } from "@/modules/reports/index.j
 import { dataExportRoutes } from "@/modules/data-export/index.js";
 import { tagRoutes, tagAdminRoutes } from "@/modules/tags/tags.routes.js";
 import { sitemapRoutes } from "@/modules/sitemap/sitemap.routes.js";
+import { subscriptionRoutes } from "@/modules/subscriptions/index.js";
 import {
     startWeeklyPlannerScheduler,
     stopWeeklyPlannerScheduler,
@@ -323,6 +324,7 @@ async function main() {
     await app.register(tagRoutes, { prefix: "/api/tags" });
     await app.register(tagAdminRoutes, { prefix: "/api/tags/admin/global" });
     await app.register(sitemapRoutes, { prefix: "/api/public/sitemap" });
+    await app.register(subscriptionRoutes, { prefix: "/api/subscriptions" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {

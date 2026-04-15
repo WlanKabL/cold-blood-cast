@@ -4,7 +4,12 @@ import { computeSheddingCycle } from "@/modules/sheddings/shedding-analysis.serv
 
 // ── Types ────────────────────────────────────────────────
 
-export type PlannerEventType = "feeding" | "vet_visit" | "shedding" | "maintenance";
+export type PlannerEventType =
+    | "feeding"
+    | "feeding_retry"
+    | "vet_visit"
+    | "shedding"
+    | "maintenance";
 
 export interface PlannerEvent {
     id: string;
@@ -115,11 +120,32 @@ async function collectFeedingEvents(
             species: true,
             feedingIntervalMinDays: true,
             feedingIntervalMaxDays: true,
+            pauseFeedingDuringShed: true,
             feedings: {
                 orderBy: { fedAt: "desc" },
                 take: 1,
-                select: { fedAt: true },
+                select: { fedAt: true, accepted: true },
             },
+            sheddings: {
+                where: { complete: false },
+                select: { id: true },
+                take: 1,
+            },
+        },
+    });
+
+    // Also collect retry events from refused feedings with retryAt in this week
+    const retryFeedings = await prisma.feeding.findMany({
+        where: {
+            pet: { userId },
+            accepted: false,
+            retryAt: { gte: weekStart, lt: weekEnd },
+        },
+        select: {
+            id: true,
+            retryAt: true,
+            foodType: true,
+            pet: { select: { id: true, name: true } },
         },
     });
 
@@ -136,6 +162,9 @@ async function collectFeedingEvents(
         );
 
         if (status === "no_schedule") continue;
+
+        const isActiveShed = pet.sheddings.length > 0;
+        const isPaused = pet.pauseFeedingDuringShed && isActiveShed;
 
         // Calculate the next due window
         let dueDateMin: Date;
@@ -155,17 +184,39 @@ async function collectFeedingEvents(
                 type: "feeding",
                 date: toDateStr(eventDate),
                 title: pet.name,
-                detail: `${pet.feedingIntervalMinDays}–${pet.feedingIntervalMaxDays}d`,
+                detail: isPaused
+                    ? "Paused (Shedding)"
+                    : `${pet.feedingIntervalMinDays}–${pet.feedingIntervalMaxDays}d`,
                 petName: pet.name,
                 enclosureName: null,
                 meta: {
                     petId: pet.id,
-                    status,
+                    status: isPaused ? "paused" : status,
                     intervalMin: pet.feedingIntervalMinDays,
                     intervalMax: pet.feedingIntervalMaxDays,
+                    isPaused,
                 },
             });
         }
+    }
+
+    // Add retry feeding events
+    for (const feeding of retryFeedings) {
+        if (!feeding.retryAt) continue;
+        events.push({
+            id: `feeding-retry-${feeding.id}`,
+            type: "feeding_retry",
+            date: toDateStr(feeding.retryAt),
+            title: feeding.pet.name,
+            detail: feeding.foodType,
+            petName: feeding.pet.name,
+            enclosureName: null,
+            meta: {
+                petId: feeding.pet.id,
+                feedingId: feeding.id,
+                foodType: feeding.foodType,
+            },
+        });
     }
 
     return events;

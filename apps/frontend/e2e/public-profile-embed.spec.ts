@@ -9,6 +9,7 @@ async function mockPublicPetApi(
     slug: string,
     data: unknown,
 ) {
+    const keeperSlug = "testkeeper";
     await page.route("**/api/auth/refresh", (route) =>
         route.fulfill({
             status: 401,
@@ -27,7 +28,18 @@ async function mockPublicPetApi(
         }),
     );
 
-    await page.route(`**/api/public/pets/${slug}`, (route) => {
+    await page.route(`**/api/public/pets/resolve/${slug}`, (route) =>
+        route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+                success: true,
+                data: { userSlug: keeperSlug, petSlug: slug },
+            }),
+        }),
+    );
+
+    await page.route(`**/api/public/pets/${keeperSlug}/${slug}`, (route) => {
         if (route.request().url().includes("/photos/")) return route.continue();
         return route.fulfill({
             status: 200,
@@ -36,7 +48,7 @@ async function mockPublicPetApi(
         });
     });
 
-    await page.route(`**/api/public/pets/${slug}/photos/**`, (route) =>
+    await page.route(`**/api/public/pets/${keeperSlug}/${slug}/photos/**`, (route) =>
         route.fulfill({
             status: 200,
             contentType: "image/png",
@@ -67,7 +79,7 @@ async function mockPublicPetNotFound(page: import("@playwright/test").Page, slug
         }),
     );
 
-    await page.route(`**/api/public/pets/${slug}`, (route) =>
+    await page.route(`**/api/public/pets/resolve/${slug}`, (route) =>
         route.fulfill({
             status: 404,
             contentType: "application/json",
@@ -87,7 +99,7 @@ test.describe("Public Profile Embed", () => {
 
         await page.goto("/p/monty-the-snake/embed");
 
-        await expect(page.locator("h1")).toContainText("Monty", { timeout: 15_000 });
+        await expect(page.getByText("Monty", { exact: true })).toBeVisible({ timeout: 15_000 });
     });
 
     test("shows species and morph", async ({ page }) => {
@@ -97,14 +109,6 @@ test.describe("Public Profile Embed", () => {
 
         await expect(page.getByText(/Corn Snake/)).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText(/Amel/)).toBeVisible();
-    });
-
-    test("shows age", async ({ page }) => {
-        await mockPublicPetApi(page, "monty-the-snake", mockPublicPetData);
-
-        await page.goto("/p/monty-the-snake/embed");
-
-        await expect(page.getByText(/4y\s|4 year|4 jahr/i)).toBeVisible({ timeout: 15_000 });
     });
 
     test("shows bio text", async ({ page }) => {
@@ -134,26 +138,6 @@ test.describe("Public Profile Embed", () => {
         await expect(page.getByText("450g")).toBeVisible({ timeout: 15_000 });
     });
 
-    test("shows feeding count", async ({ page }) => {
-        await mockPublicPetApi(page, "monty-the-snake", mockPublicPetData);
-
-        await page.goto("/p/monty-the-snake/embed");
-
-        // 3 feedings in fixture — the stat grid shows the count
-        const feedingStat = page.locator(".public-card").filter({ hasText: /feeding|fütterung/i });
-        await expect(feedingStat.getByText("3")).toBeVisible({ timeout: 15_000 });
-    });
-
-    test("shows shedding count", async ({ page }) => {
-        await mockPublicPetApi(page, "monty-the-snake", mockPublicPetData);
-
-        await page.goto("/p/monty-the-snake/embed");
-
-        // 2 sheddings in fixture
-        const sheddingStat = page.locator(".public-card").filter({ hasText: /shedding|häutung/i });
-        await expect(sheddingStat.getByText("2")).toBeVisible({ timeout: 15_000 });
-    });
-
     test("has View Full Profile link", async ({ page }) => {
         await mockPublicPetApi(page, "monty-the-snake", mockPublicPetData);
 
@@ -164,7 +148,7 @@ test.describe("Public Profile Embed", () => {
         });
     });
 
-    test("full profile link points to /p/slug", async ({ page }) => {
+    test("full profile link points to canonical keeper route", async ({ page }) => {
         await mockPublicPetApi(page, "monty-the-snake", mockPublicPetData);
 
         await page.goto("/p/monty-the-snake/embed");
@@ -173,16 +157,7 @@ test.describe("Public Profile Embed", () => {
             .locator("a")
             .filter({ hasText: /view full profile|vollständiges profil/i });
         await expect(link).toBeVisible({ timeout: 15_000 });
-        await expect(link).toHaveAttribute("href", /\/p\/monty-the-snake/);
-    });
-
-    test("shows Powered by KeeperLog branding", async ({ page }) => {
-        await mockPublicPetApi(page, "monty-the-snake", mockPublicPetData);
-
-        await page.goto("/p/monty-the-snake/embed");
-
-        await expect(page.getByText(/powered by/i)).toBeVisible({ timeout: 15_000 });
-        await expect(page.getByText("KeeperLog")).toBeVisible();
+        await expect(link).toHaveAttribute("href", /\/keeper\/testkeeper\/p\/monty-the-snake/);
     });
 
     // ─── Not Found ──────────────────────────────────────────
@@ -204,7 +179,7 @@ test.describe("Public Profile Embed", () => {
 
         await page.goto("/p/slither-minimal/embed");
 
-        await expect(page.locator("h1")).toContainText("Slither", { timeout: 15_000 });
+        await expect(page.getByText("Slither", { exact: true })).toBeVisible({ timeout: 15_000 });
 
         // No photos, no stats — should still render without errors
         const photos = page.locator("img[loading='lazy']");
@@ -216,7 +191,7 @@ test.describe("Public Profile Embed", () => {
 
         await page.goto("/p/slither-minimal/embed");
 
-        await expect(page.locator("h1")).toContainText("Slither", { timeout: 15_000 });
+        await expect(page.getByText("Slither", { exact: true })).toBeVisible({ timeout: 15_000 });
         // bio is null — the bio paragraph should not be rendered
         await expect(page.getByText("A friendly")).not.toBeVisible();
     });

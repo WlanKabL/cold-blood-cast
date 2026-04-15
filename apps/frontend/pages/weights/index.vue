@@ -45,7 +45,7 @@
         </div>
 
         <!-- List -->
-        <div v-else-if="weights?.length" class="animate-fade-in-up space-y-2 delay-150">
+        <div v-else-if="weights.length" class="animate-fade-in-up space-y-2 delay-150">
             <div
                 v-for="w in weights"
                 :key="w.id"
@@ -79,6 +79,11 @@
                         @click="confirmDelete(w.id)"
                     />
                 </div>
+            </div>
+            <!-- Infinite scroll sentinel -->
+            <div ref="sentinel" class="h-1" />
+            <div v-if="isFetchingNextPage" class="flex justify-center py-4">
+                <Icon name="lucide:loader-2" class="text-fg-muted h-5 w-5 animate-spin" />
             </div>
         </div>
 
@@ -174,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface WeightRecord {
     id: string;
@@ -199,22 +204,34 @@ useHead({ title: () => t("pages.weights.title") });
 
 const selectedPet = ref("ALL");
 
-const queryParams = computed(() => {
-    const params = new URLSearchParams();
-    if (selectedPet.value && selectedPet.value !== "ALL") params.set("petId", selectedPet.value);
-    return params.toString();
-});
-
 // ── Data ─────────────────────────────────────────────────
 const {
-    data: weights,
+    data: weightsData,
     isLoading: loading,
     error,
     refetch,
-} = useQuery({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+} = useInfiniteQuery({
     queryKey: ["weights", selectedPet],
-    queryFn: () =>
-        api.get<WeightRecord[]>(`/api/weights${queryParams.value ? `?${queryParams.value}` : ""}`),
+    queryFn: ({ pageParam }) => {
+        const params = new URLSearchParams();
+        if (selectedPet.value && selectedPet.value !== "ALL")
+            params.set("petId", selectedPet.value);
+        if (pageParam) params.set("cursor", pageParam);
+        return api.get<{ items: WeightRecord[]; nextCursor: string | null }>(
+            `/api/weights${params.size ? `?${params}` : ""}`,
+        );
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+});
+
+const weights = computed(() => weightsData.value?.pages.flatMap((p) => p.items) ?? []);
+
+const { sentinel } = useInfiniteScroll(() => fetchNextPage(), {
+    enabled: computed(() => !!hasNextPage.value && !isFetchingNextPage.value),
 });
 
 const { data: pets } = useQuery({

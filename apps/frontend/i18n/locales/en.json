@@ -125,6 +125,7 @@
     },
     "common": {
         "loading": "Loading...",
+        "redirecting": "Redirecting...",
         "error": "An error occurred",
         "retry": "Retry",
         "save": "Save",
@@ -237,6 +238,7 @@
         "vetVisits": "Vet Visits",
         "veterinarians": "Veterinarians",
         "maintenance": "Maintenance",
+        "husbandryNotes": "Husbandry Notes",
         "planner": "Weekly Planner"
     },
     "admin": {
@@ -789,6 +791,7 @@
             "addFirst": "Add your first enclosure",
             "feedingReminders": "Feeding Reminders",
             "noPetsScheduled": "No feeding schedules configured",
+            "setupFeedingSchedule": "Set up feeding schedule",
             "feedingOk": "OK",
             "feedingDue": "Due",
             "feedingCritical": "Overdue!",
@@ -802,13 +805,17 @@
             "noVet": "No vet assigned",
             "weightTrends": "Weight Trends",
             "noWeightData": "No weight data available",
+            "recordFirstWeight": "Record first weight",
             "upcomingSheddings": "Upcoming Sheddings",
             "noUpcomingSheddings": "No sheddings predicted within 7 days",
+            "logFirstShedding": "Log first shedding",
             "predictedIn": "in {days}d",
             "predictedOverdue": "{days}d overdue",
             "avgCycle": "avg. {days}d cycle",
             "overdueMaintenance": "Overdue Maintenance",
             "noOverdueMaintenance": "All maintenance tasks are up to date",
+            "scheduleVetVisit": "Schedule vet visit",
+            "createMaintenanceTask": "Create maintenance task",
             "tabs": {
                 "overview": "Overview",
                 "schedule": "Schedule",
@@ -910,8 +917,15 @@
                 "notes": "Notes",
                 "feedingIntervalMinDays": "Min. interval (days)",
                 "feedingIntervalMaxDays": "Max. interval (days)",
-                "pauseFeedingDuringShed": "Pause feeding during shed"
+                "pauseFeedingDuringShed": "Pause feeding during shed",
+                "tags": "Tags"
             },
+            "manageTags": "Manage Tags",
+            "assignedTags": "Assigned Tags",
+            "availableTags": "Available Tags",
+            "noTags": "No tags assigned",
+            "noAvailableTags": "No tags available — create tags in Settings first",
+            "tagsSaved": "Tags updated",
             "photos": {
                 "title": "Photos",
                 "subtitle": "Gallery of your pet",
@@ -1091,6 +1105,7 @@
             "allPets": "All Pets",
             "accepted": "Accepted",
             "refused": "Refused",
+            "retryOn": "Retry:",
             "confirmDelete": "Delete this feeding record?",
             "edit": "Edit Feeding",
             "saved": "Feeding saved",
@@ -1108,6 +1123,7 @@
                 "feedItem": "Feed Item",
                 "feedItemNone": "Manual entry",
                 "refusedReason": "Reason for refusal",
+                "retryAt": "Retry Date",
                 "notes": "Notes"
             },
             "refusedReasons": {
@@ -1583,6 +1599,38 @@
                 "notesPlaceholder": "Additional notes..."
             }
         },
+        "husbandryNotes": {
+            "title": "Husbandry Notes",
+            "subtitle": "Record observations, behavior changes, and habitat adjustments",
+            "add": "Add Note",
+            "addFirst": "Add your first husbandry note",
+            "create": "New Husbandry Note",
+            "edit": "Edit Note",
+            "empty": "No husbandry notes recorded yet",
+            "allPets": "All Pets",
+            "allTypes": "All Types",
+            "confirmDelete": "Delete this husbandry note?",
+            "created": "Note created",
+            "saved": "Note saved",
+            "deleted": "Note deleted",
+            "types": {
+                "observation": "Observation",
+                "behavior": "Behavior",
+                "habitat_change": "Habitat Change",
+                "health": "Health",
+                "enrichment": "Enrichment",
+                "other": "Other"
+            },
+            "fields": {
+                "pet": "Pet",
+                "type": "Type",
+                "title": "Title",
+                "titlePlaceholder": "e.g. Unusual basking pattern",
+                "content": "Details",
+                "contentPlaceholder": "Describe what you observed...",
+                "occurredAt": "Date"
+            }
+        },
         "planner": {
             "title": "Weekly Care Planner",
             "subtitle": "Overview of upcoming feedings, vet visits, sheddings, and maintenance tasks",
@@ -1629,12 +1677,123 @@
             },
             "legend": {
                 "feeding": "Feeding",
+                "feedingRetry": "Feeding Retry",
                 "vetVisit": "Vet Visit",
                 "shedding": "Shedding",
                 "maintenance": "Maintenance"
             },
             "quickComplete": "Mark as done",
-            "quickCompleted": "Marked as done"
+            "quickCompleted": "Marked as done",
+            "paused": "Paused (Shedding)",
+            "quickFeed": {
+                "title": "Log Feeding",
+                "confirm": "Log Feeding"
+            }
+        },
+        "pricing": {
+            "title": "Pricing",
+            "subtitle": "Choose a plan that fits your collection size and workflow.",
+            "subscriptionSuccess": "Your subscription was activated successfully.",
+            "subscriptionCanceled": "Checkout was canceled. No payment was made.",
+            "paymentsUnavailable": "Payments are currently unavailable.",
+            "monthly": "Monthly",
+            "yearly": "Yearly",
+            "save17": "Save 17%",
+            "feature": "Feature",
+            "unlimited": "Unlimited",
+            "perMonth": "/ month",
+            "perYear": "/ year",
+            "forever": "forever",
+            "currentPlan": "Current plan",
+            "freePlan": "Free plan",
+            "popular": "Most popular",
+            "upgrade": "Upgrade",
+            "manageSubscription": "Manage subscription",
+            "freeName": "Free",
+            "freeDesc": "For hobby keepers with a small setup",
+            "freePrice": "$0",
+            "premiumName": "Premium",
+            "premiumDesc": "More animals, more history, more planning",
+            "premiumMonthly": "$5.99",
+            "premiumYearly": "$59.99",
+            "proName": "Pro",
+            "proDesc": "For serious keepers and power users",
+            "proMonthly": "$12.99",
+            "proYearly": "$129.99",
+            "lifetimeTitle": "Pro Lifetime",
+            "lifetimeDesc": "One-time purchase. Keep Pro forever.",
+            "lifetimeCta": "Buy Lifetime",
+            "features": {
+                "enclosures": "Up to {n} enclosures",
+                "pets": "Up to {n} pets",
+                "sensors": "Up to {n} sensors per enclosure",
+                "feedings": "Feeding tracking",
+                "weights": "Weight tracking",
+                "sheddings": "Shedding tracking",
+                "dashboard": "Dashboard overview",
+                "allFree": "Everything in Free",
+                "vetVisits": "Vet visits",
+                "photos": "Photo gallery",
+                "planner": "Weekly planner",
+                "maintenance": "Maintenance reminders",
+                "publicProfile": "Public profile sharing",
+                "documents": "Document storage",
+                "allPremium": "Everything in Premium",
+                "unlimitedAll": "Unlimited enclosures, pets, and sensors",
+                "apiAccess": "API access",
+                "advancedAnalytics": "Advanced analytics",
+                "prioritySupport": "Priority support"
+            },
+            "comparison": {
+                "enclosures": "Enclosures",
+                "pets": "Pets",
+                "sensors": "Sensors per enclosure",
+                "feedings": "Feedings",
+                "weights": "Weights",
+                "sheddings": "Sheddings",
+                "dashboard": "Dashboard",
+                "vetVisits": "Vet visits",
+                "photos": "Photos",
+                "planner": "Planner",
+                "maintenance": "Maintenance",
+                "publicProfile": "Public profile",
+                "documents": "Documents",
+                "apiAccess": "API access"
+            }
+        }
+    },
+    "onboarding": {
+        "skip": "Skip",
+        "back": "Back",
+        "next": "Next",
+        "getStarted": "Get started",
+        "steps": {
+            "enclosure": {
+                "title": "Set up your enclosure",
+                "desc": "Start with the basics of your habitat.",
+                "item1": "Create your first enclosure",
+                "item2": "Add sensor basics"
+            },
+            "pet": {
+                "title": "Add your pet",
+                "desc": "Create a complete profile for your animal.",
+                "item1": "Add pet details",
+                "item2": "Upload a profile photo"
+            },
+            "care": {
+                "title": "Start tracking care",
+                "desc": "Log the key events that matter.",
+                "item1": "Log first feeding",
+                "item2": "Log first weight",
+                "item3": "Log first shedding"
+            },
+            "ready": {
+                "title": "You're ready",
+                "desc": "KeeperLog is set up for your daily workflow.",
+                "item1": "Use your dashboard",
+                "item2": "Check your weekly planner",
+                "item3": "Enable notifications"
+            }
         }
     },
     "shortcuts": {
@@ -1647,6 +1806,8 @@
         "pets": "Pets",
         "sensors": "Sensors",
         "settings": "Settings",
+        "feedings": "Feedings",
+        "weights": "Weights",
         "help": "Show shortcuts",
         "closeModal": "Close modal / overlay",
         "newEnclosure": "New enclosure",
@@ -1688,7 +1849,9 @@
     "errorPage": {
         "title": "Error",
         "fallback": "Something went wrong",
-        "goHome": "Go Home"
+        "goHome": "Go Home",
+        "goBack": "Go Back",
+        "notFoundMessage": "This page does not exist or has been moved."
     },
     "publicProfile": {
         "notFound": "Profile Not Found",

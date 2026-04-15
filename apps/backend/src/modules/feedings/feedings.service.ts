@@ -3,9 +3,9 @@ import { ErrorCodes, notFound } from "@/helpers/errors.js";
 
 export async function listFeedings(
     userId: string,
-    options: { petId?: string; from?: Date; to?: Date; limit: number },
+    options: { petId?: string; from?: Date; to?: Date; limit: number; cursor?: string },
 ) {
-    return prisma.feeding.findMany({
+    const items = await prisma.feeding.findMany({
         where: {
             pet: { userId },
             ...(options.petId ? { petId: options.petId } : {}),
@@ -23,8 +23,17 @@ export async function listFeedings(
             feedItem: { select: { id: true, name: true, size: true } },
         },
         orderBy: { fedAt: "desc" },
-        take: options.limit,
+        take: options.limit + 1,
+        ...(options.cursor ? { cursor: { id: options.cursor }, skip: 1 } : {}),
     });
+
+    const hasMore = items.length > options.limit;
+    if (hasMore) items.pop();
+
+    return {
+        items,
+        nextCursor: hasMore && items.length > 0 ? items[items.length - 1].id : null,
+    };
 }
 
 export async function getFeeding(id: string, userId: string) {
@@ -52,6 +61,7 @@ export async function createFeeding(
         quantity?: number;
         accepted?: boolean;
         refusedReason?: string;
+        retryAt?: Date;
         notes?: string;
     },
 ) {
@@ -73,6 +83,7 @@ export async function updateFeeding(
         quantity: number;
         accepted: boolean;
         refusedReason: string;
+        retryAt: Date;
         notes: string;
     }>,
 ) {

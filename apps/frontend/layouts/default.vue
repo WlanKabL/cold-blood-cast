@@ -57,6 +57,9 @@
 
         <!-- Keyboard shortcut help overlay -->
         <LayoutKeyboardShortcutHelp />
+
+        <!-- Onboarding wizard -->
+        <OnboardingWizard />
     </div>
 </template>
 

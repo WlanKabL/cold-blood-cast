@@ -22,6 +22,10 @@ const mockPrisma = {
         findFirst: vi.fn(),
         create: vi.fn(),
     },
+    userPublicProfile: {
+        findUnique: vi.fn(),
+        update: vi.fn(),
+    },
 };
 
 vi.mock("@/config/index.js", () => ({
@@ -749,6 +753,54 @@ describe("changeUsername", () => {
         await expect(
             changeUsername(USER_ID, { newUsername: "taken", password: "pw" }),
         ).rejects.toThrow(/taken/i);
+    });
+
+    it("syncs public profile slug when slug matches old username", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ username: "oldname", usernameChangedAt: null }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue(null);
+        mockPrisma.user.update.mockResolvedValue({ username: "newname" });
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({ slug: "oldname" });
+        mockPrisma.userPublicProfile.update.mockResolvedValue({});
+
+        await changeUsername(USER_ID, { newUsername: "newname", password: "pw" });
+
+        expect(mockPrisma.userPublicProfile.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { userId: USER_ID },
+                data: { slug: "newname" },
+            }),
+        );
+    });
+
+    it("does not update slug when slug does not match old username", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ username: "oldname", usernameChangedAt: null }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue(null);
+        mockPrisma.user.update.mockResolvedValue({ username: "newname" });
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue({ slug: "custom-slug" });
+
+        await changeUsername(USER_ID, { newUsername: "newname", password: "pw" });
+
+        expect(mockPrisma.userPublicProfile.update).not.toHaveBeenCalled();
+    });
+
+    it("does not update slug when no public profile exists", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ username: "oldname", usernameChangedAt: null }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue(null);
+        mockPrisma.user.update.mockResolvedValue({ username: "newname" });
+        mockPrisma.userPublicProfile.findUnique.mockResolvedValue(null);
+
+        await changeUsername(USER_ID, { newUsername: "newname", password: "pw" });
+
+        expect(mockPrisma.userPublicProfile.update).not.toHaveBeenCalled();
     });
 });
 

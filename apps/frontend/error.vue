@@ -6,23 +6,40 @@
             class="shadow-primary-500/20 mx-auto mb-6 h-16 w-16 rounded-2xl shadow-lg"
         />
 
-        <h1 class="text-fg text-4xl font-bold sm:text-6xl">{{ error?.statusCode || 500 }}</h1>
-        <p class="text-fg-muted mt-3 text-lg">
-            {{ error?.statusMessage || $t("errorPage.fallback") }}
-        </p>
-        <p
-            v-if="error?.message && error.message !== error.statusMessage"
-            class="text-fg-dim mt-1 text-sm"
-        >
-            {{ error.message }}
-        </p>
+        <!-- 404 -->
+        <template v-if="error?.statusCode === 404">
+            <h1 class="text-fg text-5xl font-bold sm:text-7xl">404</h1>
+            <p class="text-fg-muted mt-3 text-lg">
+                {{ $t("errorPage.notFoundMessage") }}
+            </p>
+            <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+                <UiButton @click="handleError">
+                    {{ $t("errorPage.goHome") }}
+                </UiButton>
+                <UiButton variant="ghost" @click="$router.back()">
+                    {{ $t("errorPage.goBack") }}
+                </UiButton>
+            </div>
+        </template>
 
-        <button
-            class="from-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 mt-8 rounded-xl bg-linear-to-r to-violet-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition"
-            @click="handleError"
-        >
-            {{ $t("errorPage.goHome") }}
-        </button>
+        <!-- Other errors -->
+        <template v-else>
+            <h1 class="text-fg text-4xl font-bold sm:text-6xl">
+                {{ error?.statusCode || 500 }}
+            </h1>
+            <p class="text-fg-muted mt-3 text-lg">
+                {{ error?.statusMessage || $t("errorPage.fallback") }}
+            </p>
+            <p
+                v-if="error?.message && error.message !== error.statusMessage"
+                class="text-fg-dim mt-1 text-sm"
+            >
+                {{ error.message }}
+            </p>
+            <UiButton class="mt-8" @click="handleError">
+                {{ $t("errorPage.goHome") }}
+            </UiButton>
+        </template>
     </div>
 </template>
 

@@ -38,7 +38,7 @@
         </div>
 
         <!-- List -->
-        <div v-else-if="feedings?.length" class="animate-fade-in-up space-y-2 delay-150">
+        <div v-else-if="feedings.length" class="animate-fade-in-up space-y-2 delay-150">
             <div
                 v-for="feeding in feedings"
                 :key="feeding.id"
@@ -87,6 +87,10 @@
                         class="text-fg-faint text-xs"
                         >{{ refusedReasonLabel(feeding.refusedReason) }}</span
                     >
+                    <span v-if="!feeding.accepted && feeding.retryAt" class="text-fg-faint text-xs">
+                        {{ $t("pages.feedings.retryOn") }}
+                        {{ new Date(feeding.retryAt).toLocaleDateString() }}
+                    </span>
                     <UiButton
                         variant="ghost"
                         icon="lucide:pencil"
@@ -100,6 +104,11 @@
                         @click="confirmDelete(feeding.id)"
                     />
                 </div>
+            </div>
+            <!-- Infinite scroll sentinel -->
+            <div ref="sentinel" class="h-1" />
+            <div v-if="isFetchingNextPage" class="flex justify-center py-4">
+                <Icon name="lucide:loader-2" class="text-fg-muted h-5 w-5 animate-spin" />
             </div>
         </div>
 
@@ -185,6 +194,12 @@
                             {{ refusedReasonLabel(preset) }}
                         </button>
                     </div>
+                    <UiTextInput
+                        v-model="form.retryAt"
+                        :label="$t('pages.feedings.fields.retryAt')"
+                        type="datetime-local"
+                        class="mt-3"
+                    />
                 </div>
                 <UiTextarea v-model="form.notes" :label="$t('pages.feedings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
@@ -267,6 +282,12 @@
                             {{ refusedReasonLabel(preset) }}
                         </button>
                     </div>
+                    <UiTextInput
+                        v-model="editForm.retryAt"
+                        :label="$t('pages.feedings.fields.retryAt')"
+                        type="datetime-local"
+                        class="mt-3"
+                    />
                 </div>
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.feedings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
@@ -294,7 +315,7 @@
 </template>
 
 <script setup lang="ts">
-import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface Feeding {
     id: string;
@@ -304,6 +325,7 @@ interface Feeding {
     quantity: number;
     accepted: boolean;
     refusedReason: string | null;
+    retryAt: string | null;
     fedAt: string;
     notes: string | null;
     pet?: { name: string };
@@ -341,22 +363,34 @@ function refusedReasonLabel(reason: string): string {
     return translated === key ? reason : translated;
 }
 
-const queryParams = computed(() => {
-    const params = new URLSearchParams();
-    if (selectedPet.value && selectedPet.value !== "ALL") params.set("petId", selectedPet.value);
-    return params.toString();
-});
-
 // ── Data ─────────────────────────────────────────────────
 const {
-    data: feedings,
+    data: feedingsData,
     isLoading: loading,
     error,
     refetch,
-} = useQuery({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+} = useInfiniteQuery({
     queryKey: ["feedings", selectedPet],
-    queryFn: () =>
-        api.get<Feeding[]>(`/api/feedings${queryParams.value ? `?${queryParams.value}` : ""}`),
+    queryFn: ({ pageParam }) => {
+        const params = new URLSearchParams();
+        if (selectedPet.value && selectedPet.value !== "ALL")
+            params.set("petId", selectedPet.value);
+        if (pageParam) params.set("cursor", pageParam);
+        return api.get<{ items: Feeding[]; nextCursor: string | null }>(
+            `/api/feedings${params.size ? `?${params}` : ""}`,
+        );
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+});
+
+const feedings = computed(() => feedingsData.value?.pages.flatMap((p) => p.items) ?? []);
+
+const { sentinel } = useInfiniteScroll(() => fetchNextPage(), {
+    enabled: computed(() => !!hasNextPage.value && !isFetchingNextPage.value),
 });
 
 const { data: pets } = useQuery({
@@ -387,6 +421,7 @@ const form = reactive({
     quantity: 1,
     accepted: true,
     refusedReason: "",
+    retryAt: "",
     notes: "",
 });
 
@@ -400,6 +435,7 @@ function resetForm() {
         quantity: 1,
         accepted: true,
         refusedReason: "",
+        retryAt: "",
         notes: "",
     });
 }
@@ -429,6 +465,7 @@ const { mutate: createMutation, isPending: creating } = useMutation({
             quantity: form.quantity,
             accepted: form.accepted,
             refusedReason: !form.accepted && form.refusedReason ? form.refusedReason : undefined,
+            retryAt: !form.accepted && form.retryAt ? form.retryAt : undefined,
             notes: form.notes || undefined,
         }),
     onSuccess: () => {
@@ -457,6 +494,7 @@ const editForm = reactive({
     quantity: 1,
     accepted: true,
     refusedReason: "",
+    retryAt: "",
     notes: "",
 });
 
@@ -470,6 +508,7 @@ function openEditModal(feeding: Feeding) {
         quantity: feeding.quantity,
         accepted: feeding.accepted,
         refusedReason: feeding.refusedReason ?? "",
+        retryAt: feeding.retryAt ? feeding.retryAt.slice(0, 16) : "",
         notes: feeding.notes ?? "",
     });
     showEdit.value = true;
@@ -494,6 +533,7 @@ const { mutate: updateMutation, isPending: updating } = useMutation({
             accepted: editForm.accepted,
             refusedReason:
                 !editForm.accepted && editForm.refusedReason ? editForm.refusedReason : undefined,
+            retryAt: !editForm.accepted && editForm.retryAt ? editForm.retryAt : undefined,
             notes: editForm.notes || undefined,
         }),
     onSuccess: () => {

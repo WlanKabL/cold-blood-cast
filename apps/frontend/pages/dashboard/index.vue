@@ -162,6 +162,12 @@
                         <p class="text-fg-muted text-sm">
                             {{ $t("pages.dashboard.noPetsScheduled") }}
                         </p>
+                        <NuxtLink
+                            to="/pets"
+                            class="text-primary-400 hover:text-primary-300 mt-2 text-sm font-medium"
+                        >
+                            {{ $t("pages.dashboard.setupFeedingSchedule") }}
+                        </NuxtLink>
                     </div>
                 </div>
 
@@ -212,6 +218,12 @@
                         <p class="text-fg-muted text-sm">
                             {{ $t("pages.dashboard.noWeightData") }}
                         </p>
+                        <NuxtLink
+                            to="/weights"
+                            class="text-primary-400 hover:text-primary-300 mt-2 text-sm font-medium"
+                        >
+                            {{ $t("pages.dashboard.recordFirstWeight") }}
+                        </NuxtLink>
                     </div>
                 </div>
             </div>
@@ -285,6 +297,12 @@
                         <p class="text-fg-muted text-sm">
                             {{ $t("pages.dashboard.noUpcomingSheddings") }}
                         </p>
+                        <NuxtLink
+                            to="/sheddings"
+                            class="text-primary-400 hover:text-primary-300 mt-2 text-sm font-medium"
+                        >
+                            {{ $t("pages.dashboard.logFirstShedding") }}
+                        </NuxtLink>
                     </div>
                 </div>
 
@@ -346,6 +364,12 @@
                         <p class="text-fg-muted text-sm">
                             {{ $t("pages.dashboard.noUpcomingVetVisits") }}
                         </p>
+                        <NuxtLink
+                            to="/vet-visits"
+                            class="text-primary-400 hover:text-primary-300 mt-2 text-sm font-medium"
+                        >
+                            {{ $t("pages.dashboard.scheduleVetVisit") }}
+                        </NuxtLink>
                     </div>
                 </div>
             </div>
@@ -488,6 +512,12 @@
                         <p class="text-fg-muted text-sm">
                             {{ $t("pages.dashboard.noOverdueMaintenance") }}
                         </p>
+                        <NuxtLink
+                            to="/maintenance"
+                            class="text-primary-400 hover:text-primary-300 mt-2 text-sm font-medium"
+                        >
+                            {{ $t("pages.dashboard.createMaintenanceTask") }}
+                        </NuxtLink>
                     </div>
                 </div>
             </div>

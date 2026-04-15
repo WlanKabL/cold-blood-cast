@@ -2,7 +2,14 @@ import { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
-import { listPets, getPet, createPet, updatePet, deletePet } from "./pets.service.js";
+import {
+    listPets,
+    getPet,
+    createPet,
+    updatePet,
+    deletePet,
+    updatePetTags,
+} from "./pets.service.js";
 
 const PetBaseSchema = z.object({
     enclosureId: z.string().cuid().optional(),
@@ -96,5 +103,23 @@ export async function petRoutes(app: FastifyInstance) {
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
         await deletePet(request.params.id, request.userId);
         return { success: true, data: { ok: true } };
+    });
+
+    // ── Tag Assignment ──
+    const PetTagsSchema = z.object({
+        tagIds: z.array(z.string().cuid()),
+    });
+
+    app.put<{ Params: { id: string } }>("/:id/tags", async (request) => {
+        const result = PetTagsSchema.safeParse(request.body);
+        if (!result.success) {
+            throw badRequest(
+                ErrorCodes.E_VALIDATION_ERROR,
+                "Invalid tag data",
+                result.error.flatten(),
+            );
+        }
+        const data = await updatePetTags(request.params.id, request.userId, result.data.tagIds);
+        return { success: true, data };
     });
 }

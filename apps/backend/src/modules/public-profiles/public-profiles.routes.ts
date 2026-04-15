@@ -10,6 +10,7 @@ import {
     checkSlugAvailability,
     getPublicPetDataByUserSlug,
     getPublicPhoto,
+    resolvePublicPetSlug,
 } from "./public-profiles.service.js";
 import { resolve, join, normalize } from "node:path";
 import { stat } from "node:fs/promises";
@@ -124,6 +125,15 @@ export async function publicProfileRoutes(app: FastifyInstance) {
 // ─── Public Routes (no auth, registered at root) ─────────────
 
 export async function publicPetRoutes(app: FastifyInstance) {
+    // GET /resolve/:petSlug — resolve pet slug to canonical keeper/pet URL
+    app.get(
+        "/resolve/:petSlug",
+        async (request: FastifyRequest<{ Params: { petSlug: string } }>) => {
+            const data = await resolvePublicPetSlug(request.params.petSlug);
+            return { success: true, data };
+        },
+    );
+
     // GET /:userSlug/:petSlug — public pet profile data (new per-user URL)
     app.get(
         "/:userSlug/:petSlug",

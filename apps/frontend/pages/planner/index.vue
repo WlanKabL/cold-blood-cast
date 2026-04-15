@@ -202,6 +202,13 @@
                                             <Icon name="lucide:alert-circle" class="h-2.5 w-2.5" />
                                             {{ $t("pages.planner.overdue") }}
                                         </span>
+                                        <span
+                                            v-if="event.meta?.isPaused"
+                                            class="inline-flex items-center gap-0.5 rounded-full bg-yellow-500/10 px-1.5 py-0.5 text-[10px] font-medium text-yellow-400"
+                                        >
+                                            <Icon name="lucide:pause" class="h-2.5 w-2.5" />
+                                            {{ $t("pages.planner.paused") }}
+                                        </span>
                                     </div>
                                     <p v-if="event.detail" class="text-fg-muted mt-0.5 text-xs">
                                         {{ event.detail }}
@@ -226,7 +233,10 @@
                                 <div class="flex shrink-0 items-center gap-1">
                                     <button
                                         v-if="
-                                            event.type === 'feeding' || event.type === 'maintenance'
+                                            (event.type === 'feeding' ||
+                                                event.type === 'feeding_retry' ||
+                                                event.type === 'maintenance') &&
+                                            event.meta?.isPaused !== true
                                         "
                                         class="text-fg-faint rounded-lg p-1.5 transition-colors hover:bg-green-500/10 hover:text-green-400"
                                         :title="$t('pages.planner.quickComplete')"
@@ -659,6 +669,65 @@
                 </div>
             </template>
         </UiModal>
+
+        <!-- Quick-Feed Modal -->
+        <UiModal
+            :show="showQuickFeed"
+            :title="$t('pages.planner.quickFeed.title')"
+            width="md"
+            @close="showQuickFeed = false"
+        >
+            <form class="space-y-4" @submit.prevent="handleQuickFeed">
+                <div
+                    v-if="quickFeedForm.petName"
+                    class="bg-surface-raised flex items-center gap-2 rounded-lg px-3 py-2"
+                >
+                    <Icon name="lucide:paw-print" class="text-primary-400 h-4 w-4" />
+                    <span class="text-fg text-sm font-medium">{{ quickFeedForm.petName }}</span>
+                </div>
+                <UiTextInput
+                    v-model="quickFeedForm.fedAt"
+                    :label="$t('pages.feedings.fields.fedAt')"
+                    type="datetime-local"
+                    required
+                />
+                <UiTextInput
+                    v-model="quickFeedForm.foodType"
+                    :label="$t('pages.feedings.fields.foodType')"
+                    required
+                />
+                <div class="grid grid-cols-2 gap-3">
+                    <UiTextInput
+                        v-model="quickFeedForm.foodSize"
+                        :label="$t('pages.feedings.fields.foodSize')"
+                    />
+                    <UiTextInput
+                        v-model.number="quickFeedForm.quantity"
+                        :label="$t('pages.feedings.fields.quantity')"
+                        type="number"
+                        min="1"
+                    />
+                </div>
+                <div class="flex items-center gap-3">
+                    <UiToggle v-model="quickFeedForm.accepted" />
+                    <label class="text-fg text-sm">{{
+                        $t("pages.feedings.fields.acceptedLabel")
+                    }}</label>
+                </div>
+                <UiTextarea
+                    v-model="quickFeedForm.notes"
+                    :label="$t('pages.feedings.fields.notes')"
+                />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton variant="ghost" @click="showQuickFeed = false">
+                        {{ $t("common.cancel") }}
+                    </UiButton>
+                    <UiButton type="submit" :loading="quickFeeding">
+                        {{ $t("pages.planner.quickFeed.confirm") }}
+                    </UiButton>
+                </div>
+            </form>
+        </UiModal>
     </div>
 </template>
 
@@ -680,7 +749,7 @@ useHead({ title: () => t("pages.planner.title") });
 
 interface PlannerEvent {
     id: string;
-    type: "feeding" | "vet_visit" | "shedding" | "maintenance";
+    type: "feeding" | "feeding_retry" | "vet_visit" | "shedding" | "maintenance";
     date: string;
     title: string;
     detail: string | null;
@@ -770,7 +839,7 @@ const overdueCount = computed(
 );
 
 // ── Type Filters ──
-const allTypes = ["feeding", "vet_visit", "shedding", "maintenance"];
+const allTypes = ["feeding", "feeding_retry", "vet_visit", "shedding", "maintenance"];
 const activeFilters = ref(new Set<string>(allTypes));
 
 function toggleFilter(type: string) {
@@ -792,16 +861,53 @@ const filteredDays = computed(() => {
 });
 
 // ── Quick Complete ──
-const { mutate: quickCompleteMutation } = useMutation({
-    mutationFn: (event: PlannerEvent) => {
-        if (event.type === "maintenance") {
+const showQuickFeed = ref(false);
+const quickFeedForm = reactive({
+    petId: "",
+    petName: "",
+    fedAt: "",
+    foodType: "",
+    foodSize: "",
+    quantity: 1,
+    accepted: true,
+    notes: "",
+});
+
+function quickComplete(event: PlannerEvent) {
+    if (event.type === "maintenance") {
+        quickCompleteMutation(event);
+        return;
+    }
+    // Open quick-feed modal pre-filled with event data
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const localIso = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    Object.assign(quickFeedForm, {
+        petId: (event.meta?.petId as string) || "",
+        petName: event.petName || event.title,
+        fedAt: localIso,
+        foodType: (event.meta?.foodType as string) || "",
+        foodSize: "",
+        quantity: 1,
+        accepted: true,
+        notes: "",
+    });
+    showQuickFeed.value = true;
+}
+
+const { mutate: quickCompleteMutation, isPending: quickFeeding } = useMutation({
+    mutationFn: (event: PlannerEvent | null) => {
+        if (event?.type === "maintenance") {
             return api.post(`/api/enclosure-maintenance/${event.id}/complete`, {});
         }
-        // feeding — create a feeding record for this pet
         return api.post("/api/feedings", {
-            petId: event.meta?.petId as string,
-            fedAt: new Date().toISOString(),
-            foodType: (event.meta?.foodType as string) || event.title,
+            petId: quickFeedForm.petId,
+            fedAt: quickFeedForm.fedAt,
+            foodType: quickFeedForm.foodType,
+            foodSize: quickFeedForm.foodSize || undefined,
+            quantity: quickFeedForm.quantity,
+            accepted: quickFeedForm.accepted,
+            notes: quickFeedForm.notes || undefined,
         });
     },
     onSuccess: () => {
@@ -810,14 +916,15 @@ const { mutate: quickCompleteMutation } = useMutation({
         queryClient.invalidateQueries({ queryKey: ["feedings"] });
         queryClient.invalidateQueries({ queryKey: ["maintenance-tasks"] });
         toast.success(t("pages.planner.quickCompleted"));
+        showQuickFeed.value = false;
     },
     onError: () => {
         toast.error(t("common.error"));
     },
 });
 
-function quickComplete(event: PlannerEvent) {
-    quickCompleteMutation(event);
+function handleQuickFeed() {
+    quickCompleteMutation(null);
 }
 
 const busiestDayLabel = computed(() => {
@@ -868,6 +975,7 @@ const eventLink = computed((): string | null => {
     if (!e) return null;
     switch (e.type) {
         case "feeding":
+        case "feeding_retry":
             return "/feedings";
         case "vet_visit":
             return "/vet-visits";
@@ -913,6 +1021,7 @@ function formatFullDate(date: string): string {
 function eventIcon(type: string): string {
     const icons: Record<string, string> = {
         feeding: "lucide:utensils",
+        feeding_retry: "lucide:rotate-ccw",
         vet_visit: "lucide:stethoscope",
         shedding: "lucide:layers",
         maintenance: "lucide:wrench",
@@ -923,6 +1032,7 @@ function eventIcon(type: string): string {
 function eventIconBgClass(type: string): string {
     const classes: Record<string, string> = {
         feeding: "bg-amber-500/10 text-amber-400",
+        feeding_retry: "bg-orange-500/10 text-orange-400",
         vet_visit: "bg-teal-500/10 text-teal-400",
         shedding: "bg-violet-500/10 text-violet-400",
         maintenance: "bg-blue-500/10 text-blue-400",
@@ -933,6 +1043,7 @@ function eventIconBgClass(type: string): string {
 function eventBadgeClass(type: string): string {
     const classes: Record<string, string> = {
         feeding: "bg-amber-500/10 text-amber-400",
+        feeding_retry: "bg-orange-500/10 text-orange-400",
         vet_visit: "bg-teal-500/10 text-teal-400",
         shedding: "bg-violet-500/10 text-violet-400",
         maintenance: "bg-blue-500/10 text-blue-400",
@@ -943,6 +1054,7 @@ function eventBadgeClass(type: string): string {
 function eventTypeKey(type: string): string {
     const keys: Record<string, string> = {
         feeding: "feeding",
+        feeding_retry: "feedingRetry",
         vet_visit: "vetVisit",
         shedding: "shedding",
         maintenance: "maintenance",

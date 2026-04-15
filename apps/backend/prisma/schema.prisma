@@ -794,6 +794,7 @@ model Pet {
     documents     PetDocument[]
     publicProfile PublicProfile?
     userPetOrders UserPetOrder[]
+    tags          Tag[]           @relation("PetTags")
 
     @@index([userId])
     @@index([enclosureId])
@@ -872,6 +873,7 @@ model Feeding {
     quantity   Int       @default(1)
     accepted   Boolean   @default(true)
     refusedReason String? @map("refused_reason")
+    retryAt    DateTime? @map("retry_at")
     notes      String?
     createdAt  DateTime  @default(now()) @map("created_at")
 
@@ -1298,6 +1300,7 @@ model Tag {
     updatedAt DateTime @updatedAt @map("updated_at")
 
     user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    pets      Pet[]    @relation("PetTags")
 
     @@unique([userId, name, category])
     @@index([category])

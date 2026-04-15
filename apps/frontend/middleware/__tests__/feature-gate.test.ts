@@ -47,10 +47,10 @@ describe("feature-gate middleware", () => {
         expect(navigateToResult).not.toHaveBeenCalled();
     });
 
-    it("redirects to /upgrade when user lacks the feature", () => {
+    it("redirects to /pricing when user lacks the feature", () => {
         mockAuthStore.hasFeature.mockReturnValue(false);
         mw(route("/analytics", "analytics"));
-        expect(navigateToResult).toHaveBeenCalledWith("/upgrade", { replace: true });
+        expect(navigateToResult).toHaveBeenCalledWith("/pricing", { replace: true });
     });
 
     it("checks the correct feature key", () => {

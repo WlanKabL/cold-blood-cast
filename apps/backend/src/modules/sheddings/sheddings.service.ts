@@ -3,9 +3,9 @@ import { ErrorCodes, notFound } from "@/helpers/errors.js";
 
 export async function listSheddings(
     userId: string,
-    options: { petId?: string; from?: Date; to?: Date; limit: number },
+    options: { petId?: string; from?: Date; to?: Date; limit: number; cursor?: string },
 ) {
-    return prisma.shedding.findMany({
+    const items = await prisma.shedding.findMany({
         where: {
             pet: { userId },
             ...(options.petId ? { petId: options.petId } : {}),
@@ -20,8 +20,17 @@ export async function listSheddings(
         },
         include: { pet: { select: { id: true, name: true } } },
         orderBy: { startedAt: "desc" },
-        take: options.limit,
+        take: options.limit + 1,
+        ...(options.cursor ? { cursor: { id: options.cursor }, skip: 1 } : {}),
     });
+
+    const hasMore = items.length > options.limit;
+    if (hasMore) items.pop();
+
+    return {
+        items,
+        nextCursor: hasMore && items.length > 0 ? items[items.length - 1].id : null,
+    };
 }
 
 export async function getShedding(id: string, userId: string) {

@@ -114,6 +114,21 @@
                     </span>
                 </div>
 
+                <!-- Tags -->
+                <div v-if="pet.tags?.length" class="mt-2 flex flex-wrap gap-1">
+                    <span
+                        v-for="tag in pet.tags"
+                        :key="tag.id"
+                        class="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
+                        :style="{
+                            backgroundColor: (tag.color ?? '#6b7280') + '22',
+                            color: tag.color ?? '#6b7280',
+                        }"
+                    >
+                        {{ tag.name }}
+                    </span>
+                </div>
+
                 <!-- Footer: Counts -->
                 <div class="mt-4 flex items-center gap-4 border-t border-white/5 pt-3">
                     <span class="text-fg-muted flex items-center gap-1.5 text-xs">
@@ -242,6 +257,7 @@ interface Pet {
     enclosureId: string | null;
     enclosure: { id: string; name: string } | null;
     photos: { id: string; uploadId: string; upload: { url: string } }[];
+    tags?: { id: string; name: string; color: string | null; category: string }[];
     _count: { feedings: number; sheddings: number; weightRecords: number; photos: number };
 }
 

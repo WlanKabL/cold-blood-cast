@@ -12,6 +12,7 @@ export async function listPets(userId: string) {
                 take: 1,
                 select: { id: true, uploadId: true, upload: { select: { url: true } } },
             },
+            tags: { select: { id: true, name: true, color: true, category: true } },
             _count: {
                 select: {
                     feedings: true,
@@ -36,6 +37,7 @@ export async function getPet(id: string, userId: string) {
                 take: 1,
                 select: { id: true, uploadId: true, upload: { select: { url: true } } },
             },
+            tags: { select: { id: true, name: true, color: true, category: true } },
             _count: {
                 select: {
                     feedings: true,
@@ -122,4 +124,34 @@ export async function deletePet(id: string, userId: string) {
         throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
     }
     await prisma.pet.delete({ where: { id } });
+}
+
+export async function updatePetTags(id: string, userId: string, tagIds: string[]) {
+    const existing = await prisma.pet.findUnique({ where: { id } });
+    if (!existing || existing.userId !== userId) {
+        throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
+    }
+
+    // Verify all tags belong to the user or are global
+    if (tagIds.length > 0) {
+        const tags = await prisma.tag.findMany({
+            where: {
+                id: { in: tagIds },
+                OR: [{ userId }, { userId: null }],
+            },
+        });
+        if (tags.length !== tagIds.length) {
+            throw notFound(ErrorCodes.E_TAG_NOT_FOUND, "One or more tags not found");
+        }
+    }
+
+    return prisma.pet.update({
+        where: { id },
+        data: {
+            tags: { set: tagIds.map((tagId) => ({ id: tagId })) },
+        },
+        include: {
+            tags: { select: { id: true, name: true, color: true, category: true } },
+        },
+    });
 }

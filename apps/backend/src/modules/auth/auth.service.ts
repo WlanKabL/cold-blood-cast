@@ -778,6 +778,19 @@ export async function changeUsername(
         select: { username: true },
     });
 
+    // Sync public profile slug if it matched the old username
+    const oldSlug = user.username.toLowerCase();
+    const profile = await prisma.userPublicProfile.findUnique({
+        where: { userId },
+        select: { slug: true },
+    });
+    if (profile && profile.slug === oldSlug) {
+        await prisma.userPublicProfile.update({
+            where: { userId },
+            data: { slug: input.newUsername.toLowerCase() },
+        });
+    }
+
     return updated;
 }
 

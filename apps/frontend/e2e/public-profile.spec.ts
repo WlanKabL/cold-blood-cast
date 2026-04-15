@@ -10,6 +10,7 @@ async function mockPublicPetApi(
     slug: string,
     data: unknown,
 ) {
+    const keeperSlug = "testkeeper";
     // Auth endpoints — public pages still trigger refresh attempts
     await page.route("**/api/auth/refresh", (route) =>
         route.fulfill({
@@ -29,8 +30,20 @@ async function mockPublicPetApi(
         }),
     );
 
-    // Public pet data
-    await page.route(`**/api/public/pets/${slug}`, (route) => {
+    // Legacy /p/:slug resolver -> canonical keeper route
+    await page.route(`**/api/public/pets/resolve/${slug}`, (route) =>
+        route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+                success: true,
+                data: { userSlug: keeperSlug, petSlug: slug },
+            }),
+        }),
+    );
+
+    // Canonical public pet data
+    await page.route(`**/api/public/pets/${keeperSlug}/${slug}`, (route) => {
         if (route.request().url().includes("/photos/")) return route.continue();
         return route.fulfill({
             status: 200,
@@ -40,7 +53,7 @@ async function mockPublicPetApi(
     });
 
     // Photo URLs — serve a 1x1 transparent PNG
-    await page.route(`**/api/public/pets/${slug}/photos/**`, (route) =>
+    await page.route(`**/api/public/pets/${keeperSlug}/${slug}/photos/**`, (route) =>
         route.fulfill({
             status: 200,
             contentType: "image/png",
@@ -71,7 +84,7 @@ async function mockPublicPetNotFound(page: import("@playwright/test").Page, slug
         }),
     );
 
-    await page.route(`**/api/public/pets/${slug}`, (route) =>
+    await page.route(`**/api/public/pets/resolve/${slug}`, (route) =>
         route.fulfill({
             status: 404,
             contentType: "application/json",

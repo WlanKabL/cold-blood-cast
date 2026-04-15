@@ -13,6 +13,6 @@ export default defineNuxtRouteMiddleware((to) => {
 
     const authStore = useAuthStore();
     if (!authStore.hasFeature(requiredFeature)) {
-        return navigateTo("/upgrade", { replace: true });
+        return navigateTo("/pricing", { replace: true });
     }
 });

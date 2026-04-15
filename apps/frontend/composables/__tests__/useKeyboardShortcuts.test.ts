@@ -136,7 +136,7 @@ describe("useGlobalKeyboardShortcuts", () => {
         const wrapper = mountWithShortcuts();
         const { globalShortcuts } = useKeyboardShortcuts();
         const nav = globalShortcuts.value.filter((s) => s.category === "navigation");
-        expect(nav.length).toBe(6);
+        expect(nav.length).toBe(7);
         wrapper.unmount();
     });
 
@@ -146,6 +146,7 @@ describe("useGlobalKeyboardShortcuts", () => {
         const keys = globalShortcuts.value.map((s) => s.key);
         expect(keys).toContain("E");
         expect(keys).toContain("P");
+        expect(keys).toContain("N");
         expect(keys).toContain("S");
         expect(keys).toContain("F");
         expect(keys).toContain("W");
@@ -179,12 +180,21 @@ describe("useGlobalKeyboardShortcuts", () => {
         wrapper.unmount();
     });
 
-    it("navigates to sensors on 's' key", async () => {
+    it("navigates to settings on 's' key", async () => {
         const wrapper = mountWithShortcuts();
         pressKey("s");
         await nextTick();
-        expect(mockPush).toHaveBeenCalledWith("/sensors");
+        expect(mockPush).toHaveBeenCalledWith("/settings");
         releaseKey("s");
+        wrapper.unmount();
+    });
+
+    it("navigates to sensors on 'n' key", async () => {
+        const wrapper = mountWithShortcuts();
+        pressKey("n");
+        await nextTick();
+        expect(mockPush).toHaveBeenCalledWith("/sensors");
+        releaseKey("n");
         wrapper.unmount();
     });
 
@@ -287,7 +297,7 @@ describe("useLocalShortcuts", () => {
         );
         const { localShortcuts } = useKeyboardShortcuts();
         expect(localShortcuts.value).toHaveLength(1);
-        expect(localShortcuts.value[0].key).toBe("n");
+        expect(localShortcuts.value[0]?.key).toBe("n");
         wrapper.unmount();
     });
 

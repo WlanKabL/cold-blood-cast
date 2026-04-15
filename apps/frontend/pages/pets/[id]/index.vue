@@ -134,6 +134,37 @@
                                 </dd>
                             </div>
                         </dl>
+
+                        <!-- Tags -->
+                        <div class="mt-4 border-t border-white/5 pt-4">
+                            <div class="mb-2 flex items-center justify-between">
+                                <dt class="text-fg-faint text-xs font-medium uppercase">
+                                    {{ $t("pages.pets.fields.tags") }}
+                                </dt>
+                                <button
+                                    class="text-primary-400 text-xs font-medium"
+                                    @click="showTagManager = true"
+                                >
+                                    {{ $t("pages.pets.manageTags") }}
+                                </button>
+                            </div>
+                            <div v-if="pet.tags?.length" class="flex flex-wrap gap-1.5">
+                                <span
+                                    v-for="tag in pet.tags"
+                                    :key="tag.id"
+                                    class="rounded-md px-2 py-0.5 text-xs font-medium"
+                                    :style="{
+                                        backgroundColor: (tag.color ?? '#6b7280') + '22',
+                                        color: tag.color ?? '#6b7280',
+                                    }"
+                                >
+                                    {{ tag.name }}
+                                </span>
+                            </div>
+                            <p v-else class="text-fg-faint text-xs">
+                                {{ $t("pages.pets.noTags") }}
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Photos Preview -->
@@ -706,11 +737,85 @@
             @confirm="handleDelete"
             @cancel="showDeleteConfirm = false"
         />
+
+        <!-- Tag Manager Modal -->
+        <UiModal
+            :show="showTagManager"
+            :title="$t('pages.pets.manageTags')"
+            width="md"
+            @close="showTagManager = false"
+        >
+            <div class="space-y-4">
+                <!-- Current tags -->
+                <div>
+                    <p class="text-fg-faint mb-2 text-xs font-medium uppercase">
+                        {{ $t("pages.pets.assignedTags") }}
+                    </p>
+                    <div v-if="selectedTagIds.length" class="flex flex-wrap gap-1.5">
+                        <button
+                            v-for="tag in selectedTagObjects"
+                            :key="tag.id"
+                            class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:opacity-75"
+                            :style="{
+                                backgroundColor: (tag.color ?? '#6b7280') + '22',
+                                color: tag.color ?? '#6b7280',
+                            }"
+                            @click="removeTag(tag.id)"
+                        >
+                            {{ tag.name }}
+                            <Icon name="lucide:x" class="h-3 w-3" />
+                        </button>
+                    </div>
+                    <p v-else class="text-fg-faint text-xs">{{ $t("pages.pets.noTags") }}</p>
+                </div>
+
+                <!-- Available tags -->
+                <div>
+                    <p class="text-fg-faint mb-2 text-xs font-medium uppercase">
+                        {{ $t("pages.pets.availableTags") }}
+                    </p>
+                    <div v-if="unselectedTags.length" class="flex flex-wrap gap-1.5">
+                        <button
+                            v-for="tag in unselectedTags"
+                            :key="tag.id"
+                            class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium opacity-50 transition-colors hover:opacity-100"
+                            :style="{
+                                backgroundColor: (tag.color ?? '#6b7280') + '22',
+                                color: tag.color ?? '#6b7280',
+                            }"
+                            @click="addTag(tag.id)"
+                        >
+                            <Icon name="lucide:plus" class="h-3 w-3" />
+                            {{ tag.name }}
+                        </button>
+                    </div>
+                    <p v-else class="text-fg-faint text-xs">
+                        {{ $t("pages.pets.noAvailableTags") }}
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-2 border-t border-white/5 pt-4">
+                    <UiButton variant="ghost" @click="showTagManager = false">
+                        {{ $t("common.cancel") }}
+                    </UiButton>
+                    <UiButton :loading="savingTags" @click="handleSaveTags">
+                        {{ $t("common.save") }}
+                    </UiButton>
+                </div>
+            </div>
+        </UiModal>
     </div>
 </template>
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+
+interface PetTag {
+    id: string;
+    name: string;
+    color: string | null;
+    category: string | null;
+}
 
 interface Pet {
     id: string;
@@ -724,6 +829,8 @@ interface Pet {
     enclosure: { id: string; name: string } | null;
     feedingIntervalMinDays: number | null;
     feedingIntervalMaxDays: number | null;
+    pauseFeedingDuringShed: boolean;
+    tags?: PetTag[];
     photos: { id: string; uploadId: string; upload: { url: string } }[];
     _count: { photos: number; documents: number };
 }
@@ -1054,5 +1161,54 @@ const { mutate: deleteMutation, isPending: deleting } = useMutation({
 
 function handleDelete() {
     deleteMutation();
+}
+
+// ── Tags ─────────────────────────────────────────────────
+const showTagManager = ref(false);
+const selectedTagIds = ref<string[]>([]);
+
+const { data: allTags } = useQuery({
+    queryKey: ["tags"],
+    queryFn: () => api.get<PetTag[]>("/api/tags"),
+});
+
+const selectedTagObjects = computed(
+    () => allTags.value?.filter((t) => selectedTagIds.value.includes(t.id)) ?? [],
+);
+
+const unselectedTags = computed(
+    () => allTags.value?.filter((t) => !selectedTagIds.value.includes(t.id)) ?? [],
+);
+
+function addTag(tagId: string) {
+    if (!selectedTagIds.value.includes(tagId)) {
+        selectedTagIds.value.push(tagId);
+    }
+}
+
+function removeTag(tagId: string) {
+    selectedTagIds.value = selectedTagIds.value.filter((id) => id !== tagId);
+}
+
+watch(showTagManager, (open) => {
+    if (open) {
+        selectedTagIds.value = pet.value?.tags?.map((t) => t.id) ?? [];
+    }
+});
+
+const { mutate: saveTagsMutation, isPending: savingTags } = useMutation({
+    mutationFn: () => api.put(`/api/pets/${petId}/tags`, { tagIds: selectedTagIds.value }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["pets"] });
+        toast.success(t("pages.pets.tagsSaved"));
+        showTagManager.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function handleSaveTags() {
+    saveTagsMutation();
 }
 </script>

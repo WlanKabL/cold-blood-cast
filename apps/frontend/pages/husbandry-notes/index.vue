@@ -6,20 +6,28 @@
         >
             <div>
                 <h1 class="text-fg text-2xl font-bold tracking-tight">
-                    {{ $t("pages.sheddings.title") }}
+                    {{ $t("pages.husbandryNotes.title") }}
                 </h1>
-                <p class="text-fg-muted mt-1 text-sm">{{ $t("pages.sheddings.subtitle") }}</p>
+                <p class="text-fg-muted mt-1 text-sm">
+                    {{ $t("pages.husbandryNotes.subtitle") }}
+                </p>
             </div>
             <UiButton icon="lucide:plus" @click="openCreateModal">{{
-                $t("pages.sheddings.add")
+                $t("pages.husbandryNotes.add")
             }}</UiButton>
         </div>
 
         <!-- Filters -->
         <div class="animate-fade-in-up flex flex-wrap gap-3 delay-75">
             <UiSelect v-model="selectedPet" class="w-48">
-                <option value="ALL">{{ $t("pages.sheddings.allPets") }}</option>
+                <option value="ALL">{{ $t("pages.husbandryNotes.allPets") }}</option>
                 <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </UiSelect>
+            <UiSelect v-model="selectedType" class="w-48">
+                <option value="ALL">{{ $t("pages.husbandryNotes.allTypes") }}</option>
+                <option v-for="tp in noteTypePresets" :key="tp" :value="tp">
+                    {{ noteTypeLabel(tp) }}
+                </option>
             </UiSelect>
         </div>
 
@@ -38,62 +46,49 @@
         </div>
 
         <!-- List -->
-        <div v-else-if="sheddings.length" class="animate-fade-in-up space-y-2 delay-150">
+        <div v-else-if="filteredNotes.length" class="animate-fade-in-up space-y-2 delay-150">
             <div
-                v-for="shed in sheddings"
-                :key="shed.id"
+                v-for="note in filteredNotes"
+                :key="note.id"
                 class="glass-card flex items-center justify-between rounded-xl p-4"
             >
                 <div class="flex items-center gap-4">
                     <div
-                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400"
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400"
                     >
-                        <Icon name="lucide:layers" class="h-5 w-5" />
+                        <Icon :name="noteTypeIcon(note.type)" class="h-5 w-5" />
                     </div>
                     <div>
-                        <p class="text-fg text-sm font-medium">{{ shed.pet?.name ?? "" }}</p>
+                        <p class="text-fg text-sm font-medium">{{ note.title }}</p>
                         <p class="text-fg-faint text-xs">
-                            {{ $t("pages.sheddings.started") }}:
-                            {{ new Date(shed.startedAt).toLocaleDateString() }}
-                            <span v-if="shed.completedAt">
-                                · {{ $t("pages.sheddings.completed") }}:
-                                {{ new Date(shed.completedAt).toLocaleDateString() }}
-                            </span>
+                            {{ note.pet?.name ?? "" }}
+                            <span class="text-fg-faint/60"> · {{ noteTypeLabel(note.type) }}</span>
+                        </p>
+                        <p v-if="note.content" class="text-fg-faint mt-0.5 line-clamp-1 text-xs">
+                            {{ note.content }}
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span
-                        :class="
-                            shed.complete
-                                ? 'bg-green-500/10 text-green-400'
-                                : 'bg-yellow-500/10 text-yellow-400'
-                        "
-                        class="rounded-md px-2 py-0.5 text-xs font-medium"
-                    >
-                        {{
-                            shed.complete
-                                ? $t("pages.sheddings.complete")
-                                : $t("pages.sheddings.inProgress")
-                        }}
-                    </span>
-                    <span
-                        v-if="shed.quality"
-                        :class="qualityBadgeClass(shed.quality)"
-                        class="rounded-md px-2 py-0.5 text-xs font-medium"
-                        >{{ qualityLabel(shed.quality) }}</span
-                    >
+                    <div class="text-right">
+                        <p class="text-fg-muted text-sm">
+                            {{ new Date(note.occurredAt).toLocaleDateString() }}
+                        </p>
+                        <p class="text-fg-faint text-xs">
+                            {{ new Date(note.occurredAt).toLocaleTimeString() }}
+                        </p>
+                    </div>
                     <UiButton
                         variant="ghost"
                         icon="lucide:pencil"
                         size="sm"
-                        @click="openEditModal(shed)"
+                        @click="openEditModal(note)"
                     />
                     <UiButton
                         variant="danger"
                         icon="lucide:trash-2"
                         size="sm"
-                        @click="confirmDelete(shed.id)"
+                        @click="confirmDelete(note.id)"
                     />
                 </div>
             </div>
@@ -106,66 +101,65 @@
 
         <!-- Empty State -->
         <div v-else class="glass-card flex flex-col items-center rounded-xl py-16">
-            <Icon name="lucide:layers" class="text-fg-faint mb-3 h-12 w-12" />
-            <p class="text-fg-muted text-sm">{{ $t("pages.sheddings.empty") }}</p>
+            <Icon name="lucide:clipboard-list" class="text-fg-faint mb-3 h-12 w-12" />
+            <p class="text-fg-muted text-sm">{{ $t("pages.husbandryNotes.empty") }}</p>
             <UiButton class="mt-4" @click="openCreateModal">{{
-                $t("pages.sheddings.addFirst")
+                $t("pages.husbandryNotes.addFirst")
             }}</UiButton>
         </div>
 
         <!-- Create Modal -->
         <UiModal
             :show="showCreate"
-            :title="$t('pages.sheddings.create')"
+            :title="$t('pages.husbandryNotes.create')"
             width="lg"
             @close="showCreate = false"
         >
             <form class="space-y-4" @submit.prevent="handleCreate">
-                <UiSelect v-model="form.petId" :label="$t('pages.sheddings.fields.pet')" required>
+                <UiSelect
+                    v-model="form.petId"
+                    :label="$t('pages.husbandryNotes.fields.pet')"
+                    required
+                >
                     <option v-for="p in pets" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </UiSelect>
-                <UiTextInput
-                    v-model="form.startedAt"
-                    :label="$t('pages.sheddings.fields.startedAt')"
-                    type="date"
-                    required
-                />
-                <UiTextInput
-                    v-model="form.completedAt"
-                    :label="$t('pages.sheddings.fields.completedAt')"
-                    type="date"
-                />
-                <div class="flex items-center gap-3">
-                    <UiToggle v-model="form.complete" />
-                    <label class="text-fg text-sm">{{
-                        $t("pages.sheddings.fields.completeLabel")
-                    }}</label>
-                </div>
                 <div>
                     <label class="text-fg-muted mb-1 block text-sm font-medium">{{
-                        $t("pages.sheddings.fields.quality")
+                        $t("pages.husbandryNotes.fields.type")
                     }}</label>
                     <div class="flex flex-wrap gap-2">
                         <button
-                            v-for="preset in qualityPresets"
-                            :key="preset"
+                            v-for="tp in noteTypePresets"
+                            :key="tp"
                             type="button"
                             class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                             :class="
-                                form.quality === preset
-                                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40'
+                                form.type === tp
+                                    ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40'
                                     : 'text-fg-muted bg-white/5 hover:bg-white/10'
                             "
-                            @click="form.quality = form.quality === preset ? '' : preset"
+                            @click="form.type = form.type === tp ? '' : tp"
                         >
-                            {{ qualityLabel(preset) }}
+                            {{ noteTypeLabel(tp) }}
                         </button>
                     </div>
                 </div>
+                <UiTextInput
+                    v-model="form.title"
+                    :label="$t('pages.husbandryNotes.fields.title')"
+                    required
+                    :placeholder="$t('pages.husbandryNotes.fields.titlePlaceholder')"
+                />
                 <UiTextarea
-                    v-model="form.notes"
-                    :label="$t('pages.sheddings.fields.notes')"
-                    :placeholder="$t('pages.sheddings.fields.notesPlaceholder')"
+                    v-model="form.content"
+                    :label="$t('pages.husbandryNotes.fields.content')"
+                    :placeholder="$t('pages.husbandryNotes.fields.contentPlaceholder')"
+                />
+                <UiTextInput
+                    v-model="form.occurredAt"
+                    :label="$t('pages.husbandryNotes.fields.occurredAt')"
+                    type="datetime-local"
+                    required
                 />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showCreate = false">{{
@@ -179,53 +173,48 @@
         <!-- Edit Modal -->
         <UiModal
             :show="showEdit"
-            :title="$t('pages.sheddings.edit')"
+            :title="$t('pages.husbandryNotes.edit')"
             width="lg"
             @close="showEdit = false"
         >
             <form class="space-y-4" @submit.prevent="handleUpdate">
-                <UiTextInput
-                    v-model="editForm.startedAt"
-                    :label="$t('pages.sheddings.fields.startedAt')"
-                    type="date"
-                    required
-                />
-                <UiTextInput
-                    v-model="editForm.completedAt"
-                    :label="$t('pages.sheddings.fields.completedAt')"
-                    type="date"
-                />
-                <div class="flex items-center gap-3">
-                    <UiToggle v-model="editForm.complete" />
-                    <label class="text-fg text-sm">{{
-                        $t("pages.sheddings.fields.completeLabel")
-                    }}</label>
-                </div>
                 <div>
                     <label class="text-fg-muted mb-1 block text-sm font-medium">{{
-                        $t("pages.sheddings.fields.quality")
+                        $t("pages.husbandryNotes.fields.type")
                     }}</label>
                     <div class="flex flex-wrap gap-2">
                         <button
-                            v-for="preset in qualityPresets"
-                            :key="preset"
+                            v-for="tp in noteTypePresets"
+                            :key="tp"
                             type="button"
                             class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                             :class="
-                                editForm.quality === preset
-                                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40'
+                                editForm.type === tp
+                                    ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40'
                                     : 'text-fg-muted bg-white/5 hover:bg-white/10'
                             "
-                            @click="editForm.quality = editForm.quality === preset ? '' : preset"
+                            @click="editForm.type = editForm.type === tp ? '' : tp"
                         >
-                            {{ qualityLabel(preset) }}
+                            {{ noteTypeLabel(tp) }}
                         </button>
                     </div>
                 </div>
+                <UiTextInput
+                    v-model="editForm.title"
+                    :label="$t('pages.husbandryNotes.fields.title')"
+                    required
+                    :placeholder="$t('pages.husbandryNotes.fields.titlePlaceholder')"
+                />
                 <UiTextarea
-                    v-model="editForm.notes"
-                    :label="$t('pages.sheddings.fields.notes')"
-                    :placeholder="$t('pages.sheddings.fields.notesPlaceholder')"
+                    v-model="editForm.content"
+                    :label="$t('pages.husbandryNotes.fields.content')"
+                    :placeholder="$t('pages.husbandryNotes.fields.contentPlaceholder')"
+                />
+                <UiTextInput
+                    v-model="editForm.occurredAt"
+                    :label="$t('pages.husbandryNotes.fields.occurredAt')"
+                    type="datetime-local"
+                    required
                 />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showEdit = false">{{
@@ -240,7 +229,7 @@
         <UiConfirmDialog
             :show="showDeleteConfirm"
             :title="$t('common.confirmDelete')"
-            :message="$t('pages.sheddings.confirmDelete')"
+            :message="$t('pages.husbandryNotes.confirmDelete')"
             variant="danger"
             :confirm-label="$t('common.delete')"
             :cancel-label="$t('common.cancel')"
@@ -254,14 +243,14 @@
 <script setup lang="ts">
 import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
-interface Shedding {
+interface HusbandryNote {
     id: string;
-    startedAt: string;
-    completedAt: string | null;
-    complete: boolean;
-    quality: string | null;
-    notes: string | null;
-    pet?: { name: string };
+    petId: string;
+    type: string;
+    title: string;
+    content: string | null;
+    occurredAt: string;
+    pet?: { id: string; name: string };
 }
 
 interface Pet {
@@ -274,37 +263,42 @@ const api = useApi();
 const queryClient = useQueryClient();
 const toast = useAppToast();
 
-definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "sheddings" });
-useHead({ title: () => t("pages.sheddings.title") });
+definePageMeta({ layout: "default", middleware: ["auth"] });
+useHead({ title: () => t("pages.husbandryNotes.title") });
 
 const selectedPet = ref("ALL");
+const selectedType = ref("ALL");
 
-const qualityPresets = ["complete", "partial", "stuck", "assisted"] as const;
+const noteTypePresets = [
+    "observation",
+    "behavior",
+    "habitat_change",
+    "health",
+    "enrichment",
+    "other",
+] as const;
 
-function qualityLabel(quality: string): string {
-    const key = `pages.sheddings.qualityPresets.${quality}`;
+function noteTypeLabel(type: string): string {
+    const key = `pages.husbandryNotes.types.${type}`;
     const translated = t(key);
-    return translated === key ? quality : translated;
+    return translated === key ? type : translated;
 }
 
-function qualityBadgeClass(quality: string): string {
-    switch (quality) {
-        case "complete":
-            return "bg-green-500/10 text-green-400";
-        case "partial":
-            return "bg-amber-500/10 text-amber-400";
-        case "stuck":
-            return "bg-red-500/10 text-red-400";
-        case "assisted":
-            return "bg-blue-500/10 text-blue-400";
-        default:
-            return "bg-white/5 text-fg-faint";
-    }
+function noteTypeIcon(type: string): string {
+    const icons: Record<string, string> = {
+        observation: "lucide:eye",
+        behavior: "lucide:activity",
+        habitat_change: "lucide:home",
+        health: "lucide:heart-pulse",
+        enrichment: "lucide:sparkles",
+        other: "lucide:clipboard-list",
+    };
+    return icons[type] ?? "lucide:clipboard-list";
 }
 
 // ── Data ─────────────────────────────────────────────────
 const {
-    data: sheddingsData,
+    data: notesData,
     isLoading: loading,
     error,
     refetch,
@@ -312,21 +306,21 @@ const {
     hasNextPage,
     isFetchingNextPage,
 } = useInfiniteQuery({
-    queryKey: ["sheddings", selectedPet],
+    queryKey: ["husbandry-notes", selectedPet],
     queryFn: ({ pageParam }) => {
         const params = new URLSearchParams();
         if (selectedPet.value && selectedPet.value !== "ALL")
             params.set("petId", selectedPet.value);
         if (pageParam) params.set("cursor", pageParam);
-        return api.get<{ items: Shedding[]; nextCursor: string | null }>(
-            `/api/sheddings${params.size ? `?${params}` : ""}`,
+        return api.get<{ items: HusbandryNote[]; nextCursor: string | null }>(
+            `/api/husbandry-notes${params.size ? `?${params}` : ""}`,
         );
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 });
 
-const sheddings = computed(() => sheddingsData.value?.pages.flatMap((p) => p.items) ?? []);
+const notes = computed(() => notesData.value?.pages.flatMap((p) => p.items) ?? []);
 
 const { sentinel } = useInfiniteScroll(() => fetchNextPage(), {
     enabled: computed(() => !!hasNextPage.value && !isFetchingNextPage.value),
@@ -337,47 +331,49 @@ const { data: pets } = useQuery({
     queryFn: () => api.get<Pet[]>("/api/pets"),
 });
 
+const filteredNotes = computed(() => {
+    if (selectedType.value === "ALL") return notes.value;
+    return notes.value.filter((n) => n.type === selectedType.value);
+});
+
 // ── Create ───────────────────────────────────────────────
 const showCreate = ref(false);
 const form = reactive({
     petId: "",
-    startedAt: "",
-    completedAt: "",
-    complete: false,
-    quality: "",
-    notes: "",
+    type: "",
+    title: "",
+    content: "",
+    occurredAt: "",
 });
 
 function resetForm() {
     Object.assign(form, {
         petId: "",
-        startedAt: "",
-        completedAt: "",
-        complete: false,
-        quality: "",
-        notes: "",
+        type: "",
+        title: "",
+        content: "",
+        occurredAt: "",
     });
 }
 
 function openCreateModal() {
     resetForm();
-    form.startedAt = new Date().toISOString().split("T")[0];
+    form.occurredAt = new Date().toISOString().slice(0, 16);
     showCreate.value = true;
 }
 
 const { mutate: createMutation, isPending: creating } = useMutation({
     mutationFn: () =>
-        api.post("/api/sheddings", {
+        api.post("/api/husbandry-notes", {
             petId: form.petId,
-            startedAt: form.startedAt,
-            completedAt: form.completedAt || undefined,
-            complete: form.complete,
-            quality: form.quality || undefined,
-            notes: form.notes || undefined,
+            type: form.type || "other",
+            title: form.title,
+            content: form.content || undefined,
+            occurredAt: form.occurredAt,
         }),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["sheddings"] });
-        toast.success(t("pages.sheddings.created"));
+        queryClient.invalidateQueries({ queryKey: ["husbandry-notes"] });
+        toast.success(t("pages.husbandryNotes.created"));
         showCreate.value = false;
         resetForm();
     },
@@ -394,37 +390,34 @@ function handleCreate() {
 const showEdit = ref(false);
 const editingId = ref("");
 const editForm = reactive({
-    startedAt: "",
-    completedAt: "",
-    complete: false,
-    quality: "",
-    notes: "",
+    type: "",
+    title: "",
+    content: "",
+    occurredAt: "",
 });
 
-function openEditModal(shed: Shedding) {
-    editingId.value = shed.id;
+function openEditModal(note: HusbandryNote) {
+    editingId.value = note.id;
     Object.assign(editForm, {
-        startedAt: shed.startedAt.split("T")[0],
-        completedAt: shed.completedAt ? shed.completedAt.split("T")[0] : "",
-        complete: shed.complete,
-        quality: shed.quality ?? "",
-        notes: shed.notes ?? "",
+        type: note.type,
+        title: note.title,
+        content: note.content ?? "",
+        occurredAt: note.occurredAt.slice(0, 16),
     });
     showEdit.value = true;
 }
 
 const { mutate: updateMutation, isPending: updating } = useMutation({
     mutationFn: () =>
-        api.put(`/api/sheddings/${editingId.value}`, {
-            startedAt: editForm.startedAt,
-            completedAt: editForm.completedAt || undefined,
-            complete: editForm.complete,
-            quality: editForm.quality || undefined,
-            notes: editForm.notes || undefined,
+        api.put(`/api/husbandry-notes/${editingId.value}`, {
+            type: editForm.type || "other",
+            title: editForm.title,
+            content: editForm.content || undefined,
+            occurredAt: editForm.occurredAt,
         }),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["sheddings"] });
-        toast.success(t("pages.sheddings.saved"));
+        queryClient.invalidateQueries({ queryKey: ["husbandry-notes"] });
+        toast.success(t("pages.husbandryNotes.saved"));
         showEdit.value = false;
     },
     onError: () => {
@@ -446,10 +439,10 @@ function confirmDelete(id: string) {
 }
 
 const { mutate: deleteMutation, isPending: deleting } = useMutation({
-    mutationFn: () => api.del(`/api/sheddings/${deletingId.value}`),
+    mutationFn: () => api.delete(`/api/husbandry-notes/${deletingId.value}`),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["sheddings"] });
-        toast.success(t("pages.sheddings.deleted"));
+        queryClient.invalidateQueries({ queryKey: ["husbandry-notes"] });
+        toast.success(t("pages.husbandryNotes.deleted"));
         showDeleteConfirm.value = false;
     },
     onError: () => {

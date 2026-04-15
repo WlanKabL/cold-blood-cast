@@ -26,6 +26,7 @@ const ListQuerySchema = z.object({
     from: z.coerce.date().optional(),
     to: z.coerce.date().optional(),
     limit: z.coerce.number().int().min(1).max(1000).default(50),
+    cursor: z.string().cuid().optional(),
 });
 
 const ChartQuerySchema = z.object({

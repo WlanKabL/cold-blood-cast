@@ -3,10 +3,12 @@ import { mockAuth } from "./helpers/mock-auth";
 import { mockGet, mockMutation } from "./helpers/mock-api";
 import { mockFeedingsList, mockPets, mockFeedItems } from "./helpers/fixtures";
 
+const pagedFeedings = { items: mockFeedingsList, nextCursor: null };
+
 test.describe("Feedings — List Page", () => {
     test.beforeEach(async ({ page }) => {
         await mockAuth(page);
-        await mockGet(page, "/api/feedings", mockFeedingsList);
+        await mockGet(page, "/api/feedings*", pagedFeedings);
         await mockGet(page, "/api/pets", mockPets);
         await mockGet(page, "/api/feed-items", mockFeedItems);
     });
@@ -68,7 +70,7 @@ test.describe("Feedings — List Page", () => {
 test.describe("Feedings — Empty State", () => {
     test("shows empty state when no feedings", async ({ page }) => {
         await mockAuth(page);
-        await mockGet(page, "/api/feedings", []);
+        await mockGet(page, "/api/feedings*", { items: [], nextCursor: null });
         await mockGet(page, "/api/pets", mockPets);
         await mockGet(page, "/api/feed-items", mockFeedItems);
 

@@ -19,6 +19,7 @@ const CreateFeedingSchema = z.object({
     quantity: z.number().int().min(1).default(1),
     accepted: z.boolean().default(true),
     refusedReason: z.string().max(100).optional(),
+    retryAt: z.coerce.date().optional(),
     notes: z.string().max(1000).optional(),
 });
 
@@ -29,6 +30,7 @@ const ListQuerySchema = z.object({
     from: z.coerce.date().optional(),
     to: z.coerce.date().optional(),
     limit: z.coerce.number().int().min(1).max(1000).default(50),
+    cursor: z.string().cuid().optional(),
 });
 
 export async function feedingRoutes(app: FastifyInstance) {

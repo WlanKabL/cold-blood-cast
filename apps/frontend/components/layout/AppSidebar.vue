@@ -199,7 +199,7 @@ const terrariumNavItems = [
         icon: "lucide:thermometer",
         label: "nav.sensors",
         feature: "sensors",
-        shortcut: "S",
+        shortcut: "N",
     },
 ];
 
@@ -245,6 +245,11 @@ const careLogNavItems = [
         icon: "lucide:wrench",
         label: "nav.maintenance",
         feature: "enclosure_maintenance",
+    },
+    {
+        to: "/husbandry-notes",
+        icon: "lucide:clipboard-list",
+        label: "nav.husbandryNotes",
     },
 ];
 

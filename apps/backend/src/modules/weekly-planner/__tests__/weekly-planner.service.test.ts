@@ -6,28 +6,22 @@ const mockPrisma = {
     vetVisit: { findMany: vi.fn() },
     shedding: { findMany: vi.fn() },
     maintenanceTask: { findMany: vi.fn() },
+    feeding: { findMany: vi.fn() },
 };
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
 
 vi.mock("@/modules/feeding-reminders/feeding-reminders.service.js", () => ({
-    computeFeedingStatus: vi.fn().mockReturnValue({ status: "due", daysSinceLastFeeding: 7 }),
+    computeFeedingStatus: vi.fn(),
 }));
 
 vi.mock("@/modules/sheddings/shedding-analysis.service.js", () => ({
-    computeSheddingCycle: vi.fn().mockReturnValue({
-        petId: "pet_1",
-        petName: "Noodle",
-        sheddingCount: 3,
-        averageIntervalDays: 28,
-        trend: "stable",
-        predictedNextDate: "2026-04-15",
-        lastShedDate: "2026-03-18",
-        intervals: [],
-        isAnomaly: false,
-        anomalyMessage: null,
-    }),
+    computeSheddingCycle: vi.fn(),
 }));
+
+const { computeFeedingStatus } =
+    await import("@/modules/feeding-reminders/feeding-reminders.service.js");
+const { computeSheddingCycle } = await import("@/modules/sheddings/shedding-analysis.service.js");
 
 const { getWeekEvents, getWeekEventsForEmail, getOptedInUsers } =
     await import("../weekly-planner.service.js");
@@ -41,6 +35,21 @@ beforeEach(() => {
     mockPrisma.vetVisit.findMany.mockResolvedValue([]);
     mockPrisma.shedding.findMany.mockResolvedValue([]);
     mockPrisma.maintenanceTask.findMany.mockResolvedValue([]);
+    mockPrisma.feeding.findMany.mockResolvedValue([]);
+
+    vi.mocked(computeFeedingStatus).mockReturnValue({ status: "due", daysSinceLastFeeding: 7 });
+    vi.mocked(computeSheddingCycle).mockReturnValue({
+        petId: "pet_1",
+        petName: "Noodle",
+        sheddingCount: 3,
+        averageIntervalDays: 28,
+        trend: "stable",
+        predictedNextDate: "2026-04-15",
+        lastShedDate: "2026-03-18",
+        intervals: [],
+        isAnomaly: false,
+        anomalyMessage: null,
+    });
 });
 
 describe("getWeekEvents", () => {
@@ -69,7 +78,9 @@ describe("getWeekEvents", () => {
                 species: "Corn Snake",
                 feedingIntervalMinDays: 7,
                 feedingIntervalMaxDays: 10,
-                feedings: [{ fedAt: lastFed }],
+                pauseFeedingDuringShed: false,
+                feedings: [{ fedAt: lastFed, accepted: true }],
+                sheddings: [],
             },
         ]);
 
@@ -238,7 +249,9 @@ describe("getWeekEvents", () => {
                 species: "Corn Snake",
                 feedingIntervalMinDays: 7,
                 feedingIntervalMaxDays: 10,
-                feedings: [{ fedAt: lastFed }],
+                pauseFeedingDuringShed: false,
+                feedings: [{ fedAt: lastFed, accepted: true }],
+                sheddings: [],
             },
         ]);
 
@@ -259,21 +272,85 @@ describe("getWeekEvents", () => {
                 species: "Ball Python",
                 feedingIntervalMinDays: null,
                 feedingIntervalMaxDays: null,
+                pauseFeedingDuringShed: false,
                 feedings: [],
+                sheddings: [],
             },
         ]);
-
-        const { computeFeedingStatus } =
-            await import("@/modules/feeding-reminders/feeding-reminders.service.js");
-        vi.mocked(computeFeedingStatus).mockReturnValueOnce({
-            status: "no_schedule",
-            daysSinceLastFeeding: null,
-        });
 
         const days = await getWeekEvents(USER_ID, MONDAY);
         const allEvents = days.flatMap((d) => d.events);
 
         expect(allEvents.filter((e) => e.type === "feeding")).toHaveLength(0);
+    });
+
+    it("marks feeding as paused when pet is shedding and pauseFeedingDuringShed is enabled", async () => {
+        const lastFed = new Date("2026-04-06T12:00:00Z");
+        mockPrisma.pet.findMany.mockResolvedValueOnce([
+            {
+                id: "pet_1",
+                name: "Noodle",
+                species: "Corn Snake",
+                feedingIntervalMinDays: 7,
+                feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: true,
+                feedings: [{ fedAt: lastFed, accepted: true }],
+                sheddings: [{ id: "shed_1" }],
+            },
+        ]);
+
+        const days = await getWeekEvents(USER_ID, MONDAY);
+        const allEvents = days.flatMap((d) => d.events);
+        const feedingEvents = allEvents.filter((e) => e.type === "feeding");
+
+        expect(feedingEvents).toHaveLength(1);
+        expect(feedingEvents[0].meta.isPaused).toBe(true);
+        expect(feedingEvents[0].meta.status).toBe("paused");
+        expect(feedingEvents[0].detail).toBe("Paused (Shedding)");
+    });
+
+    it("does not pause feeding when pauseFeedingDuringShed is disabled even if shedding", async () => {
+        const lastFed = new Date("2026-04-06T12:00:00Z");
+        mockPrisma.pet.findMany.mockResolvedValueOnce([
+            {
+                id: "pet_1",
+                name: "Noodle",
+                species: "Corn Snake",
+                feedingIntervalMinDays: 7,
+                feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: false,
+                feedings: [{ fedAt: lastFed, accepted: true }],
+                sheddings: [{ id: "shed_1" }],
+            },
+        ]);
+
+        const days = await getWeekEvents(USER_ID, MONDAY);
+        const allEvents = days.flatMap((d) => d.events);
+        const feedingEvents = allEvents.filter((e) => e.type === "feeding");
+
+        expect(feedingEvents).toHaveLength(1);
+        expect(feedingEvents[0].meta.isPaused).toBe(false);
+    });
+
+    it("places feeding_retry events from refused feedings with retryAt in week", async () => {
+        const retryDate = new Date("2026-04-15T10:00:00Z"); // Wednesday
+        mockPrisma.feeding.findMany.mockResolvedValueOnce([
+            {
+                id: "feed_1",
+                retryAt: retryDate,
+                foodType: "Fuzzy Mouse",
+                pet: { id: "pet_1", name: "Noodle" },
+            },
+        ]);
+
+        const days = await getWeekEvents(USER_ID, MONDAY);
+        const wednesday = days[2];
+
+        expect(wednesday.events).toHaveLength(1);
+        expect(wednesday.events[0].type).toBe("feeding_retry");
+        expect(wednesday.events[0].petName).toBe("Noodle");
+        expect(wednesday.events[0].detail).toBe("Fuzzy Mouse");
+        expect(wednesday.events[0].meta.foodType).toBe("Fuzzy Mouse");
     });
 });
 

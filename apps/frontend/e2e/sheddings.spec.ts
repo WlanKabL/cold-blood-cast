@@ -3,10 +3,12 @@ import { mockAuth } from "./helpers/mock-auth";
 import { mockGet } from "./helpers/mock-api";
 import { mockSheddingsList, mockPets } from "./helpers/fixtures";
 
+const pagedSheddings = { items: mockSheddingsList, nextCursor: null };
+
 test.describe("Sheddings — List Page", () => {
     test.beforeEach(async ({ page }) => {
         await mockAuth(page);
-        await mockGet(page, "/api/sheddings", mockSheddingsList);
+        await mockGet(page, "/api/sheddings*", pagedSheddings);
         await mockGet(page, "/api/pets", mockPets);
     });
 
@@ -65,7 +67,7 @@ test.describe("Sheddings — List Page", () => {
 test.describe("Sheddings — Empty State", () => {
     test("shows empty state when no sheddings", async ({ page }) => {
         await mockAuth(page);
-        await mockGet(page, "/api/sheddings", []);
+        await mockGet(page, "/api/sheddings*", { items: [], nextCursor: null });
         await mockGet(page, "/api/pets", mockPets);
 
         await page.goto("/sheddings");

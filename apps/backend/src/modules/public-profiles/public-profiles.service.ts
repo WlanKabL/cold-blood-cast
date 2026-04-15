@@ -294,6 +294,32 @@ export async function getPublicPetDataByUserSlug(userId: string, petSlug: string
     };
 }
 
+export async function resolvePublicPetSlug(petSlug: string) {
+    const profile = await prisma.publicProfile.findFirst({
+        where: { slug: petSlug, active: true },
+        select: {
+            slug: true,
+            pet: {
+                select: {
+                    user: {
+                        select: {
+                            username: true,
+                            userPublicProfile: { select: { slug: true } },
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    if (!profile) {
+        throw notFound(ErrorCodes.E_NOT_FOUND, "Public profile not found");
+    }
+
+    const userSlug = profile.pet.user.userPublicProfile?.slug ?? profile.pet.user.username;
+    return { userSlug, petSlug: profile.slug };
+}
+
 export async function getPublicPhoto(userId: string, petSlug: string, photoId: string) {
     const profile = await prisma.publicProfile.findUnique({
         where: { userId_slug: { userId, slug: petSlug } },

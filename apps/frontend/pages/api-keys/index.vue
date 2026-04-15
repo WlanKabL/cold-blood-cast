@@ -11,13 +11,10 @@
                     {{ $t("pages.apiKeys.subtitle") }}
                 </p>
             </div>
-            <button
-                class="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-violet-500 to-violet-600 px-4 py-2 text-[13px] font-medium text-white shadow-lg shadow-violet-500/20 transition-all duration-200 hover:shadow-violet-500/30 hover:brightness-110"
-                @click="openCreate"
-            >
-                <Icon name="lucide:plus" class="h-4 w-4" />
+            <UiButton @click="openCreate">
+                <Icon name="lucide:plus" class="mr-1.5 h-4 w-4" />
                 {{ $t("pages.apiKeys.create") }}
-            </button>
+            </UiButton>
         </div>
 
         <!-- Newly Created Key Banner -->
@@ -89,7 +86,7 @@
                     <code
                         class="text-fg-muted block rounded-lg bg-black/30 px-3 py-2 font-mono text-[11px] leading-relaxed break-all whitespace-pre-wrap"
                         >curl -H "Authorization: Bearer &lt;your-api-key&gt;" \
-                        {{ apiBaseUrl }}/api/trades</code
+                        {{ apiBaseUrl }}/api/pets</code
                     >
                 </div>
 
@@ -100,7 +97,7 @@
                     </h4>
                     <code
                         class="text-fg-muted block rounded-lg bg-black/30 px-3 py-2 font-mono text-[11px] leading-relaxed break-all whitespace-pre-wrap"
-                        >fetch("{{ apiBaseUrl }}/api/trades", { headers: { "Authorization": "Bearer
+                        >fetch("{{ apiBaseUrl }}/api/pets", { headers: { "Authorization": "Bearer
                         &lt;key&gt;" } })</code
                     >
                 </div>
@@ -433,17 +430,20 @@ const { data: keys, isLoading: loading } = useQuery({
     queryFn: () => api.get<ApiKey[]>("/api/api-keys"),
 });
 
-const availableScopes = ["read", "write", "trades", "accounts"];
+const availableScopes = ["read", "write", "pets", "feedings", "sensors", "enclosures"];
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseURL;
 
 const availableEndpoints = [
-    "GET /api/trades",
-    "POST /api/trades",
-    "PUT /api/trades/:id",
-    "DELETE /api/trades/:id",
-    "GET /api/accounts",
-    "GET /api/analytics/:accountId",
+    "GET /api/pets",
+    "GET /api/pets/:id",
+    "GET /api/enclosures",
+    "GET /api/sensors",
+    "GET /api/feedings",
+    "POST /api/feedings",
+    "GET /api/weights",
+    "POST /api/weights",
+    "GET /api/sheddings",
 ];
 
 const form = reactive({

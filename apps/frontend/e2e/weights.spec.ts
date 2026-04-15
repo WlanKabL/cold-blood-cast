@@ -3,10 +3,12 @@ import { mockAuth } from "./helpers/mock-auth";
 import { mockGet } from "./helpers/mock-api";
 import { mockWeightRecords, mockPets } from "./helpers/fixtures";
 
+const pagedWeights = { items: mockWeightRecords, nextCursor: null };
+
 test.describe("Weights — List Page", () => {
     test.beforeEach(async ({ page }) => {
         await mockAuth(page);
-        await mockGet(page, "/api/weights", mockWeightRecords);
+        await mockGet(page, "/api/weights*", pagedWeights);
         await mockGet(page, "/api/pets", mockPets);
     });
 
@@ -62,7 +64,7 @@ test.describe("Weights — List Page", () => {
 test.describe("Weights — Empty State", () => {
     test("shows empty state when no records", async ({ page }) => {
         await mockAuth(page);
-        await mockGet(page, "/api/weights", []);
+        await mockGet(page, "/api/weights*", { items: [], nextCursor: null });
         await mockGet(page, "/api/pets", mockPets);
 
         await page.goto("/weights");

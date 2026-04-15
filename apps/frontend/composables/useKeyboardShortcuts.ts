@@ -50,7 +50,8 @@ export function useGlobalKeyboardShortcuts() {
         { key: "D", label: "shortcuts.dashboard", category: "navigation" },
         { key: "E", label: "shortcuts.enclosures", category: "navigation" },
         { key: "P", label: "shortcuts.pets", category: "navigation" },
-        { key: "S", label: "shortcuts.sensors", category: "navigation" },
+        { key: "N", label: "shortcuts.sensors", category: "navigation" },
+        { key: "S", label: "shortcuts.settings", category: "navigation" },
         { key: "F", label: "shortcuts.feedings", category: "navigation" },
         { key: "W", label: "shortcuts.weights", category: "navigation" },
         { key: "?", label: "shortcuts.help", category: "general" },
@@ -65,7 +66,8 @@ export function useGlobalKeyboardShortcuts() {
     go("d", "/dashboard");
     go("e", "/enclosures");
     go("p", "/pets");
-    go("s", "/sensors");
+    go("n", "/sensors");
+    go("s", "/settings");
     go("f", "/feedings");
     go("w", "/weights");
 

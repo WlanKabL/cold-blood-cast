@@ -125,6 +125,7 @@
     },
     "common": {
         "loading": "Laden...",
+        "redirecting": "Weiterleitung...",
         "error": "Ein Fehler ist aufgetreten",
         "retry": "Erneut versuchen",
         "save": "Speichern",
@@ -237,6 +238,7 @@
         "vetVisits": "Tierarztbesuche",
         "veterinarians": "Tierärzte",
         "maintenance": "Wartung",
+        "husbandryNotes": "Haltungsnotizen",
         "planner": "Wochenplaner"
     },
     "admin": {
@@ -789,6 +791,7 @@
             "addFirst": "Füge dein erstes Terrarium hinzu",
             "feedingReminders": "Fütterungserinnerungen",
             "noPetsScheduled": "Keine Fütterungspläne konfiguriert",
+            "setupFeedingSchedule": "Fütterungsplan einrichten",
             "feedingOk": "OK",
             "feedingDue": "Fällig",
             "feedingCritical": "Überfällig!",
@@ -802,13 +805,17 @@
             "noVet": "Kein Tierarzt zugewiesen",
             "weightTrends": "Gewichtstrends",
             "noWeightData": "Keine Gewichtsdaten verfügbar",
+            "recordFirstWeight": "Erstes Gewicht eintragen",
             "upcomingSheddings": "Anstehende Häutungen",
             "noUpcomingSheddings": "Keine Häutungen innerhalb von 7 Tagen erwartet",
+            "logFirstShedding": "Erste Häutung eintragen",
             "predictedIn": "in {days}T",
             "predictedOverdue": "{days}T überfällig",
             "avgCycle": "Ø {days}T Zyklus",
             "overdueMaintenance": "Überfällige Wartung",
             "noOverdueMaintenance": "Alle Wartungsaufgaben sind aktuell",
+            "scheduleVetVisit": "Tierarzttermin planen",
+            "createMaintenanceTask": "Wartungsaufgabe erstellen",
             "tabs": {
                 "overview": "Übersicht",
                 "schedule": "Termine",
@@ -910,8 +917,15 @@
                 "notes": "Notizen",
                 "feedingIntervalMinDays": "Min. Intervall (Tage)",
                 "feedingIntervalMaxDays": "Max. Intervall (Tage)",
-                "pauseFeedingDuringShed": "Fütterung während Häutung pausieren"
+                "pauseFeedingDuringShed": "Fütterung während Häutung pausieren",
+                "tags": "Tags"
             },
+            "manageTags": "Tags verwalten",
+            "assignedTags": "Zugewiesene Tags",
+            "availableTags": "Verfügbare Tags",
+            "noTags": "Keine Tags zugewiesen",
+            "noAvailableTags": "Keine Tags verfügbar — erstelle Tags zuerst in den Einstellungen",
+            "tagsSaved": "Tags aktualisiert",
             "photos": {
                 "title": "Fotos",
                 "subtitle": "Galerie deines Tieres",
@@ -1091,6 +1105,7 @@
             "allPets": "Alle Tiere",
             "accepted": "Angenommen",
             "refused": "Verweigert",
+            "retryOn": "Wiederholung:",
             "confirmDelete": "Diese Fütterung löschen?",
             "edit": "Fütterung bearbeiten",
             "saved": "Fütterung gespeichert",
@@ -1108,6 +1123,7 @@
                 "feedItem": "Futtertier",
                 "feedItemNone": "Manuell eingeben",
                 "refusedReason": "Grund der Verweigerung",
+                "retryAt": "Wiederholungsdatum",
                 "notes": "Notizen"
             },
             "refusedReasons": {
@@ -1583,6 +1599,38 @@
                 "notesPlaceholder": "Zusätzliche Notizen..."
             }
         },
+        "husbandryNotes": {
+            "title": "Haltungsnotizen",
+            "subtitle": "Beobachtungen, Verhaltensänderungen und Habitat-Anpassungen festhalten",
+            "add": "Notiz hinzufügen",
+            "addFirst": "Erstelle deine erste Haltungsnotiz",
+            "create": "Neue Haltungsnotiz",
+            "edit": "Notiz bearbeiten",
+            "empty": "Noch keine Haltungsnotizen",
+            "allPets": "Alle Tiere",
+            "allTypes": "Alle Typen",
+            "confirmDelete": "Diese Haltungsnotiz löschen?",
+            "created": "Notiz erstellt",
+            "saved": "Notiz gespeichert",
+            "deleted": "Notiz gelöscht",
+            "types": {
+                "observation": "Beobachtung",
+                "behavior": "Verhalten",
+                "habitat_change": "Habitat-Änderung",
+                "health": "Gesundheit",
+                "enrichment": "Enrichment",
+                "other": "Sonstiges"
+            },
+            "fields": {
+                "pet": "Tier",
+                "type": "Typ",
+                "title": "Titel",
+                "titlePlaceholder": "z.B. Ungewöhnliches Sonnverhalten",
+                "content": "Details",
+                "contentPlaceholder": "Beschreibe deine Beobachtung...",
+                "occurredAt": "Datum"
+            }
+        },
         "planner": {
             "title": "Wochenplaner",
             "subtitle": "Übersicht über anstehende Fütterungen, Tierarztbesuche, Häutungen und Wartungsaufgaben",
@@ -1629,12 +1677,123 @@
             },
             "legend": {
                 "feeding": "Fütterung",
+                "feedingRetry": "Fütterung Wiederholung",
                 "vetVisit": "Tierarztbesuch",
                 "shedding": "Häutung",
                 "maintenance": "Wartung"
             },
             "quickComplete": "Als erledigt markieren",
-            "quickCompleted": "Als erledigt markiert"
+            "quickCompleted": "Als erledigt markiert",
+            "paused": "Pausiert (Häutung)",
+            "quickFeed": {
+                "title": "Fütterung eintragen",
+                "confirm": "Fütterung eintragen"
+            }
+        },
+        "pricing": {
+            "title": "Preise",
+            "subtitle": "Wähle den Plan, der zu deinem Bestand und Workflow passt.",
+            "subscriptionSuccess": "Dein Abonnement wurde erfolgreich aktiviert.",
+            "subscriptionCanceled": "Checkout wurde abgebrochen. Keine Zahlung erfolgt.",
+            "paymentsUnavailable": "Zahlungen sind aktuell nicht verfügbar.",
+            "monthly": "Monatlich",
+            "yearly": "Jährlich",
+            "save17": "17% sparen",
+            "feature": "Funktion",
+            "unlimited": "Unbegrenzt",
+            "perMonth": "/ Monat",
+            "perYear": "/ Jahr",
+            "forever": "für immer",
+            "currentPlan": "Aktueller Plan",
+            "freePlan": "Kostenloser Plan",
+            "popular": "Am beliebtesten",
+            "upgrade": "Upgrade",
+            "manageSubscription": "Abo verwalten",
+            "freeName": "Free",
+            "freeDesc": "Für Hobby-Halter mit kleinem Setup",
+            "freePrice": "0 €",
+            "premiumName": "Premium",
+            "premiumDesc": "Mehr Tiere, mehr Verlauf, mehr Planung",
+            "premiumMonthly": "5,99 €",
+            "premiumYearly": "59,99 €",
+            "proName": "Pro",
+            "proDesc": "Für ambitionierte Halter und Power-User",
+            "proMonthly": "12,99 €",
+            "proYearly": "129,99 €",
+            "lifetimeTitle": "Pro Lifetime",
+            "lifetimeDesc": "Einmalig bezahlen. Pro dauerhaft nutzen.",
+            "lifetimeCta": "Lifetime kaufen",
+            "features": {
+                "enclosures": "Bis zu {n} Terrarien",
+                "pets": "Bis zu {n} Tiere",
+                "sensors": "Bis zu {n} Sensoren pro Terrarium",
+                "feedings": "Fütterungs-Tracking",
+                "weights": "Gewichts-Tracking",
+                "sheddings": "Häutungs-Tracking",
+                "dashboard": "Dashboard-Übersicht",
+                "allFree": "Alles aus Free",
+                "vetVisits": "Tierarztbesuche",
+                "photos": "Fotogalerie",
+                "planner": "Wochenplaner",
+                "maintenance": "Wartungserinnerungen",
+                "publicProfile": "Öffentliche Profile",
+                "documents": "Dokumentenspeicher",
+                "allPremium": "Alles aus Premium",
+                "unlimitedAll": "Unbegrenzte Terrarien, Tiere und Sensoren",
+                "apiAccess": "API-Zugriff",
+                "advancedAnalytics": "Erweiterte Analysen",
+                "prioritySupport": "Priorisierter Support"
+            },
+            "comparison": {
+                "enclosures": "Terrarien",
+                "pets": "Tiere",
+                "sensors": "Sensoren pro Terrarium",
+                "feedings": "Fütterungen",
+                "weights": "Gewichte",
+                "sheddings": "Häutungen",
+                "dashboard": "Dashboard",
+                "vetVisits": "Tierarztbesuche",
+                "photos": "Fotos",
+                "planner": "Planer",
+                "maintenance": "Wartung",
+                "publicProfile": "Öffentliches Profil",
+                "documents": "Dokumente",
+                "apiAccess": "API-Zugriff"
+            }
+        }
+    },
+    "onboarding": {
+        "skip": "Überspringen",
+        "back": "Zurück",
+        "next": "Weiter",
+        "getStarted": "Loslegen",
+        "steps": {
+            "enclosure": {
+                "title": "Terrarium einrichten",
+                "desc": "Starte mit den Grundlagen deines Habitats.",
+                "item1": "Erstes Terrarium anlegen",
+                "item2": "Sensor-Basis hinzufügen"
+            },
+            "pet": {
+                "title": "Tier hinzufügen",
+                "desc": "Erstelle ein vollständiges Profil für dein Tier.",
+                "item1": "Tierdetails eintragen",
+                "item2": "Profilfoto hochladen"
+            },
+            "care": {
+                "title": "Pflege dokumentieren",
+                "desc": "Erfasse die wichtigsten Ereignisse direkt.",
+                "item1": "Erste Fütterung eintragen",
+                "item2": "Erstes Gewicht eintragen",
+                "item3": "Erste Häutung eintragen"
+            },
+            "ready": {
+                "title": "Du bist startklar",
+                "desc": "KeeperLog ist für deinen Alltag eingerichtet.",
+                "item1": "Dashboard nutzen",
+                "item2": "Wochenplaner prüfen",
+                "item3": "Benachrichtigungen aktivieren"
+            }
         }
     },
     "shortcuts": {
@@ -1647,6 +1806,8 @@
         "pets": "Tiere",
         "sensors": "Sensoren",
         "settings": "Einstellungen",
+        "feedings": "Fütterungen",
+        "weights": "Gewichte",
         "help": "Tastenkürzel anzeigen",
         "closeModal": "Modal / Overlay schließen",
         "newEnclosure": "Neues Terrarium",
@@ -1688,7 +1849,9 @@
     "errorPage": {
         "title": "Fehler",
         "fallback": "Etwas ist schiefgelaufen",
-        "goHome": "Zur Startseite"
+        "goHome": "Zur Startseite",
+        "goBack": "Zurück",
+        "notFoundMessage": "Diese Seite existiert nicht oder wurde verschoben."
     },
     "publicProfile": {
         "notFound": "Profil nicht gefunden",
