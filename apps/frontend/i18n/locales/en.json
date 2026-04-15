@@ -281,7 +281,8 @@
             "accessRequests": "Access Requests",
             "legal": "Legal Documents",
             "reports": "Reports",
-            "comments": "Comments"
+            "comments": "Comments",
+            "tags": "Tags"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -429,6 +430,34 @@
             "title": "Feature Flags",
             "subtitle": "Global kill-switches for platform features. These are code-defined and cannot be created or deleted.",
             "create": "Create Flag"
+        },
+        "tags": {
+            "title": "Tags",
+            "subtitle": "Manage global tags available to all users. Users can also create their own tags.",
+            "create": "Create Tag",
+            "edit": "Edit Tag",
+            "delete": "Delete",
+            "empty": "No global tags yet. Create the first one.",
+            "created": "Tag created",
+            "saved": "Tag saved",
+            "deleted": "Tag deleted",
+            "confirmDelete": "Delete Tag",
+            "confirmDeleteMsg": "Delete the tag \"{name}\"? This cannot be undone.",
+            "fields": {
+                "name": "Name",
+                "namePlaceholder": "e.g. Healthy, Urgent, Follow-up",
+                "category": "Category",
+                "color": "Color"
+            },
+            "categories": {
+                "general": "General",
+                "care": "Care",
+                "monitoring": "Monitoring",
+                "vet": "Veterinary",
+                "maintenance": "Maintenance",
+                "media": "Media",
+                "organization": "Organization"
+            }
         },
         "reports": {
             "title": "Reports",
@@ -763,6 +792,7 @@
             "feedingOk": "OK",
             "feedingDue": "Due",
             "feedingCritical": "Overdue!",
+            "feedingPaused": "Paused (Shedding)",
             "feedingNoSchedule": "No schedule",
             "daysAgo": "{n} days ago",
             "neverFed": "Never fed",
@@ -783,7 +813,19 @@
                 "overview": "Overview",
                 "schedule": "Schedule",
                 "maintenance": "Maintenance"
-            }
+            },
+            "quickFeed": "Quick log feeding",
+            "quickWeight": "Quick log weight",
+            "quickFeedTitle": "Log Feeding — {name}",
+            "quickWeightTitle": "Log Weight — {name}",
+            "quickFeedItem": "Feed Item",
+            "quickFeedItemPlaceholder": "Select feed item (optional)",
+            "quickFoodType": "Food Type",
+            "quickFedAt": "Fed at",
+            "quickWeightGrams": "Weight (g)",
+            "quickMeasuredAt": "Measured at",
+            "quickFeedSuccess": "Feeding logged",
+            "quickWeightSuccess": "Weight logged"
         },
         "enclosures": {
             "title": "Enclosures",
@@ -857,6 +899,7 @@
             "deleted": "Pet deleted",
             "feedingSchedule": "Feeding Schedule",
             "feedingScheduleHint": "Optional: Set a feeding interval to receive reminders",
+            "pauseFeedingDuringShedHint": "When enabled, feeding reminders are paused while a shedding is in progress",
             "fields": {
                 "name": "Name",
                 "enclosure": "Enclosure",
@@ -866,7 +909,8 @@
                 "birthDate": "Birth Date",
                 "notes": "Notes",
                 "feedingIntervalMinDays": "Min. interval (days)",
-                "feedingIntervalMaxDays": "Max. interval (days)"
+                "feedingIntervalMaxDays": "Max. interval (days)",
+                "pauseFeedingDuringShed": "Pause feeding during shed"
             },
             "photos": {
                 "title": "Photos",
@@ -954,6 +998,7 @@
                 "filterWeight": "Weights",
                 "filterVetVisit": "Vet Visits",
                 "filterPhoto": "Photos",
+                "filterHusbandryNote": "Notes",
                 "recentActivity": "Recent Activity",
                 "eventCount": "{count} event | {count} events"
             },
@@ -1062,7 +1107,15 @@
                 "fedAt": "Fed At",
                 "feedItem": "Feed Item",
                 "feedItemNone": "Manual entry",
+                "refusedReason": "Reason for refusal",
                 "notes": "Notes"
+            },
+            "refusedReasons": {
+                "not_hungry": "Not hungry",
+                "wrong_size": "Wrong size",
+                "shedding": "Shedding",
+                "stress": "Stress",
+                "other": "Other"
             }
         },
         "feedItems": {
@@ -1116,7 +1169,14 @@
                 "completeLabel": "Shedding is complete",
                 "quality": "Quality",
                 "qualityPlaceholder": "e.g. clean, stuck, partial",
-                "notes": "Notes"
+                "notes": "Notes",
+                "notesPlaceholder": "Describe the shedding process..."
+            },
+            "qualityPresets": {
+                "complete": "Complete",
+                "partial": "Partial",
+                "stuck": "Stuck",
+                "assisted": "Assisted"
             },
             "analysis": {
                 "title": "Shedding Cycle Analysis",
@@ -1201,6 +1261,31 @@
             "resetSending": "Sending...",
             "resetSent": "Link Sent",
             "resetSentHint": "A password reset link has been sent to your email.",
+            "usernameChange": {
+                "title": "Change Username",
+                "hint": "You can change your username once every 30 days. This affects your profile URL.",
+                "newUsername": "New Username",
+                "password": "Current Password",
+                "passwordPlaceholder": "Enter your current password",
+                "rateLimited": "You can change your username again in 30 days.",
+                "saved": "Username changed successfully."
+            },
+            "emailChange": {
+                "title": "Change Email Address",
+                "hint": "A verification code will be sent to your new email address.",
+                "currentEmail": "Current Email",
+                "newEmail": "New Email Address",
+                "newEmailPlaceholder": "your-new{'@'}email.com",
+                "password": "Current Password",
+                "passwordPlaceholder": "Enter your current password",
+                "sendCode": "Send Verification Code",
+                "codeSentTo": "A 6-digit code has been sent to {email}.",
+                "code": "Verification Code",
+                "codePlaceholder": "123456",
+                "confirm": "Confirm",
+                "back": "Back",
+                "saved": "Email address changed successfully."
+            },
             "notifications": "Notifications",
             "weeklyDigest": "Weekly Care Digest",
             "weeklyDigestHint": "Receive a summary email every Sunday at 18:00 with your upcoming care tasks for the next week.",
@@ -1433,6 +1518,18 @@
                 "visitOn": "Visit on {date}",
                 "appointmentOn": "Appointment on {date}",
                 "notSet": "Not set"
+            },
+            "costs": {
+                "title": "Vet Costs",
+                "subtitle": "Overview of veterinary expenses",
+                "allPets": "All Pets",
+                "totalCost": "Total Cost",
+                "visitCount": "Visits",
+                "avgPerVisit": "Avg. per Visit",
+                "monthlyBreakdown": "Monthly Breakdown",
+                "perPet": "Per Pet",
+                "visits": "{n} visit(s)",
+                "noData": "No cost data available"
             }
         },
         "maintenance": {
@@ -1535,7 +1632,9 @@
                 "vetVisit": "Vet Visit",
                 "shedding": "Shedding",
                 "maintenance": "Maintenance"
-            }
+            },
+            "quickComplete": "Mark as done",
+            "quickCompleted": "Marked as done"
         }
     },
     "shortcuts": {

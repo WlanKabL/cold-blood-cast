@@ -4,7 +4,7 @@ import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import { type TimelineEventType, getTimeline } from "./activity-timeline.service.js";
 
-const VALID_TYPES: TimelineEventType[] = ["feeding", "shedding", "weight", "vet_visit", "photo"];
+const VALID_TYPES: TimelineEventType[] = ["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"];
 
 const TimelineQuerySchema = z.object({
     page: z.coerce.number().int().min(1).default(1),

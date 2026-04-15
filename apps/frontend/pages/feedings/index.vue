@@ -82,6 +82,7 @@
                                 : $t("pages.feedings.refused")
                         }}
                     </span>
+                    <span v-if="!feeding.accepted && feeding.refusedReason" class="text-fg-faint text-xs">{{ refusedReasonLabel(feeding.refusedReason) }}</span>
                     <UiButton
                         variant="ghost"
                         icon="lucide:pencil"
@@ -158,6 +159,21 @@
                         $t("pages.feedings.fields.acceptedLabel")
                     }}</label>
                 </div>
+                <div v-if="!form.accepted">
+                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{ $t('pages.feedings.fields.refusedReason') }}</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            v-for="preset in refusedReasonPresets"
+                            :key="preset"
+                            type="button"
+                            class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                            :class="form.refusedReason === preset ? 'bg-red-500/20 text-red-300 ring-1 ring-red-500/40' : 'bg-white/5 text-fg-muted hover:bg-white/10'"
+                            @click="form.refusedReason = form.refusedReason === preset ? '' : preset"
+                        >
+                            {{ refusedReasonLabel(preset) }}
+                        </button>
+                    </div>
+                </div>
                 <UiTextarea v-model="form.notes" :label="$t('pages.feedings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showCreate = false">{{
@@ -216,6 +232,21 @@
                         $t("pages.feedings.fields.acceptedLabel")
                     }}</label>
                 </div>
+                <div v-if="!editForm.accepted">
+                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{ $t('pages.feedings.fields.refusedReason') }}</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            v-for="preset in refusedReasonPresets"
+                            :key="preset"
+                            type="button"
+                            class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                            :class="editForm.refusedReason === preset ? 'bg-red-500/20 text-red-300 ring-1 ring-red-500/40' : 'bg-white/5 text-fg-muted hover:bg-white/10'"
+                            @click="editForm.refusedReason = editForm.refusedReason === preset ? '' : preset"
+                        >
+                            {{ refusedReasonLabel(preset) }}
+                        </button>
+                    </div>
+                </div>
                 <UiTextarea v-model="editForm.notes" :label="$t('pages.feedings.fields.notes')" />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showEdit = false">{{
@@ -251,6 +282,7 @@ interface Feeding {
     foodSize: string | null;
     quantity: number;
     accepted: boolean;
+    refusedReason: string | null;
     fedAt: string;
     notes: string | null;
     pet?: { name: string };
@@ -279,6 +311,14 @@ definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeatur
 useHead({ title: () => t("pages.feedings.title") });
 
 const selectedPet = ref("ALL");
+
+const refusedReasonPresets = ["not_hungry", "wrong_size", "shedding", "stress", "other"] as const;
+
+function refusedReasonLabel(reason: string): string {
+    const key = `pages.feedings.refusedReasons.${reason}`;
+    const translated = t(key);
+    return translated === key ? reason : translated;
+}
 
 const queryParams = computed(() => {
     const params = new URLSearchParams();
@@ -325,6 +365,7 @@ const form = reactive({
     foodSize: "",
     quantity: 1,
     accepted: true,
+    refusedReason: "",
     notes: "",
 });
 
@@ -337,6 +378,7 @@ function resetForm() {
         foodSize: "",
         quantity: 1,
         accepted: true,
+        refusedReason: "",
         notes: "",
     });
 }
@@ -365,6 +407,7 @@ const { mutate: createMutation, isPending: creating } = useMutation({
             foodSize: form.foodSize || undefined,
             quantity: form.quantity,
             accepted: form.accepted,
+            refusedReason: !form.accepted && form.refusedReason ? form.refusedReason : undefined,
             notes: form.notes || undefined,
         }),
     onSuccess: () => {
@@ -392,6 +435,7 @@ const editForm = reactive({
     foodSize: "",
     quantity: 1,
     accepted: true,
+    refusedReason: "",
     notes: "",
 });
 
@@ -404,6 +448,7 @@ function openEditModal(feeding: Feeding) {
         foodSize: feeding.foodSize ?? "",
         quantity: feeding.quantity,
         accepted: feeding.accepted,
+        refusedReason: feeding.refusedReason ?? "",
         notes: feeding.notes ?? "",
     });
     showEdit.value = true;
@@ -426,6 +471,7 @@ const { mutate: updateMutation, isPending: updating } = useMutation({
             foodSize: editForm.foodSize || undefined,
             quantity: editForm.quantity,
             accepted: editForm.accepted,
+            refusedReason: !editForm.accepted && editForm.refusedReason ? editForm.refusedReason : undefined,
             notes: editForm.notes || undefined,
         }),
     onSuccess: () => {

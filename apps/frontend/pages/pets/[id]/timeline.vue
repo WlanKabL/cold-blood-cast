@@ -148,7 +148,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 
 interface TimelineEvent {
     id: string;
-    type: "feeding" | "shedding" | "weight" | "vet_visit" | "photo";
+    type: "feeding" | "shedding" | "weight" | "vet_visit" | "photo" | "husbandry_note";
     date: string;
     title: string;
     detail: string | null;
@@ -187,7 +187,7 @@ useHead({
 });
 
 // ── Filters ──────────────────────────────────────────────
-type EventType = "feeding" | "shedding" | "weight" | "vet_visit" | "photo";
+type EventType = "feeding" | "shedding" | "weight" | "vet_visit" | "photo" | "husbandry_note";
 
 const typeFilters = computed(() => [
     {
@@ -215,9 +215,14 @@ const typeFilters = computed(() => [
         label: t("pages.pets.timeline.filterPhoto"),
         icon: "lucide:camera",
     },
+    {
+        value: "husbandry_note" as EventType,
+        label: t("pages.pets.timeline.filterHusbandryNote"),
+        icon: "lucide:clipboard-list",
+    },
 ]);
 
-const activeTypes = ref<EventType[]>(["feeding", "shedding", "weight", "vet_visit", "photo"]);
+const activeTypes = ref<EventType[]>(["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"]);
 
 function toggleType(type: EventType) {
     const idx = activeTypes.value.indexOf(type);
@@ -313,6 +318,8 @@ function eventColorClass(type: string): string {
             return "bg-teal-500/10 text-teal-400";
         case "photo":
             return "bg-pink-500/10 text-pink-400";
+        case "husbandry_note":
+            return "bg-emerald-500/10 text-emerald-400";
         default:
             return "bg-white/5 text-fg-faint";
     }
@@ -330,6 +337,8 @@ function eventBadgeClass(type: string): string {
             return "bg-teal-500/10 text-teal-400";
         case "photo":
             return "bg-pink-500/10 text-pink-400";
+        case "husbandry_note":
+            return "bg-emerald-500/10 text-emerald-400";
         default:
             return "bg-white/5 text-fg-faint";
     }
@@ -347,6 +356,8 @@ function eventTypeLabel(type: string): string {
             return t("pages.pets.timeline.filterVetVisit");
         case "photo":
             return t("pages.pets.timeline.filterPhoto");
+        case "husbandry_note":
+            return t("pages.pets.timeline.filterHusbandryNote");
         default:
             return type;
     }

@@ -67,6 +67,7 @@ export async function createPet(
         imageUrl?: string;
         feedingIntervalMinDays?: number;
         feedingIntervalMaxDays?: number;
+        pauseFeedingDuringShed?: boolean;
     },
 ) {
     if (data.enclosureId) {
@@ -97,6 +98,7 @@ export async function updatePet(
         imageUrl: string;
         feedingIntervalMinDays: number;
         feedingIntervalMaxDays: number;
+        pauseFeedingDuringShed: boolean;
     }>,
 ) {
     const existing = await prisma.pet.findUnique({ where: { id } });

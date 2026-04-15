@@ -597,7 +597,32 @@ useSeoMeta({
     ogTitle: () => userData.value?.displayName || userData.value?.username || "KeeperLog",
     ogDescription: () => userData.value?.tagline || userData.value?.bio || "",
     ogImage: () => (userData.value?.hasAvatar ? avatarUrl.value : undefined),
+    ogUrl: () => `${config.public.baseURL}/keeper/${encodeURIComponent(slug)}`,
     ogType: "profile",
     twitterCard: "summary_large_image",
+});
+
+useHead({
+    script: [
+        {
+            type: "application/ld+json",
+            innerHTML: () => {
+                if (!userData.value) return "{}";
+                const d = userData.value;
+                return JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "ProfilePage",
+                    mainEntity: {
+                        "@type": "Person",
+                        name: d.displayName || d.username,
+                        url: `${config.public.baseURL}/keeper/${encodeURIComponent(slug)}`,
+                        ...(d.hasAvatar ? { image: avatarUrl.value } : {}),
+                        ...(d.tagline || d.bio ? { description: d.tagline || d.bio } : {}),
+                        ...(d.location ? { address: { "@type": "PostalAddress", addressLocality: d.location } } : {}),
+                    },
+                });
+            },
+        },
+    ],
 });
 </script>

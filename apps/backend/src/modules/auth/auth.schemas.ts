@@ -75,6 +75,27 @@ export const confirmAccountDeletionSchema = z.object({
     password: z.string().min(1, "Password is required"),
 });
 
+export const changeUsernameSchema = z.object({
+    newUsername: z
+        .string()
+        .min(3, "Username must be at least 3 characters")
+        .max(32, "Username must be at most 32 characters")
+        .regex(
+            /^[a-zA-Z0-9_-]+$/,
+            "Username can only contain letters, numbers, hyphens and underscores",
+        ),
+    password: z.string().min(1, "Password is required"),
+});
+
+export const requestEmailChangeSchema = z.object({
+    newEmail: z.string().email("Invalid email address"),
+    password: z.string().min(1, "Password is required"),
+});
+
+export const confirmEmailChangeSchema = z.object({
+    code: z.string().length(6, "Verification code must be 6 digits"),
+});
+
 // ─── Types ───────────────────────────────────────────────────
 
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -86,6 +107,9 @@ export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ConfirmAccountDeletionInput = z.infer<typeof confirmAccountDeletionSchema>;
+export type ChangeUsernameInput = z.infer<typeof changeUsernameSchema>;
+export type RequestEmailChangeInput = z.infer<typeof requestEmailChangeSchema>;
+export type ConfirmEmailChangeInput = z.infer<typeof confirmEmailChangeSchema>;
 
 // ─── Response Types ──────────────────────────────────────────
 

@@ -32,6 +32,7 @@ const {
     deleteVetVisit,
     getUpcomingAppointments,
     getVetCosts,
+    getVetCostsMonthly,
     convertAppointment,
 } = await import("../vet-visits.service.js");
 
@@ -708,5 +709,94 @@ describe("getVetCosts", () => {
             visitCount: 0,
             perPet: [],
         });
+    });
+});
+
+// ─── getVetCostsMonthly ────────────────────────────────
+
+describe("getVetCostsMonthly", () => {
+    it("returns monthly breakdown grouped by pet", async () => {
+        mockPrisma.vetVisit.findMany.mockResolvedValue([
+            { petId: PET_ID, costCents: 3000, visitDate: new Date("2024-03-10") },
+            { petId: PET_ID, costCents: 2000, visitDate: new Date("2024-03-20") },
+            { petId: "pet_other", costCents: 5000, visitDate: new Date("2024-03-15") },
+            { petId: PET_ID, costCents: 1000, visitDate: new Date("2024-06-01") },
+        ]);
+        mockPrisma.pet.findMany.mockResolvedValue([
+            { id: PET_ID, name: "Monty" },
+            { id: "pet_other", name: "Slinky" },
+        ]);
+
+        const result = await getVetCostsMonthly(USER_ID, { year: 2024 });
+
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith({
+            where: {
+                userId: USER_ID,
+                costCents: { not: null },
+                visitDate: { gte: new Date("2024-01-01"), lt: new Date("2025-01-01") },
+            },
+            select: { petId: true, costCents: true, visitDate: true },
+            orderBy: { visitDate: "asc" },
+        });
+
+        expect(result).toEqual([
+            { month: "2024-03", petId: PET_ID, petName: "Monty", totalCents: 5000, visitCount: 2 },
+            { month: "2024-03", petId: "pet_other", petName: "Slinky", totalCents: 5000, visitCount: 1 },
+            { month: "2024-06", petId: PET_ID, petName: "Monty", totalCents: 1000, visitCount: 1 },
+        ]);
+    });
+
+    it("filters by petId", async () => {
+        mockPrisma.vetVisit.findMany.mockResolvedValue([]);
+        mockPrisma.pet.findMany.mockResolvedValue([]);
+
+        await getVetCostsMonthly(USER_ID, { petId: PET_ID, year: 2024 });
+
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({ petId: PET_ID }),
+            }),
+        );
+    });
+
+    it("defaults to current year when no year provided", async () => {
+        mockPrisma.vetVisit.findMany.mockResolvedValue([]);
+        mockPrisma.pet.findMany.mockResolvedValue([]);
+
+        await getVetCostsMonthly(USER_ID);
+
+        const currentYear = new Date().getFullYear();
+        expect(mockPrisma.vetVisit.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({
+                    visitDate: {
+                        gte: new Date(`${currentYear}-01-01`),
+                        lt: new Date(`${currentYear + 1}-01-01`),
+                    },
+                }),
+            }),
+        );
+    });
+
+    it("returns empty array when no visits have costs", async () => {
+        mockPrisma.vetVisit.findMany.mockResolvedValue([]);
+        mockPrisma.pet.findMany.mockResolvedValue([]);
+
+        const result = await getVetCostsMonthly(USER_ID, { year: 2024 });
+
+        expect(result).toEqual([]);
+    });
+
+    it("uses 'Unknown' for missing pet names", async () => {
+        mockPrisma.vetVisit.findMany.mockResolvedValue([
+            { petId: "deleted_pet", costCents: 1000, visitDate: new Date("2024-01-15") },
+        ]);
+        mockPrisma.pet.findMany.mockResolvedValue([]);
+
+        const result = await getVetCostsMonthly(USER_ID, { year: 2024 });
+
+        expect(result).toEqual([
+            { month: "2024-01", petId: "deleted_pet", petName: "Unknown", totalCents: 1000, visitCount: 1 },
+        ]);
     });
 });

@@ -51,6 +51,7 @@ export async function createFeeding(
         foodSize?: string;
         quantity?: number;
         accepted?: boolean;
+        refusedReason?: string;
         notes?: string;
     },
 ) {
@@ -71,6 +72,7 @@ export async function updateFeeding(
         foodSize: string;
         quantity: number;
         accepted: boolean;
+        refusedReason: string;
         notes: string;
     }>,
 ) {

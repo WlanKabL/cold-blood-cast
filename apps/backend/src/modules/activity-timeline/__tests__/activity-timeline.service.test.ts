@@ -19,6 +19,9 @@ const mockPrisma = {
     petPhoto: {
         findMany: vi.fn(),
     },
+    husbandryNote: {
+        findMany: vi.fn(),
+    },
 };
 
 vi.mock("@/config/database.js", () => ({ prisma: mockPrisma }));
@@ -36,7 +39,7 @@ beforeEach(() => {
 
 describe("normalizeEvents", () => {
     it("returns empty array when all inputs are empty", () => {
-        const events = normalizeEvents([], [], [], [], []);
+        const events = normalizeEvents([], [], [], [], [], []);
         expect(events).toEqual([]);
     });
 
@@ -52,7 +55,7 @@ describe("normalizeEvents", () => {
                 notes: null,
             },
         ];
-        const events = normalizeEvents(feedings, [], [], [], []);
+        const events = normalizeEvents(feedings, [], [], [], [], []);
         expect(events).toHaveLength(1);
         expect(events[0]).toMatchObject({
             id: "f1",
@@ -74,7 +77,7 @@ describe("normalizeEvents", () => {
                 notes: "Clean shed",
             },
         ];
-        const events = normalizeEvents([], sheddings, [], [], []);
+        const events = normalizeEvents([], sheddings, [], [], [], []);
         expect(events).toHaveLength(1);
         expect(events[0]).toMatchObject({
             id: "s1",
@@ -94,7 +97,7 @@ describe("normalizeEvents", () => {
                 notes: null,
             },
         ];
-        const events = normalizeEvents([], [], weights, [], []);
+        const events = normalizeEvents([], [], weights, [], [], []);
         expect(events).toHaveLength(1);
         expect(events[0]).toMatchObject({
             id: "w1",
@@ -119,7 +122,7 @@ describe("normalizeEvents", () => {
                 veterinarian: { name: "Dr. Schmidt", clinicName: "Reptile Klinik" },
             },
         ];
-        const events = normalizeEvents([], [], [], vet, []);
+        const events = normalizeEvents([], [], [], vet, [], []);
         expect(events).toHaveLength(1);
         expect(events[0]).toMatchObject({
             id: "v1",
@@ -141,7 +144,7 @@ describe("normalizeEvents", () => {
                 upload: { url: "/uploads/abc.jpg" },
             },
         ];
-        const events = normalizeEvents([], [], [], [], photos);
+        const events = normalizeEvents([], [], [], [], photos, []);
         expect(events).toHaveLength(1);
         expect(events[0]).toMatchObject({
             id: "p1",
@@ -150,6 +153,28 @@ describe("normalizeEvents", () => {
             detail: "portrait, enclosure",
             icon: "lucide:camera",
             meta: { tags: ["portrait", "enclosure"], url: "/uploads/abc.jpg" },
+        });
+    });
+
+    it("converts husbandry notes to timeline events", () => {
+        const notes = [
+            {
+                id: "hn1",
+                type: "observation",
+                title: "Active at night",
+                content: "Noticed increased activity",
+                occurredAt: new Date("2024-06-18T20:00:00.000Z"),
+            },
+        ];
+        const events = normalizeEvents([], [], [], [], [], notes);
+        expect(events).toHaveLength(1);
+        expect(events[0]).toMatchObject({
+            id: "hn1",
+            type: "husbandry_note",
+            title: "Active at night",
+            detail: "Noticed increased activity",
+            icon: "lucide:clipboard-list",
+            meta: { noteType: "observation" },
         });
     });
 
@@ -184,7 +209,7 @@ describe("normalizeEvents", () => {
             },
         ];
 
-        const events = normalizeEvents(feedings, sheddings, weights, [], []);
+        const events = normalizeEvents(feedings, sheddings, weights, [], [], []);
 
         expect(events.map((e) => e.id)).toEqual(["w1", "f1", "s1"]);
     });
@@ -242,7 +267,7 @@ describe("normalizeEvents", () => {
             },
         ];
 
-        const events = normalizeEvents(feedings, sheddings, weights, vet, photos);
+        const events = normalizeEvents(feedings, sheddings, weights, vet, photos, []);
         expect(events).toHaveLength(5);
         expect(events.map((e) => e.type)).toEqual([
             "photo",
@@ -265,7 +290,7 @@ describe("normalizeEvents", () => {
                 notes: null,
             },
         ];
-        const events = normalizeEvents(feedings, [], [], [], []);
+        const events = normalizeEvents(feedings, [], [], [], [], []);
         expect(events[0].title).toBe("Cricket");
     });
 
@@ -283,7 +308,7 @@ describe("normalizeEvents", () => {
                 veterinarian: null,
             },
         ];
-        const events = normalizeEvents([], [], [], vet, []);
+        const events = normalizeEvents([], [], [], vet, [], []);
         expect(events[0].title).toBe("EMERGENCY");
         expect(events[0].detail).toBe("urgent");
     });
@@ -298,7 +323,7 @@ describe("normalizeEvents", () => {
                 upload: { url: "/img.jpg" },
             },
         ];
-        const events = normalizeEvents([], [], [], [], photos);
+        const events = normalizeEvents([], [], [], [], photos, []);
         expect(events[0].title).toBe("Photo");
         expect(events[0].detail).toBeNull();
     });
@@ -314,7 +339,7 @@ describe("normalizeEvents", () => {
                 notes: null,
             },
         ];
-        const events = normalizeEvents([], sheddings, [], [], []);
+        const events = normalizeEvents([], sheddings, [], [], [], []);
         expect(events[0].title).toBe("Shedding (in progress)");
     });
 });
@@ -348,11 +373,12 @@ describe("getTimeline", () => {
         mockPrisma.weightRecord.findMany.mockResolvedValue([]);
         mockPrisma.vetVisit.findMany.mockResolvedValue([]);
         mockPrisma.petPhoto.findMany.mockResolvedValue([]);
+        mockPrisma.husbandryNote.findMany.mockResolvedValue([]);
 
         const result = await getTimeline(USER_ID, PET_ID, {
             page: 1,
             limit: 50,
-            types: ["feeding", "shedding", "weight", "vet_visit", "photo"],
+            types: ["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"],
         });
 
         expect(result.events).toHaveLength(2);
@@ -402,6 +428,7 @@ describe("getTimeline", () => {
         expect(mockPrisma.weightRecord.findMany).not.toHaveBeenCalled();
         expect(mockPrisma.vetVisit.findMany).not.toHaveBeenCalled();
         expect(mockPrisma.petPhoto.findMany).not.toHaveBeenCalled();
+        expect(mockPrisma.husbandryNote.findMany).not.toHaveBeenCalled();
     });
 
     it("paginates correctly", async () => {
@@ -420,11 +447,12 @@ describe("getTimeline", () => {
         mockPrisma.weightRecord.findMany.mockResolvedValue([]);
         mockPrisma.vetVisit.findMany.mockResolvedValue([]);
         mockPrisma.petPhoto.findMany.mockResolvedValue([]);
+        mockPrisma.husbandryNote.findMany.mockResolvedValue([]);
 
         const page1 = await getTimeline(USER_ID, PET_ID, {
             page: 1,
             limit: 3,
-            types: ["feeding", "shedding", "weight", "vet_visit", "photo"],
+            types: ["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"],
         });
 
         expect(page1.events).toHaveLength(3);
@@ -434,7 +462,7 @@ describe("getTimeline", () => {
         const page4 = await getTimeline(USER_ID, PET_ID, {
             page: 4,
             limit: 3,
-            types: ["feeding", "shedding", "weight", "vet_visit", "photo"],
+            types: ["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"],
         });
 
         expect(page4.events).toHaveLength(1);
@@ -474,11 +502,12 @@ describe("getTimeline", () => {
         ]);
         mockPrisma.vetVisit.findMany.mockResolvedValue([]);
         mockPrisma.petPhoto.findMany.mockResolvedValue([]);
+        mockPrisma.husbandryNote.findMany.mockResolvedValue([]);
 
         const result = await getTimeline(USER_ID, PET_ID, {
             page: 1,
             limit: 50,
-            types: ["feeding", "shedding", "weight", "vet_visit", "photo"],
+            types: ["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"],
         });
 
         expect(result.events.map((e) => e.id)).toEqual(["s1", "f1", "w1"]);
@@ -491,11 +520,12 @@ describe("getTimeline", () => {
         mockPrisma.weightRecord.findMany.mockResolvedValue([]);
         mockPrisma.vetVisit.findMany.mockResolvedValue([]);
         mockPrisma.petPhoto.findMany.mockResolvedValue([]);
+        mockPrisma.husbandryNote.findMany.mockResolvedValue([]);
 
         const result = await getTimeline(USER_ID, PET_ID, {
             page: 1,
             limit: 50,
-            types: ["feeding", "shedding", "weight", "vet_visit", "photo"],
+            types: ["feeding", "shedding", "weight", "vet_visit", "photo", "husbandry_note"],
         });
 
         expect(result.events).toHaveLength(0);

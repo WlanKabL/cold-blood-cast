@@ -77,9 +77,7 @@
                                 : $t("pages.sheddings.inProgress")
                         }}
                     </span>
-                    <span v-if="shed.quality" class="text-fg-faint text-xs">{{
-                        shed.quality
-                    }}</span>
+                    <span v-if="shed.quality" :class="qualityBadgeClass(shed.quality)" class="rounded-md px-2 py-0.5 text-xs font-medium">{{ qualityLabel(shed.quality) }}</span>
                     <UiButton
                         variant="ghost"
                         icon="lucide:pencil"
@@ -133,12 +131,22 @@
                         $t("pages.sheddings.fields.completeLabel")
                     }}</label>
                 </div>
-                <UiTextInput
-                    v-model="form.quality"
-                    :label="$t('pages.sheddings.fields.quality')"
-                    :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')"
-                />
-                <UiTextarea v-model="form.notes" :label="$t('pages.sheddings.fields.notes')" />
+                <div>
+                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{ $t('pages.sheddings.fields.quality') }}</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            v-for="preset in qualityPresets"
+                            :key="preset"
+                            type="button"
+                            class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                            :class="form.quality === preset ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40' : 'bg-white/5 text-fg-muted hover:bg-white/10'"
+                            @click="form.quality = form.quality === preset ? '' : preset"
+                        >
+                            {{ qualityLabel(preset) }}
+                        </button>
+                    </div>
+                </div>
+                <UiTextarea v-model="form.notes" :label="$t('pages.sheddings.fields.notes')" :placeholder="$t('pages.sheddings.fields.notesPlaceholder')" />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showCreate = false">{{
                         $t("common.cancel")
@@ -173,12 +181,22 @@
                         $t("pages.sheddings.fields.completeLabel")
                     }}</label>
                 </div>
-                <UiTextInput
-                    v-model="editForm.quality"
-                    :label="$t('pages.sheddings.fields.quality')"
-                    :placeholder="$t('pages.sheddings.fields.qualityPlaceholder')"
-                />
-                <UiTextarea v-model="editForm.notes" :label="$t('pages.sheddings.fields.notes')" />
+                <div>
+                    <label class="text-fg-muted mb-1 block text-sm font-medium">{{ $t('pages.sheddings.fields.quality') }}</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            v-for="preset in qualityPresets"
+                            :key="preset"
+                            type="button"
+                            class="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                            :class="editForm.quality === preset ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/40' : 'bg-white/5 text-fg-muted hover:bg-white/10'"
+                            @click="editForm.quality = editForm.quality === preset ? '' : preset"
+                        >
+                            {{ qualityLabel(preset) }}
+                        </button>
+                    </div>
+                </div>
+                <UiTextarea v-model="editForm.notes" :label="$t('pages.sheddings.fields.notes')" :placeholder="$t('pages.sheddings.fields.notesPlaceholder')" />
                 <div class="flex justify-end gap-2 pt-2">
                     <UiButton variant="ghost" @click="showEdit = false">{{
                         $t("common.cancel")
@@ -230,6 +248,29 @@ definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeatur
 useHead({ title: () => t("pages.sheddings.title") });
 
 const selectedPet = ref("ALL");
+
+const qualityPresets = ["complete", "partial", "stuck", "assisted"] as const;
+
+function qualityLabel(quality: string): string {
+    const key = `pages.sheddings.qualityPresets.${quality}`;
+    const translated = t(key);
+    return translated === key ? quality : translated;
+}
+
+function qualityBadgeClass(quality: string): string {
+    switch (quality) {
+        case "complete":
+            return "bg-green-500/10 text-green-400";
+        case "partial":
+            return "bg-amber-500/10 text-amber-400";
+        case "stuck":
+            return "bg-red-500/10 text-red-400";
+        case "assisted":
+            return "bg-blue-500/10 text-blue-400";
+        default:
+            return "bg-white/5 text-fg-faint";
+    }
+}
 
 const queryParams = computed(() => {
     const params = new URLSearchParams();

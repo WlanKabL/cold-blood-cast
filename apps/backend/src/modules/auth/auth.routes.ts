@@ -10,6 +10,9 @@ import {
     resetPasswordSchema,
     updateProfileSchema,
     confirmAccountDeletionSchema,
+    changeUsernameSchema,
+    requestEmailChangeSchema,
+    confirmEmailChangeSchema,
 } from "./auth.schemas.js";
 import {
     registerUser,
@@ -25,6 +28,9 @@ import {
     updateProfile,
     requestAccountDeletion,
     confirmAccountDeletion,
+    changeUsername,
+    requestEmailChange,
+    confirmEmailChange,
 } from "./auth.service.js";
 
 import { env } from "@/config/env.js";
@@ -242,6 +248,7 @@ export async function authRoutes(app: FastifyInstance) {
                 onboardingCompleted: true,
                 locale: true,
                 weeklyReportEnabled: true,
+                usernameChangedAt: true,
             },
         });
 
@@ -361,4 +368,64 @@ export async function authRoutes(app: FastifyInstance) {
 
         return reply.send({ success: true, data: { deleted: true } });
     });
+
+    // ── POST /api/auth/change-username ────────────
+    app.post(
+        "/change-username",
+        { ...authRateLimit, preHandler: [authGuard] },
+        async (request, reply) => {
+            const parsed = changeUsernameSchema.safeParse(request.body);
+            if (!parsed.success) {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Validation failed",
+                    parsed.error.format(),
+                );
+            }
+
+            const result = await changeUsername(request.userId, parsed.data);
+
+            return reply.send({ success: true, data: result });
+        },
+    );
+
+    // ── POST /api/auth/request-email-change ──────
+    app.post(
+        "/request-email-change",
+        { ...authRateLimit, preHandler: [authGuard] },
+        async (request, reply) => {
+            const parsed = requestEmailChangeSchema.safeParse(request.body);
+            if (!parsed.success) {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Validation failed",
+                    parsed.error.format(),
+                );
+            }
+
+            await requestEmailChange(request.userId, parsed.data);
+
+            return reply.send({ success: true, data: { sent: true } });
+        },
+    );
+
+    // ── POST /api/auth/confirm-email-change ──────
+    app.post(
+        "/confirm-email-change",
+        { preHandler: [authGuard] },
+        async (request, reply) => {
+            const parsed = confirmEmailChangeSchema.safeParse(request.body);
+            if (!parsed.success) {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Validation failed",
+                    parsed.error.format(),
+                );
+            }
+
+            const result = await confirmEmailChange(request.userId, parsed.data);
+
+            return reply.send({ success: true, data: result });
+        },
+    );
 }

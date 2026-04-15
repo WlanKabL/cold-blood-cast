@@ -281,7 +281,8 @@
             "accessRequests": "Zugangsanfragen",
             "legal": "Rechtliche Dokumente",
             "reports": "Meldungen",
-            "comments": "Kommentare"
+            "comments": "Kommentare",
+            "tags": "Tags"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -429,6 +430,34 @@
             "title": "Feature Flags",
             "subtitle": "Globale Schalter für Plattform-Features. Diese sind code-definiert und können nicht erstellt oder gelöscht werden.",
             "create": "Flag erstellen"
+        },
+        "tags": {
+            "title": "Tags",
+            "subtitle": "Globale Tags verwalten, die allen Benutzern zur Verfügung stehen. Benutzer können auch eigene Tags erstellen.",
+            "create": "Tag erstellen",
+            "edit": "Tag bearbeiten",
+            "delete": "Löschen",
+            "empty": "Noch keine globalen Tags. Erstelle den ersten.",
+            "created": "Tag erstellt",
+            "saved": "Tag gespeichert",
+            "deleted": "Tag gelöscht",
+            "confirmDelete": "Tag löschen",
+            "confirmDeleteMsg": "Tag \"{name}\" löschen? Das kann nicht rückgängig gemacht werden.",
+            "fields": {
+                "name": "Name",
+                "namePlaceholder": "z.B. Gesund, Dringend, Nachkontrolle",
+                "category": "Kategorie",
+                "color": "Farbe"
+            },
+            "categories": {
+                "general": "Allgemein",
+                "care": "Pflege",
+                "monitoring": "Überwachung",
+                "vet": "Tierarzt",
+                "maintenance": "Wartung",
+                "media": "Medien",
+                "organization": "Organisation"
+            }
         },
         "reports": {
             "title": "Meldungen",
@@ -763,6 +792,7 @@
             "feedingOk": "OK",
             "feedingDue": "Fällig",
             "feedingCritical": "Überfällig!",
+            "feedingPaused": "Pausiert (Häutung)",
             "feedingNoSchedule": "Kein Plan",
             "daysAgo": "vor {n} Tagen",
             "neverFed": "Nie gefüttert",
@@ -783,7 +813,19 @@
                 "overview": "Übersicht",
                 "schedule": "Termine",
                 "maintenance": "Wartung"
-            }
+            },
+            "quickFeed": "Schnell Fütterung eintragen",
+            "quickWeight": "Schnell Gewicht eintragen",
+            "quickFeedTitle": "Fütterung eintragen — {name}",
+            "quickWeightTitle": "Gewicht eintragen — {name}",
+            "quickFeedItem": "Futterart",
+            "quickFeedItemPlaceholder": "Futterart wählen (optional)",
+            "quickFoodType": "Futterbezeichnung",
+            "quickFedAt": "Gefüttert am",
+            "quickWeightGrams": "Gewicht (g)",
+            "quickMeasuredAt": "Gemessen am",
+            "quickFeedSuccess": "Fütterung eingetragen",
+            "quickWeightSuccess": "Gewicht eingetragen"
         },
         "enclosures": {
             "title": "Terrarien",
@@ -857,6 +899,7 @@
             "deleted": "Tier gelöscht",
             "feedingSchedule": "Fütterungsplan",
             "feedingScheduleHint": "Optional: Lege ein Fütterungsintervall fest, um Erinnerungen zu erhalten",
+            "pauseFeedingDuringShedHint": "Wenn aktiviert, werden Fütterungserinnerungen während einer laufenden Häutung pausiert",
             "fields": {
                 "name": "Name",
                 "enclosure": "Terrarium",
@@ -866,7 +909,8 @@
                 "birthDate": "Geburtsdatum",
                 "notes": "Notizen",
                 "feedingIntervalMinDays": "Min. Intervall (Tage)",
-                "feedingIntervalMaxDays": "Max. Intervall (Tage)"
+                "feedingIntervalMaxDays": "Max. Intervall (Tage)",
+                "pauseFeedingDuringShed": "Fütterung während Häutung pausieren"
             },
             "photos": {
                 "title": "Fotos",
@@ -954,6 +998,7 @@
                 "filterWeight": "Gewicht",
                 "filterVetVisit": "Tierarztbesuche",
                 "filterPhoto": "Fotos",
+                "filterHusbandryNote": "Notizen",
                 "recentActivity": "Letzte Aktivität",
                 "eventCount": "{count} Ereignis | {count} Ereignisse"
             },
@@ -1062,7 +1107,15 @@
                 "fedAt": "Gefüttert am",
                 "feedItem": "Futtertier",
                 "feedItemNone": "Manuell eingeben",
+                "refusedReason": "Grund der Verweigerung",
                 "notes": "Notizen"
+            },
+            "refusedReasons": {
+                "not_hungry": "Nicht hungrig",
+                "wrong_size": "Falsche Größe",
+                "shedding": "Häutung",
+                "stress": "Stress",
+                "other": "Sonstiges"
             }
         },
         "feedItems": {
@@ -1116,7 +1169,14 @@
                 "completeLabel": "Häutung ist vollständig",
                 "quality": "Qualität",
                 "qualityPlaceholder": "z.B. sauber, festsitzend, teilweise",
-                "notes": "Notizen"
+                "notes": "Notizen",
+                "notesPlaceholder": "Beschreibe den Häutungsprozess..."
+            },
+            "qualityPresets": {
+                "complete": "Vollständig",
+                "partial": "Teilweise",
+                "stuck": "Festsitzend",
+                "assisted": "Mit Hilfe"
             },
             "analysis": {
                 "title": "Häutungszyklus-Analyse",
@@ -1201,6 +1261,31 @@
             "resetSending": "Wird gesendet...",
             "resetSent": "Link gesendet",
             "resetSentHint": "Ein Passwort-Reset-Link wurde an deine E-Mail gesendet.",
+            "usernameChange": {
+                "title": "Benutzername ändern",
+                "hint": "Du kannst deinen Benutzernamen alle 30 Tage ändern. Dies beeinflusst deine Profil-URL.",
+                "newUsername": "Neuer Benutzername",
+                "password": "Aktuelles Passwort",
+                "passwordPlaceholder": "Gib dein aktuelles Passwort ein",
+                "rateLimited": "Du kannst deinen Benutzernamen in 30 Tagen wieder ändern.",
+                "saved": "Benutzername erfolgreich geändert."
+            },
+            "emailChange": {
+                "title": "E-Mail-Adresse ändern",
+                "hint": "Ein Bestätigungscode wird an deine neue E-Mail-Adresse gesendet.",
+                "currentEmail": "Aktuelle E-Mail",
+                "newEmail": "Neue E-Mail-Adresse",
+                "newEmailPlaceholder": "deine-neue{'@'}email.de",
+                "password": "Aktuelles Passwort",
+                "passwordPlaceholder": "Gib dein aktuelles Passwort ein",
+                "sendCode": "Bestätigungscode senden",
+                "codeSentTo": "Ein 6-stelliger Code wurde an {email} gesendet.",
+                "code": "Bestätigungscode",
+                "codePlaceholder": "123456",
+                "confirm": "Bestätigen",
+                "back": "Zurück",
+                "saved": "E-Mail-Adresse erfolgreich geändert."
+            },
             "notifications": "Benachrichtigungen",
             "weeklyDigest": "Wöchentliche Pflegeübersicht",
             "weeklyDigestHint": "Erhalte jeden Sonntag um 18:00 Uhr eine E-Mail mit deinen anstehenden Pflegeaufgaben für die nächste Woche.",
@@ -1433,6 +1518,18 @@
                 "visitOn": "Besuch am {date}",
                 "appointmentOn": "Termin am {date}",
                 "notSet": "Nicht angegeben"
+            },
+            "costs": {
+                "title": "Tierarztkosten",
+                "subtitle": "Übersicht der Tierarztausgaben",
+                "allPets": "Alle Tiere",
+                "totalCost": "Gesamtkosten",
+                "visitCount": "Besuche",
+                "avgPerVisit": "Ø pro Besuch",
+                "monthlyBreakdown": "Monatliche Aufschlüsselung",
+                "perPet": "Pro Tier",
+                "visits": "{n} Besuch(e)",
+                "noData": "Keine Kostendaten vorhanden"
             }
         },
         "maintenance": {
@@ -1535,7 +1632,9 @@
                 "vetVisit": "Tierarztbesuch",
                 "shedding": "Häutung",
                 "maintenance": "Wartung"
-            }
+            },
+            "quickComplete": "Als erledigt markieren",
+            "quickCompleted": "Als erledigt markiert"
         }
     },
     "shortcuts": {

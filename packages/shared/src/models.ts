@@ -14,6 +14,7 @@ export interface AuthUser {
     onboardingCompleted?: boolean;
     locale?: string;
     weeklyReportEnabled?: boolean;
+    usernameChangedAt?: string | null;
 }
 
 export interface FeatureTierInfo {

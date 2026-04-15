@@ -207,6 +207,15 @@
                             max="365"
                         />
                     </div>
+                    <div class="mt-3">
+                        <UiToggle
+                            v-model="form.pauseFeedingDuringShed"
+                            :label="$t('pages.pets.fields.pauseFeedingDuringShed')"
+                        />
+                        <p class="text-fg-faint mt-1 text-xs">
+                            {{ $t('pages.pets.pauseFeedingDuringShedHint') }}
+                        </p>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
@@ -302,6 +311,7 @@ const form = reactive({
     notes: "",
     feedingIntervalMinDays: "",
     feedingIntervalMaxDays: "",
+    pauseFeedingDuringShed: false,
 });
 
 function resetForm() {
@@ -315,6 +325,7 @@ function resetForm() {
         notes: "",
         feedingIntervalMinDays: "",
         feedingIntervalMaxDays: "",
+        pauseFeedingDuringShed: false,
     });
 }
 
@@ -339,6 +350,7 @@ const { mutate: createMutation, isPending: creating } = useMutation({
             feedingIntervalMaxDays: form.feedingIntervalMaxDays
                 ? Number(form.feedingIntervalMaxDays)
                 : undefined,
+            pauseFeedingDuringShed: form.pauseFeedingDuringShed,
         }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pets"] });

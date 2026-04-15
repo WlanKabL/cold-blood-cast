@@ -699,7 +699,38 @@ useSeoMeta({
             : ""),
     ogImage: () =>
         petData.value?.profilePhotoId ? photoUrl(petData.value.profilePhotoId) : undefined,
+    ogUrl: () =>
+        `${config.public.baseURL}/keeper/${encodeURIComponent(userSlug)}/p/${encodeURIComponent(petSlug)}`,
     ogType: "profile",
     twitterCard: "summary_large_image",
+});
+
+useHead({
+    script: [
+        {
+            type: "application/ld+json",
+            innerHTML: () => {
+                if (!petData.value) return "{}";
+                const p = petData.value;
+                const profileUrl = `${config.public.baseURL}/keeper/${encodeURIComponent(userSlug)}/p/${encodeURIComponent(petSlug)}`;
+                return JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "ProfilePage",
+                    mainEntity: {
+                        "@type": "Thing",
+                        name: p.name,
+                        url: profileUrl,
+                        ...(p.bio ? { description: p.bio } : {}),
+                        ...(p.profilePhotoId
+                            ? { image: photoUrl(p.profilePhotoId) }
+                            : {}),
+                        ...(p.species
+                            ? { additionalType: p.species }
+                            : {}),
+                    },
+                });
+            },
+        },
+    ],
 });
 </script>

@@ -22,6 +22,9 @@ export const ErrorCodes = {
     // ── User ─────────────────────────────────────
     E_USER_NOT_FOUND: "E_USER_NOT_FOUND",
     E_USER_UPDATE_FAILED: "E_USER_UPDATE_FAILED",
+    E_USERNAME_CHANGE_RATE_LIMITED: "E_USERNAME_CHANGE_RATE_LIMITED",
+    E_EMAIL_CHANGE_CODE_INVALID: "E_EMAIL_CHANGE_CODE_INVALID",
+    E_EMAIL_CHANGE_CODE_EXPIRED: "E_EMAIL_CHANGE_CODE_EXPIRED",
 
     // ── Enclosures ─────────────────────────────
     E_ENCLOSURE_NOT_FOUND: "E_ENCLOSURE_NOT_FOUND",
@@ -73,6 +76,13 @@ export const ErrorCodes = {
 
     // ── Sheddings ────────────────────────────────
     E_SHEDDING_NOT_FOUND: "E_SHEDDING_NOT_FOUND",
+
+    // ── Husbandry Notes ──────────────────────────
+    E_HUSBANDRY_NOTE_NOT_FOUND: "E_HUSBANDRY_NOTE_NOT_FOUND",
+
+    // ── Tags ─────────────────────────────────────
+    E_TAG_NOT_FOUND: "E_TAG_NOT_FOUND",
+    E_TAG_DUPLICATE: "E_TAG_DUPLICATE",
 
     // ── Weight Records ───────────────────────────
     E_WEIGHT_RECORD_NOT_FOUND: "E_WEIGHT_RECORD_NOT_FOUND",

@@ -204,6 +204,7 @@ const mainNav = [
 
 const contentNav = [
     { to: "/admin/announcements", icon: "lucide:megaphone", label: "admin.nav.announcements" },
+    { to: "/admin/tags", icon: "lucide:tags", label: "admin.nav.tags" },
     { to: "/admin/reports", icon: "lucide:flag", label: "admin.nav.reports" },
     { to: "/admin/comments", icon: "lucide:message-square", label: "admin.nav.comments" },
     { to: "/admin/legal", icon: "lucide:scale", label: "admin.nav.legal" },

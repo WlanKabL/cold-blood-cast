@@ -93,7 +93,9 @@ describe("getFeedingStatuses", () => {
                 species: "Corn Snake",
                 feedingIntervalMinDays: 7,
                 feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: false,
                 feedings: [{ fedAt: thirtyDaysAgo }],
+                sheddings: [],
             },
             {
                 id: "pet_2",
@@ -101,7 +103,9 @@ describe("getFeedingStatuses", () => {
                 species: "Ball Python",
                 feedingIntervalMinDays: null,
                 feedingIntervalMaxDays: null,
+                pauseFeedingDuringShed: false,
                 feedings: [],
+                sheddings: [],
             },
         ]);
 
@@ -112,6 +116,72 @@ describe("getFeedingStatuses", () => {
         expect(result[0].status).toBe("critical"); // 30 days ago, max=10
         expect(result[1].petId).toBe("pet_2");
         expect(result[1].status).toBe("no_schedule");
+    });
+
+    it("returns paused status when pet has active shedding and toggle enabled", async () => {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        mockPrisma.pet.findMany.mockResolvedValue([
+            {
+                id: "pet_1",
+                name: "Noodle",
+                species: "Corn Snake",
+                feedingIntervalMinDays: 7,
+                feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: true,
+                feedings: [{ fedAt: thirtyDaysAgo }],
+                sheddings: [{ id: "shed_1" }],
+            },
+        ]);
+
+        const result = await getFeedingStatuses(USER_ID);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].status).toBe("paused");
+        expect(result[0].pausedReason).toBe("shedding");
+    });
+
+    it("does not pause when toggle is enabled but no active shedding", async () => {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        mockPrisma.pet.findMany.mockResolvedValue([
+            {
+                id: "pet_1",
+                name: "Noodle",
+                species: "Corn Snake",
+                feedingIntervalMinDays: 7,
+                feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: true,
+                feedings: [{ fedAt: thirtyDaysAgo }],
+                sheddings: [],
+            },
+        ]);
+
+        const result = await getFeedingStatuses(USER_ID);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].status).toBe("critical");
+        expect(result[0].pausedReason).toBeUndefined();
+    });
+
+    it("does not pause when active shedding exists but toggle is disabled", async () => {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        mockPrisma.pet.findMany.mockResolvedValue([
+            {
+                id: "pet_1",
+                name: "Noodle",
+                species: "Corn Snake",
+                feedingIntervalMinDays: 7,
+                feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: false,
+                feedings: [{ fedAt: thirtyDaysAgo }],
+                sheddings: [{ id: "shed_1" }],
+            },
+        ]);
+
+        const result = await getFeedingStatuses(USER_ID);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].status).toBe("critical");
+        expect(result[0].pausedReason).toBeUndefined();
     });
 
     it("filters by userId", async () => {
@@ -137,7 +207,9 @@ describe("getPetsNeedingReminder", () => {
                     species: "Corn Snake",
                     feedingIntervalMinDays: 7,
                     feedingIntervalMaxDays: 10,
+                    pauseFeedingDuringShed: false,
                     feedings: [{ fedAt: new Date("2026-03-25") }], // Way overdue
+                    sheddings: [],
                 },
             ])
             // Second user — no critical pets
@@ -148,7 +220,9 @@ describe("getPetsNeedingReminder", () => {
                     species: "Ball Python",
                     feedingIntervalMinDays: 14,
                     feedingIntervalMaxDays: 21,
+                    pauseFeedingDuringShed: false,
                     feedings: [{ fedAt: new Date() }], // Just fed
+                    sheddings: [],
                 },
             ]);
 
@@ -157,5 +231,26 @@ describe("getPetsNeedingReminder", () => {
         expect(result).toHaveLength(1);
         expect(result[0].petId).toBe("pet_1");
         expect(result[0].status).toBe("critical");
+    });
+
+    it("excludes paused pets from critical reminders", async () => {
+        mockPrisma.user.findMany.mockResolvedValue([{ id: "user_1" }]);
+
+        mockPrisma.pet.findMany.mockResolvedValueOnce([
+            {
+                id: "pet_1",
+                name: "Noodle",
+                species: "Corn Snake",
+                feedingIntervalMinDays: 7,
+                feedingIntervalMaxDays: 10,
+                pauseFeedingDuringShed: true,
+                feedings: [{ fedAt: new Date("2026-03-25") }], // Would be critical
+                sheddings: [{ id: "shed_1" }], // But is shedding
+            },
+        ]);
+
+        const result = await getPetsNeedingReminder();
+
+        expect(result).toHaveLength(0);
     });
 });

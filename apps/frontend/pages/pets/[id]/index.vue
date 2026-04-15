@@ -674,6 +674,15 @@
                             max="365"
                         />
                     </div>
+                    <div class="mt-3">
+                        <UiToggle
+                            v-model="editForm.pauseFeedingDuringShed"
+                            :label="$t('pages.pets.fields.pauseFeedingDuringShed')"
+                        />
+                        <p class="text-fg-faint mt-1 text-xs">
+                            {{ $t('pages.pets.pauseFeedingDuringShedHint') }}
+                        </p>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
@@ -935,6 +944,8 @@ function feedingStatusBadgeClass(status: string): string {
             return "bg-amber-500/10 text-amber-400";
         case "critical":
             return "bg-red-500/10 text-red-400";
+        case "paused":
+            return "bg-blue-500/10 text-blue-400";
         default:
             return "bg-white/5 text-fg-faint";
     }
@@ -948,6 +959,8 @@ function feedingStatusLabel(status: string): string {
             return t("pages.dashboard.feedingDue");
         case "critical":
             return t("pages.dashboard.feedingCritical");
+        case "paused":
+            return t("pages.dashboard.feedingPaused");
         default:
             return t("pages.dashboard.feedingNoSchedule");
     }
@@ -972,6 +985,7 @@ const editForm = reactive({
     notes: "",
     feedingIntervalMinDays: "",
     feedingIntervalMaxDays: "",
+    pauseFeedingDuringShed: false,
 });
 
 function openEditModal() {
@@ -986,6 +1000,7 @@ function openEditModal() {
         notes: pet.value.notes ?? "",
         feedingIntervalMinDays: pet.value.feedingIntervalMinDays?.toString() ?? "",
         feedingIntervalMaxDays: pet.value.feedingIntervalMaxDays?.toString() ?? "",
+        pauseFeedingDuringShed: pet.value.pauseFeedingDuringShed ?? false,
     });
     showEdit.value = true;
 }
@@ -1006,6 +1021,7 @@ const { mutate: updateMutation, isPending: updating } = useMutation({
             feedingIntervalMaxDays: editForm.feedingIntervalMaxDays
                 ? Number(editForm.feedingIntervalMaxDays)
                 : null,
+            pauseFeedingDuringShed: editForm.pauseFeedingDuringShed,
         }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["pets"] });

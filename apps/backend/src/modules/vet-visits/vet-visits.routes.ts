@@ -9,6 +9,7 @@ import {
     deleteVetVisit,
     getUpcomingAppointments,
     getVetCosts,
+    getVetCostsMonthly,
     convertAppointment,
 } from "./vet-visits.service.js";
 
@@ -98,6 +99,18 @@ export async function vetVisitRoutes(app: FastifyInstance) {
         const data = await getVetCosts(request.userId, {
             petId,
             veterinarianId,
+            year: year ? parseInt(year, 10) : undefined,
+        });
+        return { success: true, data };
+    });
+
+    // ── GET /api/vet-visits/costs/monthly ────────
+    app.get<{
+        Querystring: { petId?: string; year?: string };
+    }>("/costs/monthly", async (request) => {
+        const { petId, year } = request.query;
+        const data = await getVetCostsMonthly(request.userId, {
+            petId,
             year: year ? parseInt(year, 10) : undefined,
         });
         return { success: true, data };

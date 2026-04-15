@@ -108,6 +108,9 @@ const {
     updateProfile,
     requestAccountDeletion,
     confirmAccountDeletion,
+    changeUsername,
+    requestEmailChange,
+    confirmEmailChange,
 } = await import("../auth.service.js");
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -693,5 +696,173 @@ describe("confirmAccountDeletion", () => {
         await expect(confirmAccountDeletion({ token: "valid", password: "wrong" })).rejects.toThrow(
             "Incorrect password",
         );
+    });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// changeUsername
+// ═══════════════════════════════════════════════════════════════
+describe("changeUsername", () => {
+    it("changes username when password is correct and cooldown passed", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ usernameChangedAt: null }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue(null);
+        mockPrisma.user.update.mockResolvedValue({ username: "newname" });
+
+        const result = await changeUsername(USER_ID, {
+            newUsername: "newname",
+            password: "correctpw",
+        });
+
+        expect(result.username).toBe("newname");
+        expect(mockPrisma.user.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { id: USER_ID },
+                data: expect.objectContaining({ username: "newname" }),
+            }),
+        );
+    });
+
+    it("throws when password is wrong", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser());
+        mockVerifyPassword.mockResolvedValue(false);
+
+        await expect(
+            changeUsername(USER_ID, { newUsername: "x", password: "wrong" }),
+        ).rejects.toThrow(/password/i);
+    });
+
+    it("throws E_USERNAME_CHANGE_RATE_LIMITED when within cooldown", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ usernameChangedAt: new Date() }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+
+        await expect(
+            changeUsername(USER_ID, { newUsername: "x", password: "pw" }),
+        ).rejects.toThrow(/changed once/i);
+    });
+
+    it("throws when username is already taken", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ usernameChangedAt: null }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue({ id: "other_user" });
+
+        await expect(
+            changeUsername(USER_ID, { newUsername: "taken", password: "pw" }),
+        ).rejects.toThrow(/taken/i);
+    });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// requestEmailChange
+// ═══════════════════════════════════════════════════════════════
+describe("requestEmailChange", () => {
+    it("stores pending email and sends verification code", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ email: "old@example.com" }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue(null);
+        mockPrisma.user.update.mockResolvedValue({});
+
+        await requestEmailChange(USER_ID, {
+            newEmail: "new@example.com",
+            password: "pw",
+        });
+        expect(mockPrisma.user.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { id: USER_ID },
+                data: expect.objectContaining({
+                    pendingEmail: "new@example.com",
+                }),
+            }),
+        );
+    });
+
+    it("throws when password is wrong", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(makeUser());
+        mockVerifyPassword.mockResolvedValue(false);
+
+        await expect(
+            requestEmailChange(USER_ID, { newEmail: "new@x.com", password: "wrong" }),
+        ).rejects.toThrow(/password/i);
+    });
+
+    it("throws when new email is already taken", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({ email: "old@example.com" }),
+        );
+        mockVerifyPassword.mockResolvedValue(true);
+        mockPrisma.user.findFirst.mockResolvedValue({ id: "other_user" });
+
+        await expect(
+            requestEmailChange(USER_ID, { newEmail: "taken@x.com", password: "pw" }),
+        ).rejects.toThrow(/already in use/i);
+    });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// confirmEmailChange
+// ═══════════════════════════════════════════════════════════════
+describe("confirmEmailChange", () => {
+    it("updates email when code is valid", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({
+                pendingEmail: "new@example.com",
+                emailChangeCode: "123456",
+                emailChangeCodeExpiresAt: new Date(Date.now() + 600000),
+            }),
+        );
+        mockPrisma.user.findFirst.mockResolvedValue(null);
+        mockPrisma.user.update.mockResolvedValue({ email: "new@example.com" });
+
+        const result = await confirmEmailChange(USER_ID, { code: "123456" });
+
+        expect(result.email).toBe("new@example.com");
+        expect(mockPrisma.user.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { id: USER_ID },
+                data: expect.objectContaining({
+                    email: "new@example.com",
+                    emailVerified: true,
+                    pendingEmail: null,
+                    emailChangeCode: null,
+                    emailChangeCodeExpiresAt: null,
+                }),
+            }),
+        );
+    });
+
+    it("throws E_EMAIL_CHANGE_CODE_INVALID for wrong code", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({
+                pendingEmail: "new@example.com",
+                emailChangeCode: "123456",
+                emailChangeCodeExpiresAt: new Date(Date.now() + 600000),
+            }),
+        );
+
+        await expect(
+            confirmEmailChange(USER_ID, { code: "000000" }),
+        ).rejects.toThrow(/invalid|code/i);
+    });
+
+    it("throws E_EMAIL_CHANGE_CODE_EXPIRED for expired code", async () => {
+        mockPrisma.user.findUnique.mockResolvedValue(
+            makeUser({
+                pendingEmail: "new@example.com",
+                emailChangeCode: "123456",
+                emailChangeCodeExpiresAt: new Date(Date.now() - 1000),
+            }),
+        );
+
+        await expect(
+            confirmEmailChange(USER_ID, { code: "123456" }),
+        ).rejects.toThrow(/expired/i);
     });
 });

@@ -45,10 +45,16 @@ async function getUsersWithCriticalPets(): Promise<UserReminderGroup[]> {
                     species: true,
                     feedingIntervalMinDays: true,
                     feedingIntervalMaxDays: true,
+                    pauseFeedingDuringShed: true,
                     feedings: {
                         orderBy: { fedAt: "desc" },
                         take: 1,
                         select: { fedAt: true },
+                    },
+                    sheddings: {
+                        where: { complete: false },
+                        take: 1,
+                        select: { id: true },
                     },
                 },
             },
@@ -62,6 +68,9 @@ async function getUsersWithCriticalPets(): Promise<UserReminderGroup[]> {
         const criticalPets: CriticalPetInfo[] = [];
 
         for (const pet of user.pets) {
+            const hasActiveShedding = pet.sheddings.length > 0;
+            if (pet.pauseFeedingDuringShed && hasActiveShedding) continue;
+
             const lastFedAt = pet.feedings[0]?.fedAt ?? null;
             const { daysSinceLastFeeding, status } = computeFeedingStatus(
                 pet.feedingIntervalMinDays,

@@ -353,3 +353,70 @@ export async function getVetCosts(
         })),
     };
 }
+
+// ─── Monthly Cost Breakdown ──────────────────────────────────
+
+export async function getVetCostsMonthly(
+    userId: string,
+    opts?: { petId?: string; year?: number },
+) {
+    const year = opts?.year ?? new Date().getFullYear();
+    const where: Record<string, unknown> = {
+        userId,
+        costCents: { not: null },
+        visitDate: {
+            gte: new Date(`${year}-01-01`),
+            lt: new Date(`${year + 1}-01-01`),
+        },
+    };
+    if (opts?.petId) where.petId = opts.petId;
+
+    const visits = await prisma.vetVisit.findMany({
+        where,
+        select: {
+            petId: true,
+            costCents: true,
+            visitDate: true,
+        },
+        orderBy: { visitDate: "asc" },
+    });
+
+    // Enrich pet names
+    const petIds = [...new Set(visits.map((v) => v.petId))];
+    const pets = await prisma.pet.findMany({
+        where: { id: { in: petIds } },
+        select: { id: true, name: true },
+    });
+    const petMap = new Map(pets.map((p) => [p.id, p.name]));
+
+    // Group by month + pet
+    const byMonthPet = new Map<string, { totalCents: number; visitCount: number }>();
+    for (const v of visits) {
+        const month = v.visitDate.toISOString().slice(0, 7); // "2025-04"
+        const key = `${month}|${v.petId}`;
+        const entry = byMonthPet.get(key) ?? { totalCents: 0, visitCount: 0 };
+        entry.totalCents += v.costCents ?? 0;
+        entry.visitCount += 1;
+        byMonthPet.set(key, entry);
+    }
+
+    const result: {
+        month: string;
+        petId: string;
+        petName: string;
+        totalCents: number;
+        visitCount: number;
+    }[] = [];
+
+    for (const [key, data] of byMonthPet) {
+        const [month, petId] = key.split("|");
+        result.push({
+            month,
+            petId,
+            petName: petMap.get(petId) ?? "Unknown",
+            ...data,
+        });
+    }
+
+    return result.sort((a, b) => a.month.localeCompare(b.month));
+}

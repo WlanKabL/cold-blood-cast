@@ -187,3 +187,50 @@ test.describe("Weekly Planner — Navigation", () => {
         await expect(page.getByText(/today|heute/i).first()).toBeVisible({ timeout: 15_000 });
     });
 });
+
+test.describe("Weekly Planner — Type Filters", () => {
+    test.beforeEach(async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, "/api/planner/week*", mockPlannerWeek);
+    });
+
+    test("shows type filter buttons", async ({ page }) => {
+        await page.goto("/planner");
+
+        await expect(page.getByText("Noodle").first()).toBeVisible({ timeout: 15_000 });
+
+        // Filter buttons for different event types
+        await expect(page.getByText(/feeding|fütterung/i).first()).toBeVisible();
+        await expect(page.getByText(/maintenance|wartung/i).first()).toBeVisible();
+    });
+
+    test("clicking filter hides matching event type", async ({ page }) => {
+        await page.goto("/planner");
+
+        await expect(page.getByText("Noodle").first()).toBeVisible({ timeout: 15_000 });
+
+        // Vet visit "Checkup" should be visible initially
+        await expect(page.getByText("Checkup").first()).toBeVisible();
+
+        // Click vet filter to toggle it off
+        const vetFilter = page.getByRole("button", { name: /vet|tierarzt/i }).first();
+        await vetFilter.click();
+
+        // Vet visit "Checkup" should now be hidden
+        await expect(page.getByText("Checkup")).toHaveCount(0, { timeout: 5_000 });
+    });
+
+    test("toggling filter back restores events", async ({ page }) => {
+        await page.goto("/planner");
+
+        await expect(page.getByText("Noodle").first()).toBeVisible({ timeout: 15_000 });
+
+        // Toggle off, then toggle on
+        const vetFilter = page.getByRole("button", { name: /vet|tierarzt/i }).first();
+        await vetFilter.click();
+        await expect(page.getByText("Checkup")).toHaveCount(0, { timeout: 5_000 });
+
+        await vetFilter.click();
+        await expect(page.getByText("Checkup").first()).toBeVisible({ timeout: 5_000 });
+    });
+});

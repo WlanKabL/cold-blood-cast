@@ -232,6 +232,175 @@
                     </div>
                 </div>
 
+                <!-- Username Change -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.usernameChange.title") }}
+                    </h2>
+                    <p class="text-fg-muted mb-4 text-[12px]">
+                        {{ $t("pages.settings.usernameChange.hint") }}
+                    </p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-fg-dim mb-1 block text-[12px] font-medium">
+                                {{ $t("pages.settings.usernameChange.newUsername") }}
+                            </label>
+                            <input
+                                v-model="usernameForm.newUsername"
+                                type="text"
+                                maxlength="32"
+                                :placeholder="authStore.user?.username"
+                                class="border-line bg-surface text-fg focus:border-accent w-full rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label class="text-fg-dim mb-1 block text-[12px] font-medium">
+                                {{ $t("pages.settings.usernameChange.password") }}
+                            </label>
+                            <input
+                                v-model="usernameForm.password"
+                                type="password"
+                                :placeholder="$t('pages.settings.usernameChange.passwordPlaceholder')"
+                                class="border-line bg-surface text-fg focus:border-accent w-full rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
+                                @keydown.enter="submitUsernameChange"
+                            />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <p v-if="usernameRateLimited" class="text-fg-muted text-[12px]">
+                                <Icon name="lucide:clock" class="mr-1 inline h-3.5 w-3.5" />
+                                {{ $t("pages.settings.usernameChange.rateLimited") }}
+                            </p>
+                            <span v-else />
+                            <button
+                                :disabled="usernameChanging || !usernameFormValid || usernameRateLimited"
+                                class="bg-accent hover:bg-accent/90 shrink-0 rounded-xl px-5 py-2.5 text-[13px] font-medium text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                @click="submitUsernameChange"
+                            >
+                                <Icon
+                                    v-if="usernameChanging"
+                                    name="lucide:loader-2"
+                                    class="mr-1.5 inline h-4 w-4 animate-spin"
+                                />
+                                {{ $t("pages.settings.save") }}
+                            </button>
+                        </div>
+                        <p v-if="usernameSuccess" class="text-[12px] text-green-500">
+                            <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
+                            {{ $t("pages.settings.usernameChange.saved") }}
+                        </p>
+                        <p v-if="usernameError" class="text-[12px] text-red-500">
+                            {{ usernameError }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Email Change -->
+                <div class="glass-card p-6">
+                    <h2 class="text-fg mb-4 text-[15px] font-semibold">
+                        {{ $t("pages.settings.emailChange.title") }}
+                    </h2>
+                    <p class="text-fg-muted mb-4 text-[12px]">
+                        {{ $t("pages.settings.emailChange.hint") }}
+                    </p>
+
+                    <!-- Step 1: Request email change -->
+                    <div v-if="!emailChangeCodeSent" class="space-y-3">
+                        <div>
+                            <label class="text-fg-dim mb-1 block text-[12px] font-medium">
+                                {{ $t("pages.settings.emailChange.currentEmail") }}
+                            </label>
+                            <p class="text-fg text-[13px]">{{ authStore.user?.email }}</p>
+                        </div>
+                        <div>
+                            <label class="text-fg-dim mb-1 block text-[12px] font-medium">
+                                {{ $t("pages.settings.emailChange.newEmail") }}
+                            </label>
+                            <input
+                                v-model="emailForm.newEmail"
+                                type="email"
+                                :placeholder="$t('pages.settings.emailChange.newEmailPlaceholder')"
+                                class="border-line bg-surface text-fg focus:border-accent w-full rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label class="text-fg-dim mb-1 block text-[12px] font-medium">
+                                {{ $t("pages.settings.emailChange.password") }}
+                            </label>
+                            <input
+                                v-model="emailForm.password"
+                                type="password"
+                                :placeholder="$t('pages.settings.emailChange.passwordPlaceholder')"
+                                class="border-line bg-surface text-fg focus:border-accent w-full rounded-xl border px-4 py-2.5 text-[13px] transition-colors outline-none"
+                                @keydown.enter="requestEmailChange"
+                            />
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                :disabled="emailRequesting || !emailRequestFormValid"
+                                class="bg-accent hover:bg-accent/90 shrink-0 rounded-xl px-5 py-2.5 text-[13px] font-medium text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                @click="requestEmailChange"
+                            >
+                                <Icon
+                                    v-if="emailRequesting"
+                                    name="lucide:loader-2"
+                                    class="mr-1.5 inline h-4 w-4 animate-spin"
+                                />
+                                {{ $t("pages.settings.emailChange.sendCode") }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Confirm with code -->
+                    <div v-else class="space-y-3">
+                        <p class="text-fg-muted text-[12px]">
+                            <Icon name="lucide:mail" class="mr-1 inline h-3.5 w-3.5" />
+                            {{ $t("pages.settings.emailChange.codeSentTo", { email: emailForm.newEmail }) }}
+                        </p>
+                        <div>
+                            <label class="text-fg-dim mb-1 block text-[12px] font-medium">
+                                {{ $t("pages.settings.emailChange.code") }}
+                            </label>
+                            <input
+                                v-model="emailConfirmCode"
+                                type="text"
+                                maxlength="6"
+                                inputmode="numeric"
+                                :placeholder="$t('pages.settings.emailChange.codePlaceholder')"
+                                class="border-line bg-surface text-fg focus:border-accent w-full rounded-xl border px-4 py-2.5 text-[13px] tracking-widest transition-colors outline-none"
+                                @keydown.enter="confirmEmailChange"
+                            />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <button
+                                class="text-fg-muted hover:text-fg text-[12px] underline transition-colors"
+                                @click="resetEmailChangeFlow"
+                            >
+                                {{ $t("pages.settings.emailChange.back") }}
+                            </button>
+                            <button
+                                :disabled="emailConfirming || emailConfirmCode.length !== 6"
+                                class="bg-accent hover:bg-accent/90 shrink-0 rounded-xl px-5 py-2.5 text-[13px] font-medium text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                @click="confirmEmailChange"
+                            >
+                                <Icon
+                                    v-if="emailConfirming"
+                                    name="lucide:loader-2"
+                                    class="mr-1.5 inline h-4 w-4 animate-spin"
+                                />
+                                {{ $t("pages.settings.emailChange.confirm") }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <p v-if="emailSuccess" class="mt-3 text-[12px] text-green-500">
+                        <Icon name="lucide:check" class="mr-1 inline h-3.5 w-3.5" />
+                        {{ $t("pages.settings.emailChange.saved") }}
+                    </p>
+                    <p v-if="emailError" class="mt-3 text-[12px] text-red-500">
+                        {{ emailError }}
+                    </p>
+                </div>
+
                 <!-- Cookie Preferences -->
                 <div class="glass-card p-6">
                     <h2 class="text-fg mb-4 text-[15px] font-semibold">
@@ -584,6 +753,123 @@ async function requestPasswordChange() {
     } finally {
         resetSending.value = false;
     }
+}
+
+// ── Username Change ──
+const usernameForm = reactive({ newUsername: "", password: "" });
+const usernameChanging = ref(false);
+const usernameSuccess = ref(false);
+const usernameError = ref("");
+
+const usernameFormValid = computed(
+    () => usernameForm.newUsername.trim().length >= 3 && usernameForm.password.length > 0,
+);
+
+const usernameRateLimited = computed(() => {
+    const changedAt = authStore.user?.usernameChangedAt;
+    if (!changedAt) return false;
+    const cooldownMs = 30 * 24 * 60 * 60 * 1000;
+    return Date.now() - new Date(changedAt).getTime() < cooldownMs;
+});
+
+async function submitUsernameChange() {
+    if (!usernameFormValid.value || usernameRateLimited.value) return;
+
+    usernameChanging.value = true;
+    usernameSuccess.value = false;
+    usernameError.value = "";
+
+    try {
+        const json = await api.post<{ username: string }>("/api/auth/change-username", {
+            newUsername: usernameForm.newUsername.trim(),
+            password: usernameForm.password,
+        });
+
+        if (authStore.user) {
+            authStore.user = {
+                ...authStore.user,
+                username: json.username,
+                usernameChangedAt: new Date().toISOString(),
+            };
+        }
+        usernameForm.newUsername = "";
+        usernameForm.password = "";
+        usernameSuccess.value = true;
+        setTimeout(() => {
+            usernameSuccess.value = false;
+        }, 3000);
+    } catch (err: unknown) {
+        usernameError.value = err instanceof Error ? err.message : String(err);
+    } finally {
+        usernameChanging.value = false;
+    }
+}
+
+// ── Email Change ──
+const emailForm = reactive({ newEmail: "", password: "" });
+const emailChangeCodeSent = ref(false);
+const emailConfirmCode = ref("");
+const emailRequesting = ref(false);
+const emailConfirming = ref(false);
+const emailSuccess = ref(false);
+const emailError = ref("");
+
+const emailRequestFormValid = computed(
+    () => emailForm.newEmail.trim().length > 0 && emailForm.password.length > 0,
+);
+
+async function requestEmailChange() {
+    if (!emailRequestFormValid.value) return;
+
+    emailRequesting.value = true;
+    emailError.value = "";
+
+    try {
+        await api.post("/api/auth/request-email-change", {
+            newEmail: emailForm.newEmail.trim(),
+            password: emailForm.password,
+        });
+        emailChangeCodeSent.value = true;
+        emailForm.password = "";
+    } catch (err: unknown) {
+        emailError.value = err instanceof Error ? err.message : String(err);
+    } finally {
+        emailRequesting.value = false;
+    }
+}
+
+async function confirmEmailChange() {
+    if (emailConfirmCode.value.length !== 6) return;
+
+    emailConfirming.value = true;
+    emailError.value = "";
+
+    try {
+        const json = await api.post<{ email: string }>("/api/auth/confirm-email-change", {
+            code: emailConfirmCode.value,
+        });
+
+        if (authStore.user) {
+            authStore.user = { ...authStore.user, email: json.email };
+        }
+        resetEmailChangeFlow();
+        emailSuccess.value = true;
+        setTimeout(() => {
+            emailSuccess.value = false;
+        }, 3000);
+    } catch (err: unknown) {
+        emailError.value = err instanceof Error ? err.message : String(err);
+    } finally {
+        emailConfirming.value = false;
+    }
+}
+
+function resetEmailChangeFlow() {
+    emailChangeCodeSent.value = false;
+    emailConfirmCode.value = "";
+    emailForm.newEmail = "";
+    emailForm.password = "";
+    emailError.value = "";
 }
 
 // ── Account Deletion ──

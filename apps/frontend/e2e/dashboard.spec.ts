@@ -191,3 +191,105 @@ test.describe("Dashboard — Feeding Reminders", () => {
         await expect(page.getByText("Slither").first()).toBeVisible();
     });
 });
+
+test.describe("Dashboard — Quick Actions", () => {
+    const feedingRemindersWithPets = [
+        {
+            petId: "pet_001",
+            petName: "Monty",
+            species: "corn_snake",
+            intervalMinDays: 7,
+            intervalMaxDays: 10,
+            lastFedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
+            daysSinceLastFeeding: 8,
+            status: "due",
+        },
+    ];
+
+    test("shows quick feed button on feeding status card", async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, "/api/enclosures", mockEnclosures);
+        await mockGet(page, "/api/pets", mockPets);
+        await mockGet(page, "/api/sensors", mockSensors);
+        await mockGet(page, "/api/feedings", mockFeedings);
+        await mockGet(page, "/api/feeding-reminders", feedingRemindersWithPets);
+        await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", []);
+
+        await page.goto("/dashboard");
+
+        await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
+
+        // Quick feed button should be visible
+        const quickFeedBtn = page.getByTitle(/quick log feeding|schnell fütterung/i).first();
+        await expect(quickFeedBtn).toBeVisible();
+    });
+
+    test("shows quick weight button on feeding status card", async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, "/api/enclosures", mockEnclosures);
+        await mockGet(page, "/api/pets", mockPets);
+        await mockGet(page, "/api/sensors", mockSensors);
+        await mockGet(page, "/api/feedings", mockFeedings);
+        await mockGet(page, "/api/feeding-reminders", feedingRemindersWithPets);
+        await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", []);
+
+        await page.goto("/dashboard");
+
+        await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
+
+        // Quick weight button should be visible
+        const quickWeightBtn = page.getByTitle(/quick log weight|schnell gewicht/i).first();
+        await expect(quickWeightBtn).toBeVisible();
+    });
+
+    test("opens quick feeding modal", async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, "/api/enclosures", mockEnclosures);
+        await mockGet(page, "/api/pets", mockPets);
+        await mockGet(page, "/api/sensors", mockSensors);
+        await mockGet(page, "/api/feedings", mockFeedings);
+        await mockGet(page, "/api/feeding-reminders", feedingRemindersWithPets);
+        await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", []);
+        await mockGet(page, "/api/feed-items", []);
+
+        await page.goto("/dashboard");
+
+        await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
+
+        await page.getByTitle(/quick log feeding|schnell fütterung/i).first().click();
+
+        // Modal should appear with pet name
+        await expect(
+            page.getByText(/monty/i, { exact: false }).first(),
+        ).toBeVisible({ timeout: 5_000 });
+    });
+
+    test("opens quick weight modal", async ({ page }) => {
+        await mockAuth(page);
+        await mockGet(page, "/api/enclosures", mockEnclosures);
+        await mockGet(page, "/api/pets", mockPets);
+        await mockGet(page, "/api/sensors", mockSensors);
+        await mockGet(page, "/api/feedings", mockFeedings);
+        await mockGet(page, "/api/feeding-reminders", feedingRemindersWithPets);
+        await mockGet(page, "/api/vet-visits/upcoming", []);
+        await mockGet(page, "/api/weights/chart*", mockWeightChartSeries);
+        await mockGet(page, "/api/sheddings/upcoming", []);
+
+        await page.goto("/dashboard");
+
+        await expect(page.getByText("Monty").first()).toBeVisible({ timeout: 15_000 });
+
+        await page.getByTitle(/quick log weight|schnell gewicht/i).first().click();
+
+        // Modal should appear with weight input
+        await expect(
+            page.getByText(/monty/i, { exact: false }).first(),
+        ).toBeVisible({ timeout: 5_000 });
+    });
+});

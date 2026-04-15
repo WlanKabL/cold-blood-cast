@@ -3,26 +3,22 @@ import { z } from "zod";
 import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
-    listFeedings,
-    getFeeding,
-    createFeeding,
-    updateFeeding,
-    deleteFeeding,
-} from "./feedings.service.js";
+    listHusbandryNotes,
+    getHusbandryNote,
+    createHusbandryNote,
+    updateHusbandryNote,
+    deleteHusbandryNote,
+} from "./husbandry-notes.service.js";
 
-const CreateFeedingSchema = z.object({
+const CreateNoteSchema = z.object({
     petId: z.string().cuid(),
-    feedItemId: z.string().cuid().optional(),
-    fedAt: z.coerce.date(),
-    foodType: z.string().min(1).max(100),
-    foodSize: z.string().max(50).optional(),
-    quantity: z.number().int().min(1).default(1),
-    accepted: z.boolean().default(true),
-    refusedReason: z.string().max(100).optional(),
-    notes: z.string().max(1000).optional(),
+    type: z.string().min(1).max(50),
+    title: z.string().min(1).max(200),
+    content: z.string().max(5000).optional(),
+    occurredAt: z.coerce.date(),
 });
 
-const UpdateFeedingSchema = CreateFeedingSchema.omit({ petId: true }).partial();
+const UpdateNoteSchema = CreateNoteSchema.omit({ petId: true }).partial();
 
 const ListQuerySchema = z.object({
     petId: z.string().cuid().optional(),
@@ -31,7 +27,7 @@ const ListQuerySchema = z.object({
     limit: z.coerce.number().int().min(1).max(1000).default(50),
 });
 
-export async function feedingRoutes(app: FastifyInstance) {
+export async function husbandryNoteRoutes(app: FastifyInstance) {
     app.addHook("preHandler", authGuard);
     app.addHook("preHandler", emailVerifiedGuard);
 
@@ -44,43 +40,43 @@ export async function feedingRoutes(app: FastifyInstance) {
                 query.error.flatten(),
             );
         }
-        const data = await listFeedings(request.userId, query.data);
+        const data = await listHusbandryNotes(request.userId, query.data);
         return { success: true, data };
     });
 
     app.get<{ Params: { id: string } }>("/:id", async (request) => {
-        const data = await getFeeding(request.params.id, request.userId);
+        const data = await getHusbandryNote(request.params.id, request.userId);
         return { success: true, data };
     });
 
     app.post("/", async (request, reply) => {
-        const result = CreateFeedingSchema.safeParse(request.body);
+        const result = CreateNoteSchema.safeParse(request.body);
         if (!result.success) {
             throw badRequest(
                 ErrorCodes.E_VALIDATION_ERROR,
-                "Invalid feeding data",
+                "Invalid husbandry note data",
                 result.error.flatten(),
             );
         }
-        const feeding = await createFeeding(request.userId, result.data);
-        return reply.status(201).send({ success: true, data: feeding });
+        const note = await createHusbandryNote(request.userId, result.data);
+        return reply.status(201).send({ success: true, data: note });
     });
 
     app.put<{ Params: { id: string } }>("/:id", async (request) => {
-        const result = UpdateFeedingSchema.safeParse(request.body);
+        const result = UpdateNoteSchema.safeParse(request.body);
         if (!result.success) {
             throw badRequest(
                 ErrorCodes.E_VALIDATION_ERROR,
-                "Invalid feeding data",
+                "Invalid husbandry note data",
                 result.error.flatten(),
             );
         }
-        const data = await updateFeeding(request.params.id, request.userId, result.data);
+        const data = await updateHusbandryNote(request.params.id, request.userId, result.data);
         return { success: true, data };
     });
 
     app.delete<{ Params: { id: string } }>("/:id", async (request) => {
-        await deleteFeeding(request.params.id, request.userId);
+        await deleteHusbandryNote(request.params.id, request.userId);
         return { success: true, data: { ok: true } };
     });
 }

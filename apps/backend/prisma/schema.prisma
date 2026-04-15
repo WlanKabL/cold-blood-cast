@@ -38,6 +38,14 @@ model User {
     deleteToken                String?   @map("delete_token")
     deleteTokenExpiresAt       DateTime? @map("delete_token_expires_at")
 
+    // ── Username change ──────────────────────────
+    usernameChangedAt          DateTime? @map("username_changed_at")
+
+    // ── Email change ─────────────────────────────
+    pendingEmail               String?   @map("pending_email")
+    emailChangeCode            String?   @map("email_change_code")
+    emailChangeCodeExpiresAt   DateTime? @map("email_change_code_expires_at")
+
     // ── Onboarding ───────────────────────────────
     onboardingCompleted        Boolean   @default(false) @map("onboarding_completed")
 
@@ -82,6 +90,7 @@ model User {
     userBadges              UserBadge[]
     resolvedReports         ContentReport[]
     profileComments         ProfileComment[]
+    tags                    Tag[]
 
     @@map("users")
 }
@@ -766,8 +775,9 @@ model Pet {
     notes           String?
     imageUrl        String?   @map("image_url")
 
-    feedingIntervalMinDays Int? @map("feeding_interval_min_days")
-    feedingIntervalMaxDays Int? @map("feeding_interval_max_days")
+    feedingIntervalMinDays    Int?    @map("feeding_interval_min_days")
+    feedingIntervalMaxDays    Int?    @map("feeding_interval_max_days")
+    pauseFeedingDuringShed    Boolean @default(false) @map("pause_feeding_during_shed")
 
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
@@ -861,6 +871,7 @@ model Feeding {
     foodSize   String?   @map("food_size")
     quantity   Int       @default(1)
     accepted   Boolean   @default(true)
+    refusedReason String? @map("refused_reason")
     notes      String?
     createdAt  DateTime  @default(now()) @map("created_at")
 
@@ -1271,4 +1282,25 @@ model ContentReport {
     @@index([targetType, targetId])
     @@index([status])
     @@map("content_reports")
+}
+
+// ==========================================
+// Tags
+// ==========================================
+
+model Tag {
+    id        String   @id @default(cuid())
+    name      String   @db.VarChar(50)
+    userId    String?  @map("user_id")
+    category  String   @db.VarChar(30)
+    color     String?  @db.VarChar(7)
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, name, category])
+    @@index([category])
+    @@index([userId])
+    @@map("tags")
 }

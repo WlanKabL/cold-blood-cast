@@ -25,6 +25,9 @@ import type {
     ResetPasswordInput,
     UpdateProfileInput,
     ConfirmAccountDeletionInput,
+    ChangeUsernameInput,
+    RequestEmailChangeInput,
+    ConfirmEmailChangeInput,
     AuthTokens,
 } from "./auth.schemas.js";
 import {
@@ -712,4 +715,207 @@ export async function confirmAccountDeletion(input: ConfirmAccountDeletionInput)
         html: accountDeletedTemplate({ username }),
         log: { template: "account_deleted" },
     });
+}
+
+// ─── Username Change ─────────────────────────────────────────
+
+const USERNAME_CHANGE_COOLDOWN_DAYS = 30;
+
+export async function changeUsername(
+    userId: string,
+    input: ChangeUsernameInput,
+): Promise<{ username: string }> {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            username: true,
+            passwordHash: true,
+            usernameChangedAt: true,
+        },
+    });
+
+    if (!user) {
+        throw notFound(ErrorCodes.E_USER_NOT_FOUND, "User not found");
+    }
+
+    // Verify password
+    const valid = await verifyPassword(input.password, user.passwordHash);
+    if (!valid) {
+        throw unauthorized(ErrorCodes.E_AUTH_INVALID_CREDENTIALS, "Incorrect password");
+    }
+
+    // Rate-limit check
+    if (user.usernameChangedAt) {
+        const cooldownEnd = new Date(user.usernameChangedAt);
+        cooldownEnd.setDate(cooldownEnd.getDate() + USERNAME_CHANGE_COOLDOWN_DAYS);
+        if (new Date() < cooldownEnd) {
+            throw badRequest(
+                ErrorCodes.E_USERNAME_CHANGE_RATE_LIMITED,
+                `Username can only be changed once every ${USERNAME_CHANGE_COOLDOWN_DAYS} days`,
+            );
+        }
+    }
+
+    // Check uniqueness (case-insensitive)
+    const normalized = input.newUsername.toLowerCase();
+    if (normalized === user.username.toLowerCase()) {
+        throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "New username is the same as current");
+    }
+
+    const existing = await prisma.user.findFirst({
+        where: { username: { equals: normalized, mode: "insensitive" } },
+    });
+    if (existing) {
+        throw badRequest(ErrorCodes.E_AUTH_USERNAME_TAKEN, "Username is already taken");
+    }
+
+    const updated = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            username: input.newUsername,
+            usernameChangedAt: new Date(),
+        },
+        select: { username: true },
+    });
+
+    return updated;
+}
+
+// ─── Email Change ────────────────────────────────────────────
+
+export async function requestEmailChange(
+    userId: string,
+    input: RequestEmailChangeInput,
+): Promise<void> {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            email: true,
+            username: true,
+            passwordHash: true,
+        },
+    });
+
+    if (!user) {
+        throw notFound(ErrorCodes.E_USER_NOT_FOUND, "User not found");
+    }
+
+    // Verify password
+    const valid = await verifyPassword(input.password, user.passwordHash);
+    if (!valid) {
+        throw unauthorized(ErrorCodes.E_AUTH_INVALID_CREDENTIALS, "Incorrect password");
+    }
+
+    // Check new email is different (case-insensitive)
+    if (input.newEmail.toLowerCase() === user.email.toLowerCase()) {
+        throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "New email is the same as current");
+    }
+
+    // Check new email is not already in use
+    const existing = await prisma.user.findFirst({
+        where: { email: { equals: input.newEmail, mode: "insensitive" } },
+    });
+    if (existing) {
+        throw badRequest(ErrorCodes.E_AUTH_EMAIL_TAKEN, "Email is already in use");
+    }
+
+    // Generate verification code and store pending email
+    const code = generateVerificationCode();
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: {
+            pendingEmail: input.newEmail,
+            emailChangeCode: code,
+            emailChangeCodeExpiresAt: expiresAt,
+        },
+    });
+
+    // Send verification code to the NEW email
+    void sendMail({
+        to: input.newEmail,
+        subject: "Confirm your new email — KeeperLog",
+        html: verifyEmailTemplate({
+            username: user.username,
+            verifyUrl: `${env().CORS_ORIGIN}/settings?emailCode=${code}`,
+            code,
+            expiresInMinutes: 30,
+        }),
+        log: { userId, template: "email_change_verification" },
+    });
+}
+
+export async function confirmEmailChange(
+    userId: string,
+    input: ConfirmEmailChangeInput,
+): Promise<{ email: string }> {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            pendingEmail: true,
+            emailChangeCode: true,
+            emailChangeCodeExpiresAt: true,
+        },
+    });
+
+    if (!user) {
+        throw notFound(ErrorCodes.E_USER_NOT_FOUND, "User not found");
+    }
+
+    if (!user.emailChangeCode || !user.pendingEmail) {
+        throw badRequest(ErrorCodes.E_EMAIL_CHANGE_CODE_INVALID, "No email change pending");
+    }
+
+    if (user.emailChangeCode !== input.code) {
+        throw badRequest(ErrorCodes.E_EMAIL_CHANGE_CODE_INVALID, "Invalid verification code");
+    }
+
+    if (!user.emailChangeCodeExpiresAt || user.emailChangeCodeExpiresAt < new Date()) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                pendingEmail: null,
+                emailChangeCode: null,
+                emailChangeCodeExpiresAt: null,
+            },
+        });
+        throw badRequest(
+            ErrorCodes.E_EMAIL_CHANGE_CODE_EXPIRED,
+            "Verification code has expired. Please request a new email change",
+        );
+    }
+
+    // Final uniqueness check (race condition guard)
+    const existing = await prisma.user.findFirst({
+        where: {
+            email: { equals: user.pendingEmail, mode: "insensitive" },
+            id: { not: userId },
+        },
+    });
+    if (existing) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                pendingEmail: null,
+                emailChangeCode: null,
+                emailChangeCodeExpiresAt: null,
+            },
+        });
+        throw badRequest(ErrorCodes.E_AUTH_EMAIL_TAKEN, "Email is already in use");
+    }
+
+    const updated = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            email: user.pendingEmail,
+            emailVerified: true,
+            pendingEmail: null,
+            emailChangeCode: null,
+            emailChangeCodeExpiresAt: null,
+        },
+        select: { email: true },
+    });
+
+    return updated;
 }

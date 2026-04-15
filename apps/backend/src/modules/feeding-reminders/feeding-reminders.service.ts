@@ -1,6 +1,6 @@
 import { prisma } from "@/config/database.js";
 
-export type FeedingStatus = "ok" | "due" | "overdue" | "critical" | "no_schedule";
+export type FeedingStatus = "ok" | "due" | "overdue" | "critical" | "no_schedule" | "paused";
 
 export interface PetFeedingStatus {
     petId: string;
@@ -11,6 +11,7 @@ export interface PetFeedingStatus {
     lastFedAt: Date | null;
     daysSinceLastFeeding: number | null;
     status: FeedingStatus;
+    pausedReason?: string;
 }
 
 function daysBetween(a: Date, b: Date): number {
@@ -55,10 +56,16 @@ export async function getFeedingStatuses(userId: string): Promise<PetFeedingStat
             species: true,
             feedingIntervalMinDays: true,
             feedingIntervalMaxDays: true,
+            pauseFeedingDuringShed: true,
             feedings: {
                 orderBy: { fedAt: "desc" },
                 take: 1,
                 select: { fedAt: true },
+            },
+            sheddings: {
+                where: { complete: false },
+                take: 1,
+                select: { id: true },
             },
         },
         orderBy: { name: "asc" },
@@ -68,7 +75,10 @@ export async function getFeedingStatuses(userId: string): Promise<PetFeedingStat
 
     return pets.map((pet) => {
         const lastFedAt = pet.feedings[0]?.fedAt ?? null;
-        const { daysSinceLastFeeding, status } = computeFeedingStatus(
+        const hasActiveShedding = pet.sheddings.length > 0;
+        const isPaused = pet.pauseFeedingDuringShed && hasActiveShedding;
+
+        const { daysSinceLastFeeding, status: computedStatus } = computeFeedingStatus(
             pet.feedingIntervalMinDays,
             pet.feedingIntervalMaxDays,
             lastFedAt,
@@ -83,7 +93,8 @@ export async function getFeedingStatuses(userId: string): Promise<PetFeedingStat
             intervalMaxDays: pet.feedingIntervalMaxDays,
             lastFedAt,
             daysSinceLastFeeding,
-            status,
+            status: isPaused ? "paused" : computedStatus,
+            ...(isPaused ? { pausedReason: "shedding" } : {}),
         };
     });
 }

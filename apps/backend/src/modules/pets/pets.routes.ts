@@ -30,6 +30,7 @@ const PetBaseSchema = z.object({
         .optional()
         .nullable()
         .transform((v) => v ?? undefined),
+    pauseFeedingDuringShed: z.boolean().optional(),
 });
 
 const feedingIntervalRefine = (data: {

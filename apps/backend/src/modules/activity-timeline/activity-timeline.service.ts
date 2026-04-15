@@ -3,7 +3,7 @@ import { ErrorCodes, notFound } from "@/helpers/errors.js";
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type TimelineEventType = "feeding" | "shedding" | "weight" | "vet_visit" | "photo";
+export type TimelineEventType = "feeding" | "shedding" | "weight" | "vet_visit" | "photo" | "husbandry_note";
 
 export interface TimelineEvent {
     id: string;
@@ -152,6 +152,26 @@ function photoToEvent(p: PhotoRow): TimelineEvent {
     };
 }
 
+interface HusbandryNoteRow {
+    id: string;
+    type: string;
+    title: string;
+    content: string | null;
+    occurredAt: Date;
+}
+
+function husbandryNoteToEvent(n: HusbandryNoteRow): TimelineEvent {
+    return {
+        id: n.id,
+        type: "husbandry_note",
+        date: n.occurredAt.toISOString(),
+        title: n.title,
+        detail: n.content,
+        icon: "lucide:clipboard-list",
+        meta: { noteType: n.type },
+    };
+}
+
 // ─── Main Query ──────────────────────────────────────────────
 
 export function normalizeEvents(
@@ -160,6 +180,7 @@ export function normalizeEvents(
     weights: WeightRow[],
     vetVisits: VetVisitRow[],
     photos: PhotoRow[],
+    husbandryNotes: HusbandryNoteRow[] = [],
 ): TimelineEvent[] {
     const events: TimelineEvent[] = [
         ...feedings.map(feedingToEvent),
@@ -167,6 +188,7 @@ export function normalizeEvents(
         ...weights.map(weightToEvent),
         ...vetVisits.map(vetVisitToEvent),
         ...photos.map(photoToEvent),
+        ...husbandryNotes.map(husbandryNoteToEvent),
     ];
 
     events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -184,7 +206,7 @@ export async function getTimeline(
     const typeSet = new Set(types);
 
     // Query all requested types in parallel
-    const [feedings, sheddings, weights, vetVisits, photos] = await Promise.all([
+    const [feedings, sheddings, weights, vetVisits, photos, husbandryNotes] = await Promise.all([
         typeSet.has("feeding")
             ? prisma.feeding.findMany({
                   where: { petId },
@@ -251,9 +273,22 @@ export async function getTimeline(
                   orderBy: { takenAt: "desc" },
               })
             : Promise.resolve([]),
+        typeSet.has("husbandry_note")
+            ? prisma.husbandryNote.findMany({
+                  where: { petId },
+                  select: {
+                      id: true,
+                      type: true,
+                      title: true,
+                      content: true,
+                      occurredAt: true,
+                  },
+                  orderBy: { occurredAt: "desc" },
+              })
+            : Promise.resolve([]),
     ]);
 
-    const allEvents = normalizeEvents(feedings, sheddings, weights, vetVisits, photos);
+    const allEvents = normalizeEvents(feedings, sheddings, weights, vetVisits, photos, husbandryNotes);
     const total = allEvents.length;
     const start = (page - 1) * limit;
     const paged = allEvents.slice(start, start + limit);

@@ -117,23 +117,41 @@
                                     {{ feedingStatusLabel(fs.status) }}
                                 </span>
                             </div>
-                            <div class="text-fg-faint mt-2 text-xs">
-                                <template v-if="fs.daysSinceLastFeeding === null">
-                                    {{ $t("pages.dashboard.neverFed") }}
-                                </template>
-                                <template v-else-if="fs.daysSinceLastFeeding === 0">
-                                    {{ $t("pages.dashboard.today") }}
-                                </template>
-                                <template v-else>
-                                    {{
-                                        $t("pages.dashboard.daysAgo", {
-                                            n: fs.daysSinceLastFeeding,
-                                        })
-                                    }}
-                                </template>
-                                <template v-if="fs.intervalMinDays && fs.intervalMaxDays">
-                                    · {{ fs.intervalMinDays }}–{{ fs.intervalMaxDays }}d
-                                </template>
+                            <div class="text-fg-faint mt-2 flex items-center justify-between text-xs">
+                                <span>
+                                    <template v-if="fs.daysSinceLastFeeding === null">
+                                        {{ $t("pages.dashboard.neverFed") }}
+                                    </template>
+                                    <template v-else-if="fs.daysSinceLastFeeding === 0">
+                                        {{ $t("pages.dashboard.today") }}
+                                    </template>
+                                    <template v-else>
+                                        {{
+                                            $t("pages.dashboard.daysAgo", {
+                                                n: fs.daysSinceLastFeeding,
+                                            })
+                                        }}
+                                    </template>
+                                    <template v-if="fs.intervalMinDays && fs.intervalMaxDays">
+                                        · {{ fs.intervalMinDays }}–{{ fs.intervalMaxDays }}d
+                                    </template>
+                                </span>
+                                <span class="flex gap-1">
+                                    <button
+                                        class="rounded p-1 transition-colors hover:bg-white/10"
+                                        :title="$t('pages.dashboard.quickFeed')"
+                                        @click="openQuickFeeding(fs.petId, fs.petName)"
+                                    >
+                                        <Icon name="lucide:utensils" class="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                        class="rounded p-1 transition-colors hover:bg-white/10"
+                                        :title="$t('pages.dashboard.quickWeight')"
+                                        @click="openQuickWeight(fs.petId, fs.petName)"
+                                    >
+                                        <Icon name="lucide:scale" class="h-3.5 w-3.5" />
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -472,11 +490,90 @@
                 </div>
             </div>
         </UiTabs>
+
+        <!-- Quick Feeding Modal -->
+        <UiModal
+            :show="showQuickFeeding"
+            :title="$t('pages.dashboard.quickFeedTitle', { name: quickFeedForm.petName })"
+            width="sm"
+            @close="showQuickFeeding = false"
+        >
+            <form class="space-y-4" @submit.prevent="quickFeedMutate()">
+                <UiSelect
+                    v-if="feedItems?.length"
+                    v-model="quickFeedForm.feedItemId"
+                    :label="$t('pages.dashboard.quickFeedItem')"
+                    :placeholder-option="$t('pages.dashboard.quickFeedItemPlaceholder')"
+                    @update:model-value="onQuickFeedItemSelected"
+                >
+                    <option v-for="fi in feedItems" :key="fi.id" :value="fi.id">
+                        {{ fi.name }}{{ fi.size ? ` (${fi.size})` : "" }}
+                    </option>
+                </UiSelect>
+                <UiTextInput
+                    v-model="quickFeedForm.foodType"
+                    :label="$t('pages.dashboard.quickFoodType')"
+                    required
+                />
+                <UiTextInput
+                    v-model="quickFeedForm.fedAt"
+                    :label="$t('pages.dashboard.quickFedAt')"
+                    type="datetime-local"
+                    required
+                />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton
+                        variant="ghost"
+                        @click="showQuickFeeding = false"
+                    >
+                        {{ $t("common.cancel") }}
+                    </UiButton>
+                    <UiButton type="submit" :loading="quickFeedPending">
+                        {{ $t("common.save") }}
+                    </UiButton>
+                </div>
+            </form>
+        </UiModal>
+
+        <!-- Quick Weight Modal -->
+        <UiModal
+            :show="showQuickWeight"
+            :title="$t('pages.dashboard.quickWeightTitle', { name: quickWeightForm.petName })"
+            width="sm"
+            @close="showQuickWeight = false"
+        >
+            <form class="space-y-4" @submit.prevent="quickWeightMutate()">
+                <UiTextInput
+                    v-model.number="quickWeightForm.weightGrams"
+                    :label="$t('pages.dashboard.quickWeightGrams')"
+                    type="number"
+                    min="1"
+                    required
+                />
+                <UiTextInput
+                    v-model="quickWeightForm.measuredAt"
+                    :label="$t('pages.dashboard.quickMeasuredAt')"
+                    type="date"
+                    required
+                />
+                <div class="flex justify-end gap-2 pt-2">
+                    <UiButton
+                        variant="ghost"
+                        @click="showQuickWeight = false"
+                    >
+                        {{ $t("common.cancel") }}
+                    </UiButton>
+                    <UiButton type="submit" :loading="quickWeightPending">
+                        {{ $t("common.save") }}
+                    </UiButton>
+                </div>
+            </form>
+        </UiModal>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 interface DashboardEnclosure {
     id: string;
@@ -512,7 +609,7 @@ interface FeedingStatusItem {
     intervalMaxDays: number | null;
     lastFedAt: string | null;
     daysSinceLastFeeding: number | null;
-    status: "ok" | "due" | "overdue" | "critical" | "no_schedule";
+    status: "ok" | "due" | "overdue" | "critical" | "no_schedule" | "paused";
 }
 
 interface UpcomingVetVisit {
@@ -550,6 +647,8 @@ interface UpcomingSheddingItem {
 
 const { t } = useI18n();
 const api = useApi();
+const queryClient = useQueryClient();
+const toast = useAppToast();
 
 definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "dashboard" });
 useHead({ title: () => t("pages.dashboard.title") });
@@ -616,6 +715,98 @@ const { data: upcomingSheddings } = useQuery({
     queryFn: () => api.get<UpcomingSheddingItem[]>("/api/sheddings/upcoming"),
 });
 
+// ── Feed Items (for quick feeding modal) ──
+interface FeedItem {
+    id: string;
+    name: string;
+    size: string | null;
+}
+
+const { data: feedItems } = useQuery({
+    queryKey: ["feed-items"],
+    queryFn: () => api.get<FeedItem[]>("/api/feed-items"),
+});
+
+// ── Quick Feeding ──
+const showQuickFeeding = ref(false);
+const quickFeedForm = reactive({
+    petId: "",
+    petName: "",
+    feedItemId: "",
+    foodType: "",
+    fedAt: "",
+});
+
+function openQuickFeeding(petId: string, petName: string) {
+    quickFeedForm.petId = petId;
+    quickFeedForm.petName = petName;
+    quickFeedForm.feedItemId = "";
+    quickFeedForm.foodType = "";
+    quickFeedForm.fedAt = new Date().toISOString().slice(0, 16);
+    showQuickFeeding.value = true;
+}
+
+function onQuickFeedItemSelected(feedItemId: string) {
+    const fi = feedItems.value?.find((f) => f.id === feedItemId);
+    if (fi) {
+        quickFeedForm.foodType = fi.name;
+    }
+}
+
+const { mutate: quickFeedMutate, isPending: quickFeedPending } = useMutation({
+    mutationFn: () =>
+        api.post("/api/feedings", {
+            petId: quickFeedForm.petId,
+            feedItemId: quickFeedForm.feedItemId || undefined,
+            fedAt: quickFeedForm.fedAt,
+            foodType: quickFeedForm.foodType,
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["feedings"] });
+        queryClient.invalidateQueries({ queryKey: ["feeding-reminders"] });
+        toast.success(t("pages.dashboard.quickFeedSuccess"));
+        showQuickFeeding.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+// ── Quick Weight ──
+const showQuickWeight = ref(false);
+const quickWeightForm = reactive({
+    petId: "",
+    petName: "",
+    weightGrams: null as number | null,
+    measuredAt: "",
+});
+
+function openQuickWeight(petId: string, petName: string) {
+    quickWeightForm.petId = petId;
+    quickWeightForm.petName = petName;
+    quickWeightForm.weightGrams = null;
+    quickWeightForm.measuredAt = new Date().toISOString().slice(0, 10);
+    showQuickWeight.value = true;
+}
+
+const { mutate: quickWeightMutate, isPending: quickWeightPending } = useMutation({
+    mutationFn: () =>
+        api.post("/api/weights", {
+            petId: quickWeightForm.petId,
+            weightGrams: quickWeightForm.weightGrams,
+            measuredAt: quickWeightForm.measuredAt,
+        }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["weights"] });
+        queryClient.invalidateQueries({ queryKey: ["weights-chart-dashboard"] });
+        toast.success(t("pages.dashboard.quickWeightSuccess"));
+        showQuickWeight.value = false;
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
 function feedingStatusBadgeClass(status: string): string {
     switch (status) {
         case "ok":
@@ -624,6 +815,8 @@ function feedingStatusBadgeClass(status: string): string {
             return "bg-amber-500/10 text-amber-400";
         case "critical":
             return "bg-red-500/10 text-red-400";
+        case "paused":
+            return "bg-blue-500/10 text-blue-400";
         default:
             return "bg-white/5 text-fg-faint";
     }
@@ -637,6 +830,8 @@ function feedingStatusLabel(status: string): string {
             return t("pages.dashboard.feedingDue");
         case "critical":
             return t("pages.dashboard.feedingCritical");
+        case "paused":
+            return t("pages.dashboard.feedingPaused");
         default:
             return t("pages.dashboard.feedingNoSchedule");
     }

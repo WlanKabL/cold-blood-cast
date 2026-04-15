@@ -97,7 +97,25 @@
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <!-- Main: Day Agenda -->
                 <div class="space-y-4">
-                    <div v-for="day in days" :key="day.date">
+                    <!-- Type Filters -->
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            v-for="type in eventTypes"
+                            :key="type.key"
+                            class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all"
+                            :class="
+                                activeFilters.has(type.key)
+                                    ? `${type.bgClass} border-transparent`
+                                    : 'border-line text-fg-faint hover:bg-surface-hover'
+                            "
+                            @click="toggleFilter(type.key)"
+                        >
+                            <Icon :name="type.icon" class="h-3.5 w-3.5" />
+                            {{ $t(type.label) }}
+                        </button>
+                    </div>
+
+                    <div v-for="day in filteredDays" :key="day.date">
                         <!-- Day Header Row -->
                         <div
                             class="mb-2 flex items-center gap-3"
@@ -205,10 +223,20 @@
                                         </span>
                                     </p>
                                 </div>
-                                <Icon
-                                    name="lucide:chevron-right"
-                                    class="text-fg-faint mt-1 h-4 w-4 shrink-0"
-                                />
+                                <div class="flex shrink-0 items-center gap-1">
+                                    <button
+                                        v-if="event.type === 'feeding' || event.type === 'maintenance'"
+                                        class="text-fg-faint hover:text-green-400 rounded-lg p-1.5 transition-colors hover:bg-green-500/10"
+                                        :title="$t('pages.planner.quickComplete')"
+                                        @click.stop="quickComplete(event)"
+                                    >
+                                        <Icon name="lucide:check" class="h-4 w-4" />
+                                    </button>
+                                    <Icon
+                                        name="lucide:chevron-right"
+                                        class="text-fg-faint mt-1 h-4 w-4"
+                                    />
+                                </div>
                             </button>
                         </div>
 
@@ -633,7 +661,7 @@
 </template>
 
 <script setup lang="ts">
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
 
 definePageMeta({
     layout: "default",
@@ -643,6 +671,8 @@ definePageMeta({
 
 const { t, locale } = useI18n();
 const api = useApi();
+const queryClient = useQueryClient();
+const toast = useAppToast();
 
 useHead({ title: () => t("pages.planner.title") });
 
@@ -736,6 +766,57 @@ const overdueCount = computed(
         days.value?.reduce((sum, d) => sum + d.events.filter((e) => e.meta?.isOverdue).length, 0) ??
         0,
 );
+
+// ── Type Filters ──
+const allTypes = ["feeding", "vet_visit", "shedding", "maintenance"];
+const activeFilters = ref(new Set<string>(allTypes));
+
+function toggleFilter(type: string) {
+    const next = new Set(activeFilters.value);
+    if (next.has(type)) {
+        if (next.size > 1) next.delete(type);
+    } else {
+        next.add(type);
+    }
+    activeFilters.value = next;
+}
+
+const filteredDays = computed(() => {
+    if (!days.value) return [];
+    return days.value.map((day) => ({
+        ...day,
+        events: day.events.filter((e) => activeFilters.value.has(e.type)),
+    }));
+});
+
+// ── Quick Complete ──
+const { mutate: quickCompleteMutation } = useMutation({
+    mutationFn: (event: PlannerEvent) => {
+        if (event.type === "maintenance") {
+            return api.post(`/api/enclosure-maintenance/${event.id}/complete`, {});
+        }
+        // feeding — create a feeding record for this pet
+        return api.post("/api/feedings", {
+            petId: event.meta?.petId as string,
+            fedAt: new Date().toISOString(),
+            foodType: (event.meta?.foodType as string) || event.title,
+        });
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["planner"] });
+        queryClient.invalidateQueries({ queryKey: ["feeding-reminders"] });
+        queryClient.invalidateQueries({ queryKey: ["feedings"] });
+        queryClient.invalidateQueries({ queryKey: ["maintenance-tasks"] });
+        toast.success(t("pages.planner.quickCompleted"));
+    },
+    onError: () => {
+        toast.error(t("common.error"));
+    },
+});
+
+function quickComplete(event: PlannerEvent) {
+    quickCompleteMutation(event);
+}
 
 const busiestDayLabel = computed(() => {
     if (!days.value) return null;

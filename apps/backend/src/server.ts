@@ -40,6 +40,7 @@ import { veterinarianRoutes } from "@/modules/veterinarians/index.js";
 import { vetVisitRoutes, vetVisitDocumentRoutes } from "@/modules/vet-visits/index.js";
 import { petDocumentRoutes } from "@/modules/pet-documents/index.js";
 import { activityTimelineRoutes } from "@/modules/activity-timeline/index.js";
+import { husbandryNoteRoutes } from "@/modules/husbandry-notes/index.js";
 import { enclosureMaintenanceRoutes } from "@/modules/enclosure-maintenance/index.js";
 import {
     startMaintenanceReminderScheduler,
@@ -56,6 +57,7 @@ import {
 } from "@/modules/community/index.js";
 import { reportPublicRoutes, reportAdminRoutes } from "@/modules/reports/index.js";
 import { dataExportRoutes } from "@/modules/data-export/index.js";
+import { tagRoutes, tagAdminRoutes } from "@/modules/tags/tags.routes.js";
 import {
     startWeeklyPlannerScheduler,
     stopWeeklyPlannerScheduler,
@@ -303,6 +305,7 @@ async function main() {
     await app.register(vetVisitRoutes, { prefix: "/api/vet-visits" });
     await app.register(vetVisitDocumentRoutes, { prefix: "/api/vet-visits" });
     await app.register(activityTimelineRoutes, { prefix: "/api/pets" });
+    await app.register(husbandryNoteRoutes, { prefix: "/api/husbandry-notes" });
     await app.register(enclosureMaintenanceRoutes, { prefix: "/api/enclosure-maintenance" });
     await app.register(weeklyPlannerRoutes, { prefix: "/api/planner" });
     await app.register(publicProfileRoutes, { prefix: "/api/public-profiles" });
@@ -316,6 +319,8 @@ async function main() {
     await app.register(reportPublicRoutes, { prefix: "/api/public/reports" });
     await app.register(reportAdminRoutes, { prefix: "/api/admin/reports" });
     await app.register(dataExportRoutes, { prefix: "/api/data-export" });
+    await app.register(tagRoutes, { prefix: "/api/tags" });
+    await app.register(tagAdminRoutes, { prefix: "/api/tags/admin/global" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {
