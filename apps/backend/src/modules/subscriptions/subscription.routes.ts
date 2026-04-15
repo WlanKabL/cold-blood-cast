@@ -26,10 +26,7 @@ export async function subscriptionRoutes(app: FastifyInstance): Promise<void> {
     // Authenticated: create Stripe Checkout Session
     app.post("/checkout", { preHandler: [authGuard, emailVerifiedGuard] }, async (request) => {
         if (!isStripeEnabled()) {
-            throw badRequest(
-                ErrorCodes.E_FEATURE_DISABLED,
-                "Payments are not currently available",
-            );
+            throw badRequest(ErrorCodes.E_FEATURE_DISABLED, "Payments are not currently available");
         }
 
         const { plan } = request.body as { plan: string };
@@ -52,10 +49,7 @@ export async function subscriptionRoutes(app: FastifyInstance): Promise<void> {
     // Authenticated: create Stripe Customer Portal session
     app.post("/portal", { preHandler: [authGuard, emailVerifiedGuard] }, async (request) => {
         if (!isStripeEnabled()) {
-            throw badRequest(
-                ErrorCodes.E_FEATURE_DISABLED,
-                "Payments are not currently available",
-            );
+            throw badRequest(ErrorCodes.E_FEATURE_DISABLED, "Payments are not currently available");
         }
 
         const portalUrl = await createPortalSession(request.userId);

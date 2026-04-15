@@ -2,56 +2,55 @@
     "landing": {
         "nav": {
             "features": "Features",
-            "howItWorks": "How It Works",
-            "forKeepers": "For Keepers",
+            "whyKeeperlog": "Why KeeperLog",
+            "pricing": "Pricing",
+            "compare": "Compare",
             "login": "Sign In",
             "getStarted": "Get Started"
         },
         "hero": {
-            "titleLine1": "Your reptiles.",
-            "titleLine2": "Taken care of.",
-            "word1": "Always.",
-            "word2": "Effortlessly.",
-            "word3": "Reliably.",
-            "subtitle": "KeeperLog is the all-in-one companion for reptile keepers who care. Monitor your enclosures, track feedings and sheds, and get a heads-up when something needs attention.",
-            "primaryCta": "Get Started",
-            "secondaryCta": "See What's Inside"
+            "titleLine1": "Every feeding. Every shed.",
+            "titleLine2": "Every vet visit. One place.",
+            "subtitle": "KeeperLog is the structured care documentation system for reptile keepers. Replace scattered notes with a real record of your animals' lives.",
+            "primaryCta": "Start documenting — free",
+            "secondaryCta": "Explore the features"
         },
         "features": {
-            "label": "What's inside",
-            "title": "Everything a keeper needs",
-            "subtitle": "From live sensor data to a complete care journal — KeeperLog covers your daily routine without getting in the way.",
-            "sensors": {
-                "title": "Sensors & Climate",
-                "desc": "Hook up your DHT22, BME280, or pull data from Home Assistant. Temperature, humidity, pressure — always visible, always logged."
-            },
-            "alerts": {
-                "title": "Smart Alerts",
-                "desc": "Set safe ranges for your enclosures and get a Telegram ping when something's off. No spam, just the stuff that matters."
-            },
+            "label": "What you can track",
+            "title": "Structured care for every animal",
+            "subtitle": "Feedings, sheddings, weights, vet visits, photos, and more — all in one structured record per animal.",
             "careLog": {
                 "title": "Care Journal",
-                "desc": "Feedings, sheds, weight — log it all in seconds. Look back anytime and see the full picture of your animal's health."
-            },
-            "dashboard": {
-                "title": "Live Dashboard",
-                "desc": "One screen, all your enclosures. Real-time data via WebSockets — no reloading, no waiting."
-            }
-        },
-        "keepers": {
-            "label": "Why keepers love it",
-            "title": "Less stress, more keeping",
-            "peace": {
-                "title": "Peace of Mind",
-                "desc": "Go to sleep knowing your enclosures are watched. If something goes off, you'll know — even at 3 AM."
+                "desc": "Log feedings, sheddings, weights, and vet visits in seconds. Look back anytime and see the full picture of your animal's health."
             },
             "history": {
-                "title": "Full History",
-                "desc": "Every feeding, every shed, every sensor reading — logged and searchable. No more 'when was the last time I…?'"
+                "title": "Animal History",
+                "desc": "A complete timeline for every animal. See trends, spot problems, and never forget when you last fed, weighed, or checked on them."
             },
+            "publicProfiles": {
+                "title": "Public Profiles",
+                "desc": "Share your animals with the world. Public profiles with photos, care stats, and a shareable link — perfect for breeders, vets, or fellow keepers."
+            }
+        },
+        "product": {
+            "label": "See it in action",
+            "title": "Built for real keeping routines",
+            "desc": "KeeperLog shows you everything about your animals at a glance — recent feedings, weight trends, shed cycles, and upcoming vet visits."
+        },
+        "trust": {
+            "label": "Why you can trust it",
+            "title": "Built with care, built for keepers",
             "privacy": {
-                "title": "Your Data, Secured",
-                "desc": "Encrypted storage, strict access controls, and no third-party tracking. Your animals' data stays yours."
+                "title": "Your data, your control",
+                "desc": "Encrypted storage, no third-party tracking, and full GDPR data export. Your animals' data stays yours."
+            },
+            "keeper": {
+                "title": "Built by a keeper",
+                "desc": "Not a corporation. KeeperLog was built by a reptile keeper who needed this tool — and made it real."
+            },
+            "free": {
+                "title": "Free to start",
+                "desc": "No credit card, no trial. Create your account and start documenting immediately."
             }
         },
         "howItWorks": {
@@ -61,53 +60,28 @@
                 "title": "Sign Up",
                 "desc": "Create your free account in seconds. No credit card, no setup hassle — just sign up and you're in."
             },
-            "setup": {
-                "title": "Set Up",
-                "desc": "Add your enclosures, register your animals, set your alert thresholds. Five minutes, tops."
+            "addAnimals": {
+                "title": "Add Your Animals",
+                "desc": "Add your animals with name, species, and a photo. Set up as many as you keep — no limits."
             },
-            "relax": {
-                "title": "Relax",
-                "desc": "That's it. KeeperLog monitors around the clock, logs everything, and pings you when it matters. You do the keeping — we handle the rest."
+            "startTracking": {
+                "title": "Start Documenting",
+                "desc": "Log feedings, weights, sheds, and vet visits. Build a real care record from day one."
             }
-        },
-        "setup": {
-            "label": "Your setup, your rules",
-            "title": "Works with what you have",
-            "desc": "KeeperLog fits into whatever hardware you're already running. No proprietary ecosystem, no vendor lock-in — just plug in and go.",
-            "tech": {
-                "pi": "Runs on Pi 3, 4 & 5",
-                "dht": "GPIO or I²C sensors",
-                "ha": "Pull any HA entity",
-                "telegram": "Instant mobile alerts",
-                "ws": "Live data, no polling",
-                "local": "Everything stays local"
-            }
-        },
-        "trust": {
-            "encrypted": "Encrypted & secure",
-            "openSource": "Built for keepers",
-            "fast": "Setup in 5 minutes"
-        },
-        "social": {
-            "enclosures": "Unlimited Enclosures",
-            "sensors": "Unlimited Sensors",
-            "monitoring": "Monitoring",
-            "alerts": "Alert Response"
         },
         "cta": {
-            "title": "Ready to level up your keeping?",
-            "subtitle": "Join keepers who stopped guessing and started knowing. Sign up and see the difference.",
-            "button": "Get Started"
+            "title": "Your animals deserve a real record.",
+            "subtitle": "Stop relying on memory and scattered notes. Start building a structured care history today.",
+            "button": "Create your free account"
         },
         "footer": {
-            "tagline": "The all-in-one tool for reptile keepers — sensors, alerts, and care journal in one place.",
+            "tagline": "Structured care documentation for reptile keepers — feedings, sheds, weights, vet visits, and more.",
             "product": "Product",
-            "resources": "Resources",
-            "docs": "Documentation",
+            "explore": "Explore",
             "legal": "Legal",
             "copyright": "© {year} KeeperLog. All rights reserved."
         },
-        "pageTitle": "KeeperLog — For Reptile Keepers"
+        "pageTitle": "KeeperLog — Care Documentation for Reptile Keepers"
     },
     "cookie": {
         "message": "We use cookies to keep you logged in and improve your experience.",
@@ -1839,11 +1813,268 @@
     },
     "seo": {
         "home": {
-            "title": "KeeperLog - Terrarium Monitoring System",
-            "description": "KeeperLog — real-time terrarium monitoring, automated alerts, and care journal for reptile keepers."
+            "title": "KeeperLog — Care Documentation for Reptile Keepers",
+            "description": "Track feedings, sheddings, weights, and vet visits for all your reptiles. Structured care documentation — replace scattered notes with real records."
         },
         "register": {
-            "description": "Create your free KeeperLog account — start monitoring your terrarium, tracking your reptile's health, and getting automated alerts."
+            "description": "Create your free KeeperLog account — start documenting feedings, sheddings, weights, and vet visits for your reptiles today."
+        },
+        "features": {
+            "title": "Features — KeeperLog",
+            "description": "Everything KeeperLog offers: care journal, animal history, public profiles, weight charts, photo galleries, health tracking, and more."
+        },
+        "whyKeeperlog": {
+            "title": "Why KeeperLog — Replace Spreadsheets & Guesswork",
+            "description": "Why reptile keepers choose KeeperLog over spreadsheets, sticky notes, and memory. Structured care documentation that actually works."
+        },
+        "faq": {
+            "title": "FAQ — KeeperLog",
+            "description": "Frequently asked questions about KeeperLog. Is it free? What animals can I track? How safe is my data?"
+        },
+        "compare": {
+            "title": "Excel vs KeeperLog — Reptile Care Tracking Compared",
+            "description": "See how KeeperLog compares to spreadsheets for tracking reptile care. Visual charts, reminders, public profiles, and more."
+        }
+    },
+    "explore": {
+        "features": {
+            "pageTitle": "Features — KeeperLog",
+            "hero": {
+                "label": "Everything you can do",
+                "title": "What KeeperLog offers",
+                "desc": "A structured system for documenting care, tracking health, and sharing your animals — built by a keeper, for keepers."
+            },
+            "careJournal": {
+                "title": "Care Journal",
+                "desc": "Log feedings, sheddings, weights, and vet visits with just a few taps. Every event is timestamped and stored permanently. Look back at any animal's complete care history whenever you need it.",
+                "items": {
+                    "feedings": "Track every feeding with prey type, size, and acceptance",
+                    "sheddings": "Record each shed with quality and completeness notes",
+                    "weights": "Log weight regularly and see trends over time",
+                    "vetVisits": "Document vet appointments, diagnoses, and costs",
+                    "notes": "Add husbandry notes for anything else worth remembering"
+                }
+            },
+            "animalManagement": {
+                "title": "Animal Management",
+                "desc": "Each animal gets its own profile with species, morph, gender, birthdate, and a photo gallery. Manage enclosures, assign animals, and keep everything connected.",
+                "items": {
+                    "profiles": "Detailed profiles per animal with photo, species, and morph",
+                    "enclosures": "Track enclosures and assign animals to them",
+                    "photos": "Upload and organize photo galleries per animal",
+                    "documents": "Attach documents like vet records or certificates"
+                }
+            },
+            "publicProfiles": {
+                "title": "Public Profiles",
+                "desc": "Share your animals publicly with a custom URL. Public profiles show photos, care stats, and a bio — ideal for breeders, rescue handovers, or simply showing off your collection to fellow keepers.",
+                "items": {
+                    "customUrl": "Custom shareable URL for each animal and keeper",
+                    "careStats": "Visible care statistics build trust with anyone who visits",
+                    "community": "Likes and comments from other keepers",
+                    "embed": "Embeddable profile widgets for forums or websites"
+                }
+            },
+            "healthTracking": {
+                "title": "Health & Weight Tracking",
+                "desc": "Visual weight charts, shedding cycle tracking, and vet visit records give you a clear view of each animal's health over time. Spot problems early and keep a solid record for your vet.",
+                "items": {
+                    "weightCharts": "Visual weight progression charts per animal",
+                    "shedCycles": "Shedding cycle tracking across time",
+                    "vetRecords": "Complete vet visit history with cost tracking",
+                    "reminders": "Feeding and vet reminders so you never forget"
+                }
+            },
+            "planning": {
+                "title": "Planning & Reminders",
+                "desc": "A weekly planner and automated reminders help you stay on top of feeding schedules, vet appointments, and enclosure maintenance — without having to remember everything yourself.",
+                "items": {
+                    "weeklyPlanner": "Visual weekly planner for all your animals",
+                    "feedingReminders": "Automated feeding reminders per animal",
+                    "vetReminders": "Upcoming vet appointment notifications",
+                    "maintenance": "Enclosure maintenance schedules and logs"
+                }
+            },
+            "monitoring": {
+                "title": "Climate Monitoring",
+                "desc": "Optionally connect temperature and humidity sensors to monitor your enclosures around the clock. Get alerts when conditions leave safe ranges. Works with DHT22, BME280, and Home Assistant.",
+                "items": {
+                    "sensors": "Support for DHT22, BME280, and Home Assistant sensors",
+                    "alerts": "Telegram alerts when climate conditions are off",
+                    "history": "Sensor data logged and viewable over time",
+                    "dashboard": "Real-time dashboard for all connected enclosures"
+                }
+            },
+            "cta": {
+                "title": "Ready to get started?",
+                "desc": "Create your free account and start documenting your animals' care today.",
+                "button": "Create free account"
+            }
+        },
+        "why": {
+            "pageTitle": "Why KeeperLog",
+            "hero": {
+                "label": "Why switch",
+                "title": "Your animals deserve better than a spreadsheet",
+                "desc": "Most keepers track care with spreadsheets, sticky notes, or memory. It works — until it doesn't. KeeperLog gives you a real system that grows with your collection."
+            },
+            "problems": {
+                "title": "Sound familiar?",
+                "memory": {
+                    "title": "When was the last feeding?",
+                    "desc": "You think it was Tuesday. Or was it Monday? With multiple animals, memory becomes unreliable fast."
+                },
+                "scattered": {
+                    "title": "Notes everywhere, overview nowhere",
+                    "desc": "A spreadsheet here, a note there, a photo somewhere in your camera roll. No single source of truth."
+                },
+                "handover": {
+                    "title": "Proving your care is hard",
+                    "desc": "Vet visit coming up? Selling an animal? Good luck compiling months of care data from scattered notes."
+                },
+                "forgetting": {
+                    "title": "Important things slip through",
+                    "desc": "Vet appointments, medication schedules, deworming — the things you can't afford to forget are the easiest to miss."
+                }
+            },
+            "solution": {
+                "title": "What changes with KeeperLog",
+                "items": {
+                    "onePlace": {
+                        "title": "Everything in one place",
+                        "desc": "Every feeding, shed, weight, vet visit, and note — per animal, searchable, permanent."
+                    },
+                    "trends": {
+                        "title": "See trends over time",
+                        "desc": "Weight charts, shedding cycles, feeding history — spot problems early instead of reacting late."
+                    },
+                    "shareProof": {
+                        "title": "Share and prove your care",
+                        "desc": "Public profiles with real data. Show your vet, a buyer, or fellow keepers a complete care record."
+                    },
+                    "neverForget": {
+                        "title": "Never forget again",
+                        "desc": "Reminders for feedings, vet visits, and maintenance. The system remembers so you don't have to."
+                    }
+                }
+            },
+            "cta": {
+                "title": "Try it. It's free.",
+                "desc": "No commitment. No credit card. Just a better way to track your animals' care.",
+                "button": "Create free account"
+            }
+        },
+        "faq": {
+            "pageTitle": "FAQ — KeeperLog",
+            "hero": {
+                "title": "Frequently Asked Questions",
+                "desc": "Quick answers about KeeperLog — what it does, what it costs, and how your data is handled."
+            },
+            "items": {
+                "free": {
+                    "q": "Is KeeperLog free?",
+                    "a": "Yes. KeeperLog has a free tier that lets you track your animals without paying anything. Premium tiers with more features are available if you want them."
+                },
+                "animals": {
+                    "q": "What animals can I track?",
+                    "a": "Any. KeeperLog was built for reptile keepers, but the tracking system works for any animal — snakes, geckos, tortoises, amphibians, or anything else you keep."
+                },
+                "dataSafe": {
+                    "q": "Is my data safe?",
+                    "a": "Yes. All uploaded files are encrypted at rest, passwords are hashed with PBKDF2 + SHA-512, and there is no third-party tracking. You can export and delete your data at any time."
+                },
+                "sensors": {
+                    "q": "Do I need sensors or special hardware?",
+                    "a": "No. Sensors are completely optional. The core of KeeperLog is care documentation — feedings, sheds, weights, vet visits. Climate monitoring is an extra feature, not a requirement."
+                },
+                "publicProfiles": {
+                    "q": "Can I share my animal profiles publicly?",
+                    "a": "Yes. You can create public profiles for your animals with custom URLs. Choose what to show — photos, weight, feeding data, species info — and share the link with anyone."
+                },
+                "export": {
+                    "q": "Can I export my data?",
+                    "a": "Yes. KeeperLog supports full GDPR-compliant data export. You can download all your data at any time from the settings page."
+                },
+                "mobile": {
+                    "q": "Does it work on my phone?",
+                    "a": "Yes. KeeperLog is a responsive web app that works on any device with a browser. No app store download needed."
+                },
+                "whoBuilt": {
+                    "q": "Who built this?",
+                    "a": "KeeperLog was built by a reptile keeper who needed a proper tracking system and couldn't find one. It's a passion project that became a real product."
+                }
+            },
+            "cta": {
+                "title": "Still have questions?",
+                "desc": "Create a free account and see for yourself — or reach out if something isn't covered here.",
+                "button": "Get started for free"
+            }
+        },
+        "compare": {
+            "pageTitle": "Excel vs KeeperLog",
+            "hero": {
+                "label": "Comparison",
+                "title": "Excel vs KeeperLog",
+                "desc": "Spreadsheets work. Until you have 5 animals, 200 feedings, and a vet asking for a care summary. Here's how they compare."
+            },
+            "table": {
+                "feature": "Feature",
+                "excel": "Excel / Sheets",
+                "keeperlog": "KeeperLog",
+                "rows": {
+                    "feedingLog": {
+                        "label": "Feeding log",
+                        "excel": "Manual rows, no structure",
+                        "keeperlog": "Structured entries with prey type, size, and notes"
+                    },
+                    "weightTracking": {
+                        "label": "Weight tracking",
+                        "excel": "Manual chart creation",
+                        "keeperlog": "Automatic visual weight charts per animal"
+                    },
+                    "photos": {
+                        "label": "Photo management",
+                        "excel": "Not possible",
+                        "keeperlog": "Per-animal photo gallery with lightbox"
+                    },
+                    "sharing": {
+                        "label": "Sharing with others",
+                        "excel": "Export file manually",
+                        "keeperlog": "Public profile with shareable URL"
+                    },
+                    "reminders": {
+                        "label": "Reminders",
+                        "excel": "None",
+                        "keeperlog": "Feeding, vet, and maintenance reminders"
+                    },
+                    "mobile": {
+                        "label": "Mobile use",
+                        "excel": "Awkward on small screens",
+                        "keeperlog": "Fully responsive web app"
+                    },
+                    "multiAnimal": {
+                        "label": "Multiple animals",
+                        "excel": "Multiple tabs or files",
+                        "keeperlog": "One dashboard, all animals organized"
+                    },
+                    "dataSafety": {
+                        "label": "Data safety",
+                        "excel": "One corrupt file = everything gone",
+                        "keeperlog": "Encrypted database, automatic backups"
+                    }
+                }
+            },
+            "honest": {
+                "title": "When a spreadsheet is fine",
+                "desc": "If you keep one animal and rarely need to look back, a simple spreadsheet might be all you need. No shame in that.",
+                "title2": "When you need more",
+                "desc2": "As soon as you have multiple animals, want visual trends, need to share records, or just want to stop forgetting things — a dedicated system pays off."
+            },
+            "cta": {
+                "title": "Ready to upgrade from spreadsheets?",
+                "desc": "Start with a free account. Your animals' data deserves a real system.",
+                "button": "Create free account"
+            }
         }
     },
     "errorPage": {

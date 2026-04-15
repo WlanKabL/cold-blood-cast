@@ -16,8 +16,8 @@
     --z-fg-soft: rgba(0, 0, 0, 0.7);
     --z-fg-dim: rgba(0, 0, 0, 0.6);
     --z-fg-muted: rgba(0, 0, 0, 0.55);
-    --z-fg-faint: rgba(0, 0, 0, 0.4);
-    --z-fg-ghost: rgba(0, 0, 0, 0.25);
+    --z-fg-faint: rgba(0, 0, 0, 0.45);
+    --z-fg-ghost: rgba(0, 0, 0, 0.3);
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(0, 0, 0, 0.1);
     --glass-hover: rgba(255, 255, 255, 0.85);
@@ -54,9 +54,9 @@
     --z-fg: #ffffff;
     --z-fg-soft: rgba(255, 255, 255, 0.7);
     --z-fg-dim: rgba(255, 255, 255, 0.6);
-    --z-fg-muted: rgba(255, 255, 255, 0.4);
-    --z-fg-faint: rgba(255, 255, 255, 0.3);
-    --z-fg-ghost: rgba(255, 255, 255, 0.2);
+    --z-fg-muted: rgba(255, 255, 255, 0.5);
+    --z-fg-faint: rgba(255, 255, 255, 0.38);
+    --z-fg-ghost: rgba(255, 255, 255, 0.25);
     --glass-bg: rgba(255, 255, 255, 0.03);
     --glass-border: rgba(255, 255, 255, 0.06);
     --glass-hover: rgba(255, 255, 255, 0.06);

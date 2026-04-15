@@ -2,56 +2,55 @@
     "landing": {
         "nav": {
             "features": "Features",
-            "howItWorks": "So geht's",
-            "forKeepers": "Für Halter",
+            "whyKeeperlog": "Warum KeeperLog",
+            "pricing": "Preise",
+            "compare": "Vergleich",
             "login": "Anmelden",
             "getStarted": "Loslegen"
         },
         "hero": {
-            "titleLine1": "Deine Reptilien.",
-            "titleLine2": "Bestens versorgt.",
-            "word1": "Immer.",
-            "word2": "Mühelos.",
-            "word3": "Zuverlässig.",
-            "subtitle": "KeeperLog ist der All-in-One-Begleiter für Reptilienhalter, denen ihre Tiere am Herzen liegen. Überwache deine Terrarien, tracke Fütterungen und Häutungen und werde benachrichtigt, wenn etwas deine Aufmerksamkeit braucht.",
-            "primaryCta": "Loslegen",
-            "secondaryCta": "Entdecken"
+            "titleLine1": "Jede Fütterung. Jede Häutung.",
+            "titleLine2": "Jeder Tierarztbesuch. An einem Ort.",
+            "subtitle": "KeeperLog ist das strukturierte Pflegedokumentationssystem für Reptilienhalter. Ersetze lose Notizen durch eine echte Pflegehistorie deiner Tiere.",
+            "primaryCta": "Jetzt dokumentieren — kostenlos",
+            "secondaryCta": "Features entdecken"
         },
         "features": {
-            "label": "Was drin steckt",
-            "title": "Alles, was ein Halter braucht",
-            "subtitle": "Von Live-Sensordaten bis zum kompletten Pflegebuch — KeeperLog begleitet deinen Alltag, ohne im Weg zu stehen.",
-            "sensors": {
-                "title": "Klima & Sensoren",
-                "desc": "Schließ deinen DHT22, BME280 an oder hol dir Daten von Home Assistant. Temperatur, Luftfeuchtigkeit, Druck — immer sichtbar, immer gespeichert."
-            },
-            "alerts": {
-                "title": "Smarte Alarme",
-                "desc": "Setz sichere Bereiche für deine Terrarien und bekomm eine Telegram-Nachricht, wenn was nicht stimmt. Kein Spam, nur das Wichtige."
-            },
+            "label": "Was du tracken kannst",
+            "title": "Strukturierte Pflege für jedes Tier",
+            "subtitle": "Fütterungen, Häutungen, Gewichte, Tierarztbesuche, Fotos und mehr — alles in einer strukturierten Akte pro Tier.",
             "careLog": {
                 "title": "Pflegebuch",
-                "desc": "Fütterungen, Häutungen, Gewicht — alles in Sekunden protokolliert. Schau jederzeit zurück und sieh das ganze Bild."
-            },
-            "dashboard": {
-                "title": "Live-Dashboard",
-                "desc": "Ein Bildschirm, alle Terrarien. Echtzeit-Daten via WebSockets — kein Neuladen, kein Warten."
-            }
-        },
-        "keepers": {
-            "label": "Warum Halter es lieben",
-            "title": "Weniger Stress, mehr Haltung",
-            "peace": {
-                "title": "Ruhe im Kopf",
-                "desc": "Geh schlafen und weiß, dass deine Terrarien überwacht werden. Wenn was schiefgeht, erfährst du es — auch um 3 Uhr nachts."
+                "desc": "Protokolliere Fütterungen, Häutungen, Gewichte und Tierarztbesuche in Sekunden. Schau jederzeit zurück und sieh das ganze Bild."
             },
             "history": {
-                "title": "Lückenlose Historie",
-                "desc": "Jede Fütterung, jede Häutung, jeder Messwert — protokolliert und durchsuchbar. Kein ‚Wann hab ich nochmal…?' mehr."
+                "title": "Tierhistorie",
+                "desc": "Eine lückenlose Zeitleiste für jedes Tier. Erkenne Trends, entdecke Probleme, und vergiss nie wieder, wann du zuletzt gefüttert, gewogen oder kontrolliert hast."
             },
+            "publicProfiles": {
+                "title": "Öffentliche Profile",
+                "desc": "Teile deine Tiere mit der Welt. Öffentliche Profile mit Fotos, Pflegedaten und einem teilbaren Link — perfekt für Züchter, Tierärzte oder andere Halter."
+            }
+        },
+        "product": {
+            "label": "So sieht es aus",
+            "title": "Gemacht für echte Haltungsroutinen",
+            "desc": "KeeperLog zeigt dir alles über deine Tiere auf einen Blick — letzte Fütterungen, Gewichtstrends, Häutungszyklen und anstehende Tierarzttermine."
+        },
+        "trust": {
+            "label": "Warum du vertrauen kannst",
+            "title": "Mit Sorgfalt gebaut, für Halter gemacht",
             "privacy": {
-                "title": "Deine Daten, geschützt",
-                "desc": "Verschlüsselte Speicherung, strikte Zugriffskontrollen und kein Third-Party-Tracking. Die Daten deiner Tiere bleiben deine."
+                "title": "Deine Daten, deine Kontrolle",
+                "desc": "Verschlüsselte Speicherung, kein Third-Party-Tracking und vollständiger DSGVO-Datenexport. Die Daten deiner Tiere bleiben deine."
+            },
+            "keeper": {
+                "title": "Von einem Halter gebaut",
+                "desc": "Kein Konzern. KeeperLog wurde von einem Reptilienhalter gebaut, der dieses Tool brauchte — und es Realität werden ließ."
+            },
+            "free": {
+                "title": "Kostenlos starten",
+                "desc": "Keine Kreditkarte, kein Testzeitraum. Erstell dein Konto und leg sofort los."
             }
         },
         "howItWorks": {
@@ -61,53 +60,28 @@
                 "title": "Registrieren",
                 "desc": "Erstell dein kostenloses Konto in Sekunden. Keine Kreditkarte, kein Aufwand — einfach anmelden und los."
             },
-            "setup": {
-                "title": "Einrichten",
-                "desc": "Lege deine Terrarien an, füge deine Tiere hinzu, setz deine Alarmschwellen. Dauert maximal fünf Minuten."
+            "addAnimals": {
+                "title": "Tiere hinzufügen",
+                "desc": "Füge deine Tiere mit Name, Art und Foto hinzu. So viele du hältst — ohne Limits."
             },
-            "relax": {
-                "title": "Zurücklehnen",
-                "desc": "Das war's. KeeperLog überwacht rund um die Uhr, protokolliert alles und meldet sich, wenn's wichtig ist. Du machst die Haltung — wir den Rest."
+            "startTracking": {
+                "title": "Dokumentieren",
+                "desc": "Protokolliere Fütterungen, Gewichte, Häutungen und Tierarztbesuche. Bau dir eine echte Pflegehistorie ab Tag eins."
             }
-        },
-        "setup": {
-            "label": "Dein Setup, deine Regeln",
-            "title": "Funktioniert mit dem, was du hast",
-            "desc": "KeeperLog passt sich an deine vorhandene Hardware an. Kein proprietäres Ökosystem, kein Vendor Lock-in — einfach anschließen und los.",
-            "tech": {
-                "pi": "Läuft auf Pi 3, 4 & 5",
-                "dht": "GPIO- oder I²C-Sensoren",
-                "ha": "Jede HA-Entität nutzbar",
-                "telegram": "Sofortige Handy-Alarme",
-                "ws": "Live-Daten, kein Polling",
-                "local": "Alles bleibt lokal"
-            }
-        },
-        "trust": {
-            "encrypted": "Verschlüsselt & sicher",
-            "openSource": "Gemacht für Halter",
-            "fast": "Setup in 5 Minuten"
-        },
-        "social": {
-            "enclosures": "Unbegrenzt Terrarien",
-            "sensors": "Unbegrenzt Sensoren",
-            "monitoring": "Überwachung",
-            "alerts": "Alarmzeit"
         },
         "cta": {
-            "title": "Bereit, deine Haltung aufs nächste Level zu bringen?",
-            "subtitle": "Schließ dich Haltern an, die aufgehört haben zu raten und angefangen haben zu wissen. Meld dich an und sieh den Unterschied.",
-            "button": "Loslegen"
+            "title": "Deine Tiere verdienen eine echte Akte.",
+            "subtitle": "Verlass dich nicht mehr auf dein Gedächtnis und verstreute Notizen. Bau dir noch heute eine strukturierte Pflegehistorie auf.",
+            "button": "Kostenloses Konto erstellen"
         },
         "footer": {
-            "tagline": "Das All-in-One-Tool für Reptilienhalter — Sensoren, Alarme und Pflegebuch an einem Ort.",
+            "tagline": "Strukturierte Pflegedokumentation für Reptilienhalter — Fütterungen, Häutungen, Gewichte, Tierarztbesuche und mehr.",
             "product": "Produkt",
-            "resources": "Ressourcen",
-            "docs": "Dokumentation",
+            "explore": "Entdecken",
             "legal": "Rechtliches",
             "copyright": "© {year} KeeperLog. Alle Rechte vorbehalten."
         },
-        "pageTitle": "KeeperLog — Für Reptilienhalter"
+        "pageTitle": "KeeperLog — Pflegedokumentation für Reptilienhalter"
     },
     "cookie": {
         "message": "Wir verwenden Cookies, um dich angemeldet zu halten und dein Erlebnis zu verbessern.",
@@ -1839,11 +1813,268 @@
     },
     "seo": {
         "home": {
-            "title": "KeeperLog - Terrarium-Überwachungssystem",
-            "description": "KeeperLog — Echtzeit-Terrarien-Überwachung, automatische Alarme und Pflegebuch für Reptilienhalter."
+            "title": "KeeperLog — Pflegedokumentation für Reptilienhalter",
+            "description": "Protokolliere Fütterungen, Häutungen, Gewichte und Tierarztbesuche für alle deine Reptilien. Strukturierte Pflegedokumentation statt loser Notizen."
         },
         "register": {
-            "description": "Erstelle dein kostenloses KeeperLog Konto — überwache dein Terrarium, verfolge die Gesundheit deines Reptils und erhalte automatische Alarme."
+            "description": "Erstelle dein kostenloses KeeperLog-Konto — dokumentiere Fütterungen, Häutungen, Gewichte und Tierarztbesuche für deine Reptilien."
+        },
+        "features": {
+            "title": "Features — KeeperLog",
+            "description": "Alles, was KeeperLog bietet: Pflegebuch, Tierhistorie, öffentliche Profile, Gewichtsdiagramme, Fotogalerien, Gesundheitstracking und mehr."
+        },
+        "whyKeeperlog": {
+            "title": "Warum KeeperLog — Schluss mit Tabellen & Rätselraten",
+            "description": "Warum Reptilienhalter KeeperLog statt Tabellen, Zetteln und Gedächtnis wählen. Strukturierte Pflegedokumentation, die wirklich funktioniert."
+        },
+        "faq": {
+            "title": "FAQ — KeeperLog",
+            "description": "Häufig gestellte Fragen zu KeeperLog. Ist es kostenlos? Welche Tiere kann ich tracken? Wie sicher sind meine Daten?"
+        },
+        "compare": {
+            "title": "Excel vs KeeperLog — Reptilienpflege-Tracking im Vergleich",
+            "description": "Sieh, wie KeeperLog im Vergleich zu Tabellen für das Tracking der Reptilienpflege abschneidet. Visuelle Diagramme, Erinnerungen, öffentliche Profile und mehr."
+        }
+    },
+    "explore": {
+        "features": {
+            "pageTitle": "Features — KeeperLog",
+            "hero": {
+                "label": "Alles, was du tun kannst",
+                "title": "Was KeeperLog bietet",
+                "desc": "Ein strukturiertes System zum Dokumentieren der Pflege, Verfolgen der Gesundheit und Teilen deiner Tiere — von einem Halter gebaut, für Halter."
+            },
+            "careJournal": {
+                "title": "Pflegebuch",
+                "desc": "Protokolliere Fütterungen, Häutungen, Gewichte und Tierarztbesuche mit wenigen Klicks. Jedes Ereignis wird mit Zeitstempel dauerhaft gespeichert. Schau jederzeit die komplette Pflegehistorie jedes Tieres nach.",
+                "items": {
+                    "feedings": "Jede Fütterung mit Futterart, Größe und Annahme erfassen",
+                    "sheddings": "Jede Häutung mit Qualität und Vollständigkeit dokumentieren",
+                    "weights": "Regelmäßig Gewicht protokollieren und Trends verfolgen",
+                    "vetVisits": "Tierarzttermine, Diagnosen und Kosten dokumentieren",
+                    "notes": "Haltungsnotizen für alles, was sich zu merken lohnt"
+                }
+            },
+            "animalManagement": {
+                "title": "Tierverwaltung",
+                "desc": "Jedes Tier bekommt ein eigenes Profil mit Art, Morph, Geschlecht, Geburtsdatum und Fotogalerie. Verwalte Terrarien, weise Tiere zu und halte alles verbunden.",
+                "items": {
+                    "profiles": "Detaillierte Profile pro Tier mit Foto, Art und Morph",
+                    "enclosures": "Terrarien verwalten und Tiere zuordnen",
+                    "photos": "Fotogalerien pro Tier hochladen und organisieren",
+                    "documents": "Dokumente wie Tierarztberichte oder Zertifikate anhängen"
+                }
+            },
+            "publicProfiles": {
+                "title": "Öffentliche Profile",
+                "desc": "Teile deine Tiere öffentlich mit einer eigenen URL. Öffentliche Profile zeigen Fotos, Pflegedaten und eine Bio — ideal für Züchter, Übergaben oder um deine Sammlung anderen Haltern zu zeigen.",
+                "items": {
+                    "customUrl": "Eigene teilbare URL für jedes Tier und jeden Halter",
+                    "careStats": "Sichtbare Pflegestatistiken schaffen Vertrauen bei Besuchern",
+                    "community": "Likes und Kommentare von anderen Haltern",
+                    "embed": "Einbettbare Profil-Widgets für Foren oder Webseiten"
+                }
+            },
+            "healthTracking": {
+                "title": "Gesundheits- & Gewichtstracking",
+                "desc": "Visuelle Gewichtsdiagramme, Häutungszyklus-Tracking und Tierarztbesuch-Aufzeichnungen geben dir einen klaren Überblick über die Gesundheit jedes Tieres über die Zeit. Erkenne Probleme früh und führe eine solide Akte für deinen Tierarzt.",
+                "items": {
+                    "weightCharts": "Visuelle Gewichtsverlaufs-Diagramme pro Tier",
+                    "shedCycles": "Häutungszyklus-Tracking über die Zeit",
+                    "vetRecords": "Vollständige Tierarztbesuch-Historie mit Kostenerfassung",
+                    "reminders": "Fütterungs- und Tierarzterinnerungen, damit du nichts vergisst"
+                }
+            },
+            "planning": {
+                "title": "Planung & Erinnerungen",
+                "desc": "Ein Wochenplaner und automatische Erinnerungen helfen dir, Fütterungspläne, Tierarzttermine und Terrarienwartung im Griff zu behalten — ohne alles selbst im Kopf haben zu müssen.",
+                "items": {
+                    "weeklyPlanner": "Visueller Wochenplaner für alle deine Tiere",
+                    "feedingReminders": "Automatische Fütterungserinnerungen pro Tier",
+                    "vetReminders": "Benachrichtigungen für anstehende Tierarzttermine",
+                    "maintenance": "Terrarienwartungs-Zeitpläne und Protokolle"
+                }
+            },
+            "monitoring": {
+                "title": "Klimaüberwachung",
+                "desc": "Verbinde optional Temperatur- und Feuchtigkeitssensoren, um deine Terrarien rund um die Uhr zu überwachen. Bekomme Alarme, wenn Werte den sicheren Bereich verlassen. Funktioniert mit DHT22, BME280 und Home Assistant.",
+                "items": {
+                    "sensors": "Unterstützung für DHT22, BME280 und Home Assistant Sensoren",
+                    "alerts": "Telegram-Alarme bei abweichenden Klimabedingungen",
+                    "history": "Sensordaten protokolliert und über die Zeit einsehbar",
+                    "dashboard": "Echtzeit-Dashboard für alle verbundenen Terrarien"
+                }
+            },
+            "cta": {
+                "title": "Bereit loszulegen?",
+                "desc": "Erstelle dein kostenloses Konto und beginne noch heute mit der Dokumentation der Pflege deiner Tiere.",
+                "button": "Kostenloses Konto erstellen"
+            }
+        },
+        "why": {
+            "pageTitle": "Warum KeeperLog",
+            "hero": {
+                "label": "Warum wechseln",
+                "title": "Deine Tiere verdienen mehr als eine Tabelle",
+                "desc": "Die meisten Halter tracken ihre Pflege mit Tabellen, Zetteln oder dem Gedächtnis. Das funktioniert — bis es nicht mehr geht. KeeperLog gibt dir ein echtes System, das mit deiner Sammlung wächst."
+            },
+            "problems": {
+                "title": "Kommt dir bekannt vor?",
+                "memory": {
+                    "title": "Wann war die letzte Fütterung?",
+                    "desc": "Du denkst, es war Dienstag. Oder doch Montag? Bei mehreren Tieren wird das Gedächtnis schnell unzuverlässig."
+                },
+                "scattered": {
+                    "title": "Notizen überall, Überblick nirgends",
+                    "desc": "Eine Tabelle hier, eine Notiz da, ein Foto irgendwo in der Galerie. Keine einzige verlässliche Quelle."
+                },
+                "handover": {
+                    "title": "Pflege nachweisen ist schwer",
+                    "desc": "Tierarztbesuch steht an? Tier wird verkauft? Viel Spaß beim Zusammenstellen von Monaten an Pflegedaten aus verstreuten Notizen."
+                },
+                "forgetting": {
+                    "title": "Wichtiges rutscht durch",
+                    "desc": "Tierarzttermine, Medikamentenpläne, Entwurmungen — genau die Dinge, die du nicht vergessen darfst, sind am leichtesten zu übersehen."
+                }
+            },
+            "solution": {
+                "title": "Was sich mit KeeperLog ändert",
+                "items": {
+                    "onePlace": {
+                        "title": "Alles an einem Ort",
+                        "desc": "Jede Fütterung, Häutung, jedes Gewicht, jeder Tierarztbesuch und jede Notiz — pro Tier, durchsuchbar, dauerhaft."
+                    },
+                    "trends": {
+                        "title": "Trends über die Zeit erkennen",
+                        "desc": "Gewichtsdiagramme, Häutungszyklen, Fütterungshistorie — Probleme früh erkennen statt spät reagieren."
+                    },
+                    "shareProof": {
+                        "title": "Teilen und Pflege nachweisen",
+                        "desc": "Öffentliche Profile mit echten Daten. Zeig deinem Tierarzt, einem Käufer oder anderen Haltern eine vollständige Pflegeakte."
+                    },
+                    "neverForget": {
+                        "title": "Nie wieder vergessen",
+                        "desc": "Erinnerungen für Fütterungen, Tierarztbesuche und Wartung. Das System merkt sich, was du nicht im Kopf behalten musst."
+                    }
+                }
+            },
+            "cta": {
+                "title": "Probier es aus. Kostenlos.",
+                "desc": "Keine Verpflichtung. Keine Kreditkarte. Einfach eine bessere Art, die Pflege deiner Tiere zu dokumentieren.",
+                "button": "Kostenloses Konto erstellen"
+            }
+        },
+        "faq": {
+            "pageTitle": "FAQ — KeeperLog",
+            "hero": {
+                "title": "Häufig gestellte Fragen",
+                "desc": "Schnelle Antworten über KeeperLog — was es kann, was es kostet und wie deine Daten behandelt werden."
+            },
+            "items": {
+                "free": {
+                    "q": "Ist KeeperLog kostenlos?",
+                    "a": "Ja. KeeperLog hat eine kostenlose Stufe, mit der du deine Tiere tracken kannst, ohne etwas zu bezahlen. Premium-Stufen mit mehr Features sind verfügbar, wenn du sie willst."
+                },
+                "animals": {
+                    "q": "Welche Tiere kann ich tracken?",
+                    "a": "Alle. KeeperLog wurde für Reptilienhalter gebaut, aber das Tracking-System funktioniert für jedes Tier — Schlangen, Geckos, Schildkröten, Amphibien oder alles andere, was du hältst."
+                },
+                "dataSafe": {
+                    "q": "Sind meine Daten sicher?",
+                    "a": "Ja. Alle hochgeladenen Dateien werden verschlüsselt gespeichert, Passwörter mit PBKDF2 + SHA-512 gehasht, und es gibt kein Third-Party-Tracking. Du kannst deine Daten jederzeit exportieren und löschen."
+                },
+                "sensors": {
+                    "q": "Brauche ich Sensoren oder spezielle Hardware?",
+                    "a": "Nein. Sensoren sind komplett optional. Der Kern von KeeperLog ist Pflegedokumentation — Fütterungen, Häutungen, Gewichte, Tierarztbesuche. Klimaüberwachung ist ein Zusatzfeature, keine Voraussetzung."
+                },
+                "publicProfiles": {
+                    "q": "Kann ich Tierprofile öffentlich teilen?",
+                    "a": "Ja. Du kannst öffentliche Profile für deine Tiere mit eigenen URLs erstellen. Wähle, was sichtbar sein soll — Fotos, Gewicht, Fütterungsdaten, Artinfo — und teile den Link mit jedem."
+                },
+                "export": {
+                    "q": "Kann ich meine Daten exportieren?",
+                    "a": "Ja. KeeperLog unterstützt vollständigen DSGVO-konformen Datenexport. Du kannst alle deine Daten jederzeit über die Einstellungsseite herunterladen."
+                },
+                "mobile": {
+                    "q": "Funktioniert es auf dem Handy?",
+                    "a": "Ja. KeeperLog ist eine responsive Web-App, die auf jedem Gerät mit Browser funktioniert. Kein App-Store-Download nötig."
+                },
+                "whoBuilt": {
+                    "q": "Wer hat das gebaut?",
+                    "a": "KeeperLog wurde von einem Reptilienhalter gebaut, der ein vernünftiges Tracking-System brauchte und keines finden konnte. Ein Leidenschaftsprojekt, das zu einem echten Produkt wurde."
+                }
+            },
+            "cta": {
+                "title": "Noch Fragen?",
+                "desc": "Erstelle ein kostenloses Konto und überzeug dich selbst — oder melde dich, wenn hier etwas nicht abgedeckt wird.",
+                "button": "Kostenlos starten"
+            }
+        },
+        "compare": {
+            "pageTitle": "Excel vs KeeperLog",
+            "hero": {
+                "label": "Vergleich",
+                "title": "Excel vs KeeperLog",
+                "desc": "Tabellen funktionieren. Bis du 5 Tiere, 200 Fütterungen und einen Tierarzt hast, der eine Zusammenfassung will. So vergleichen sie sich."
+            },
+            "table": {
+                "feature": "Feature",
+                "excel": "Excel / Sheets",
+                "keeperlog": "KeeperLog",
+                "rows": {
+                    "feedingLog": {
+                        "label": "Fütterungsprotokoll",
+                        "excel": "Manuelle Zeilen, keine Struktur",
+                        "keeperlog": "Strukturierte Einträge mit Futterart, Größe und Notizen"
+                    },
+                    "weightTracking": {
+                        "label": "Gewichtstracking",
+                        "excel": "Diagramm manuell erstellen",
+                        "keeperlog": "Automatische visuelle Gewichtsdiagramme pro Tier"
+                    },
+                    "photos": {
+                        "label": "Fotoverwaltung",
+                        "excel": "Nicht möglich",
+                        "keeperlog": "Fotogalerie pro Tier mit Lightbox"
+                    },
+                    "sharing": {
+                        "label": "Mit anderen teilen",
+                        "excel": "Datei manuell exportieren",
+                        "keeperlog": "Öffentliches Profil mit teilbarer URL"
+                    },
+                    "reminders": {
+                        "label": "Erinnerungen",
+                        "excel": "Keine",
+                        "keeperlog": "Fütterungs-, Tierarzt- und Wartungserinnerungen"
+                    },
+                    "mobile": {
+                        "label": "Mobilnutzung",
+                        "excel": "Umständlich auf kleinen Bildschirmen",
+                        "keeperlog": "Voll responsive Web-App"
+                    },
+                    "multiAnimal": {
+                        "label": "Mehrere Tiere",
+                        "excel": "Mehrere Tabs oder Dateien",
+                        "keeperlog": "Ein Dashboard, alle Tiere organisiert"
+                    },
+                    "dataSafety": {
+                        "label": "Datensicherheit",
+                        "excel": "Eine kaputte Datei = alles weg",
+                        "keeperlog": "Verschlüsselte Datenbank, automatische Backups"
+                    }
+                }
+            },
+            "honest": {
+                "title": "Wann eine Tabelle reicht",
+                "desc": "Wenn du ein Tier hältst und selten zurückschauen musst, reicht eine einfache Tabelle vielleicht aus. Kein Problem.",
+                "title2": "Wann du mehr brauchst",
+                "desc2": "Sobald du mehrere Tiere hast, visuelle Trends willst, Daten teilen musst oder einfach aufhören willst, Dinge zu vergessen — lohnt sich ein dediziertes System."
+            },
+            "cta": {
+                "title": "Bereit für ein Upgrade von Tabellen?",
+                "desc": "Starte mit einem kostenlosen Konto. Deine Tierdaten verdienen ein echtes System.",
+                "button": "Kostenloses Konto erstellen"
+            }
         }
     },
     "errorPage": {

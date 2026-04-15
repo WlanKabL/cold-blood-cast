@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         "/pricing",
     ];
 
-    const publicPrefixes = ["/legal", "/export", "/p/", "/keeper/"];
+    const publicPrefixes = ["/legal", "/export", "/p/", "/keeper/", "/explore"];
 
     // Skip auth check for public routes
     if (publicRoutes.includes(to.path) || publicPrefixes.some((p) => to.path.startsWith(p))) {
