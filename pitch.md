@@ -1,86 +1,36 @@
-# KeeperLog – Pitch für Zoohandlung / Reptilienladen
+# KeeperLog - shop pitch / feedback intro
 
-## Ziel des Gesprächs
+## Short version
 
-Ich will hier nichts aggressiv verkaufen, sondern ehrliches Feedback bekommen und schauen, ob das für euch oder eure Kunden überhaupt sinnvoll wäre.
+Hey, I am building a tool called KeeperLog for reptile keepers.
 
-## Kurzpitch
+The idea is pretty simple:
+a clean place to manage the stuff that is easy to forget or gets messy over time, like feedings, sheds, notes, reminders and animal data.
 
-Ich entwickle gerade ein Tool namens KeeperLog für Reptilienhalter.
+I started building it because with reptiles, a lot of important things do not happen daily.
+With a dog, feeding is obvious.
+With a snake, it is more like:
+when did I feed again, when was the last shed, does this timing still look normal, did I note that down somewhere or not?
 
-Die Grundidee ist, alles an einem Ort zu haben, was im Alltag mit Reptilien schnell unübersichtlich wird:
-Fütterungen, Häutungen, Erinnerungen, Notizen und wichtige Tierdaten.
+So I wanted one place for all of that.
 
-Der eigentliche Punkt ist aber nicht nur simples Tracking.
+I also think the interesting part is not just private tracking, but the handover side:
+if someone buys an animal, a seller or shop could later give them a link or QR code with the animal profile and important history instead of random notes or missing information.
 
-Was ich spannender finde, ist die Verbindung zwischen Halter, Verkäufer und Tier:
+I do not want to hard pitch this to you.
+I would rather just show it to you for two minutes and get honest feedback.
 
-Wenn jemand ein Tier kauft, könnte er direkt einen Link oder QR-Code zu einem digitalen Tierprofil bekommen.
-Also nicht nur „hier ist das Tier“, sondern direkt mit Daten wie Schlupfdatum, Verlauf, Notizen oder anderen wichtigen Infos, die man sonst schnell verliert oder nie sauber mitbekommt.
+You can click through it yourself.
+I mainly want to know:
+does this actually make sense to you, where does it feel useful, and where does it feel pointless or missing something?
 
-Für Käufer schafft das mehr Vertrauen und Bindung.
-Für Halter mehr Übersicht.
-Und für Shops oder Züchter könnte es langfristig ein moderner Weg sein, Tiere sauber zu dokumentieren und digital zu übergeben.
+## Even shorter version
 
-Aktuell kann KeeperLog schon:
-- Tiere anlegen
-- öffentliche Profile darstellen
-- Fütterungen tracken
-- Häutungen dokumentieren
-- Erinnerungen setzen
-- Notizen festhalten
+Hey, I am building a reptile management tool called KeeperLog.
 
-Also genau die Dinge, die man im Alltag sonst gern vergisst, gerade wenn man mehrere Tiere hat oder wenn Aufgaben nicht täglich passieren.
+It is for things like feedings, sheds, reminders, notes and animal profiles, especially for stuff that is easy to forget over time.
 
-Mir geht es gerade vor allem um ehrliches Feedback:
-Ist das aus deiner Sicht sinnvoll?
-Wäre sowas für Kunden interessant?
-Und wo würdest du sofort sagen: Das fehlt noch oder das müsste anders sein?
+The part I find really interesting is that it could also work as a digital handover system for sold animals later on, with a link or QR code for the buyer.
 
-## Wenn die Person nur wenig Zeit hat
-
-Ich entwickle gerade ein digitales Management-Tool für Reptilienhalter.
-Nicht nur zum Tracken von Fütterungen und Häutungen, sondern auch mit der Idee, Tiere beim Verkauf digital per Link oder QR-Code mit Profil und Daten zu übergeben.
-Mich würde interessieren, ob du darin echten Nutzen siehst oder eher nicht.
-
-## Wenn mehr Interesse da ist
-
-Was mich daran reizt:
-Viele Informationen zu Reptilien gehen beim Kauf oder im Alltag verloren oder landen in Notizen, Chats, Excel oder einfach im Kopf.
-Ich will das sauber, übersichtlich und langfristig nutzbar machen.
-
-Gerade so Sachen wie:
-- Wann war die letzte Fütterung?
-- Wann war die letzte Häutung?
-- Gibt es Auffälligkeiten?
-- Wie alt ist das Tier genau?
-- Welche Infos hat der Vorbesitzer oder Verkäufer mitgegeben?
-
-Das soll nicht verstreut sein, sondern in einem nachvollziehbaren Verlauf.
-
-## Was ich aktuell bewusst noch nicht überverkaufe
-
-Es ist noch im Aufbau.
-Ein paar Dinge wie Breeding-/Genetik-Themen und Medication Plans sind noch nicht fertig.
-Ich will gerade erst sicherstellen, dass der Kern im Alltag wirklich sinnvoll ist.
-
-## Fragen, die ich stellen würde
-
-- Würdest du so etwas grundsätzlich sinnvoll finden?
-- Wäre das eher nur etwas für große Halter/Züchter oder auch für normale Käufer?
-- Würde ein digitales Tierprofil beim Verkauf aus deiner Sicht Mehrwert schaffen?
-- Welche Information müsste aus deiner Sicht auf jeden Fall drin sein?
-- Was wäre das Erste, was dich daran stören oder abschrecken würde?
-
-## Wichtige Haltung im Gespräch
-
-- Nicht verteidigen
-- Nicht zu viel erklären
-- Nicht direkt verkaufen
-- Erst verstehen, wie die Person denkt
-- Kritik aktiv einladen
-
-## Abschluss, wenn es gut läuft
-
-Wenn du magst, kann ich dir das einfach mal zeigen oder dir einen Testzugang geben.
-Ist aktuell noch kostenlos, mir geht es erstmal um ehrliches Feedback und darum, das Ding sinnvoll weiterzuentwickeln.
+I would love to just show it to you for a minute and get honest feedback.
+You can click through it yourself.
