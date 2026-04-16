@@ -226,7 +226,7 @@
                                 </span>
                             </div>
                             <NuxtLink
-                                :to="`/maintenance`"
+                                to="/maintenance"
                                 class="text-primary-400 text-sm font-medium"
                             >
                                 {{ $t("pages.dashboard.viewAll") }}

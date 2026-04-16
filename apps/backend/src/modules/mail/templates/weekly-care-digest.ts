@@ -62,13 +62,13 @@ const DAY_NAMES_DE = [
 // ── Helpers ──────────────────────────────────────────────────
 
 function dayName(dateStr: string, locale: string): string {
-    const d = new Date(dateStr + "T00:00:00.000Z");
+    const d = new Date(`${dateStr}T00:00:00.000Z`);
     const dow = d.getUTCDay();
     return locale === "de" ? (DAY_NAMES_DE[dow] ?? "") : (DAY_NAMES_EN[dow] ?? "");
 }
 
 function formatDate(dateStr: string, locale: string): string {
-    const d = new Date(dateStr + "T00:00:00.000Z");
+    const d = new Date(`${dateStr}T00:00:00.000Z`);
     return d.toLocaleDateString(locale === "de" ? "de-DE" : "en-US", {
         month: "short",
         day: "numeric",

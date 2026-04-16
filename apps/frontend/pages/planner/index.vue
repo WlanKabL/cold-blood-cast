@@ -1001,16 +1001,16 @@ function isToday(date: string): boolean {
 // ── Formatting ──
 function formatDayName(date: string): string {
     const loc = locale.value === "de" ? "de-DE" : "en-US";
-    return new Date(date + "T00:00:00").toLocaleDateString(loc, { weekday: "short" });
+    return new Date(`${date}T00:00:00`).toLocaleDateString(loc, { weekday: "short" });
 }
 
 function formatDayNumber(date: string): string {
-    return new Date(date + "T00:00:00").getDate().toString();
+    return new Date(`${date}T00:00:00`).getDate().toString();
 }
 
 function formatFullDate(date: string): string {
     const loc = locale.value === "de" ? "de-DE" : "en-US";
-    return new Date(date + "T00:00:00").toLocaleDateString(loc, {
+    return new Date(`${date}T00:00:00`).toLocaleDateString(loc, {
         weekday: "long",
         day: "numeric",
         month: "long",

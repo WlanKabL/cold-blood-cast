@@ -539,8 +539,9 @@ function handleFileSelect(event: Event) {
     for (const file of files) {
         if (file.size > MAX_FILE_SIZE) {
             toast.error(
-                t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }) +
-                    ` (${file.name})`,
+                `${t("common.fileTooLarge", {
+                    max: formatFileSize(MAX_FILE_SIZE),
+                })} (${file.name})`,
             );
             continue;
         }
@@ -558,8 +559,9 @@ function handleDrop(event: DragEvent) {
     for (const file of files) {
         if (file.size > MAX_FILE_SIZE) {
             toast.error(
-                t("common.fileTooLarge", { max: formatFileSize(MAX_FILE_SIZE) }) +
-                    ` (${file.name})`,
+                `${t("common.fileTooLarge", {
+                    max: formatFileSize(MAX_FILE_SIZE),
+                })} (${file.name})`,
             );
             continue;
         }

@@ -23,6 +23,22 @@ import {
     type ChartOptions,
 } from "chart.js";
 
+const props = withDefaults(
+    defineProps<{
+        series: WeightSeries[];
+        height?: number;
+        showLegend?: boolean;
+        fill?: boolean;
+        sparkline?: boolean;
+    }>(),
+    {
+        height: 300,
+        showLegend: true,
+        fill: true,
+        sparkline: false,
+    },
+);
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -39,22 +55,6 @@ export interface WeightSeries {
     petName: string;
     points: { date: string; weightGrams: number }[];
 }
-
-const props = withDefaults(
-    defineProps<{
-        series: WeightSeries[];
-        height?: number;
-        showLegend?: boolean;
-        fill?: boolean;
-        sparkline?: boolean;
-    }>(),
-    {
-        height: 300,
-        showLegend: true,
-        fill: true,
-        sparkline: false,
-    },
-);
 
 const COLORS = [
     { border: "rgb(138, 156, 74)", bg: "rgba(138, 156, 74, 0.15)" }, // olive primary

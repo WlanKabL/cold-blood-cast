@@ -25,16 +25,6 @@ import {
     type ChartOptions,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-export interface MonthlyCostEntry {
-    month: string;
-    petId: string;
-    petName: string;
-    totalCents: number;
-    visitCount: number;
-}
-
 const props = withDefaults(
     defineProps<{
         entries: MonthlyCostEntry[];
@@ -44,6 +34,16 @@ const props = withDefaults(
         height: 280,
     },
 );
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+export interface MonthlyCostEntry {
+    month: string;
+    petId: string;
+    petName: string;
+    totalCents: number;
+    visitCount: number;
+}
 
 const { locale } = useI18n();
 
@@ -62,7 +62,7 @@ const chartData = computed<ChartData<"bar">>(() => {
 
     const loc = locale.value === "de" ? "de-DE" : "en-US";
     const labels = months.map((m) => {
-        const d = new Date(m + "-01");
+        const d = new Date(`${m}-01`);
         return d.toLocaleDateString(loc, { month: "short" });
     });
 

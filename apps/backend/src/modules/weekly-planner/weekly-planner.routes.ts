@@ -25,7 +25,7 @@ export async function weeklyPlannerRoutes(app: FastifyInstance): Promise<void> {
 
         let weekStart: Date;
         if (parsed.data.from) {
-            weekStart = new Date(parsed.data.from + "T00:00:00.000Z");
+            weekStart = new Date(`${parsed.data.from}T00:00:00.000Z`);
             if (isNaN(weekStart.getTime())) {
                 throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Invalid date format");
             }

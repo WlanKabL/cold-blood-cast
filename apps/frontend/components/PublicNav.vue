@@ -61,8 +61,8 @@
                 <!-- Mobile menu button -->
                 <button
                     class="text-fg-muted hover:text-fg rounded-xl p-2 transition md:hidden"
-                    @click="mobileMenuOpen = !mobileMenuOpen"
                     :aria-label="mobileMenuOpen ? 'Close menu' : 'Open menu'"
+                    @click="mobileMenuOpen = !mobileMenuOpen"
                 >
                     <Icon :name="mobileMenuOpen ? 'lucide:x' : 'lucide:menu'" class="h-5 w-5" />
                 </button>

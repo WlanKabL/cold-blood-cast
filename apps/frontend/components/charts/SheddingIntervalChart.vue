@@ -25,14 +25,6 @@ import {
     type ChartOptions,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-export interface SheddingInterval {
-    fromDate: string;
-    toDate: string;
-    days: number;
-}
-
 const props = withDefaults(
     defineProps<{
         intervals: SheddingInterval[];
@@ -44,6 +36,14 @@ const props = withDefaults(
         height: 200,
     },
 );
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+export interface SheddingInterval {
+    fromDate: string;
+    toDate: string;
+    days: number;
+}
 
 const BAR_COLOR = { bg: "rgba(138, 156, 74, 0.6)", border: "rgb(138, 156, 74)" };
 const ANOMALY_COLOR = { bg: "rgba(239, 68, 68, 0.5)", border: "rgb(239, 68, 68)" };
