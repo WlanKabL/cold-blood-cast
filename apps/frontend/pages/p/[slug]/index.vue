@@ -22,27 +22,21 @@
 definePageMeta({ layout: false });
 
 const route = useRoute();
-const config = useRuntimeConfig();
 const slug = route.params.slug as string;
+const api = useApi();
 
 const loading = ref(true);
-const apiBase = config.public.apiBaseURL;
 
 async function resolveAndRedirect() {
     try {
-        const res = await fetch(`${apiBase}/api/public/pets/resolve/${encodeURIComponent(slug)}`);
-        if (!res.ok) {
-            loading.value = false;
-            return;
-        }
-        const json = await res.json();
-        if (json.success) {
-            await navigateTo(
-                `/keeper/${encodeURIComponent(json.data.userSlug)}/p/${encodeURIComponent(json.data.petSlug)}`,
-                { replace: true, redirectCode: 301 },
-            );
-            return;
-        }
+        const data = await api.get<{ userSlug: string; petSlug: string }>(
+            `/api/public/pets/resolve/${encodeURIComponent(slug)}`,
+        );
+        await navigateTo(
+            `/keeper/${encodeURIComponent(data.userSlug)}/p/${encodeURIComponent(data.petSlug)}`,
+            { replace: true, redirectCode: 301 },
+        );
+        return;
     } catch {
         // fall through to not found
     }
