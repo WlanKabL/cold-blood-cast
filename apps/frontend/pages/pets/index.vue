@@ -187,7 +187,7 @@
                 />
                 <UiTextInput v-model="form.morph" :label="$t('pages.pets.fields.morph')" />
                 <UiSelect v-model="form.gender" :label="$t('pages.pets.fields.gender')">
-                    <option v-for="g in genderOptions" :key="g" :value="g">
+                    <option v-for="g in GENDERS" :key="g" :value="g">
                         {{ $t(`common.gender.${g}`) }}
                     </option>
                 </UiSelect>
@@ -246,6 +246,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { GENDERS } from "@cold-blood-cast/shared";
 
 interface Pet {
     id: string;
@@ -274,8 +275,6 @@ const resolveUrl = useResolveUrl();
 
 definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "pets" });
 useHead({ title: () => t("pages.pets.title") });
-
-const genderOptions = ["MALE", "FEMALE", "UNKNOWN"];
 
 // ── Filters ──────────────────────────────────────────────
 const searchQuery = ref("");

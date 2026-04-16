@@ -37,12 +37,12 @@ describe("listHusbandryNotes", () => {
 
         const result = await listHusbandryNotes("user1", { limit: 50 });
 
-        expect(result).toEqual(notes);
+        expect(result).toEqual({ items: notes, nextCursor: null });
         expect(mockPrisma.husbandryNote.findMany).toHaveBeenCalledWith(
             expect.objectContaining({
                 where: { pet: { userId: "user1" } },
                 orderBy: { occurredAt: "desc" },
-                take: 50,
+                take: 51,
             }),
         );
     });

@@ -1,5 +1,6 @@
 import { type FastifyInstance } from "fastify";
 import { z } from "zod";
+import { SENSOR_TYPES } from "@cold-blood-cast/shared";
 import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
@@ -15,7 +16,7 @@ import {
 const CreateSensorSchema = z.object({
     enclosureId: z.string().cuid().optional(),
     name: z.string().min(1).max(100),
-    type: z.enum(["TEMPERATURE", "HUMIDITY", "PRESSURE", "WATER"]),
+    type: z.enum(SENSOR_TYPES),
     unit: z.string().min(1).max(20),
     homeAssistantEntityId: z.string().optional(),
     limitsJson: z.unknown().optional(),

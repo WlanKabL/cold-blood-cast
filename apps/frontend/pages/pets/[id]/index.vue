@@ -670,7 +670,7 @@
                 />
                 <UiTextInput v-model="editForm.morph" :label="$t('pages.pets.fields.morph')" />
                 <UiSelect v-model="editForm.gender" :label="$t('pages.pets.fields.gender')">
-                    <option v-for="g in genderOptions" :key="g" :value="g">
+                    <option v-for="g in GENDERS" :key="g" :value="g">
                         {{ $t(`common.gender.${g}`) }}
                     </option>
                 </UiSelect>
@@ -809,6 +809,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { GENDERS } from "@cold-blood-cast/shared";
 
 interface PetTag {
     id: string;
@@ -942,7 +943,6 @@ const authStore = useAuthStore();
 const resolveUrl = useResolveUrl();
 
 const petId = route.params.id as string;
-const genderOptions = ["MALE", "FEMALE", "UNKNOWN"];
 
 const activeTab = ref("overview");
 

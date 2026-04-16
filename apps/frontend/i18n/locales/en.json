@@ -1741,6 +1741,7 @@
         "back": "Back",
         "next": "Next",
         "getStarted": "Get started",
+        "backToChecklist": "Back to checklist",
         "steps": {
             "enclosure": {
                 "title": "Set up your enclosure",

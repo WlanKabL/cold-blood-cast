@@ -173,7 +173,7 @@
                 />
                 <div class="grid grid-cols-2 gap-3">
                     <UiSelect v-model="form.type" :label="$t('pages.enclosures.fields.type')">
-                        <option v-for="t in enclosureTypes" :key="t" :value="t">{{ t }}</option>
+                        <option v-for="t in ENCLOSURE_TYPES" :key="t" :value="t">{{ t }}</option>
                     </UiSelect>
                     <UiTextInput
                         v-model="form.room"
@@ -225,6 +225,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { ENCLOSURE_TYPES } from "@cold-blood-cast/shared";
 
 interface EnclosureListItem {
     id: string;
@@ -248,8 +249,6 @@ const toast = useAppToast();
 
 definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "enclosures" });
 useHead({ title: () => t("pages.enclosures.title") });
-
-const enclosureTypes = ["TERRARIUM", "VIVARIUM", "AQUARIUM", "PALUDARIUM", "RACK", "OTHER"];
 
 // ── Filters ──────────────────────────────────────────────
 const searchQuery = ref("");

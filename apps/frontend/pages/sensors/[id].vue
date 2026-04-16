@@ -150,7 +150,7 @@
                 />
                 <div class="grid grid-cols-2 gap-3">
                     <UiSelect v-model="editForm.type" :label="$t('pages.sensors.fields.type')">
-                        <option v-for="st in sensorTypes" :key="st" :value="st">{{ st }}</option>
+                        <option v-for="st in SENSOR_TYPES" :key="st" :value="st">{{ st }}</option>
                     </UiSelect>
                     <UiTextInput
                         v-model="editForm.unit"
@@ -198,6 +198,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { SENSOR_TYPES } from "@cold-blood-cast/shared";
 
 interface Sensor {
     id: string;
@@ -228,7 +229,7 @@ const queryClient = useQueryClient();
 const toast = useAppToast();
 
 const sensorId = route.params.id as string;
-const sensorTypes = ["TEMPERATURE", "HUMIDITY", "PRESSURE", "WATER"];
+
 const timeRange = ref("24h");
 const timeRangeOptions = [
     { label: "1h", value: "1h" },

@@ -1,5 +1,6 @@
 import { type FastifyInstance } from "fastify";
 import { z } from "zod";
+import { GENDERS } from "@cold-blood-cast/shared";
 import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
@@ -16,7 +17,7 @@ const PetBaseSchema = z.object({
     name: z.string().min(1).max(100),
     species: z.string().min(1).max(100),
     morph: z.string().max(100).optional(),
-    gender: z.enum(["MALE", "FEMALE", "UNKNOWN"]).default("UNKNOWN"),
+    gender: z.enum(GENDERS).default("UNKNOWN"),
     birthDate: z.coerce.date().optional(),
     acquisitionDate: z.coerce.date().optional(),
     notes: z.string().max(2000).optional(),

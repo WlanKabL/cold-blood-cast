@@ -70,8 +70,8 @@ describe("alertConditionBadge", () => {
     it("returns blue for BELOW", () => {
         expect(alertConditionBadge("BELOW")).toContain("text-blue-400");
     });
-    it("returns emerald for EQUAL", () => {
-        expect(alertConditionBadge("EQUAL")).toContain("text-emerald-400");
+    it("returns emerald for OUTSIDE_RANGE", () => {
+        expect(alertConditionBadge("OUTSIDE_RANGE")).toContain("text-emerald-400");
     });
 });
 

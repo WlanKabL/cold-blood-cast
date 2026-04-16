@@ -12,6 +12,7 @@
 const ENCLOSURE_TYPE_BADGE: Record<string, string> = {
     TERRARIUM: "bg-emerald-500/10 text-emerald-400",
     VIVARIUM: "bg-primary-500/10 text-primary-400",
+    AQUARIUM: "bg-blue-500/10 text-blue-400",
     PALUDARIUM: "bg-cyan-500/10 text-cyan-400",
     RACK: "bg-amber-500/10 text-amber-400",
     OTHER: "bg-zinc-500/10 text-zinc-400",
@@ -52,7 +53,7 @@ export function genderBadge(gender: string): string {
 const ALERT_CONDITION_BADGE: Record<string, string> = {
     ABOVE: "bg-red-500/10 text-red-400",
     BELOW: "bg-blue-500/10 text-blue-400",
-    EQUAL: "bg-emerald-500/10 text-emerald-400",
+    OUTSIDE_RANGE: "bg-emerald-500/10 text-emerald-400",
 };
 
 export function alertConditionBadge(condition: string): string {

@@ -292,7 +292,7 @@ describe("listWeightRecords", () => {
                     pet: { userId: USER_ID },
                     petId: PET_ID_1,
                 }),
-                take: 10,
+                take: 11,
                 orderBy: { measuredAt: "desc" },
             }),
         );

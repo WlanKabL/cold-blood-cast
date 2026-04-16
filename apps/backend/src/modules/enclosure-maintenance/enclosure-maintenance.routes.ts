@@ -1,5 +1,6 @@
 import { type FastifyInstance } from "fastify";
 import { z } from "zod";
+import { MAINTENANCE_TYPES } from "@cold-blood-cast/shared";
 import { authGuard, emailVerifiedGuard, requireFeature } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
@@ -12,15 +13,7 @@ import {
     getOverdueTasksForUser,
 } from "./enclosure-maintenance.service.js";
 
-const MaintenanceTypeEnum = z.enum([
-    "CLEANING",
-    "SUBSTRATE_CHANGE",
-    "LAMP_REPLACEMENT",
-    "WATER_CHANGE",
-    "FILTER_CHANGE",
-    "DISINFECTION",
-    "OTHER",
-]);
+const MaintenanceTypeEnum = z.enum(MAINTENANCE_TYPES);
 
 const CreateMaintenanceTaskSchema = z.object({
     enclosureId: z.string().cuid(),

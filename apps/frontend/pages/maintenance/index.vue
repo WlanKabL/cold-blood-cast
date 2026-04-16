@@ -30,7 +30,7 @@
             </UiTextInput>
             <UiSelect v-model="selectedType" class="w-48">
                 <option value="ALL">{{ $t("pages.maintenance.allTypes") }}</option>
-                <option v-for="mt in maintenanceTypes" :key="mt" :value="mt">
+                <option v-for="mt in MAINTENANCE_TYPES" :key="mt" :value="mt">
                     {{ $t(`pages.maintenance.types.${mt}`) }}
                 </option>
             </UiSelect>
@@ -188,7 +188,7 @@
                 </UiSelect>
 
                 <UiSelect v-model="form.type" :label="$t('pages.maintenance.fields.type')">
-                    <option v-for="mt in maintenanceTypes" :key="mt" :value="mt">
+                    <option v-for="mt in MAINTENANCE_TYPES" :key="mt" :value="mt">
                         {{ $t(`pages.maintenance.types.${mt}`) }}
                     </option>
                 </UiSelect>
@@ -256,6 +256,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { MAINTENANCE_TYPES } from "@cold-blood-cast/shared";
 
 interface MaintenanceTask {
     id: string;
@@ -287,16 +288,6 @@ definePageMeta({
     requiredFeature: "enclosure_maintenance",
 });
 useHead({ title: () => t("pages.maintenance.title") });
-
-const maintenanceTypes = [
-    "CLEANING",
-    "SUBSTRATE_CHANGE",
-    "LAMP_REPLACEMENT",
-    "WATER_CHANGE",
-    "FILTER_CHANGE",
-    "DISINFECTION",
-    "OTHER",
-];
 
 // ── Filters ──────────────────────────────────────────────
 const searchQuery = ref("");

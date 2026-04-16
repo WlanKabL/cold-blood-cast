@@ -1,5 +1,6 @@
 import { type FastifyInstance } from "fastify";
 import { z } from "zod";
+import { ENCLOSURE_TYPES } from "@cold-blood-cast/shared";
 import { authGuard, emailVerifiedGuard, requireFeature } from "@/middleware/index.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import {
@@ -12,9 +13,7 @@ import {
 
 const CreateEnclosureSchema = z.object({
     name: z.string().min(1).max(100),
-    type: z
-        .enum(["TERRARIUM", "VIVARIUM", "AQUARIUM", "PALUDARIUM", "RACK", "OTHER"])
-        .default("TERRARIUM"),
+    type: z.enum(ENCLOSURE_TYPES).default("TERRARIUM"),
     species: z.string().max(100).optional(),
     description: z.string().max(1000).optional(),
     imageUrl: z.string().url().optional(),

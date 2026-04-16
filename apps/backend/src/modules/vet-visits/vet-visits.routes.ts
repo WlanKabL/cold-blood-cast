@@ -1,5 +1,6 @@
 import { type FastifyInstance } from "fastify";
 import { z } from "zod";
+import { VET_VISIT_TYPES } from "@cold-blood-cast/shared";
 import { authGuard, emailVerifiedGuard } from "@/middleware/index.js";
 import {
     listVetVisits,
@@ -13,17 +14,7 @@ import {
     convertAppointment,
 } from "./vet-visits.service.js";
 
-const VetVisitTypeEnum = z.enum([
-    "CHECKUP",
-    "EMERGENCY",
-    "SURGERY",
-    "VACCINATION",
-    "DEWORMING",
-    "FECAL_TEST",
-    "CONSULTATION",
-    "FOLLOW_UP",
-    "OTHER",
-]);
+const VetVisitTypeEnum = z.enum(VET_VISIT_TYPES);
 
 const CreateVisitSchema = z.object({
     petId: z.string().min(1),

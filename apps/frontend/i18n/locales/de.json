@@ -1741,6 +1741,7 @@
         "back": "Zurück",
         "next": "Weiter",
         "getStarted": "Loslegen",
+        "backToChecklist": "Zurück zur Checkliste",
         "steps": {
             "enclosure": {
                 "title": "Terrarium einrichten",

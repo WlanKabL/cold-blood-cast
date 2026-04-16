@@ -28,7 +28,7 @@
             </UiTextInput>
             <UiSelect v-model="selectedType" class="w-48">
                 <option value="ALL">{{ $t("pages.sensors.allTypes") }}</option>
-                <option v-for="st in sensorTypes" :key="st" :value="st">{{ st }}</option>
+                <option v-for="st in SENSOR_TYPES" :key="st" :value="st">{{ st }}</option>
             </UiSelect>
         </div>
 
@@ -131,7 +131,7 @@
                 />
                 <div class="grid grid-cols-2 gap-3">
                     <UiSelect v-model="form.type" :label="$t('pages.sensors.fields.type')">
-                        <option v-for="st in sensorTypes" :key="st" :value="st">{{ st }}</option>
+                        <option v-for="st in SENSOR_TYPES" :key="st" :value="st">{{ st }}</option>
                     </UiSelect>
                     <UiTextInput
                         v-model="form.unit"
@@ -159,6 +159,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { SENSOR_TYPES } from "@cold-blood-cast/shared";
 
 interface Sensor {
     id: string;
@@ -182,8 +183,6 @@ const toast = useAppToast();
 
 definePageMeta({ layout: "default", middleware: ["feature-gate"], requiredFeature: "sensors" });
 useHead({ title: () => t("pages.sensors.title") });
-
-const sensorTypes = ["TEMPERATURE", "HUMIDITY", "PRESSURE", "WATER"];
 
 // ── Filters ──────────────────────────────────────────────
 const searchQuery = ref("");

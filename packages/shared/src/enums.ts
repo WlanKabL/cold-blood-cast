@@ -30,3 +30,48 @@ export type LegalDocumentKey =
     | "cookie_policy"
     | "acceptable_use_policy"
     | "refund_policy";
+
+// ─── Domain Enums (mirrored from Prisma schema) ──────────────
+
+export const ENCLOSURE_TYPES = [
+    "TERRARIUM",
+    "VIVARIUM",
+    "AQUARIUM",
+    "PALUDARIUM",
+    "RACK",
+    "OTHER",
+] as const;
+export type EnclosureType = (typeof ENCLOSURE_TYPES)[number];
+
+export const GENDERS = ["MALE", "FEMALE", "UNKNOWN"] as const;
+export type Gender = (typeof GENDERS)[number];
+
+export const SENSOR_TYPES = ["TEMPERATURE", "HUMIDITY", "PRESSURE", "WATER"] as const;
+export type SensorType = (typeof SENSOR_TYPES)[number];
+
+export const MAINTENANCE_TYPES = [
+    "CLEANING",
+    "SUBSTRATE_CHANGE",
+    "LAMP_REPLACEMENT",
+    "WATER_CHANGE",
+    "FILTER_CHANGE",
+    "DISINFECTION",
+    "OTHER",
+] as const;
+export type MaintenanceType = (typeof MAINTENANCE_TYPES)[number];
+
+export const VET_VISIT_TYPES = [
+    "CHECKUP",
+    "EMERGENCY",
+    "SURGERY",
+    "VACCINATION",
+    "DEWORMING",
+    "FECAL_TEST",
+    "CONSULTATION",
+    "FOLLOW_UP",
+    "OTHER",
+] as const;
+export type VetVisitType = (typeof VET_VISIT_TYPES)[number];
+
+export const ALERT_CONDITIONS = ["ABOVE", "BELOW", "OUTSIDE_RANGE"] as const;
+export type AlertCondition = (typeof ALERT_CONDITIONS)[number];

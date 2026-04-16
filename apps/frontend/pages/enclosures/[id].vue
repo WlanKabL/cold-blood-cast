@@ -284,7 +284,9 @@
                 />
                 <div class="grid grid-cols-2 gap-3">
                     <UiSelect v-model="editForm.type" :label="$t('pages.enclosures.fields.type')">
-                        <option v-for="et in enclosureTypes" :key="et" :value="et">{{ et }}</option>
+                        <option v-for="et in ENCLOSURE_TYPES" :key="et" :value="et">
+                            {{ et }}
+                        </option>
                     </UiSelect>
                     <UiTextInput
                         v-model="editForm.room"
@@ -355,6 +357,7 @@
 
 <script setup lang="ts">
 import { useQuery, useQueryClient, useMutation } from "@tanstack/vue-query";
+import { ENCLOSURE_TYPES } from "@cold-blood-cast/shared";
 
 interface EnclosurePet {
     id: string;
@@ -416,8 +419,6 @@ const enclosureTabs = computed(() => [
     { key: "inhabitants", label: t("pages.enclosures.tabs.inhabitants"), icon: "lucide:heart" },
     { key: "maintenance", label: t("pages.enclosures.tabs.maintenance"), icon: "lucide:wrench" },
 ]);
-
-const enclosureTypes = ["TERRARIUM", "VIVARIUM", "AQUARIUM", "PALUDARIUM", "RACK", "OTHER"];
 
 // ── Data ─────────────────────────────────────────────────
 const {

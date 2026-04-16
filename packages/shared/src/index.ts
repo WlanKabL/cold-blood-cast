@@ -37,6 +37,21 @@ export type {
     EmailStatus,
     AccessRequestStatus,
     LegalDocumentKey,
+    EnclosureType,
+    Gender,
+    SensorType,
+    MaintenanceType,
+    VetVisitType,
+    AlertCondition,
+} from "./enums.js";
+
+export {
+    ENCLOSURE_TYPES,
+    GENDERS,
+    SENSOR_TYPES,
+    MAINTENANCE_TYPES,
+    VET_VISIT_TYPES,
+    ALERT_CONDITIONS,
 } from "./enums.js";
 
 export type {
