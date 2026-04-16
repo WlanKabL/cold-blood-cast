@@ -8,14 +8,23 @@ mkdir -p /app/uploads/petPhotos /app/uploads/petDocs /app/uploads/vetDocs /app/u
 chown -R coldblood:nodejs /app/uploads
 
 # ── Run database migrations ──────────────────
-# Resolve any previously failed migrations so deploy can re-apply them.
-# This is safe: the fixed SQL is fully idempotent (IF NOT EXISTS / DO $$ guards).
-npx prisma migrate resolve --rolled-back 20260415173717_add_pet_tags_relation 2>/dev/null || true
-
 # Fail hard if migrations cannot be applied — a running server with a
 # mismatched schema causes silent data errors, which is worse than a
 # container that refuses to start.
-npx prisma migrate deploy
+#
+# If a previous deploy left a failed migration (P3009), auto-resolve it
+# and retry. This works because all migration SQL is idempotent.
+if ! npx prisma migrate deploy > /tmp/migrate_out 2>&1; then
+    if grep -q "P3009" /tmp/migrate_out; then
+        FAILED=$(grep -o '`[^`]*`' /tmp/migrate_out | head -1 | tr -d '`')
+        echo "[entrypoint] Auto-resolving failed migration: $FAILED"
+        npx prisma migrate resolve --rolled-back "$FAILED"
+        npx prisma migrate deploy
+    else
+        cat /tmp/migrate_out >&2
+        exit 1
+    fi
+fi
 
 # ── Start server as non-root user ─────────────
 exec node dist/server.js

@@ -4,6 +4,38 @@ on:
     workflow_call:
 
 jobs:
+    migrations:
+        name: Migration Validation
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_USER: test
+                    POSTGRES_PASSWORD: test
+                    POSTGRES_DB: coldbloodcast_test
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U test"
+                    --health-interval 5s
+                    --health-timeout 3s
+                    --health-retries 5
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
+
+            - name: Generate Prisma client
+              run: pnpm --filter @cold-blood-cast/backend db:generate
+
+            - name: Validate migrations (prisma migrate deploy)
+              env:
+                  DATABASE_URL: postgresql://test:test@localhost:5432/coldbloodcast_test
+              run: pnpm --filter @cold-blood-cast/backend exec prisma migrate deploy
+
     backend:
         name: Backend Tests
         runs-on: ubuntu-latest
