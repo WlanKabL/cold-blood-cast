@@ -26,12 +26,18 @@ export function computeTouchPriority(input: {
     utmMedium?: string | null;
     utmCampaign?: string | null;
     fbclid?: string | null;
+    gclid?: string | null;
     referrer?: string | null;
 }): TouchPriority {
-    const hasCampaignMarkers = !!(input.utmSource || input.utmCampaign || input.fbclid);
+    const hasCampaignMarkers = !!(
+        input.utmSource ||
+        input.utmCampaign ||
+        input.fbclid ||
+        input.gclid
+    );
     const medium = (input.utmMedium ?? "").toLowerCase();
 
-    if (hasCampaignMarkers && (PAID_MEDIUMS.has(medium) || !!input.fbclid)) {
+    if (hasCampaignMarkers && (PAID_MEDIUMS.has(medium) || !!input.fbclid || !!input.gclid)) {
         return TouchPriority.PAID_CAMPAIGN;
     }
     if (hasCampaignMarkers) {
@@ -64,6 +70,10 @@ export function normalizeLandingInput(input: LandingAttributionInput): {
     utmCampaign: string | null;
     utmContent: string | null;
     utmTerm: string | null;
+    utmId: string | null;
+    adsetId: string | null;
+    adsetName: string | null;
+    gclid: string | null;
     fbclid: string | null;
     fbc: string | null;
     fbp: string | null;
@@ -82,6 +92,10 @@ export function normalizeLandingInput(input: LandingAttributionInput): {
         utmCampaign: norm(input.utmCampaign),
         utmContent: norm(input.utmContent),
         utmTerm: norm(input.utmTerm),
+        utmId: norm(input.utmId),
+        adsetId: norm(input.adsetId),
+        adsetName: norm(input.adsetName),
+        gclid: norm(input.gclid),
         fbclid: norm(input.fbclid),
         fbc: norm(input.fbc),
         fbp: norm(input.fbp),

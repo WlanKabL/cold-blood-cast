@@ -63,6 +63,11 @@ export default defineNuxtPlugin(async () => {
     const utmCampaign = readQueryParam(params, "utm_campaign");
     const utmContent = readQueryParam(params, "utm_content");
     const utmTerm = readQueryParam(params, "utm_term");
+    // v3.1: extended attribution params
+    const utmId = readQueryParam(params, "utm_id");
+    const adsetId = readQueryParam(params, "adset_id");
+    const adsetName = readQueryParam(params, "adset_name");
+    const gclid = readQueryParam(params, "gclid");
     const fbclid = readQueryParam(params, "fbclid");
     const referrer = document.referrer && document.referrer.length > 0 ? document.referrer : undefined;
     const landingPath = url.pathname + (url.search || "");
@@ -73,6 +78,10 @@ export default defineNuxtPlugin(async () => {
         utmCampaign ||
         utmContent ||
         utmTerm ||
+        utmId ||
+        adsetId ||
+        adsetName ||
+        gclid ||
         fbclid
     );
 
@@ -90,6 +99,10 @@ export default defineNuxtPlugin(async () => {
         utmCampaign,
         utmContent,
         utmTerm,
+        utmId,
+        adsetId,
+        adsetName,
+        gclid,
         fbclid,
         referrer,
         landingPath,

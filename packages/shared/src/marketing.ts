@@ -64,6 +64,10 @@ export const landingAttributionInputSchema = z.object({
     utmCampaign: z.string().max(255).optional().nullable(),
     utmContent: z.string().max(255).optional().nullable(),
     utmTerm: z.string().max(255).optional().nullable(),
+    utmId: z.string().max(255).optional().nullable(),
+    adsetId: z.string().max(255).optional().nullable(),
+    adsetName: z.string().max(255).optional().nullable(),
+    gclid: z.string().max(512).optional().nullable(),
     fbclid: z.string().max(512).optional().nullable(),
     fbc: z.string().max(512).optional().nullable(),
     fbp: z.string().max(512).optional().nullable(),
@@ -102,6 +106,10 @@ export interface MarketingAttributionRow {
     utmCampaign: string | null;
     utmContent: string | null;
     utmTerm: string | null;
+    utmId: string | null;
+    adsetId: string | null;
+    adsetName: string | null;
+    gclid: string | null;
     fbclid: string | null;
     referrer: string | null;
     landingPath: string | null;

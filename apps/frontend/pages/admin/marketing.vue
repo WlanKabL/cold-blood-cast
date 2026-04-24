@@ -130,6 +130,9 @@
                             <th class="py-2">{{ $t("admin.marketing.user") }}</th>
                             <th class="py-2">utm_source</th>
                             <th class="py-2">utm_campaign</th>
+                            <th class="py-2">utm_content</th>
+                            <th class="py-2">adset</th>
+                            <th class="py-2">click_id</th>
                             <th class="py-2">referrer</th>
                             <th class="py-2">{{ $t("admin.marketing.boundAt") }}</th>
                         </tr>
@@ -139,6 +142,9 @@
                             <td class="py-2">{{ row.username }} <span class="text-fg-muted">({{ row.email }})</span></td>
                             <td class="py-2">{{ row.utmSource ?? "—" }}</td>
                             <td class="py-2">{{ row.utmCampaign ?? "—" }}</td>
+                            <td class="py-2 max-w-[10rem] truncate" :title="row.utmContent ?? ''">{{ row.utmContent ?? "—" }}</td>
+                            <td class="py-2 max-w-[12rem] truncate" :title="row.adsetName ?? row.adsetId ?? ''">{{ row.adsetName ?? row.adsetId ?? "—" }}</td>
+                            <td class="py-2 max-w-[8rem] truncate" :title="row.fbclid ?? row.gclid ?? ''">{{ row.fbclid ? "fb" : row.gclid ? "gcl" : "—" }}</td>
                             <td class="py-2 max-w-xs truncate">{{ row.referrer ?? "—" }}</td>
                             <td class="py-2">{{ formatDate(row.boundAt) }}</td>
                         </tr>

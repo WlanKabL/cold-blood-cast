@@ -60,6 +60,80 @@ test.describe("Marketing Attribution Flow", () => {
         expect(stored).not.toBeNull();
     });
 
+    test("v3.1: captures extended attribution params (utm_id, adset_*, gclid)", async ({
+        page,
+    }) => {
+        await page.route("**/api/marketing/landing", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: {
+                        landingSessionId: "ignored",
+                        expiresAt: new Date(Date.now() + 30 * 86400_000).toISOString(),
+                    },
+                }),
+            }),
+        );
+
+        const [landingReq] = await Promise.all([
+            page.waitForRequest(
+                (req) =>
+                    req.url().includes("/api/marketing/landing") && req.method() === "POST",
+                { timeout: 15_000 },
+            ),
+            page.goto(
+                "/?utm_source=facebook&utm_medium=paidsocial&utm_campaign=Spring%20Promo&utm_content=120210000123&utm_id=1203456789&adset_id=9988776655&adset_name=Lookalike%20DE%201&gclid=Cj0KCQiA-test",
+            ),
+        ]);
+
+        const body = landingReq.postDataJSON() as Record<string, unknown>;
+        expect(body.utmId).toBe("1203456789");
+        expect(body.adsetId).toBe("9988776655");
+        expect(body.adsetName).toBe("Lookalike DE 1");
+        expect(body.gclid).toBe("Cj0KCQiA-test");
+        // Original v1 params still flow through.
+        expect(body.utmSource).toBe("facebook");
+        expect(body.utmContent).toBe("120210000123");
+    });
+
+    test("does NOT re-POST on second landing without new markers (idempotent)", async ({
+        page,
+    }) => {
+        // Pre-seed a stored landing session so the plugin treats this as a return visit.
+        await page.addInitScript(() => {
+            window.localStorage.setItem(
+                "cbc-landing-attribution",
+                JSON.stringify({
+                    landingSessionId: "11111111-1111-4111-8111-111111111111",
+                    capturedAt: Date.now(),
+                }),
+            );
+        });
+
+        let landingPostCount = 0;
+        await page.route("**/api/marketing/landing", (route) => {
+            landingPostCount += 1;
+            return route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: {
+                        landingSessionId: "ignored",
+                        expiresAt: new Date(Date.now() + 30 * 86400_000).toISOString(),
+                    },
+                }),
+            });
+        });
+
+        await page.goto("/");
+        await page.waitForTimeout(500);
+        // No marketing markers + already-stored session → must not POST again.
+        expect(landingPostCount).toBe(0);
+    });
+
     test("registration sends landingSessionId + marketingConsent and fires Pixel with canonical eventId", async ({
         page,
     }) => {

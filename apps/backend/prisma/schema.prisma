@@ -541,6 +541,13 @@ model LandingAttribution {
     utmCampaign      String?  @map("utm_campaign")
     utmContent       String?  @map("utm_content")
     utmTerm          String?  @map("utm_term")
+    /** Meta canonical campaign id (utm_id from Meta dynamic params, kept separate from utm_campaign which often holds the human-readable name). */
+    utmId            String?  @map("utm_id")
+    /** Manually-passed adset id (Meta does not auto-fill {{adset.id}} into utm_*). */
+    adsetId          String?  @map("adset_id")
+    adsetName        String?  @map("adset_name")
+    /** Google ads click id (parallel to fbclid). */
+    gclid            String?
     fbclid           String?
     fbc              String?
     fbp              String?
@@ -554,6 +561,8 @@ model LandingAttribution {
     userAttributions UserAttribution[]
 
     @@index([utmSource, utmCampaign, utmContent])
+    @@index([utmId])
+    @@index([adsetId])
     @@index([firstSeenAt])
     @@index([expiresAt])
     @@map("landing_attributions")
