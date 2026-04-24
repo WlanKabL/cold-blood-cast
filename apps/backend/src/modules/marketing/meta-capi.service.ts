@@ -3,6 +3,7 @@
 
 import pino from "pino";
 import { env } from "@/config/env.js";
+import { getMarketingConfig } from "./marketing-config.service.js";
 import type { MetaServerEventPayload } from "./meta-payload.js";
 
 const log = pino({ name: "meta-capi" });
@@ -20,26 +21,27 @@ export async function dispatchMetaCapiEvent(
     payload: MetaServerEventPayload,
 ): Promise<MetaCapiResult> {
     const e = env();
+    const cfg = await getMarketingConfig();
 
-    if (!e.META_CAPI_ENABLED) {
+    if (!cfg.metaCapiEnabled) {
         log.debug({ eventId: payload.event_id }, "META_CAPI disabled — skip");
         return { delivered: false, skipped: true, errorCode: "DISABLED_BY_ENV" };
     }
-    if (!e.META_PIXEL_ID || !e.META_ACCESS_TOKEN) {
+    if (!cfg.metaPixelId || !cfg.metaAccessToken) {
         log.warn({ eventId: payload.event_id }, "META_CAPI enabled but credentials missing");
         return { delivered: false, skipped: true, errorCode: "MISSING_CREDENTIALS" };
     }
-    if (e.META_CAPI_DRY_RUN) {
+    if (cfg.metaCapiDryRun) {
         log.info({ eventId: payload.event_id, payload }, "META_CAPI dry-run");
         return { delivered: false, skipped: true, errorCode: "DRY_RUN" };
     }
 
-    const url = `https://graph.facebook.com/v19.0/${e.META_PIXEL_ID}/events`;
+    const url = `https://graph.facebook.com/v19.0/${cfg.metaPixelId}/events`;
     const body: Record<string, unknown> = {
         data: [payload],
-        access_token: e.META_ACCESS_TOKEN,
+        access_token: cfg.metaAccessToken,
     };
-    if (e.META_TEST_EVENT_CODE) body.test_event_code = e.META_TEST_EVENT_CODE;
+    if (cfg.metaTestEventCode) body.test_event_code = cfg.metaTestEventCode;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), e.TRACKING_DISPATCH_TIMEOUT_MS);

@@ -115,6 +115,7 @@ export {
     ATTRIBUTION_TTL_DAYS_DEFAULT,
     ACTIVATION_WINDOW_DAYS_V1,
     landingAttributionInputSchema,
+    marketingSettingsUpdateSchema,
 } from "./marketing.js";
 
 export type {
@@ -130,5 +131,11 @@ export type {
     MarketingAttributionRow,
     MarketingEventRow,
     MarketingCampaignAggregate,
+    MarketingOverviewTotals,
+    MarketingOverviewConfig,
     MarketingOverviewResponse,
+    MarketingSettingsResponse,
+    MarketingSettingsUpdateInput,
+    MarketingPublicConfig,
+    MarketingQueueHealth,
 } from "./marketing.js";

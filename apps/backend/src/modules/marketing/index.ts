@@ -14,3 +14,12 @@ export {
 } from "./marketing.queue.js";
 export { buildCanonicalEventId } from "./event-id.js";
 export { decideMarketingDispatch } from "./consent-matrix.js";
+export {
+    recordActivationEvent,
+    recordFirstCareEntryActivation,
+} from "./activation.service.js";
+export {
+    getMarketingConfig,
+    updateMarketingSettings,
+    invalidateMarketingConfigCache,
+} from "./marketing-config.service.js";

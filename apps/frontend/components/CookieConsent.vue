@@ -100,7 +100,15 @@ const COOKIE_CONSENT_VERSION = 2;
 
 function hasConsented(): boolean {
     if (!import.meta.client) return true;
-    return localStorage.getItem(COOKIE_KEY) !== null;
+    const raw = localStorage.getItem(COOKIE_KEY);
+    if (!raw) return false;
+    try {
+        const parsed = JSON.parse(raw) as { version?: number };
+        // Re-prompt when consent schema bumps (e.g. v1 → v2 added marketing flag).
+        return typeof parsed.version === "number" && parsed.version >= COOKIE_CONSENT_VERSION;
+    } catch {
+        return false;
+    }
 }
 
 function saveConsent(analyticsVal: boolean, marketingVal: boolean) {
@@ -133,6 +141,18 @@ function savePreferences() {
 
 onMounted(() => {
     if (!hasConsented()) {
+        // Pre-fill toggles from a previous (older-version) consent so the user
+        // doesn't lose their analytics preference on a schema bump.
+        const raw = localStorage.getItem(COOKIE_KEY);
+        if (raw) {
+            try {
+                const prev = JSON.parse(raw) as { analytics?: boolean; marketing?: boolean };
+                if (typeof prev.analytics === "boolean") analytics.value = prev.analytics;
+                if (typeof prev.marketing === "boolean") marketing.value = prev.marketing;
+            } catch {
+                // ignore – treat as fresh consent
+            }
+        }
         visible.value = true;
     }
 });

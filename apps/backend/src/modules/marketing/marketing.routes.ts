@@ -5,12 +5,33 @@ import type { FastifyInstance } from "fastify";
 import {
     landingAttributionInputSchema,
     type MarketingLandingResponse,
+    type MarketingPublicConfig,
 } from "@cold-blood-cast/shared";
 import { authGuard } from "@/middleware/auth.js";
-import { badRequest } from "@/helpers/index.js";
+import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import { markBrowserEventDelivered, recordLandingAttribution } from "./marketing.service.js";
+import { getMarketingConfig } from "./marketing-config.service.js";
 
 export async function marketingRoutes(fastify: FastifyInstance) {
+    // ── GET /api/marketing/config — public, used by Pixel plugin ──
+    fastify.get(
+        "/config",
+        {
+            schema: {
+                tags: ["Marketing"],
+                summary: "Public marketing config (Pixel ID + enabled flag)",
+            },
+        },
+        async (_request, reply) => {
+            const cfg = await getMarketingConfig();
+            const payload: MarketingPublicConfig = {
+                metaPixelEnabled: cfg.metaPixelEnabled,
+                metaPixelId: cfg.metaPixelId,
+            };
+            return reply.send({ success: true, data: payload });
+        },
+    );
+
     // ── POST /api/marketing/landing — anonymous, capture first-touch ──
     fastify.post(
         "/landing",
@@ -39,7 +60,10 @@ export async function marketingRoutes(fastify: FastifyInstance) {
         async (request, reply) => {
             const parsed = landingAttributionInputSchema.safeParse(request.body);
             if (!parsed.success) {
-                throw badRequest(parsed.error.issues[0]?.message ?? "Invalid landing payload");
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    parsed.error.issues[0]?.message ?? "Invalid landing payload",
+                );
             }
             const result = await recordLandingAttribution(parsed.data);
             const payload: MarketingLandingResponse = {

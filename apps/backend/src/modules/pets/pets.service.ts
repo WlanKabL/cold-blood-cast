@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound, forbidden } from "@/helpers/errors.js";
+import { recordActivationEvent } from "@/modules/marketing/index.js";
 import type { Gender } from "@prisma/client";
 
 export async function listPets(userId: string) {
@@ -80,9 +81,12 @@ export async function createPet(
             throw forbidden(ErrorCodes.E_FORBIDDEN, "Enclosure not found or not yours");
         }
     }
-    return prisma.pet.create({
+    const pet = await prisma.pet.create({
         data: { ...data, userId },
     });
+    // Best-effort activation tracking — never block pet creation.
+    void recordActivationEvent(userId, "AnimalProfileCreated", { petId: pet.id });
+    return pet;
 }
 
 export async function updatePet(

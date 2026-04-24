@@ -252,6 +252,7 @@
         "disabled": "Disabled",
         "grant": "Grant",
         "deny": "Deny",
+        "refresh": "Refresh",
         "nav": {
             "overview": "Overview",
             "content": "Content",
@@ -603,7 +604,9 @@
             "tabs": {
                 "overview": "Overview",
                 "users": "Attributed users",
-                "events": "Events"
+                "events": "Events",
+                "settings": "Settings",
+                "queue": "Queue"
             },
             "totals": {
                 "landings": "Landings (total)",
@@ -616,7 +619,28 @@
             "activated": "Activated",
             "activationRate": "Activation rate",
             "user": "User",
-            "boundAt": "Bound at"
+            "boundAt": "Bound at",
+            "settings": {
+                "title": "Marketing configuration",
+                "subtitle": "Database values override .env defaults. Leave a field empty to use the default. The CAPI access token always stays in .env for security.",
+                "pixelId": "Meta Pixel ID",
+                "pixelIdHint": "Leave empty to use the META_PIXEL_ID env value.",
+                "pixelEnabled": "Meta Pixel enabled",
+                "capiEnabled": "Meta CAPI enabled",
+                "capiDryRun": "CAPI dry-run (log only, no real dispatch)",
+                "testEventCode": "Test event code",
+                "useEnv": "Use .env default",
+                "tokenMissing": "META_ACCESS_TOKEN is not set — CAPI stays inactive even if enabled.",
+                "saved": "Settings saved"
+            },
+            "queue": {
+                "actions": "Actions",
+                "retry": "Retry",
+                "retried": "Event re-enqueued",
+                "paused": "⚠️ Queue is paused",
+                "recentFailures": "Recent failed jobs",
+                "noFailures": "No failed jobs."
+            }
         },
         "legal": {
             "title": "Legal Documents",

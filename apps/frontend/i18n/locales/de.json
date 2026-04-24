@@ -252,6 +252,7 @@
         "disabled": "Deaktiviert",
         "grant": "Gewähren",
         "deny": "Verweigern",
+        "refresh": "Aktualisieren",
         "nav": {
             "overview": "Übersicht",
             "content": "Inhalt",
@@ -603,7 +604,9 @@
             "tabs": {
                 "overview": "Übersicht",
                 "users": "Zugeordnete Nutzer",
-                "events": "Events"
+                "events": "Events",
+                "settings": "Einstellungen",
+                "queue": "Queue"
             },
             "totals": {
                 "landings": "Landings (gesamt)",
@@ -616,7 +619,28 @@
             "activated": "Aktiviert",
             "activationRate": "Aktivierungs-Rate",
             "user": "Nutzer",
-            "boundAt": "Verknüpft am"
+            "boundAt": "Verknüpft am",
+            "settings": {
+                "title": "Marketing-Konfiguration",
+                "subtitle": "Werte aus der Datenbank überschreiben die .env-Defaults. Leer lassen bedeutet 'Standard verwenden'. Der CAPI-Access-Token bleibt aus Sicherheitsgründen in der .env-Datei.",
+                "pixelId": "Meta Pixel ID",
+                "pixelIdHint": "Leer lassen, um den Wert aus META_PIXEL_ID zu verwenden.",
+                "pixelEnabled": "Meta Pixel aktiviert",
+                "capiEnabled": "Meta CAPI aktiviert",
+                "capiDryRun": "CAPI Dry-Run (nur Logging, kein echter Versand)",
+                "testEventCode": "Test-Event-Code",
+                "useEnv": "Standard aus .env",
+                "tokenMissing": "META_ACCESS_TOKEN ist nicht gesetzt — CAPI bleibt inaktiv, auch wenn aktiviert.",
+                "saved": "Einstellungen gespeichert"
+            },
+            "queue": {
+                "actions": "Aktionen",
+                "retry": "Erneut versuchen",
+                "retried": "Event neu eingereiht",
+                "paused": "⚠️ Queue ist pausiert",
+                "recentFailures": "Letzte Fehlgeschlagene Jobs",
+                "noFailures": "Keine fehlgeschlagenen Jobs."
+            }
         },
         "legal": {
             "title": "Rechtliche Dokumente",

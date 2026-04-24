@@ -89,7 +89,8 @@ export interface MarketingAttributionRow {
     userId: string;
     username: string;
     email: string;
-    signupDate: string;
+    boundAt: string;
+    landingSessionId: string;
     utmSource: string | null;
     utmMedium: string | null;
     utmCampaign: string | null;
@@ -97,40 +98,113 @@ export interface MarketingAttributionRow {
     utmTerm: string | null;
     fbclid: string | null;
     referrer: string | null;
-    activated: boolean;
-    activationDate: string | null;
+    landingPath: string | null;
+    firstSeenAt: string;
 }
 
 export interface MarketingEventRow {
     id: string;
+    userId: string | null;
+    landingSessionId: string | null;
     eventName: string;
     eventId: string;
     eventSource: MarketingEventSource;
+    consentState: MarketingConsentState;
+    metaEnabled: boolean;
     status: MarketingEventStatus;
     attemptCount: number;
-    failureReason: string | null;
     providerResponseCode: number | null;
-    nextRetryAt: string | null;
+    lastErrorCode: string | null;
+    failureReason: string | null;
+    sentAt: string | null;
     createdAt: string;
-    payloadPreview: Record<string, unknown> | null;
 }
 
 export interface MarketingCampaignAggregate {
     utmSource: string | null;
     utmCampaign: string | null;
     utmContent: string | null;
-    registrationCount: number;
-    activationCount: number;
-    activationConversionRate: number;
+    signups: number;
+    activated: number;
+    activationRate: number;
+    firstSeenAt: string;
+}
+
+export interface MarketingOverviewTotals {
+    landings: number;
+    attributedUsers: number;
+    registrationEvents: number;
+}
+
+export interface MarketingOverviewConfig {
+    metaPixelEnabled: boolean;
+    metaCapiEnabled: boolean;
+    metaCapiDryRun: boolean;
+    attributionTtlDays: number;
 }
 
 export interface MarketingOverviewResponse {
-    rangeStart: string;
-    rangeEnd: string;
-    totalRegistrations: number;
-    totalActivations: number;
-    activationConversionRate: number;
-    bySource: MarketingCampaignAggregate[];
-    byCampaign: MarketingCampaignAggregate[];
-    byContent: MarketingCampaignAggregate[];
+    totals: MarketingOverviewTotals;
+    eventStatusCounts: Record<string, number>;
+    campaigns: MarketingCampaignAggregate[];
+    config: MarketingOverviewConfig;
+}
+
+// ─── Admin: dynamic settings ────────────────────────────────
+
+export interface MarketingSettingsResponse {
+    metaPixelEnabled: boolean;
+    metaPixelId: string | null;
+    metaCapiEnabled: boolean;
+    metaCapiDryRun: boolean;
+    metaTestEventCode: string | null;
+    /** True when the field is overridden in the database (vs falling back to env). */
+    overrides: {
+        metaPixelEnabled: boolean;
+        metaPixelId: boolean;
+        metaCapiEnabled: boolean;
+        metaCapiDryRun: boolean;
+        metaTestEventCode: boolean;
+    };
+    /** Whether the CAPI access token is configured in the environment. */
+    metaAccessTokenConfigured: boolean;
+}
+
+export const marketingSettingsUpdateSchema = z.object({
+    metaPixelEnabled: z.boolean().nullable().optional(),
+    metaPixelId: z.string().max(64).nullable().optional(),
+    metaCapiEnabled: z.boolean().nullable().optional(),
+    metaCapiDryRun: z.boolean().nullable().optional(),
+    metaTestEventCode: z.string().max(64).nullable().optional(),
+});
+export type MarketingSettingsUpdateInput = z.infer<typeof marketingSettingsUpdateSchema>;
+
+// ─── Public marketing config (returned to all clients) ──────
+
+export interface MarketingPublicConfig {
+    metaPixelEnabled: boolean;
+    metaPixelId: string | null;
+}
+
+// ─── Admin: BullMQ queue health (V2 §13.4) ──────────────────
+
+export interface MarketingQueueHealth {
+    name: string;
+    counts: {
+        waiting: number;
+        active: number;
+        delayed: number;
+        completed: number;
+        failed: number;
+        paused: number;
+    };
+    paused: boolean;
+    failedJobs: Array<{
+        id: string;
+        name: string;
+        attemptsMade: number;
+        failedReason: string | null;
+        timestamp: string;
+        data: Record<string, unknown>;
+    }>;
 }

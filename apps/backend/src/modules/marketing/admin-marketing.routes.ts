@@ -2,15 +2,24 @@
 // Plan v1.7 §13.
 
 import type { FastifyInstance } from "fastify";
-import type {
-    MarketingAttributionRow,
-    MarketingCampaignAggregate,
-    MarketingEventRow,
-    MarketingOverviewResponse,
+import {
+    marketingSettingsUpdateSchema,
+    type MarketingAttributionRow,
+    type MarketingCampaignAggregate,
+    type MarketingEventRow,
+    type MarketingOverviewResponse,
+    type MarketingQueueHealth,
+    type MarketingSettingsResponse,
 } from "@cold-blood-cast/shared";
 import { prisma } from "@/config/database.js";
 import { adminGuard, authGuard } from "@/middleware/auth.js";
+import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import { env } from "@/config/env.js";
+import {
+    getMarketingConfig,
+    updateMarketingSettings,
+} from "./marketing-config.service.js";
+import { getMarketingQueue } from "./marketing.queue.js";
 
 export async function adminMarketingRoutes(fastify: FastifyInstance) {
     fastify.addHook("preHandler", authGuard);
@@ -27,6 +36,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
         },
         async (_request, reply) => {
             const e = env();
+            const cfg = await getMarketingConfig();
             const activationDays = 7;
             const now = Date.now();
             const activationCutoff = new Date(now - activationDays * 24 * 60 * 60 * 1000);
@@ -108,9 +118,9 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                 eventStatusCounts,
                 campaigns: campaignAggregates,
                 config: {
-                    metaPixelEnabled: e.META_PIXEL_ENABLED,
-                    metaCapiEnabled: e.META_CAPI_ENABLED,
-                    metaCapiDryRun: e.META_CAPI_DRY_RUN,
+                    metaPixelEnabled: cfg.metaPixelEnabled,
+                    metaCapiEnabled: cfg.metaCapiEnabled,
+                    metaCapiDryRun: cfg.metaCapiDryRun,
                     attributionTtlDays: e.TRACKING_ATTRIBUTION_TTL_DAYS,
                 },
             };
@@ -228,10 +238,10 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                 landingSessionId: e.landingSessionId,
                 eventName: e.eventName,
                 eventId: e.eventId,
-                eventSource: e.eventSource,
-                consentState: e.consentState,
+                eventSource: e.eventSource as MarketingEventRow["eventSource"],
+                consentState: e.consentState as MarketingEventRow["consentState"],
                 metaEnabled: e.metaEnabled,
-                status: e.status,
+                status: e.status as MarketingEventRow["status"],
                 attemptCount: e.attemptCount,
                 providerResponseCode: e.providerResponseCode,
                 lastErrorCode: e.lastErrorCode,
@@ -243,6 +253,159 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                 success: true,
                 data: { items: rows, total, page, pageSize },
             });
+        },
+    );
+
+    // ── GET /api/admin/marketing/settings ──
+    fastify.get(
+        "/settings",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Read dynamic marketing settings (DB overrides + env fallback)",
+            },
+        },
+        async (_request, reply) => {
+            const cfg = await getMarketingConfig({ fresh: true });
+            const response: MarketingSettingsResponse = {
+                metaPixelEnabled: cfg.metaPixelEnabled,
+                metaPixelId: cfg.metaPixelId,
+                metaCapiEnabled: cfg.metaCapiEnabled,
+                metaCapiDryRun: cfg.metaCapiDryRun,
+                metaTestEventCode: cfg.metaTestEventCode,
+                metaAccessTokenConfigured: Boolean(cfg.metaAccessToken),
+                overrides: {
+                    metaPixelEnabled: cfg.overrides["marketing.metaPixelEnabled"],
+                    metaPixelId: cfg.overrides["marketing.metaPixelId"],
+                    metaCapiEnabled: cfg.overrides["marketing.metaCapiEnabled"],
+                    metaCapiDryRun: cfg.overrides["marketing.metaCapiDryRun"],
+                    metaTestEventCode: cfg.overrides["marketing.metaTestEventCode"],
+                },
+            };
+            return reply.send({ success: true, data: response });
+        },
+    );
+
+    // ── PUT /api/admin/marketing/settings ──
+    // null clears the DB override (fall back to env). undefined leaves untouched.
+    fastify.put(
+        "/settings",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Update dynamic marketing settings",
+                body: { type: "object", additionalProperties: true },
+            },
+        },
+        async (request, reply) => {
+            const parsed = marketingSettingsUpdateSchema.safeParse(request.body);
+            if (!parsed.success) {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    parsed.error.issues[0]?.message ?? "Invalid settings payload",
+                );
+            }
+            const cfg = await updateMarketingSettings(parsed.data);
+            const response: MarketingSettingsResponse = {
+                metaPixelEnabled: cfg.metaPixelEnabled,
+                metaPixelId: cfg.metaPixelId,
+                metaCapiEnabled: cfg.metaCapiEnabled,
+                metaCapiDryRun: cfg.metaCapiDryRun,
+                metaTestEventCode: cfg.metaTestEventCode,
+                metaAccessTokenConfigured: Boolean(cfg.metaAccessToken),
+                overrides: {
+                    metaPixelEnabled: cfg.overrides["marketing.metaPixelEnabled"],
+                    metaPixelId: cfg.overrides["marketing.metaPixelId"],
+                    metaCapiEnabled: cfg.overrides["marketing.metaCapiEnabled"],
+                    metaCapiDryRun: cfg.overrides["marketing.metaCapiDryRun"],
+                    metaTestEventCode: cfg.overrides["marketing.metaTestEventCode"],
+                },
+            };
+            return reply.send({ success: true, data: response });
+        },
+    );
+
+    // ── GET /api/admin/marketing/queue-health ── (V2 §13.4)
+    fastify.get(
+        "/queue-health",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "BullMQ marketing queue health + recent failed jobs",
+            },
+        },
+        async (_request, reply) => {
+            const queue = getMarketingQueue();
+            const [counts, paused, failedJobs] = await Promise.all([
+                queue.getJobCounts(
+                    "waiting",
+                    "active",
+                    "delayed",
+                    "completed",
+                    "failed",
+                    "paused",
+                ),
+                queue.isPaused(),
+                queue.getFailed(0, 19),
+            ]);
+
+            const response: MarketingQueueHealth = {
+                name: queue.name,
+                counts: {
+                    waiting: counts.waiting ?? 0,
+                    active: counts.active ?? 0,
+                    delayed: counts.delayed ?? 0,
+                    completed: counts.completed ?? 0,
+                    failed: counts.failed ?? 0,
+                    paused: counts.paused ?? 0,
+                },
+                paused,
+                failedJobs: failedJobs.map((job) => ({
+                    id: String(job.id ?? ""),
+                    name: job.name,
+                    attemptsMade: job.attemptsMade,
+                    failedReason: job.failedReason ?? null,
+                    timestamp: new Date(job.timestamp).toISOString(),
+                    data: (job.data ?? {}) as unknown as Record<string, unknown>,
+                })),
+            };
+            return reply.send({ success: true, data: response });
+        },
+    );
+
+    // ── POST /api/admin/marketing/events/:id/retry ──
+    fastify.post(
+        "/events/:id/retry",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Re-enqueue a failed marketing event for dispatch",
+                params: {
+                    type: "object",
+                    required: ["id"],
+                    properties: { id: { type: "string" } },
+                },
+            },
+        },
+        async (request, reply) => {
+            const { id } = request.params as { id: string };
+            const event = await prisma.marketingEvent.findUnique({ where: { id } });
+            if (!event) throw badRequest(ErrorCodes.E_NOT_FOUND, "Event not found");
+            if (event.eventSource !== "server") {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    "Only server-side events can be re-dispatched",
+                );
+            }
+            await prisma.marketingEvent.update({
+                where: { id },
+                data: { status: "pending", failureReason: null, lastErrorCode: null },
+            });
+            const queue = getMarketingQueue();
+            // Remove old job (if any) so the unique jobId can be re-used.
+            await queue.remove(id).catch(() => undefined);
+            await queue.add("dispatch", { marketingEventId: id }, { jobId: id });
+            return reply.send({ success: true, data: { enqueued: true } });
         },
     );
 }

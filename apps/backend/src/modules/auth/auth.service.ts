@@ -59,7 +59,10 @@ import pino from "pino";
 
 // ─── Register ────────────────────────────────────────────────
 
-export async function registerUser(input: RegisterInput) {
+export async function registerUser(
+    input: RegisterInput,
+    ctx: { ip?: string | null; userAgent?: string | null; sourceUrl?: string | null } = {},
+) {
     // Check registration mode
     const regMode = await getSystemSetting<string>("registration_mode", "open");
 
@@ -158,7 +161,7 @@ export async function registerUser(input: RegisterInput) {
             landingSessionId: input.landingSessionId ?? null,
             requestIp: ctx.ip ?? null,
             requestUserAgent: ctx.userAgent ?? null,
-            sourceUrl: ctx.sourceUrl,
+            sourceUrl: ctx.sourceUrl ?? undefined,
         });
     } catch (err) {
         // Tracking must never block registration.

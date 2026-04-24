@@ -3,6 +3,7 @@
 
 import { randomUUID } from "node:crypto";
 import pino from "pino";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/config/database.js";
 import { env } from "@/config/env.js";
 import type {
@@ -148,7 +149,7 @@ export async function recordRegistrationEvent(
             eventSource: "server",
             metaEnabled: e.META_CAPI_ENABLED,
             consentState: ctx.consentState,
-            payload: serverPayload as object | null,
+            payload: (serverPayload as Prisma.InputJsonValue | null) ?? Prisma.JsonNull,
             status: decision.serverDispatchAllowed ? "pending" : decision.initialStatus,
             failureReason: decision.serverDispatchAllowed ? null : `consent_${ctx.consentState}`,
             lockToken: randomUUID(),
@@ -165,7 +166,7 @@ export async function recordRegistrationEvent(
             eventSource: "browser",
             metaEnabled: e.META_PIXEL_ENABLED,
             consentState: ctx.consentState,
-            payload: null,
+            payload: Prisma.JsonNull,
             status: decision.browserDispatchAllowed ? "pending" : decision.initialStatus,
             failureReason: decision.browserDispatchAllowed ? null : `consent_${ctx.consentState}`,
         },

@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound } from "@/helpers/errors.js";
+import { recordActivationEvent } from "@/modules/marketing/index.js";
 
 export async function listSheddings(
     userId: string,
@@ -59,7 +60,9 @@ export async function createShedding(
     if (!pet || pet.userId !== userId) {
         throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
     }
-    return prisma.shedding.create({ data });
+    const shedding = await prisma.shedding.create({ data });
+    void recordActivationEvent(userId, "FirstCareEntryCreated", { kind: "shedding", sheddingId: shedding.id });
+    return shedding;
 }
 
 export async function updateShedding(

@@ -1,6 +1,7 @@
 import type { VetVisitType } from "@prisma/client";
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound } from "@/helpers/errors.js";
+import { recordActivationEvent } from "@/modules/marketing/index.js";
 
 const VISIT_INCLUDE = {
     pet: { select: { id: true, name: true, species: true } },
@@ -147,6 +148,14 @@ export async function createVetVisit(
                 weightGrams: data.weightGrams,
                 notes: `Vet visit weight`,
             },
+        });
+    }
+
+    // Best-effort activation tracking — only for completed visits, not future appointments.
+    if (!data.isAppointment) {
+        void recordActivationEvent(userId, "FirstCareEntryCreated", {
+            kind: "vet_visit",
+            visitId: visit.id,
         });
     }
 

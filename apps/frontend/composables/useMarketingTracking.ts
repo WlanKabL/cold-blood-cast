@@ -8,11 +8,35 @@ export function useMarketingTracking() {
     const config = useRuntimeConfig();
     const api = useApi();
 
+    function readPixelConfig(): { enabled: boolean; pixelId: string } {
+        // Prefer the dynamic admin-managed config cached by the Meta Pixel plugin.
+        try {
+            const raw = sessionStorage.getItem("cbc-marketing-public-config");
+            if (raw) {
+                const parsed = JSON.parse(raw) as {
+                    metaPixelEnabled?: boolean;
+                    metaPixelId?: string | null;
+                };
+                if (typeof parsed.metaPixelEnabled === "boolean") {
+                    return {
+                        enabled: parsed.metaPixelEnabled,
+                        pixelId: parsed.metaPixelId ?? "",
+                    };
+                }
+            }
+        } catch {
+            // ignore
+        }
+        return {
+            enabled: !!config.public.metaPixelEnabled,
+            pixelId: String(config.public.metaPixelId || ""),
+        };
+    }
+
     function ensurePixelLoaded(): boolean {
         if (typeof window === "undefined") return false;
-        if (!config.public.metaPixelEnabled) return false;
-        const pixelId = String(config.public.metaPixelId || "");
-        if (!pixelId) return false;
+        const { enabled, pixelId } = readPixelConfig();
+        if (!enabled || !pixelId) return false;
         if (!window.fbq) loadMetaPixel(pixelId);
         return !!window.fbq;
     }

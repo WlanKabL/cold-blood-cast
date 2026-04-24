@@ -51,12 +51,80 @@ function readMarketingConsentFromStorage(): boolean {
     }
 }
 
-export default defineNuxtPlugin(() => {
+const PUBLIC_CONFIG_CACHE_KEY = "cbc-marketing-public-config";
+const PUBLIC_CONFIG_CACHE_TTL_MS = 5 * 60 * 1000;
+
+interface CachedPublicConfig {
+    metaPixelEnabled: boolean;
+    metaPixelId: string | null;
+    cachedAt: number;
+}
+
+async function loadPublicConfig(
+    apiBaseURL: string,
+    fallbackEnabled: boolean,
+    fallbackPixelId: string,
+): Promise<{ enabled: boolean; pixelId: string }> {
+    // sessionStorage cache so we don't hit the API on every navigation.
+    try {
+        const cached = sessionStorage.getItem(PUBLIC_CONFIG_CACHE_KEY);
+        if (cached) {
+            const parsed = JSON.parse(cached) as CachedPublicConfig;
+            if (Date.now() - parsed.cachedAt < PUBLIC_CONFIG_CACHE_TTL_MS) {
+                return {
+                    enabled: parsed.metaPixelEnabled,
+                    pixelId: parsed.metaPixelId ?? "",
+                };
+            }
+        }
+    } catch {
+        // ignore
+    }
+    try {
+        const res = await fetch(`${apiBaseURL}/api/marketing/config`, {
+            credentials: "include",
+        });
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const body = (await res.json()) as {
+            success: boolean;
+            data: { metaPixelEnabled: boolean; metaPixelId: string | null };
+        };
+        if (body.success) {
+            const cache: CachedPublicConfig = {
+                metaPixelEnabled: body.data.metaPixelEnabled,
+                metaPixelId: body.data.metaPixelId,
+                cachedAt: Date.now(),
+            };
+            try {
+                sessionStorage.setItem(PUBLIC_CONFIG_CACHE_KEY, JSON.stringify(cache));
+            } catch {
+                // ignore quota errors
+            }
+            return {
+                enabled: body.data.metaPixelEnabled,
+                pixelId: body.data.metaPixelId ?? "",
+            };
+        }
+    } catch {
+        // fall through to env-based fallback
+    }
+    return { enabled: fallbackEnabled, pixelId: fallbackPixelId };
+}
+
+export default defineNuxtPlugin(async () => {
     if (import.meta.server) return;
     const config = useRuntimeConfig();
-    const enabled = !!config.public.metaPixelEnabled;
-    const pixelId = String(config.public.metaPixelId || "");
-    if (!enabled || !pixelId) return;
+    const apiBaseURL = String(config.public.apiBaseURL || "");
+    const fallbackEnabled = !!config.public.metaPixelEnabled;
+    const fallbackPixelId = String(config.public.metaPixelId || "");
+
     if (!readMarketingConsentFromStorage()) return;
+
+    const { enabled, pixelId } = await loadPublicConfig(
+        apiBaseURL,
+        fallbackEnabled,
+        fallbackPixelId,
+    );
+    if (!enabled || !pixelId) return;
     loadMetaPixel(pixelId);
 });

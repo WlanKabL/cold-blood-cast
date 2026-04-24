@@ -161,6 +161,7 @@
                             <th class="py-2">attempts</th>
                             <th class="py-2">created_at</th>
                             <th class="py-2">last_error</th>
+                            <th class="py-2 text-right">{{ $t("admin.marketing.queue.actions") }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,9 +173,207 @@
                             <td class="py-2">{{ row.attemptCount }}</td>
                             <td class="py-2">{{ formatDate(row.createdAt) }}</td>
                             <td class="py-2 text-rose-400">{{ row.lastErrorCode ?? "—" }}</td>
+                            <td class="py-2 text-right">
+                                <button
+                                    v-if="row.status === 'failed' && row.eventSource === 'server'"
+                                    type="button"
+                                    class="text-xs text-emerald-400 hover:text-emerald-300 disabled:opacity-50"
+                                    :disabled="retryingId === row.id"
+                                    @click="retryEvent(row.id)"
+                                >
+                                    {{
+                                        retryingId === row.id
+                                            ? $t("common.loading")
+                                            : $t("admin.marketing.queue.retry")
+                                    }}
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Settings tab -->
+        <div v-if="tabIndex === 3" class="space-y-4">
+            <div v-if="settingsLoading" class="text-fg-muted text-sm">
+                {{ $t("common.loading") }}
+            </div>
+            <div v-else-if="settings" class="glass-card max-w-2xl space-y-5 p-5">
+                <div>
+                    <h2 class="text-fg text-sm font-semibold">
+                        {{ $t("admin.marketing.settings.title") }}
+                    </h2>
+                    <p class="text-fg-muted mt-1 text-xs">
+                        {{ $t("admin.marketing.settings.subtitle") }}
+                    </p>
+                </div>
+
+                <!-- Pixel ID -->
+                <div class="space-y-1">
+                    <label class="text-fg block text-sm font-medium">
+                        {{ $t("admin.marketing.settings.pixelId") }}
+                    </label>
+                    <input
+                        v-model="settingsForm.metaPixelId"
+                        type="text"
+                        :placeholder="settings.metaPixelId ?? '—'"
+                        class="border-line bg-card-bg text-fg w-full rounded-lg border px-3 py-2 text-sm"
+                    />
+                    <p class="text-fg-soft text-[11px]">
+                        {{ $t("admin.marketing.settings.pixelIdHint") }}
+                    </p>
+                </div>
+
+                <!-- Pixel enabled tri-state -->
+                <div class="space-y-1">
+                    <label class="text-fg block text-sm font-medium">
+                        {{ $t("admin.marketing.settings.pixelEnabled") }}
+                    </label>
+                    <select
+                        v-model="settingsForm.metaPixelEnabled"
+                        class="border-line bg-card-bg text-fg w-full rounded-lg border px-3 py-2 text-sm"
+                    >
+                        <option :value="null">
+                            {{ $t("admin.marketing.settings.useEnv") }}
+                        </option>
+                        <option :value="true">{{ $t("common.enabled") }}</option>
+                        <option :value="false">{{ $t("common.disabled") }}</option>
+                    </select>
+                </div>
+
+                <!-- CAPI enabled -->
+                <div class="space-y-1">
+                    <label class="text-fg block text-sm font-medium">
+                        {{ $t("admin.marketing.settings.capiEnabled") }}
+                    </label>
+                    <select
+                        v-model="settingsForm.metaCapiEnabled"
+                        class="border-line bg-card-bg text-fg w-full rounded-lg border px-3 py-2 text-sm"
+                    >
+                        <option :value="null">
+                            {{ $t("admin.marketing.settings.useEnv") }}
+                        </option>
+                        <option :value="true">{{ $t("common.enabled") }}</option>
+                        <option :value="false">{{ $t("common.disabled") }}</option>
+                    </select>
+                    <p
+                        v-if="!settings.metaAccessTokenConfigured"
+                        class="text-amber-400 text-[11px]"
+                    >
+                        {{ $t("admin.marketing.settings.tokenMissing") }}
+                    </p>
+                </div>
+
+                <!-- CAPI dry run -->
+                <div class="space-y-1">
+                    <label class="text-fg block text-sm font-medium">
+                        {{ $t("admin.marketing.settings.capiDryRun") }}
+                    </label>
+                    <select
+                        v-model="settingsForm.metaCapiDryRun"
+                        class="border-line bg-card-bg text-fg w-full rounded-lg border px-3 py-2 text-sm"
+                    >
+                        <option :value="null">
+                            {{ $t("admin.marketing.settings.useEnv") }}
+                        </option>
+                        <option :value="true">{{ $t("common.enabled") }}</option>
+                        <option :value="false">{{ $t("common.disabled") }}</option>
+                    </select>
+                </div>
+
+                <!-- Test event code -->
+                <div class="space-y-1">
+                    <label class="text-fg block text-sm font-medium">
+                        {{ $t("admin.marketing.settings.testEventCode") }}
+                    </label>
+                    <input
+                        v-model="settingsForm.metaTestEventCode"
+                        type="text"
+                        :placeholder="settings.metaTestEventCode ?? '—'"
+                        class="border-line bg-card-bg text-fg w-full rounded-lg border px-3 py-2 text-sm"
+                    />
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button
+                        type="button"
+                        class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50"
+                        :disabled="settingsSaving"
+                        @click="saveSettings"
+                    >
+                        {{ settingsSaving ? $t("common.loading") : $t("common.save") }}
+                    </button>
+                    <button
+                        type="button"
+                        class="border-line text-fg-muted hover:bg-hover rounded-lg border px-4 py-2 text-sm transition"
+                        @click="loadSettings"
+                    >
+                        {{ $t("common.cancel") }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Queue tab -->
+        <div v-if="tabIndex === 4" class="space-y-4">
+            <div v-if="queueLoading" class="text-fg-muted text-sm">{{ $t("common.loading") }}</div>
+            <div v-else-if="queueHealth" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                    <div
+                        v-for="(count, key) in queueHealth.counts"
+                        :key="key"
+                        class="glass-card p-3"
+                    >
+                        <p class="text-fg-muted text-[11px] uppercase">{{ key }}</p>
+                        <p class="text-fg text-xl font-bold">{{ count }}</p>
+                    </div>
+                </div>
+                <div v-if="queueHealth.paused" class="text-amber-400 text-sm">
+                    {{ $t("admin.marketing.queue.paused") }}
+                </div>
+                <div class="glass-card overflow-x-auto p-4">
+                    <h2 class="text-fg mb-3 text-sm font-semibold">
+                        {{ $t("admin.marketing.queue.recentFailures") }}
+                    </h2>
+                    <div
+                        v-if="queueHealth.failedJobs.length === 0"
+                        class="text-fg-muted text-xs"
+                    >
+                        {{ $t("admin.marketing.queue.noFailures") }}
+                    </div>
+                    <table v-else class="w-full text-left text-xs">
+                        <thead class="text-fg-muted">
+                            <tr>
+                                <th class="py-2">job_id</th>
+                                <th class="py-2">attempts</th>
+                                <th class="py-2">timestamp</th>
+                                <th class="py-2">reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="job in queueHealth.failedJobs"
+                                :key="job.id"
+                                class="border-line border-t"
+                            >
+                                <td class="py-2 font-mono">{{ job.id }}</td>
+                                <td class="py-2">{{ job.attemptsMade }}</td>
+                                <td class="py-2">{{ formatDate(job.timestamp) }}</td>
+                                <td class="py-2 text-rose-400 max-w-md truncate">
+                                    {{ job.failedReason ?? "—" }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button
+                    type="button"
+                    class="border-line text-fg-muted hover:bg-hover rounded-lg border px-3 py-1.5 text-xs"
+                    @click="loadQueueHealth"
+                >
+                    {{ $t("common.refresh") }}
+                </button>
             </div>
         </div>
     </div>
@@ -185,17 +384,23 @@ import type {
     MarketingOverviewResponse,
     MarketingAttributionRow,
     MarketingEventRow,
+    MarketingSettingsResponse,
+    MarketingSettingsUpdateInput,
+    MarketingQueueHealth,
 } from "@cold-blood-cast/shared";
 
 definePageMeta({ layout: "admin" });
 
 const api = useApi();
+const toast = useAppToast();
 const { t } = useI18n();
 
 const tabs = computed(() => [
     { label: t("admin.marketing.tabs.overview") },
     { label: t("admin.marketing.tabs.users") },
     { label: t("admin.marketing.tabs.events") },
+    { label: t("admin.marketing.tabs.settings") },
+    { label: t("admin.marketing.tabs.queue") },
 ]);
 const tabIndex = ref(0);
 
@@ -205,6 +410,29 @@ const users = ref<{ items: MarketingAttributionRow[]; total: number } | null>(nu
 const usersLoading = ref(false);
 const events = ref<{ items: MarketingEventRow[]; total: number } | null>(null);
 const eventsLoading = ref(false);
+
+// ── Settings tab state ──
+const settings = ref<MarketingSettingsResponse | null>(null);
+const settingsLoading = ref(false);
+const settingsSaving = ref(false);
+const settingsForm = reactive<{
+    metaPixelEnabled: boolean | null;
+    metaPixelId: string;
+    metaCapiEnabled: boolean | null;
+    metaCapiDryRun: boolean | null;
+    metaTestEventCode: string;
+}>({
+    metaPixelEnabled: null,
+    metaPixelId: "",
+    metaCapiEnabled: null,
+    metaCapiDryRun: null,
+    metaTestEventCode: "",
+});
+
+// ── Queue tab state ──
+const queueHealth = ref<MarketingQueueHealth | null>(null);
+const queueLoading = ref(false);
+const retryingId = ref<string | null>(null);
 
 async function loadOverview() {
     overviewLoading.value = true;
@@ -237,10 +465,89 @@ async function loadEvents() {
     }
 }
 
+async function loadSettings() {
+    settingsLoading.value = true;
+    try {
+        const res = await api.get<MarketingSettingsResponse>("/api/admin/marketing/settings");
+        settings.value = res;
+        settingsForm.metaPixelEnabled = res.overrides.metaPixelEnabled
+            ? res.metaPixelEnabled
+            : null;
+        settingsForm.metaPixelId = res.overrides.metaPixelId ? (res.metaPixelId ?? "") : "";
+        settingsForm.metaCapiEnabled = res.overrides.metaCapiEnabled ? res.metaCapiEnabled : null;
+        settingsForm.metaCapiDryRun = res.overrides.metaCapiDryRun ? res.metaCapiDryRun : null;
+        settingsForm.metaTestEventCode = res.overrides.metaTestEventCode
+            ? (res.metaTestEventCode ?? "")
+            : "";
+    } finally {
+        settingsLoading.value = false;
+    }
+}
+
+async function saveSettings() {
+    settingsSaving.value = true;
+    try {
+        const payload: MarketingSettingsUpdateInput = {
+            metaPixelEnabled: settingsForm.metaPixelEnabled,
+            metaPixelId:
+                settingsForm.metaPixelId.trim().length > 0 ? settingsForm.metaPixelId.trim() : null,
+            metaCapiEnabled: settingsForm.metaCapiEnabled,
+            metaCapiDryRun: settingsForm.metaCapiDryRun,
+            metaTestEventCode:
+                settingsForm.metaTestEventCode.trim().length > 0
+                    ? settingsForm.metaTestEventCode.trim()
+                    : null,
+        };
+        const res = await api.put<MarketingSettingsResponse>(
+            "/api/admin/marketing/settings",
+            payload,
+        );
+        settings.value = res;
+        toast.success(t("admin.marketing.settings.saved"));
+        // Refresh overview KPI badges and clear sessionStorage so next page load reads fresh values.
+        try {
+            sessionStorage.removeItem("cbc-marketing-public-config");
+        } catch {
+            // ignore
+        }
+        await loadOverview();
+    } catch (err) {
+        toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+        settingsSaving.value = false;
+    }
+}
+
+async function loadQueueHealth() {
+    queueLoading.value = true;
+    try {
+        queueHealth.value = await api.get<MarketingQueueHealth>(
+            "/api/admin/marketing/queue-health",
+        );
+    } finally {
+        queueLoading.value = false;
+    }
+}
+
+async function retryEvent(eventId: string) {
+    retryingId.value = eventId;
+    try {
+        await api.post(`/api/admin/marketing/events/${eventId}/retry`);
+        toast.success(t("admin.marketing.queue.retried"));
+        await Promise.all([loadEvents(), loadQueueHealth()]);
+    } catch (err) {
+        toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+        retryingId.value = null;
+    }
+}
+
 watch(tabIndex, (idx) => {
     if (idx === 0 && !overview.value) loadOverview();
     if (idx === 1 && !users.value) loadUsers();
     if (idx === 2 && !events.value) loadEvents();
+    if (idx === 3 && !settings.value) loadSettings();
+    if (idx === 4 && !queueHealth.value) loadQueueHealth();
 });
 
 function formatDate(s: string): string {
