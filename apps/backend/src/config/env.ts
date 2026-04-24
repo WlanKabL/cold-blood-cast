@@ -80,6 +80,10 @@ const envSchema = z.object({
     TRACKING_RETRY_BASE_DELAY_MS: z.coerce.number().int().min(100).default(5000),
     TRACKING_DISPATCH_TIMEOUT_MS: z.coerce.number().int().min(500).default(5000),
     TRACKING_EVENT_RETENTION_DAYS: z.coerce.number().int().positive().default(180),
+    // V3: KPI calculation window for "activated" users (signup → first qualifying event)
+    TRACKING_ACTIVATION_WINDOW_DAYS: z.coerce.number().int().positive().max(365).default(7),
+    // V3: Audience export retention (CSV files on disk)
+    TRACKING_AUDIENCE_EXPORT_RETENTION_DAYS: z.coerce.number().int().positive().default(30),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -12,6 +12,7 @@ const SETTING_KEYS = [
     "marketing.metaCapiDryRun",
     "marketing.metaPixelId",
     "marketing.metaTestEventCode",
+    "marketing.activationWindowDays",
 ] as const;
 
 export type MarketingSettingKey = (typeof SETTING_KEYS)[number];
@@ -24,6 +25,8 @@ export interface MarketingConfig {
     metaCapiEnabled: boolean;
     metaCapiDryRun: boolean;
     metaTestEventCode: string | null;
+    // ── V3: KPI window for activation cohorts (days after signup) ──
+    activationWindowDays: number;
     // ── Secret (env-only, never returned via public endpoint) ──
     metaAccessToken: string | null;
     // ── Source bookkeeping for the admin UI ──
@@ -39,6 +42,12 @@ function parseBool(raw: string | undefined, fallback: boolean): boolean {
     if (TRUE_STRINGS.has(v)) return true;
     if (FALSE_STRINGS.has(v)) return false;
     return fallback;
+}
+
+function parseInt10(raw: string | undefined, fallback: number): number {
+    if (raw === undefined) return fallback;
+    const n = Number.parseInt(raw, 10);
+    return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
 let cache: { value: MarketingConfig; loadedAt: number } | null = null;
@@ -68,6 +77,10 @@ export async function getMarketingConfig(opts?: { fresh?: boolean }): Promise<Ma
         metaCapiDryRun: parseBool(dbMap.get("marketing.metaCapiDryRun"), e.META_CAPI_DRY_RUN),
         metaTestEventCode:
             dbMap.get("marketing.metaTestEventCode") ?? e.META_TEST_EVENT_CODE ?? null,
+        activationWindowDays: parseInt10(
+            dbMap.get("marketing.activationWindowDays"),
+            e.TRACKING_ACTIVATION_WINDOW_DAYS,
+        ),
         metaAccessToken: e.META_ACCESS_TOKEN ?? null,
         overrides: {
             "marketing.metaPixelEnabled": has("marketing.metaPixelEnabled"),
@@ -75,6 +88,7 @@ export async function getMarketingConfig(opts?: { fresh?: boolean }): Promise<Ma
             "marketing.metaCapiDryRun": has("marketing.metaCapiDryRun"),
             "marketing.metaPixelId": has("marketing.metaPixelId"),
             "marketing.metaTestEventCode": has("marketing.metaTestEventCode"),
+            "marketing.activationWindowDays": has("marketing.activationWindowDays"),
         },
     };
 
@@ -88,6 +102,7 @@ export interface MarketingSettingsUpdate {
     metaCapiEnabled?: boolean | null;
     metaCapiDryRun?: boolean | null;
     metaTestEventCode?: string | null;
+    activationWindowDays?: number | null;
 }
 
 const KEY_MAP: Record<keyof MarketingSettingsUpdate, MarketingSettingKey> = {
@@ -96,6 +111,7 @@ const KEY_MAP: Record<keyof MarketingSettingsUpdate, MarketingSettingKey> = {
     metaCapiEnabled: "marketing.metaCapiEnabled",
     metaCapiDryRun: "marketing.metaCapiDryRun",
     metaTestEventCode: "marketing.metaTestEventCode",
+    activationWindowDays: "marketing.activationWindowDays",
 };
 
 /**
@@ -118,7 +134,7 @@ export async function updateMarketingSettings(
             ops.push(prisma.systemSetting.deleteMany({ where: { key } }));
             continue;
         }
-        const stringValue = typeof value === "boolean" ? String(value) : value.trim();
+        const stringValue = typeof value === "boolean" ? String(value) : String(value).trim();
         if (stringValue.length === 0) {
             ops.push(prisma.systemSetting.deleteMany({ where: { key } }));
             continue;

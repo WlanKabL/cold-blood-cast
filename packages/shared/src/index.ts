@@ -114,8 +114,15 @@ export {
     ATTRIBUTION_MODELS,
     ATTRIBUTION_TTL_DAYS_DEFAULT,
     ACTIVATION_WINDOW_DAYS_V1,
+    HIGH_VALUE_EVENT_NAMES,
+    AUDIENCE_EXPORT_FORMATS,
+    AUDIENCE_EXPORT_STATUSES,
+    AUDIENCE_SYNC_PROVIDERS,
     landingAttributionInputSchema,
     marketingSettingsUpdateSchema,
+    recordHighValueEventSchema,
+    audienceExportFilterSchema,
+    createAudienceExportSchema,
 } from "./marketing.js";
 
 export type {
@@ -138,4 +145,14 @@ export type {
     MarketingSettingsUpdateInput,
     MarketingPublicConfig,
     MarketingQueueHealth,
+    HighValueEventName,
+    RecordHighValueEventInput,
+    AudienceExportFormat,
+    AudienceExportStatus,
+    AudienceExportFilter,
+    CreateAudienceExportInput,
+    AudienceExportRow,
+    MarketingRoiCampaignRow,
+    MarketingRoiReport,
+    AudienceSyncProvider,
 } from "./marketing.js";

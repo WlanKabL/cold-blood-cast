@@ -3,7 +3,9 @@
 
 import type { FastifyInstance } from "fastify";
 import {
+    createAudienceExportSchema,
     marketingSettingsUpdateSchema,
+    recordHighValueEventSchema,
     type MarketingAttributionRow,
     type MarketingCampaignAggregate,
     type MarketingEventRow,
@@ -20,6 +22,17 @@ import {
     updateMarketingSettings,
 } from "./marketing-config.service.js";
 import { getMarketingQueue } from "./marketing.queue.js";
+import { recordHighValueEvent } from "./high-value-events.service.js";
+import {
+    createAudienceExport,
+    deleteAudienceExport,
+    findExportByToken,
+    listAudienceExports,
+} from "./audience-export.service.js";
+import { buildRoiReport } from "./roi-report.service.js";
+import { getAudienceSyncProvider } from "./audience-sync.service.js";
+import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
 
 export async function adminMarketingRoutes(fastify: FastifyInstance) {
     fastify.addHook("preHandler", authGuard);
@@ -37,9 +50,8 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
         async (_request, reply) => {
             const e = env();
             const cfg = await getMarketingConfig();
-            const activationDays = 7;
-            const now = Date.now();
-            const activationCutoff = new Date(now - activationDays * 24 * 60 * 60 * 1000);
+            const activationDays = cfg.activationWindowDays;
+            const windowMs = activationDays * 24 * 60 * 60 * 1000;
 
             const [totalLandings, totalAttributed, registrationsTotal, eventStats, campaigns] =
                 await Promise.all([
@@ -82,8 +94,9 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                     first: row.boundAt,
                 };
                 entry.signups += 1;
+                const cutoff = new Date(row.boundAt.getTime() + windowMs);
                 const activated = row.user.activationEvents.some(
-                    (a) => a.occurredAt >= row.boundAt && a.occurredAt <= activationCutoff,
+                    (a) => a.occurredAt >= row.boundAt && a.occurredAt <= cutoff,
                 );
                 if (activated) entry.activated += 1;
                 if (row.boundAt < entry.first) entry.first = row.boundAt;
@@ -122,6 +135,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                     metaCapiEnabled: cfg.metaCapiEnabled,
                     metaCapiDryRun: cfg.metaCapiDryRun,
                     attributionTtlDays: e.TRACKING_ATTRIBUTION_TTL_DAYS,
+                    activationWindowDays: cfg.activationWindowDays,
                 },
             };
             return reply.send({ success: true, data: response });
@@ -273,6 +287,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                 metaCapiEnabled: cfg.metaCapiEnabled,
                 metaCapiDryRun: cfg.metaCapiDryRun,
                 metaTestEventCode: cfg.metaTestEventCode,
+                activationWindowDays: cfg.activationWindowDays,
                 metaAccessTokenConfigured: Boolean(cfg.metaAccessToken),
                 overrides: {
                     metaPixelEnabled: cfg.overrides["marketing.metaPixelEnabled"],
@@ -280,6 +295,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                     metaCapiEnabled: cfg.overrides["marketing.metaCapiEnabled"],
                     metaCapiDryRun: cfg.overrides["marketing.metaCapiDryRun"],
                     metaTestEventCode: cfg.overrides["marketing.metaTestEventCode"],
+                    activationWindowDays: cfg.overrides["marketing.activationWindowDays"],
                 },
             };
             return reply.send({ success: true, data: response });
@@ -312,6 +328,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                 metaCapiEnabled: cfg.metaCapiEnabled,
                 metaCapiDryRun: cfg.metaCapiDryRun,
                 metaTestEventCode: cfg.metaTestEventCode,
+                activationWindowDays: cfg.activationWindowDays,
                 metaAccessTokenConfigured: Boolean(cfg.metaAccessToken),
                 overrides: {
                     metaPixelEnabled: cfg.overrides["marketing.metaPixelEnabled"],
@@ -319,6 +336,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                     metaCapiEnabled: cfg.overrides["marketing.metaCapiEnabled"],
                     metaCapiDryRun: cfg.overrides["marketing.metaCapiDryRun"],
                     metaTestEventCode: cfg.overrides["marketing.metaTestEventCode"],
+                    activationWindowDays: cfg.overrides["marketing.activationWindowDays"],
                 },
             };
             return reply.send({ success: true, data: response });
@@ -406,6 +424,189 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
             await queue.remove(id).catch(() => undefined);
             await queue.add("dispatch", { marketingEventId: id }, { jobId: id });
             return reply.send({ success: true, data: { enqueued: true } });
+        },
+    );
+
+    // ── GET /api/admin/marketing/reports/roi ── (V3 §23)
+    fastify.get(
+        "/reports/roi",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Per-campaign ROI report (signups, activation, revenue)",
+                querystring: {
+                    type: "object",
+                    properties: {
+                        from: { type: "string", format: "date-time" },
+                        to: { type: "string", format: "date-time" },
+                    },
+                },
+            },
+        },
+        async (request, reply) => {
+            const { from, to } = request.query as { from?: string; to?: string };
+            const report = await buildRoiReport({
+                cohortFrom: from ? new Date(from) : null,
+                cohortTo: to ? new Date(to) : null,
+            });
+            return reply.send({ success: true, data: report });
+        },
+    );
+
+    // ── POST /api/admin/marketing/high-value-events ── (V3 §23)
+    // Manual recording / hook endpoint for delayed conversion feedback.
+    fastify.post(
+        "/high-value-events",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Record a high-value conversion event for a user",
+                body: { type: "object", additionalProperties: true },
+            },
+        },
+        async (request, reply) => {
+            const parsed = recordHighValueEventSchema.safeParse(request.body);
+            if (!parsed.success) {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    parsed.error.issues[0]?.message ?? "Invalid high-value payload",
+                );
+            }
+            const result = await recordHighValueEvent(parsed.data);
+            return reply.send({ success: true, data: result });
+        },
+    );
+
+    // ── POST /api/admin/marketing/audience-exports ── (V3 §23)
+    fastify.post(
+        "/audience-exports",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Create a hashed-audience export (CSV/JSON) for ad platforms",
+                body: { type: "object", additionalProperties: true },
+            },
+        },
+        async (request, reply) => {
+            const parsed = createAudienceExportSchema.safeParse(request.body);
+            if (!parsed.success) {
+                throw badRequest(
+                    ErrorCodes.E_VALIDATION_ERROR,
+                    parsed.error.issues[0]?.message ?? "Invalid export payload",
+                );
+            }
+            const userId = request.userId;
+            if (!userId) throw badRequest(ErrorCodes.E_FORBIDDEN, "No user context");
+            const row = await createAudienceExport(parsed.data, userId);
+            return reply.send({ success: true, data: row });
+        },
+    );
+
+    // ── GET /api/admin/marketing/audience-exports ──
+    fastify.get(
+        "/audience-exports",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "List recent audience exports",
+            },
+        },
+        async (_request, reply) => {
+            const items = await listAudienceExports();
+            return reply.send({ success: true, data: { items } });
+        },
+    );
+
+    // ── DELETE /api/admin/marketing/audience-exports/:id ──
+    fastify.delete(
+        "/audience-exports/:id",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Delete an audience export and its file",
+                params: {
+                    type: "object",
+                    required: ["id"],
+                    properties: { id: { type: "string" } },
+                },
+            },
+        },
+        async (request, reply) => {
+            const { id } = request.params as { id: string };
+            const ok = await deleteAudienceExport(id);
+            if (!ok) throw badRequest(ErrorCodes.E_NOT_FOUND, "Export not found");
+            return reply.send({ success: true, data: { deleted: true } });
+        },
+    );
+
+    // ── GET /api/admin/marketing/audience-exports/download/:token ──
+    // Token-protected so download links can be shared internally without
+    // re-authenticating; admin guard still applies because the route is
+    // registered under the admin prefix.
+    fastify.get(
+        "/audience-exports/download/:token",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Stream an audience export file",
+                params: {
+                    type: "object",
+                    required: ["token"],
+                    properties: { token: { type: "string", minLength: 16 } },
+                },
+            },
+        },
+        async (request, reply) => {
+            const { token } = request.params as { token: string };
+            const found = await findExportByToken(token);
+            if (!found) throw badRequest(ErrorCodes.E_NOT_FOUND, "Export not available");
+            const fileStat = await stat(found.filePath).catch(() => null);
+            if (!fileStat) throw badRequest(ErrorCodes.E_NOT_FOUND, "File missing on disk");
+            reply.header(
+                "Content-Type",
+                found.format === "csv" ? "text/csv; charset=utf-8" : "application/json",
+            );
+            reply.header("Content-Disposition", `attachment; filename="${found.fileName}"`);
+            reply.header("Content-Length", fileStat.size);
+            return reply.send(createReadStream(found.filePath));
+        },
+    );
+
+    // ── POST /api/admin/marketing/audience-exports/:id/sync ── (V3 §23)
+    // Provider-stub. Returns 501-style payload until a real upload is wired.
+    fastify.post(
+        "/audience-exports/:id/sync",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Sync an export to an ad platform (stub)",
+                params: {
+                    type: "object",
+                    required: ["id"],
+                    properties: { id: { type: "string" } },
+                },
+                body: { type: "object", additionalProperties: true },
+            },
+        },
+        async (request, reply) => {
+            const { id } = request.params as { id: string };
+            const body = (request.body ?? {}) as { provider?: string; options?: Record<string, unknown> };
+            const providerName = (body.provider ?? "meta_custom_audience") as
+                | "meta_custom_audience";
+            const provider = getAudienceSyncProvider(providerName);
+            if (!provider) {
+                throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Unknown sync provider");
+            }
+            const row = await prisma.audienceExport.findUnique({ where: { id } });
+            if (!row || !row.filePath) throw badRequest(ErrorCodes.E_NOT_FOUND, "Export not ready");
+            const result = await provider.sync({
+                exportId: row.id,
+                filePath: row.filePath,
+                format: row.format as "csv" | "json",
+                rowCount: row.rowCount,
+                options: body.options,
+            });
+            return reply.send({ success: true, data: result });
         },
     );
 }

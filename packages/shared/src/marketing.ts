@@ -6,7 +6,13 @@ import { z } from "zod";
 
 // ─── Event names (taxonomy) ─────────────────────────────────
 
-export const MARKETING_EVENT_NAMES = ["PageView", "CompleteRegistration"] as const;
+export const MARKETING_EVENT_NAMES = [
+    "PageView",
+    "CompleteRegistration",
+    // V3: high-value conversion events (delayed feedback to Meta)
+    "Subscribe",
+    "Purchase",
+] as const;
 export type MarketingEventName = (typeof MARKETING_EVENT_NAMES)[number];
 
 /** Activation events allowed to count toward v1 KPI calculations (Phase 2). */
@@ -141,6 +147,7 @@ export interface MarketingOverviewConfig {
     metaCapiEnabled: boolean;
     metaCapiDryRun: boolean;
     attributionTtlDays: number;
+    activationWindowDays: number;
 }
 
 export interface MarketingOverviewResponse {
@@ -158,6 +165,7 @@ export interface MarketingSettingsResponse {
     metaCapiEnabled: boolean;
     metaCapiDryRun: boolean;
     metaTestEventCode: string | null;
+    activationWindowDays: number;
     /** True when the field is overridden in the database (vs falling back to env). */
     overrides: {
         metaPixelEnabled: boolean;
@@ -165,6 +173,7 @@ export interface MarketingSettingsResponse {
         metaCapiEnabled: boolean;
         metaCapiDryRun: boolean;
         metaTestEventCode: boolean;
+        activationWindowDays: boolean;
     };
     /** Whether the CAPI access token is configured in the environment. */
     metaAccessTokenConfigured: boolean;
@@ -176,6 +185,7 @@ export const marketingSettingsUpdateSchema = z.object({
     metaCapiEnabled: z.boolean().nullable().optional(),
     metaCapiDryRun: z.boolean().nullable().optional(),
     metaTestEventCode: z.string().max(64).nullable().optional(),
+    activationWindowDays: z.number().int().positive().max(365).nullable().optional(),
 });
 export type MarketingSettingsUpdateInput = z.infer<typeof marketingSettingsUpdateSchema>;
 
@@ -208,3 +218,105 @@ export interface MarketingQueueHealth {
         data: Record<string, unknown>;
     }>;
 }
+
+// ─── V3: high-value conversion events ───────────────────────
+
+/** v3 events that are dispatched server-side with monetary value. */
+export const HIGH_VALUE_EVENT_NAMES = ["Subscribe", "Purchase"] as const;
+export type HighValueEventName = (typeof HIGH_VALUE_EVENT_NAMES)[number];
+
+export const recordHighValueEventSchema = z.object({
+    userId: z.string().min(1),
+    eventName: z.enum(HIGH_VALUE_EVENT_NAMES),
+    value: z.number().nonnegative(),
+    currency: z.string().length(3).toUpperCase(),
+    /** Provider-side dedup id (e.g. Stripe charge id). Optional. */
+    externalId: z.string().max(128).optional().nullable(),
+});
+export type RecordHighValueEventInput = z.infer<typeof recordHighValueEventSchema>;
+
+// ─── V3: audience export ────────────────────────────────────
+
+export const AUDIENCE_EXPORT_FORMATS = ["csv", "json"] as const;
+export type AudienceExportFormat = (typeof AUDIENCE_EXPORT_FORMATS)[number];
+
+export const AUDIENCE_EXPORT_STATUSES = ["pending", "ready", "failed", "expired"] as const;
+export type AudienceExportStatus = (typeof AUDIENCE_EXPORT_STATUSES)[number];
+
+/** Filter spec for an audience export. All fields are optional ANDs. */
+export const audienceExportFilterSchema = z.object({
+    /** Only include users activated within the activation window. */
+    activatedOnly: z.boolean().optional(),
+    /** Only include users with at least one high-value event. */
+    highValueOnly: z.boolean().optional(),
+    utmSource: z.string().max(255).optional().nullable(),
+    utmCampaign: z.string().max(255).optional().nullable(),
+    utmContent: z.string().max(255).optional().nullable(),
+    /** ISO date — include users signed up on or after this date. */
+    signedUpFrom: z.string().datetime().optional().nullable(),
+    /** ISO date — include users signed up on or before this date. */
+    signedUpTo: z.string().datetime().optional().nullable(),
+});
+export type AudienceExportFilter = z.infer<typeof audienceExportFilterSchema>;
+
+export const createAudienceExportSchema = z.object({
+    name: z.string().min(1).max(120),
+    format: z.enum(AUDIENCE_EXPORT_FORMATS).default("csv"),
+    filter: audienceExportFilterSchema,
+});
+export type CreateAudienceExportInput = z.infer<typeof createAudienceExportSchema>;
+
+export interface AudienceExportRow {
+    id: string;
+    name: string;
+    format: AudienceExportFormat;
+    status: AudienceExportStatus;
+    rowCount: number;
+    filter: AudienceExportFilter;
+    error: string | null;
+    createdById: string;
+    createdAt: string;
+    expiresAt: string | null;
+    /** Tokenised download URL (only present while status='ready' and not expired). */
+    downloadUrl: string | null;
+}
+
+// ─── V3: ROI report ─────────────────────────────────────────
+
+export interface MarketingRoiCampaignRow {
+    utmSource: string | null;
+    utmCampaign: string | null;
+    utmContent: string | null;
+    signups: number;
+    activated: number;
+    activationRate: number;
+    /** Count of high-value events tied to users in this campaign. */
+    highValueEvents: number;
+    /** Sum of `value` of all high-value events for this campaign (single currency only). */
+    revenue: number;
+    currency: string | null;
+    /** Revenue per signup. */
+    revenuePerSignup: number;
+}
+
+export interface MarketingRoiReport {
+    activationWindowDays: number;
+    /** ISO range start (UTC) for the cohort; null = all-time. */
+    cohortFrom: string | null;
+    /** ISO range end (UTC); null = now. */
+    cohortTo: string | null;
+    totals: {
+        signups: number;
+        activated: number;
+        highValueEvents: number;
+        revenue: number;
+        currency: string | null;
+    };
+    campaigns: MarketingRoiCampaignRow[];
+}
+
+// ─── V3: Audience sync provider abstraction ─────────────────
+
+/** Stable identifier for an audience-sync provider (e.g. Meta Custom Audiences). */
+export const AUDIENCE_SYNC_PROVIDERS = ["meta_custom_audience"] as const;
+export type AudienceSyncProvider = (typeof AUDIENCE_SYNC_PROVIDERS)[number];

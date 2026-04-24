@@ -586,6 +586,9 @@ model MarketingEvent {
     metaEnabled          Boolean   @default(false) @map("meta_enabled")
     consentState         String    @map("consent_state")
     payload              Json?
+    // ── V3: monetary value for ROI / high-value events ──
+    value                Float?
+    currency             String?   @db.VarChar(3)
     status               String    @default("pending")
     attemptCount         Int       @default(0) @map("attempt_count")
     nextRetryAt          DateTime? @map("next_retry_at")
@@ -622,6 +625,27 @@ model UserActivationEvent {
     @@index([userId, activationType])
     @@index([occurredAt])
     @@map("user_activation_events")
+}
+
+// ─── V3: Marketing audience exports (Custom Audience prep) ──
+model AudienceExport {
+    id           String    @id @default(cuid())
+    name         String
+    format       String    @default("csv") // csv | json
+    filterJson   Json      @map("filter_json")
+    rowCount     Int       @default(0) @map("row_count")
+    filePath     String?   @map("file_path")
+    downloadToken String?  @unique @map("download_token")
+    status       String    @default("pending") // pending | ready | failed | expired
+    error        String?
+    createdById  String    @map("created_by_id")
+    createdAt    DateTime  @default(now()) @map("created_at")
+    expiresAt    DateTime? @map("expires_at")
+
+    @@index([createdById])
+    @@index([status])
+    @@index([createdAt])
+    @@map("audience_exports")
 }
 
 // ==========================================

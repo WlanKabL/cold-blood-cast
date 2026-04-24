@@ -33,8 +33,10 @@ export interface BuildMetaPayloadInput {
         fbp?: string | null;
         landingPath?: string | null;
     } | null;
-    request: { ip?: string | null; userAgent?: string | null };
+    request?: { ip?: string | null; userAgent?: string | null };
     sourceUrl?: string;
+    /** V3: monetary or other custom_data fields (e.g. value, currency). */
+    customData?: Record<string, unknown>;
 }
 
 /** SHA-256 lowercase trim hash per Meta CAPI spec. */
@@ -49,10 +51,10 @@ export function buildMetaServerEventPayload(input: BuildMetaPayloadInput): MetaS
     };
     if (input.landing?.fbc) userData.fbc = input.landing.fbc;
     if (input.landing?.fbp) userData.fbp = input.landing.fbp;
-    if (input.request.ip) userData.client_ip_address = input.request.ip;
-    if (input.request.userAgent) userData.client_user_agent = input.request.userAgent;
+    if (input.request?.ip) userData.client_ip_address = input.request.ip;
+    if (input.request?.userAgent) userData.client_user_agent = input.request.userAgent;
 
-    return {
+    const payload: MetaServerEventPayload = {
         event_name: input.eventName,
         event_time: Math.floor(input.eventTime.getTime() / 1000),
         event_id: input.eventId,
@@ -60,4 +62,8 @@ export function buildMetaServerEventPayload(input: BuildMetaPayloadInput): MetaS
         event_source_url: input.sourceUrl,
         user_data: userData,
     };
+    if (input.customData && Object.keys(input.customData).length > 0) {
+        payload.custom_data = input.customData;
+    }
+    return payload;
 }

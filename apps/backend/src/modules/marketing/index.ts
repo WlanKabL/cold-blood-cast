@@ -23,3 +23,16 @@ export {
     updateMarketingSettings,
     invalidateMarketingConfigCache,
 } from "./marketing-config.service.js";
+export { recordHighValueEvent } from "./high-value-events.service.js";
+export {
+    createAudienceExport,
+    listAudienceExports,
+    findExportByToken,
+    deleteAudienceExport,
+    expireOldAudienceExports,
+} from "./audience-export.service.js";
+export {
+    registerAudienceSyncProvider,
+    getAudienceSyncProvider,
+} from "./audience-sync.service.js";
+export { buildRoiReport } from "./roi-report.service.js";

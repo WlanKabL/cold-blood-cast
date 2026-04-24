@@ -606,7 +606,9 @@
                 "users": "Zugeordnete Nutzer",
                 "events": "Events",
                 "settings": "Einstellungen",
-                "queue": "Queue"
+                "queue": "Queue",
+                "reports": "Reports",
+                "audiences": "Audiences"
             },
             "totals": {
                 "landings": "Landings (gesamt)",
@@ -631,7 +633,9 @@
                 "testEventCode": "Test-Event-Code",
                 "useEnv": "Standard aus .env",
                 "tokenMissing": "META_ACCESS_TOKEN ist nicht gesetzt — CAPI bleibt inaktiv, auch wenn aktiviert.",
-                "saved": "Einstellungen gespeichert"
+                "saved": "Einstellungen gespeichert",
+                "activationWindowDays": "Aktivierungs-Fenster (Tage)",
+                "activationWindowDaysHint": "Anzahl Tage nach Registrierung, in denen ein Aktivierungs-Event als 'aktiviert' zählt. Leer lassen für Standardwert (Env)."
             },
             "queue": {
                 "actions": "Aktionen",
@@ -640,6 +644,33 @@
                 "paused": "⚠️ Queue ist pausiert",
                 "recentFailures": "Letzte Fehlgeschlagene Jobs",
                 "noFailures": "Keine fehlgeschlagenen Jobs."
+            },
+            "reports": {
+                "signups": "Signups",
+                "activated": "Aktiviert",
+                "highValueEvents": "High-Value-Events",
+                "revenue": "Umsatz",
+                "revenuePerSignup": "Umsatz / Signup",
+                "activationWindowDays": "Aktivierungs-Fenster (Tage)",
+                "perCampaign": "Pro Kampagne",
+                "empty": "Keine Daten im gewählten Zeitraum."
+            },
+            "audiences": {
+                "createTitle": "Audience-Export erstellen",
+                "createSubtitle": "Erzeugt eine Datei mit SHA-256-gehashten E-Mails — kompatibel mit Meta Custom Audiences. Klartext-E-Mails werden nie exportiert.",
+                "namePlaceholder": "Audience-Name (z. B. 'Aktivierte Trial-Nutzer Q1')",
+                "activatedOnly": "Nur aktivierte Nutzer",
+                "highValueOnly": "Nur Nutzer mit High-Value-Events",
+                "create": "Export starten",
+                "created": "Audience-Export erstellt",
+                "name": "Name",
+                "rowCount": "Zeilen",
+                "expiresAt": "Läuft ab",
+                "download": "Download",
+                "sync": "Sync",
+                "syncOk": "Audience an Provider übermittelt",
+                "syncStub": "Audience-Sync ist noch nicht implementiert. Bitte CSV manuell hochladen.",
+                "empty": "Noch keine Audience-Exporte erstellt."
             }
         },
         "legal": {
