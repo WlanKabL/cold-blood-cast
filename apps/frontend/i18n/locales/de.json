@@ -93,21 +93,11 @@
         "necessary": "Notwendig",
         "necessaryDesc": "Erforderlich für Login und Kernfunktionalität. Kann nicht deaktiviert werden.",
         "analytics": "Analyse",
-        "analyticsDesc": "Hilft uns zu verstehen, wie KeeperLog genutzt wird, um das Produkt zu verbessern.",
+        "analyticsDesc": "Hilft uns zu verstehen, wie Cold Blood Cast genutzt wird, um das Produkt zu verbessern.",
+        "marketing": "Marketing",
+        "marketingDesc": "Erlaubt das Messen unserer Werbekampagnen (z. B. Meta Pixel). Ohne Zustimmung wird kein Pixel geladen.",
         "alwaysOn": "Immer aktiv",
         "revoke": "Cookie-Einstellungen"
-    },
-    "cookie_consent": {
-        "title": "Cookies & Tracking",
-        "message": "Wir verwenden Cookies, um Cold Blood Cast zu betreiben und – wenn du zustimmst – unsere Reichweite zu messen.",
-        "essential": "Notwendig",
-        "essential_desc": "Login, Sicherheit und Kernfunktionen. Kann nicht deaktiviert werden.",
-        "analytics": "Analyse",
-        "analytics_desc": "Hilft uns zu verstehen, wie die Seite genutzt wird.",
-        "marketing": "Marketing",
-        "marketing_desc": "Erlaubt das Messen unserer Werbekampagnen (z. B. Meta Pixel).",
-        "accept_all": "Alle akzeptieren",
-        "save_preferences": "Einstellungen speichern"
     },
     "common": {
         "loading": "Laden...",

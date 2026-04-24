@@ -903,6 +903,9 @@ async function requestAccountDeletion() {
 
 // ── Cookie Preferences ──
 function revokeCookieConsent() {
+    // Clear both the current and the legacy storage key so the banner re-prompts
+    // regardless of which schema version was previously stored.
+    localStorage.removeItem("cbc-cookie-consent");
     localStorage.removeItem("kl_cookie_consent");
     window.location.reload();
 }
