@@ -6,19 +6,19 @@
 
 ## Events (v1)
 
-| Event Name             | Trigger                                    | Server Dispatch | Browser Dispatch |
-| ---------------------- | ------------------------------------------ | --------------- | ---------------- |
-| `CompleteRegistration` | Successful signup (after user creation)    | ✅ Meta CAPI    | ✅ Meta Pixel    |
-| `PageView`             | (reserved, not yet emitted)                | —               | —                |
+| Event Name             | Trigger                                 | Server Dispatch | Browser Dispatch |
+| ---------------------- | --------------------------------------- | --------------- | ---------------- |
+| `CompleteRegistration` | Successful signup (after user creation) | ✅ Meta CAPI    | ✅ Meta Pixel    |
+| `PageView`             | (reserved, not yet emitted)             | —               | —                |
 
 ## Activation events (internal, not sent to Meta in v1)
 
 These power the activation-rate KPI in the admin dashboard.
 
-| Type                   | Trigger                                                     |
-| ---------------------- | ----------------------------------------------------------- |
-| `AnimalProfileCreated` | First pet created for a user                                |
-| `FirstCareEntryCreated`| First feeding / weight / shedding / care entry              |
+| Type                    | Trigger                                        |
+| ----------------------- | ---------------------------------------------- |
+| `AnimalProfileCreated`  | First pet created for a user                   |
+| `FirstCareEntryCreated` | First feeding / weight / shedding / care entry |
 
 Activation window: **7 days** after signup (`ACTIVATION_WINDOW_DAYS_V1`).
 

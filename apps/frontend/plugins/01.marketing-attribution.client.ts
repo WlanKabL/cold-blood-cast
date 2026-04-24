@@ -69,7 +69,8 @@ export default defineNuxtPlugin(async () => {
     const adsetName = readQueryParam(params, "adset_name");
     const gclid = readQueryParam(params, "gclid");
     const fbclid = readQueryParam(params, "fbclid");
-    const referrer = document.referrer && document.referrer.length > 0 ? document.referrer : undefined;
+    const referrer =
+        document.referrer && document.referrer.length > 0 ? document.referrer : undefined;
     const landingPath = url.pathname + (url.search || "");
 
     const hasAnyMarketingMarker = !!(

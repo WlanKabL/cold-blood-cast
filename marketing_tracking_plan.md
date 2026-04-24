@@ -1,6 +1,9 @@
 # PLAN.md
+
 # KeeperLog Marketing Tracking & Attribution System
+
 # v1.7 Execution Plan for Claude
+
 # Target: KeeperLog first, reusable later for ZentraX
 
 ---
@@ -20,6 +23,7 @@ The purpose is to build a clean, maintainable, privacy-aware marketing data back
 - How can the same system later be reused for ZentraX?
 
 This plan is written so Claude can:
+
 - audit the real codebase first
 - refine implementation details based on repository reality
 - implement the system in phases
@@ -29,6 +33,7 @@ This plan is written so Claude can:
 - document tradeoffs and constraints
 
 This revision explicitly removes ambiguity around:
+
 - deduplication
 - consent gating
 - attribution rules
@@ -43,6 +48,7 @@ This revision explicitly removes ambiguity around:
 ### 1.1 Primary business goal
 
 Build a first-party attribution and marketing event system that allows KeeperLog to:
+
 - measure ad performance beyond clicks
 - tie registrations and activation events to acquisition source
 - improve Meta optimization over time
@@ -51,6 +57,7 @@ Build a first-party attribution and marketing event system that allows KeeperLog
 ### 1.2 Technical goals
 
 Build a reusable tracking layer that:
+
 - captures attribution data on landing
 - persists attribution through signup
 - emits browser and server events in a deduplicated way
@@ -61,6 +68,7 @@ Build a reusable tracking layer that:
 ### 1.3 Non-goals for v1
 
 Do **not** build in v1:
+
 - full BI platform
 - full multi-touch attribution
 - automatic audience sync
@@ -76,7 +84,9 @@ Do **not** build in v1:
 ## 2. Scope strategy
 
 ### Phase 1 = required foundation
+
 Must exist before anything else:
+
 - UTM capture
 - fbclid capture
 - session-level attribution persistence
@@ -89,7 +99,9 @@ Must exist before anything else:
 - consent-aware send/skip logic
 
 ### Phase 2 = quality / activation signal
+
 After Phase 1 works:
+
 - activation events
 - richer attribution table views
 - event retry and delivery monitoring
@@ -97,7 +109,9 @@ After Phase 1 works:
 - campaign quality analysis based on activation, not just registration
 
 ### Phase 3 = scaling features
+
 Only after data quality exists:
+
 - custom audience preparation
 - advanced value events
 - audience sync workflows
@@ -111,6 +125,7 @@ Only after data quality exists:
 Claude must follow these rules.
 
 ### 3.1 Architecture principles
+
 - Keep business logic separated from transport logic
 - Keep Meta integration isolated behind service interfaces
 - Keep event models strongly typed
@@ -122,6 +137,7 @@ Claude must follow these rules.
 - Make every meaningful state transition observable and auditable
 
 ### 3.2 DRY rules
+
 - Do not duplicate attribution parsing logic across frontend and backend
 - Do not duplicate event payload building in multiple places
 - Centralize Meta payload creation
@@ -130,6 +146,7 @@ Claude must follow these rules.
 - Reuse event type definitions, enums, and interfaces
 
 ### 3.3 Maintainability rules
+
 - No giant god service
 - No hidden background magic without logs
 - No “just throw everything into middleware”
@@ -138,7 +155,9 @@ Claude must follow these rules.
 - Prefer small focused services over one mega “tracking manager”
 
 ### 3.4 Testing expectations
+
 At minimum:
+
 - unit tests for attribution parsing
 - unit tests for first-touch prioritization
 - unit tests for event_id generation
@@ -153,6 +172,7 @@ At minimum:
 ## 4. Required feature set
 
 ### 4.1 Attribution capture on landing
+
 On first landing, capture and persist if available:
 
 - `utm_source`
@@ -167,35 +187,44 @@ On first landing, capture and persist if available:
 - generated internal `landing_session_id`
 
 Preferred storage strategy:
+
 - first-party cookie or equivalent first-party storage
 - backend persistence once session attribution is registered or bound during signup
 
 ### 4.2 Browser-side tracking
+
 For consented marketing users:
+
 - Meta Pixel page view
 - Meta Pixel `CompleteRegistration`
 - future Pixel activation events
 
 ### 4.3 Server-side tracking
+
 On backend:
+
 - Conversions API `CompleteRegistration`
 - future activation events
 - proper deduplication support
 - request logging and retry-safe persistence
 
 ### 4.4 Deduplication (binding rule, no ambiguity)
+
 This is mandatory and no alternative strategy should be implemented in v1.
 
 #### Rule
+
 For any deduplicated marketing event pair (browser + server):
+
 - there is exactly **one logical event**
 - there is exactly **one canonical event_id**
 - that event_id is generated **server-side only**
 - the same event_id is used by:
-  - server-side Conversions API event
-  - browser-side Pixel event
+    - server-side Conversions API event
+    - browser-side Pixel event
 
 #### Canonical algorithm (required)
+
 The v1 event_id algorithm is:
 
 - namespace: fixed UUID namespace constant defined in code and documentation
@@ -204,22 +233,28 @@ The v1 event_id algorithm is:
 - event_id = UUIDv5(namespace, input string)
 
 #### Required ordering
+
 The concatenation order must always be:
+
 1. registration_transaction_id
 2. user_id
 3. event_name
 
 #### Constraints
+
 - `registration_transaction_id` must be stable and idempotent for the successful registration flow
 - `user_id` must be the final persisted user identifier
 - the frontend must never generate a substitute event_id
 - the frontend must only use the canonical event_id returned by the backend
 
 #### Goal
+
 One registration must never become two logical registrations due to race conditions, retries, or inconsistent event_id generation.
 
 ### 4.5 User-level attribution
+
 When a new user signs up, bind:
+
 - user ID
 - landing_session_id
 - captured UTM data
@@ -227,14 +262,17 @@ When a new user signs up, bind:
 - first-touch attribution timestamp
 
 For v1:
+
 - only first-touch attribution
 - no last-touch model
 - no multi-touch model
 
 ### 4.6 Event storage
+
 Create an internal marketing event table for outgoing marketing events.
 
 Must include:
+
 - internal row ID
 - user ID nullable
 - landing_session_id nullable
@@ -255,9 +293,11 @@ Must include:
 - created_at / updated_at
 
 ### 4.7 Internal dashboard
+
 Build an internal admin dashboard showing at minimum:
 
 #### Users table
+
 - user id
 - signup date
 - acquisition source
@@ -268,6 +308,7 @@ Build an internal admin dashboard showing at minimum:
 - activation date if available
 
 #### Events table
+
 - event type
 - event_id
 - status
@@ -279,6 +320,7 @@ Build an internal admin dashboard showing at minimum:
 - next retry at
 
 #### Campaign view
+
 - grouped by source/campaign/content
 - registrations count
 - activation count
@@ -292,16 +334,19 @@ This is mandatory.
 Do not improvise event names across the system.
 
 ### 5.1 v1 events
+
 - `PageView`
 - `CompleteRegistration`
 
 ### 5.2 v2 KeeperLog activation events
+
 Only the following events are allowed to count as **qualifying activation events** for v1 KPI calculations:
 
 - `AnimalProfileCreated`
 - `FirstCareEntryCreated`
 
 ### 5.3 Optional later activation events
+
 These may be added later, but do **not** count toward v1 KPI definitions unless the plan is explicitly revised:
 
 - `FirstFeedingLogged`
@@ -309,7 +354,9 @@ These may be added later, but do **not** count toward v1 KPI definitions unless 
 - `PublicProfileShared`
 
 ### 5.4 Event naming rules
+
 Event names must be:
+
 - stable
 - human-readable
 - product-safe
@@ -323,24 +370,31 @@ Event names must be:
 This section is binding for v1.
 
 ### 6.1 Attribution model
+
 Use **first-touch attribution only** in v1.
 
 ### 6.2 First-touch overwrite policy
+
 Never overwrite a valid first-touch attribution with:
+
 - `direct`
 - `none`
 - empty UTM set
 - no-referrer fallback traffic
 
 ### 6.3 TTL for landing attribution
+
 Landing attribution TTL:
+
 - default: **30 days**
 
 After TTL expiry:
+
 - a new valid attributed landing may create a new landing attribution record
 - but existing bound user attribution must not be retroactively changed
 
 ### 6.4 Priority order for candidate touches
+
 When multiple candidate touches occur before signup and first-touch is not yet bound, prioritize:
 
 1. paid traffic with valid campaign markers (`utm_source`, `utm_campaign`, or `fbclid`)
@@ -349,12 +403,16 @@ When multiple candidate touches occur before signup and first-touch is not yet b
 4. direct / none
 
 ### 6.5 Signup binding rule
+
 At signup:
+
 - bind the earliest still-valid highest-priority first-touch attribution candidate
 - once bound, do not replace it in v1
 
 ### 6.6 Timezone rule
+
 All attribution timestamps and dashboard cohorting in v1:
+
 - stored in UTC
 - dashboard grouping default = UTC
 
@@ -366,7 +424,9 @@ This is mandatory and must be implemented explicitly.
 Do not leave this implicit in helper logic.
 
 ### 7.1 Consent states
+
 Supported states:
+
 - `granted`
 - `denied`
 - `unknown`
@@ -374,14 +434,15 @@ Supported states:
 
 ### 7.2 Rules by state
 
-| Consent state | Internal attribution storage | Browser Pixel event | Server CAPI event | marketing_events row | Send status |
-|---|---|---|---|---|---|
-| granted | yes | yes | yes | yes | pending/sent/failed |
-| denied | restricted operational fields only | no | no | yes if internal audit trail is needed | skipped |
-| unknown | restricted operational fields only | no | no | yes if internal audit trail is needed | skipped |
-| revoked | restricted operational fields only for new internal records; no new dispatch | no | no | yes if internal audit trail is needed | skipped |
+| Consent state | Internal attribution storage                                                 | Browser Pixel event | Server CAPI event | marketing_events row                  | Send status         |
+| ------------- | ---------------------------------------------------------------------------- | ------------------- | ----------------- | ------------------------------------- | ------------------- |
+| granted       | yes                                                                          | yes                 | yes               | yes                                   | pending/sent/failed |
+| denied        | restricted operational fields only                                           | no                  | no                | yes if internal audit trail is needed | skipped             |
+| unknown       | restricted operational fields only                                           | no                  | no                | yes if internal audit trail is needed | skipped             |
+| revoked       | restricted operational fields only for new internal records; no new dispatch | no                  | no                | yes if internal audit trail is needed | skipped             |
 
 ### 7.3 Allowed field set for denied / unknown / revoked
+
 When consent is not granted, the system may only persist the following minimum operational fields in `marketing_events`:
 
 - internal row ID
@@ -406,11 +467,13 @@ The following fields must **not** be stored in marketing-dispatch records for de
 - any marketing-ready external identifier
 
 ### 7.4 Operational interpretation
+
 - internal operational logging may exist in a restricted form if necessary for product operation, fraud prevention, or security analysis
 - optional marketing dispatch to Meta must never happen without the allowed consent state under your legal model
 - consent state at event generation time must be stored with the event record
 
 ### 7.5 Claude requirement
+
 Claude must not invent broader marketing dispatch permissions than defined here.
 Any implementation uncertainty must be documented clearly.
 
@@ -421,7 +484,9 @@ Any implementation uncertainty must be documented clearly.
 Claude should adapt to actual repo/database style, but the v1 schema should conceptually include:
 
 ### 8.1 Table: `landing_attributions`
+
 Fields:
+
 - id
 - landing_session_id
 - utm_source
@@ -440,13 +505,16 @@ Fields:
 - updated_at
 
 #### Required constraints/indexes
+
 - unique: `landing_session_id`
 - index: `utm_source`, `utm_campaign`, `utm_content`
 - index: `first_seen_at`
 - index: `expires_at`
 
 ### 8.2 Table: `user_attributions`
+
 Fields:
+
 - id
 - user_id
 - landing_attribution_id
@@ -456,12 +524,15 @@ Fields:
 - updated_at
 
 #### Required constraints/indexes
+
 - unique: `user_id`, `attribution_model`
 - index: `landing_attribution_id`
 - index: `bound_at`
 
 ### 8.3 Table: `marketing_events`
+
 Fields:
+
 - id
 - user_id nullable
 - landing_session_id nullable
@@ -484,6 +555,7 @@ Fields:
 - updated_at
 
 #### Required constraints/indexes
+
 - required unique safeguard: `event_name`, `event_id`, `event_source`
 - index: `status`, `next_retry_at`
 - index: `user_id`
@@ -492,7 +564,9 @@ Fields:
 - index: `event_name`, `status`
 
 ### 8.4 Table: `user_activation_events`
+
 Fields:
+
 - id
 - user_id
 - activation_type
@@ -501,6 +575,7 @@ Fields:
 - created_at
 
 #### Required constraints/indexes
+
 - index: `user_id`, `activation_type`
 - index: `occurred_at`
 
@@ -509,7 +584,9 @@ Fields:
 ## 9. Frontend requirements
 
 ### 9.1 Landing capture logic
+
 On first app entry / landing page:
+
 - parse URL params
 - capture UTM params and fbclid
 - generate `landing_session_id` if absent
@@ -519,14 +596,18 @@ On first app entry / landing page:
 - expose helper for backend sync if needed
 
 ### 9.2 Registration flow integration
+
 On successful signup:
+
 - ensure attribution is linked or resolvable
 - use backend-provided canonical `event_id`
 - trigger browser tracking only if consent state = granted
 - do not fire browser registration event with locally invented fallback IDs
 
 ### 9.3 Consent integration
+
 Frontend must know:
+
 - whether marketing tracking is allowed
 - whether to skip Pixel entirely
 - whether to suppress optional marketing identifier persistence
@@ -536,14 +617,18 @@ Frontend must know:
 ## 10. Backend requirements
 
 ### 10.1 Attribution binding endpoint or registration integration
+
 Backend must:
+
 - receive or resolve landing attribution
 - persist it
 - bind it to the new user
 - record registration event in `marketing_events`
 
 ### 10.2 Meta Conversions API service
+
 Create a dedicated service/module:
+
 - isolated from controllers
 - typed payload mapping
 - retry-aware
@@ -553,11 +638,14 @@ Create a dedicated service/module:
 - dry-run capable
 
 ### 10.3 Event queue strategy
+
 For v1:
+
 - DB-backed queue only
 - no external broker
 
 Recommended behavior:
+
 - registration writes marketing event row
 - send attempt may occur synchronously only if safe
 - failures remain in DB
@@ -565,6 +653,7 @@ Recommended behavior:
 - processing lock must prevent duplicate worker handling
 
 ### 10.4 Retry strategy
+
 - limited retry count
 - exponential backoff or bounded retry schedule
 - clear failure statuses
@@ -577,11 +666,14 @@ Recommended behavior:
 ## 11. Meta-specific implementation notes
 
 ### 11.1 Deduplication
+
 Use one shared canonical event identity for browser + server registration events.
 No alternative dedup pattern is allowed in v1.
 
 ### 11.2 Matching parameters
+
 Where legally and technically allowed, support fields such as:
+
 - external_id
 - fbc
 - fbp
@@ -593,6 +685,7 @@ Do not blindly send everything.
 Only send what is justified, documented, and supported by your legal and consent model.
 
 ### 11.3 Dynamic parameter usage
+
 The system must work with ad URLs containing campaign/content/source parameters.
 Do not hardcode one ad platform forever.
 Store normalized attribution fields in your own schema.
@@ -604,11 +697,13 @@ Store normalized attribution fields in your own schema.
 ### 12.1 v1 dashboard pages
 
 #### Page A: Attribution overview
+
 - signups by source
 - signups by campaign
 - signups by content / creative
 
 #### Page B: User attribution list
+
 - searchable table
 - filters
 - signup date
@@ -616,6 +711,7 @@ Store normalized attribution fields in your own schema.
 - activation status
 
 #### Page C: Event delivery list
+
 - event_name
 - event_id
 - status
@@ -625,18 +721,20 @@ Store normalized attribution fields in your own schema.
 - next_retry_at
 
 ### 12.2 KPI definitions (binding for v1)
+
 To avoid ambiguity, define v1 KPIs as:
 
 - **Registration count** = users created during selected UTC date range
 - **Activation count** = users with one of the allowed v1 qualifying activation events within **7 days after signup**
 - **Allowed v1 qualifying activation events**:
-  - `AnimalProfileCreated`
-  - `FirstCareEntryCreated`
+    - `AnimalProfileCreated`
+    - `FirstCareEntryCreated`
 - **Activation conversion rate** = activation count / registration count
 - **Campaign cohorting** = grouped by `signup_date` in UTC
 - **Attribution grouping** = first-touch attribution only
 
 ### 12.3 Nice-to-have later
+
 - time series charts
 - activation funnel
 - audience export prep
@@ -652,6 +750,7 @@ Claude must not assume tracking is always allowed.
 Implementation must be consent-aware.
 
 At minimum:
+
 - if marketing consent is missing, browser Meta tracking must not fire
 - if server-side marketing event sending is not allowed under the consent model, it must not dispatch
 - internal audit/event records may still exist in restricted form, but must be clearly separated from ad-platform dispatch semantics
@@ -669,6 +768,7 @@ This feature changes KeeperLog’s legal surface area.
 Claude must leave clear notes for required documentation updates.
 
 At minimum these legal areas will need review and likely updates:
+
 - Privacy Policy
 - Cookie Policy
 - consent banner / consent manager configuration
@@ -676,6 +776,7 @@ At minimum these legal areas will need review and likely updates:
 - internal records of processing if you maintain them
 
 Claude does not need to draft final legal text, but must document:
+
 - what data is captured
 - what identifiers are stored
 - what is sent to Meta
@@ -688,12 +789,14 @@ Claude does not need to draft final legal text, but must document:
 ## 15. Logging and observability
 
 Must have:
+
 - structured logs for attribution binding
 - structured logs for event dispatch
 - failure reason capture
 - admin visibility for failure states
 
 Should have:
+
 - environment flag to disable Meta sending in non-prod
 - dry-run mode for payload validation
 - payload redaction for sensitive fields in logs
@@ -705,12 +808,14 @@ Should have:
 This plan is KeeperLog-first, but architecture must support ZentraX later.
 
 That means:
+
 - do not hardcode animal-specific assumptions into the tracking core
 - keep product-specific activation events modular
 - shared tracking core should support multiple products
 - product-specific event definitions can extend a shared event system
 
 Suggested structure:
+
 - shared attribution core
 - KeeperLog event mappings
 - future ZentraX event mappings
@@ -747,8 +852,10 @@ Claude must not jump straight into coding.
 Claude must follow this order:
 
 ### Step 1
+
 Audit the existing repo and architecture.
 Identify:
+
 - frontend stack
 - backend stack
 - auth flow
@@ -759,11 +866,14 @@ Identify:
 - current consent handling if any
 
 ### Step 2
+
 Refine this plan based on repo reality.
 Do not blindly implement if the repo structure suggests a better path.
 
 ### Step 3
+
 Write a technical design note before coding:
+
 - data model decisions
 - attribution persistence strategy
 - event_id generation strategy
@@ -772,10 +882,13 @@ Write a technical design note before coding:
 - dashboard integration path
 
 ### Step 4
+
 Implement Phase 1 only.
 
 ### Step 5
+
 Verify:
+
 - attribution persists
 - signup is linked to attribution
 - registration event stored
@@ -783,6 +896,7 @@ Verify:
 - admin can inspect outcomes
 
 ### Step 6
+
 Only then move to activation events and quality improvements.
 
 ---
@@ -830,6 +944,7 @@ Claude must avoid:
 ## 21. Required documentation updates in repo
 
 Claude must update or create:
+
 - implementation notes
 - event taxonomy documentation
 - environment variable documentation
@@ -845,6 +960,7 @@ Claude must update or create:
 Claude must include at least one explicit E2E validation scenario:
 
 ### Scenario: one signup, one logical registration event
+
 - a user lands with UTM + fbclid
 - attribution is captured
 - user signs up successfully
@@ -865,12 +981,14 @@ This E2E scenario must be documented and, where practical, tested.
 Do not build now unless explicitly requested, but design for:
 
 ### v2
+
 - activation events
 - campaign quality analysis
 - event retry monitoring
 - multi-product support
 
 ### v3
+
 - audience exports
 - audience sync
 - delayed high-value conversion feedback
@@ -878,6 +996,7 @@ Do not build now unless explicitly requested, but design for:
 - activation-window configurability
 
 ### v4
+
 - reusable internal marketing engine for KeeperLog + ZentraX + later products
 
 ---

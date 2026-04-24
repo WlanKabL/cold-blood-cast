@@ -7,15 +7,15 @@
 
 ## 1. Stack alignment
 
-| Concern             | Decision                                                                |
-| ------------------- | ----------------------------------------------------------------------- |
-| Backend             | Fastify 5 + Prisma 6 (Postgres) + Pino                                  |
-| Queue               | **BullMQ** (already installed; Redis configured via `getRedis()`)       |
-| Frontend            | Nuxt 4 client-side plugins                                              |
-| Consent storage     | Extend existing `CookieConsent` model with `marketing` boolean          |
-| Existing identifier | `userId` (cuid) — used in event_id input string                         |
-| Logger              | Pino — child loggers per module                                         |
-| Auth                | Existing `authGuard` for capture endpoint, `adminGuard` for dashboard   |
+| Concern             | Decision                                                              |
+| ------------------- | --------------------------------------------------------------------- |
+| Backend             | Fastify 5 + Prisma 6 (Postgres) + Pino                                |
+| Queue               | **BullMQ** (already installed; Redis configured via `getRedis()`)     |
+| Frontend            | Nuxt 4 client-side plugins                                            |
+| Consent storage     | Extend existing `CookieConsent` model with `marketing` boolean        |
+| Existing identifier | `userId` (cuid) — used in event_id input string                       |
+| Logger              | Pino — child loggers per module                                       |
+| Auth                | Existing `authGuard` for capture endpoint, `adminGuard` for dashboard |
 
 ## 2. Module layout
 
@@ -67,10 +67,10 @@ This satisfies: stable, deterministic per successful registration, never replaye
 3. POST `/api/marketing/landing` (anonymous, rate-limited) → upserts `LandingAttribution`
 4. On successful signup, frontend POSTs `landing_session_id` together with the registration body via existing register endpoint (extended Zod schema: optional `landingSessionId`)
 5. `auth.service.registerUser` calls `bindAttributionToUser(user.id, landingSessionId)`:
-   - Resolves `LandingAttribution`
-   - Applies first-touch priority + TTL rules (`attribution.ts`)
-   - Creates `UserAttribution` row
-   - Calls `recordRegistrationEvent(user, consent)` → enqueues BullMQ job
+    - Resolves `LandingAttribution`
+    - Applies first-touch priority + TTL rules (`attribution.ts`)
+    - Creates `UserAttribution` row
+    - Calls `recordRegistrationEvent(user, consent)` → enqueues BullMQ job
 6. Response includes `marketingEventId` (canonical event_id) so frontend can fire Pixel with same id
 
 ## 6. Consent decision matrix (centralized)
@@ -110,20 +110,20 @@ Frontend:
 
 ## 9. Env vars (added to `apps/backend/src/config/env.ts`)
 
-| Var                              | Default              | Purpose                          |
-| -------------------------------- | -------------------- | -------------------------------- |
-| `META_PIXEL_ENABLED`             | `false`              | Toggle browser Pixel             |
-| `META_CAPI_ENABLED`              | `false`              | Toggle server CAPI               |
-| `META_CAPI_DRY_RUN`              | `false`              | Build payload but skip POST      |
-| `META_PIXEL_ID`                  | (optional)           | Pixel ID                         |
-| `META_ACCESS_TOKEN`              | (optional, redacted) | CAPI token                       |
-| `META_TEST_EVENT_CODE`           | (optional)           | Meta test events                 |
-| `TRACKING_ATTRIBUTION_TTL_DAYS`  | `90`                 | First-touch TTL (matches FE localStorage) |
-| `TRACKING_PENDING_RESCUE_AFTER_SECONDS` | `120`         | Stuck-pending sweep threshold    |
-| `TRACKING_MAX_RETRY_COUNT`       | `5`                  | Worker retries                   |
-| `TRACKING_RETRY_BASE_DELAY_MS`   | `5000`               | Backoff base                     |
-| `TRACKING_DISPATCH_TIMEOUT_MS`   | `5000`               | HTTP timeout to Meta             |
-| `TRACKING_EVENT_RETENTION_DAYS`  | `180`                | (informational; cleanup later)   |
+| Var                                     | Default              | Purpose                                   |
+| --------------------------------------- | -------------------- | ----------------------------------------- |
+| `META_PIXEL_ENABLED`                    | `false`              | Toggle browser Pixel                      |
+| `META_CAPI_ENABLED`                     | `false`              | Toggle server CAPI                        |
+| `META_CAPI_DRY_RUN`                     | `false`              | Build payload but skip POST               |
+| `META_PIXEL_ID`                         | (optional)           | Pixel ID                                  |
+| `META_ACCESS_TOKEN`                     | (optional, redacted) | CAPI token                                |
+| `META_TEST_EVENT_CODE`                  | (optional)           | Meta test events                          |
+| `TRACKING_ATTRIBUTION_TTL_DAYS`         | `90`                 | First-touch TTL (matches FE localStorage) |
+| `TRACKING_PENDING_RESCUE_AFTER_SECONDS` | `120`                | Stuck-pending sweep threshold             |
+| `TRACKING_MAX_RETRY_COUNT`              | `5`                  | Worker retries                            |
+| `TRACKING_RETRY_BASE_DELAY_MS`          | `5000`               | Backoff base                              |
+| `TRACKING_DISPATCH_TIMEOUT_MS`          | `5000`               | HTTP timeout to Meta                      |
+| `TRACKING_EVENT_RETENTION_DAYS`         | `180`                | (informational; cleanup later)            |
 
 `META_PIXEL_ID` exposed to frontend via `runtimeConfig.public.metaPixelId` only when `META_PIXEL_ENABLED=true`.
 
@@ -141,4 +141,3 @@ Frontend:
 - Audience export
 - Retroactive backfill
 - Cleanup/retention worker (env var documented, job deferred)
-

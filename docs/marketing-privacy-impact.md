@@ -25,13 +25,13 @@ When dispatch is not allowed the event row is created with
 
 ## Data sent to Meta (only when `granted`)
 
-| Field         | Source                  | Hashing            |
-| ------------- | ----------------------- | ------------------ |
-| `em`          | user email              | SHA-256 (lowercase, trimmed) |
-| `external_id` | internal user id        | SHA-256            |
-| `client_ip`   | request IP              | sent as-is to Meta |
-| `client_user_agent` | request User-Agent | sent as-is        |
-| `fbc`/`fbp`   | Meta cookies (if any)   | sent as-is        |
+| Field               | Source                | Hashing                      |
+| ------------------- | --------------------- | ---------------------------- |
+| `em`                | user email            | SHA-256 (lowercase, trimmed) |
+| `external_id`       | internal user id      | SHA-256                      |
+| `client_ip`         | request IP            | sent as-is to Meta           |
+| `client_user_agent` | request User-Agent    | sent as-is                   |
+| `fbc`/`fbp`         | Meta cookies (if any) | sent as-is                   |
 
 We never send raw email, name, address, plaintext IDs.
 

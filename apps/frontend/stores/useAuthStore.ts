@@ -112,7 +112,9 @@ export const useAuthStore = defineStore("auth", () => {
                 pendingApproval?: boolean;
                 tokens?: { accessToken: string };
                 user?: AuthUser;
-                marketingDispatch?: import("@cold-blood-cast/shared").MarketingRegistrationDispatchInfo | null;
+                marketingDispatch?:
+                    | import("@cold-blood-cast/shared").MarketingRegistrationDispatchInfo
+                    | null;
             }>("/api/auth/register", {
                 method: "POST",
                 body: JSON.stringify(payload),
