@@ -50,7 +50,8 @@ Set these in `apps/backend/.env` (or your deployment env):
 | `META_CAPI_DRY_RUN` | recommended on first deploy | `true` | If true, payloads are logged but not sent to Meta |
 | `META_ACCESS_TOKEN` | CAPI live | — | System-user CAPI access token (NOT the page token) |
 | `META_TEST_EVENT_CODE` | optional | — | Set during validation so events show up in Meta's "Test Events" tab without polluting prod metrics |
-| `TRACKING_ATTRIBUTION_TTL_DAYS` | always | `30` | How long an unbound landing session stays valid |
+| `TRACKING_ATTRIBUTION_TTL_DAYS` | always | `90` | How long an unbound landing session stays valid (must match the frontend localStorage TTL of 90d) |
+| `TRACKING_PENDING_RESCUE_AFTER_SECONDS` | always | `120` | Server events stuck in `pending` longer than this are re-enqueued on startup and via `POST /api/admin/marketing/rescue-pending` (recovery from Redis outages) |
 | `TRACKING_ACTIVATION_WINDOW_DAYS` | always | `7` | Window after signup in which activation events count |
 | `TRACKING_AUDIENCE_EXPORT_RETENTION_DAYS` | always | `30` | How long generated audience CSVs remain downloadable |
 | `TRACKING_DISPATCH_TIMEOUT_MS` | always | `8000` | HTTP timeout per Meta CAPI call |
@@ -171,6 +172,44 @@ Run through this before pointing real ad spend at the system.
 6. **Re-landing dedup**
    - Re-open the site (no UTMs in URL) with localStorage already containing a `cbc-landing-attribution`.
    - Confirm `/api/marketing/landing` is **not** POSTed again.
+
+---
+
+## Part E2 — Operating the queue (failures & recovery)
+
+The CAPI worker is BullMQ-backed and depends on Redis. The system is built so that no marketing failure can block registration, and so that any transient outage is recoverable.
+
+**Failure semantics on the `marketing_events` row:**
+
+| Status | Meaning | Action |
+|---|---|---|
+| `pending` | enqueued, not yet processed (or stuck because Redis was down) | recovered on next worker start, or via rescue endpoint |
+| `processing` | a worker picked it up | wait |
+| `sent` | delivered to Meta (HTTP 2xx) | none |
+| `failed` | hard failure after BullMQ retry budget exhausted | inspect `lastErrorCode`/`failureReason`, fix root cause, then `POST /api/admin/marketing/events/:id/retry` |
+| `skipped` | deliberate non-dispatch (consent denied, channel disabled, dry-run) | none — informational only |
+
+**Recovery: stuck `pending` events (Redis was unreachable when the row was created)**
+
+The backend automatically calls `rescueStuckPendingEvents()` on startup. It re-enqueues every server event with `status=pending` older than `TRACKING_PENDING_RESCUE_AFTER_SECONDS` (default 120s). BullMQ uses the marketing-event id as `jobId`, so re-enqueueing the same event is a no-op — the sweep is **idempotent and safe to run repeatedly**.
+
+You can also trigger it manually:
+
+```bash
+curl -XPOST -H 'Authorization: Bearer <admin-jwt>' \
+  https://your-host/api/admin/marketing/rescue-pending \
+  -H 'content-type: application/json' \
+  -d '{"olderThanSeconds": 60, "limit": 1000}'
+```
+
+Response: `{ scanned, reEnqueued, skipped }`.
+
+**Recovery: events failed because of `MISSING_CREDENTIALS`**
+
+If `META_CAPI_ENABLED=true` and `META_CAPI_DRY_RUN=false` but `META_PIXEL_ID` or `META_ACCESS_TOKEN` were not set, the worker marks affected events as `failed` (not `skipped`). This is intentional: it is a misconfiguration, not a deliberate skip. After setting the credentials:
+
+1. restart the backend (so the env reload applies), or update via the admin settings UI
+2. for each affected row, `POST /api/admin/marketing/events/:id/retry` (or batch this from the admin UI)
 
 ---
 

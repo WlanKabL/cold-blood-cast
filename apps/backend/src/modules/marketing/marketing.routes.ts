@@ -24,9 +24,12 @@ export async function marketingRoutes(fastify: FastifyInstance) {
         },
         async (_request, reply) => {
             const cfg = await getMarketingConfig();
+            // Truthful effective state: don't claim Pixel is enabled if the ID
+            // is missing — the frontend would otherwise try to load fbq with no id.
+            const effectivePixelEnabled = cfg.metaPixelEnabled && !!cfg.metaPixelId;
             const payload: MarketingPublicConfig = {
-                metaPixelEnabled: cfg.metaPixelEnabled,
-                metaPixelId: cfg.metaPixelId,
+                metaPixelEnabled: effectivePixelEnabled,
+                metaPixelId: effectivePixelEnabled ? cfg.metaPixelId : null,
             };
             return reply.send({ success: true, data: payload });
         },

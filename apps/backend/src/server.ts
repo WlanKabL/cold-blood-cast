@@ -378,6 +378,12 @@ async function main() {
     try {
         startMarketingWorker();
         app.log.info("Marketing worker started");
+        // Recover events that were persisted while Redis was unreachable. Idempotent.
+        const { rescueStuckPendingEvents } = await import("@/modules/marketing/index.js");
+        const rescued = await rescueStuckPendingEvents();
+        if (rescued.reEnqueued > 0) {
+            app.log.info({ rescued }, "Marketing: stuck pending events re-enqueued on startup");
+        }
     } catch (err) {
         app.log.warn({ err }, "Failed to start marketing worker");
     }

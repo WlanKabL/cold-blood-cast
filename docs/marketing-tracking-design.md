@@ -118,7 +118,8 @@ Frontend:
 | `META_PIXEL_ID`                  | (optional)           | Pixel ID                         |
 | `META_ACCESS_TOKEN`              | (optional, redacted) | CAPI token                       |
 | `META_TEST_EVENT_CODE`           | (optional)           | Meta test events                 |
-| `TRACKING_ATTRIBUTION_TTL_DAYS`  | `30`                 | First-touch TTL                  |
+| `TRACKING_ATTRIBUTION_TTL_DAYS`  | `90`                 | First-touch TTL (matches FE localStorage) |
+| `TRACKING_PENDING_RESCUE_AFTER_SECONDS` | `120`         | Stuck-pending sweep threshold    |
 | `TRACKING_MAX_RETRY_COUNT`       | `5`                  | Worker retries                   |
 | `TRACKING_RETRY_BASE_DELAY_MS`   | `5000`               | Backoff base                     |
 | `TRACKING_DISPATCH_TIMEOUT_MS`   | `5000`               | HTTP timeout to Meta             |

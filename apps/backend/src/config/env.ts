@@ -75,7 +75,11 @@ const envSchema = z.object({
     META_TEST_EVENT_CODE: z.string().optional(),
 
     // Marketing tracking — attribution & queue tuning
-    TRACKING_ATTRIBUTION_TTL_DAYS: z.coerce.number().int().positive().default(30),
+    // 90d matches the frontend localStorage TTL so re-visiting users still bind on signup.
+    TRACKING_ATTRIBUTION_TTL_DAYS: z.coerce.number().int().positive().default(90),
+    // Stuck-pending recovery: server events older than this are re-enqueued on startup
+    // (and on demand via admin route). Keep larger than typical Meta CAPI dispatch latency.
+    TRACKING_PENDING_RESCUE_AFTER_SECONDS: z.coerce.number().int().min(30).default(120),
     TRACKING_MAX_RETRY_COUNT: z.coerce.number().int().min(0).default(5),
     TRACKING_RETRY_BASE_DELAY_MS: z.coerce.number().int().min(100).default(5000),
     TRACKING_DISPATCH_TIMEOUT_MS: z.coerce.number().int().min(500).default(5000),

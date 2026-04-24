@@ -28,11 +28,28 @@ export async function dispatchMetaCapiEvent(
         return { delivered: false, skipped: true, errorCode: "DISABLED_BY_ENV" };
     }
     if (!cfg.metaPixelId || !cfg.metaAccessToken) {
+        // Misconfiguration, not a deliberate skip. Surface as failure so admin retry
+        // works after credentials are fixed (and BullMQ keeps the job in `failed`).
         log.warn({ eventId: payload.event_id }, "META_CAPI enabled but credentials missing");
-        return { delivered: false, skipped: true, errorCode: "MISSING_CREDENTIALS" };
+        return {
+            delivered: false,
+            skipped: false,
+            errorCode: "MISSING_CREDENTIALS",
+            errorMessage: "META_PIXEL_ID or META_ACCESS_TOKEN is not configured",
+        };
     }
     if (cfg.metaCapiDryRun) {
-        log.info({ eventId: payload.event_id, payload }, "META_CAPI dry-run");
+        // Avoid logging the full payload at INFO — it contains hashed PII plus IP/UA.
+        // Keep a summary at INFO for traceability and dump the payload only at DEBUG.
+        log.info(
+            {
+                eventId: payload.event_id,
+                eventName: payload.event_name,
+                hasUserData: !!payload.user_data,
+            },
+            "META_CAPI dry-run",
+        );
+        log.debug({ eventId: payload.event_id, payload }, "META_CAPI dry-run payload");
         return { delivered: false, skipped: true, errorCode: "DRY_RUN" };
     }
 

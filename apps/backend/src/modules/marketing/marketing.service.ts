@@ -123,12 +123,36 @@ export async function recordRegistrationEvent(
     // matches the actual decision used at dispatch time. Plan §15.
     const cfg = await getMarketingConfig();
 
+    // Idempotency guard: a retried registration call (or a duplicate transactional
+    // write) would otherwise hit the unique (eventName, eventId, eventSource)
+    // constraint and explode. The deterministic eventId means the existing rows
+    // already represent the same logical event — return the original dispatch info.
+    const existingServer = await prisma.marketingEvent.findFirst({
+        where: { eventName, eventId, eventSource: "server" },
+        select: { id: true, status: true },
+    });
+    if (existingServer) {
+        log.info(
+            { userId: ctx.userId, eventId, existingId: existingServer.id },
+            "registration event already recorded — idempotent skip",
+        );
+        return {
+            eventId,
+            eventName,
+            browserDispatchAllowed:
+                decision.browserDispatchAllowed && cfg.metaPixelEnabled && !!cfg.metaPixelId,
+        };
+    }
+
     // Effective dispatch gates: consent allows it AND the channel is enabled.
+    // For the browser side, also require the Pixel ID to actually be present —
+    // otherwise we'd ask the client to fire fbq with no id (no-op + audit lie).
     // When a channel is disabled at record-time we still persist the audit
     // row but skip enqueue and mark it `skipped` with a clear reason — this
     // avoids worker noise and keeps the dashboard honest.
+    const pixelChannelLive = cfg.metaPixelEnabled && !!cfg.metaPixelId;
     const serverEffectiveAllowed = decision.serverDispatchAllowed && cfg.metaCapiEnabled;
-    const browserEffectiveAllowed = decision.browserDispatchAllowed && cfg.metaPixelEnabled;
+    const browserEffectiveAllowed = decision.browserDispatchAllowed && pixelChannelLive;
 
     const serverSkipReason = !decision.serverDispatchAllowed
         ? `consent_${ctx.consentState}`
@@ -139,7 +163,9 @@ export async function recordRegistrationEvent(
         ? `consent_${ctx.consentState}`
         : !cfg.metaPixelEnabled
           ? "pixel_disabled"
-          : null;
+          : !cfg.metaPixelId
+            ? "pixel_id_missing"
+            : null;
 
     const landing =
         ctx.landingSessionId && decision.storeFullPayload
@@ -178,20 +204,32 @@ export async function recordRegistrationEvent(
     });
 
     // ── Persist browser-side audit row (fired by client when allowed)
-    await prisma.marketingEvent.create({
-        data: {
-            userId: ctx.userId,
-            landingSessionId: decision.storeFullPayload ? ctx.landingSessionId : null,
-            eventName,
-            eventId,
-            eventSource: "browser",
-            metaEnabled: cfg.metaPixelEnabled,
-            consentState: ctx.consentState,
-            payload: Prisma.JsonNull,
-            status: browserEffectiveAllowed ? "pending" : "skipped",
-            failureReason: browserSkipReason,
-        },
-    });
+    // Tolerate P2002 in case the browser row already exists from a prior partial run.
+    try {
+        await prisma.marketingEvent.create({
+            data: {
+                userId: ctx.userId,
+                landingSessionId: decision.storeFullPayload ? ctx.landingSessionId : null,
+                eventName,
+                eventId,
+                eventSource: "browser",
+                metaEnabled: cfg.metaPixelEnabled,
+                consentState: ctx.consentState,
+                payload: Prisma.JsonNull,
+                status: browserEffectiveAllowed ? "pending" : "skipped",
+                failureReason: browserSkipReason,
+            },
+        });
+    } catch (err) {
+        if (
+            err instanceof Prisma.PrismaClientKnownRequestError &&
+            err.code === "P2002"
+        ) {
+            log.info({ userId: ctx.userId, eventId }, "browser audit row already exists");
+        } else {
+            throw err;
+        }
+    }
 
     // ── Enqueue server dispatch only when actually deliverable.
     // Skipping the queue when CAPI is globally off avoids dead worker churn.

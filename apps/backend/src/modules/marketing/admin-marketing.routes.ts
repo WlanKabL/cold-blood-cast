@@ -21,7 +21,7 @@ import {
     getMarketingConfig,
     updateMarketingSettings,
 } from "./marketing-config.service.js";
-import { getMarketingQueue } from "./marketing.queue.js";
+import { getMarketingQueue, rescueStuckPendingEvents } from "./marketing.queue.js";
 import { recordHighValueEvent } from "./high-value-events.service.js";
 import {
     createAudienceExport,
@@ -429,6 +429,38 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
             await queue.remove(id).catch(() => undefined);
             await queue.add("dispatch", { marketingEventId: id }, { jobId: id });
             return reply.send({ success: true, data: { enqueued: true } });
+        },
+    );
+
+    // ── POST /api/admin/marketing/rescue-pending ──
+    // Re-enqueue server events stuck in `pending` (e.g. after a Redis outage).
+    // Idempotent: BullMQ ignores duplicate jobIds, so calling repeatedly is safe.
+    fastify.post(
+        "/rescue-pending",
+        {
+            schema: {
+                tags: ["Admin", "Marketing"],
+                summary: "Re-enqueue stuck pending server events (recovery)",
+                body: {
+                    type: "object",
+                    properties: {
+                        olderThanSeconds: { type: "integer", minimum: 0 },
+                        limit: { type: "integer", minimum: 1, maximum: 5000 },
+                    },
+                    additionalProperties: false,
+                },
+            },
+        },
+        async (request, reply) => {
+            const body = (request.body ?? {}) as {
+                olderThanSeconds?: number;
+                limit?: number;
+            };
+            const result = await rescueStuckPendingEvents({
+                olderThanSeconds: body.olderThanSeconds,
+                limit: body.limit,
+            });
+            return reply.send({ success: true, data: result });
         },
     );
 

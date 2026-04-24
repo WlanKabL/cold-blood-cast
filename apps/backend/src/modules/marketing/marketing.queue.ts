@@ -145,3 +145,61 @@ export async function stopMarketingWorker(): Promise<void> {
         queueInstance = null;
     }
 }
+
+// ─── Stuck-pending recovery ────────────────────────────────
+// If Redis was unreachable when `recordRegistrationEvent` /
+// `recordHighValueEvent` enqueued, the row is persisted with
+// status=`pending` but no BullMQ job exists. Re-enqueueing with
+// `jobId = marketingEvent.id` is idempotent — BullMQ silently
+// ignores duplicate jobIds, so this is safe to call repeatedly.
+
+export interface RescuePendingResult {
+    scanned: number;
+    reEnqueued: number;
+    skipped: number;
+}
+
+export async function rescueStuckPendingEvents(opts?: {
+    olderThanSeconds?: number;
+    limit?: number;
+}): Promise<RescuePendingResult> {
+    const e = env();
+    const olderThan = opts?.olderThanSeconds ?? e.TRACKING_PENDING_RESCUE_AFTER_SECONDS;
+    const limit = opts?.limit ?? 500;
+    const cutoff = new Date(Date.now() - olderThan * 1000);
+
+    const candidates = await prisma.marketingEvent.findMany({
+        where: {
+            status: "pending",
+            eventSource: "server",
+            createdAt: { lt: cutoff },
+        },
+        select: { id: true, attemptCount: true },
+        take: limit,
+        orderBy: { createdAt: "asc" },
+    });
+
+    if (candidates.length === 0) {
+        return { scanned: 0, reEnqueued: 0, skipped: 0 };
+    }
+
+    const queue = getMarketingQueue();
+    let reEnqueued = 0;
+    let skipped = 0;
+    for (const row of candidates) {
+        // Drop dead/stale BullMQ job (if any) so we can re-add with the same jobId.
+        await queue.remove(row.id).catch(() => undefined);
+        try {
+            await queue.add("dispatch", { marketingEventId: row.id }, { jobId: row.id });
+            reEnqueued += 1;
+        } catch (err) {
+            skipped += 1;
+            log.warn({ marketingEventId: row.id, err: (err as Error).message }, "rescue enqueue failed");
+        }
+    }
+    log.info(
+        { scanned: candidates.length, reEnqueued, skipped, olderThanSeconds: olderThan },
+        "stuck pending events rescued",
+    );
+    return { scanned: candidates.length, reEnqueued, skipped };
+}

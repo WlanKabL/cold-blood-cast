@@ -10,6 +10,7 @@ export {
     enqueueMarketingEventDispatch,
     startMarketingWorker,
     stopMarketingWorker,
+    rescueStuckPendingEvents,
     MARKETING_QUEUE_NAME,
 } from "./marketing.queue.js";
 export { buildCanonicalEventId } from "./event-id.js";
