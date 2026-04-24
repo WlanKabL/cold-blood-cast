@@ -83,6 +83,13 @@ export async function recordHighValueEvent(
         const decision = decideMarketingDispatch(consentState, input.eventName);
         const cfg = await getMarketingConfig();
         const now = new Date();
+        // Effective gate: consent allows AND CAPI channel is enabled at record-time.
+        const serverEffectiveAllowed = decision.serverDispatchAllowed && cfg.metaCapiEnabled;
+        const skipReason = !decision.serverDispatchAllowed
+            ? `consent_${consentState}`
+            : !cfg.metaCapiEnabled
+              ? "capi_disabled"
+              : null;
 
         const landing =
             landingSessionId && decision.storeFullPayload
@@ -117,13 +124,13 @@ export async function recordHighValueEvent(
                 payload: (payload as Prisma.InputJsonValue | null) ?? Prisma.JsonNull,
                 value: input.value,
                 currency: input.currency,
-                status: decision.serverDispatchAllowed ? "pending" : decision.initialStatus,
-                failureReason: decision.serverDispatchAllowed ? null : `consent_${consentState}`,
+                status: serverEffectiveAllowed ? "pending" : "skipped",
+                failureReason: skipReason,
                 lockToken: randomUUID(),
             },
         });
 
-        if (decision.serverDispatchAllowed) {
+        if (serverEffectiveAllowed) {
             await enqueueMarketingEventDispatch(created.id);
             log.info(
                 { userId: input.userId, eventId, value: input.value, currency: input.currency },
@@ -131,8 +138,8 @@ export async function recordHighValueEvent(
             );
         } else {
             log.info(
-                { userId: input.userId, eventId, consentState },
-                "high-value event recorded but skipped (consent gate)",
+                { userId: input.userId, eventId, consentState, capiEnabled: cfg.metaCapiEnabled },
+                "high-value event recorded but skipped",
             );
         }
 
@@ -140,7 +147,7 @@ export async function recordHighValueEvent(
             recorded: true,
             eventId,
             marketingEventId: created.id,
-            reason: decision.serverDispatchAllowed ? undefined : "no_consent",
+            reason: serverEffectiveAllowed ? undefined : "no_consent",
         };
     } catch (err) {
         log.error(

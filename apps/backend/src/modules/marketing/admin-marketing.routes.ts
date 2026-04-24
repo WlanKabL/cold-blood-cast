@@ -31,6 +31,7 @@ import {
 } from "./audience-export.service.js";
 import { buildRoiReport } from "./roi-report.service.js";
 import { getAudienceSyncProvider } from "./audience-sync.service.js";
+import { isActivatedWithinWindow } from "./activation-window.js";
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 
@@ -51,7 +52,6 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
             const e = env();
             const cfg = await getMarketingConfig();
             const activationDays = cfg.activationWindowDays;
-            const windowMs = activationDays * 24 * 60 * 60 * 1000;
 
             const [totalLandings, totalAttributed, registrationsTotal, eventStats, campaigns] =
                 await Promise.all([
@@ -94,9 +94,10 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                     first: row.boundAt,
                 };
                 entry.signups += 1;
-                const cutoff = new Date(row.boundAt.getTime() + windowMs);
-                const activated = row.user.activationEvents.some(
-                    (a) => a.occurredAt >= row.boundAt && a.occurredAt <= cutoff,
+                const activated = isActivatedWithinWindow(
+                    row.boundAt,
+                    row.user.activationEvents,
+                    activationDays,
                 );
                 if (activated) entry.activated += 1;
                 if (row.boundAt < entry.first) entry.first = row.boundAt;

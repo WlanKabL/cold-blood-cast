@@ -23,6 +23,7 @@ import { decideMarketingDispatch } from "./consent-matrix.js";
 import { buildCanonicalEventId } from "./event-id.js";
 import { buildMetaServerEventPayload } from "./meta-payload.js";
 import { enqueueMarketingEventDispatch } from "./marketing.queue.js";
+import { getMarketingConfig } from "./marketing-config.service.js";
 
 const log = pino({ name: "marketing-service" });
 
@@ -118,7 +119,27 @@ export async function recordRegistrationEvent(
 
     const decision = decideMarketingDispatch(ctx.consentState, eventName);
     const now = new Date();
-    const e = env();
+    // Resolve effective config (env + DB overrides) so the audit-trail value
+    // matches the actual decision used at dispatch time. Plan §15.
+    const cfg = await getMarketingConfig();
+
+    // Effective dispatch gates: consent allows it AND the channel is enabled.
+    // When a channel is disabled at record-time we still persist the audit
+    // row but skip enqueue and mark it `skipped` with a clear reason — this
+    // avoids worker noise and keeps the dashboard honest.
+    const serverEffectiveAllowed = decision.serverDispatchAllowed && cfg.metaCapiEnabled;
+    const browserEffectiveAllowed = decision.browserDispatchAllowed && cfg.metaPixelEnabled;
+
+    const serverSkipReason = !decision.serverDispatchAllowed
+        ? `consent_${ctx.consentState}`
+        : !cfg.metaCapiEnabled
+          ? "capi_disabled"
+          : null;
+    const browserSkipReason = !decision.browserDispatchAllowed
+        ? `consent_${ctx.consentState}`
+        : !cfg.metaPixelEnabled
+          ? "pixel_disabled"
+          : null;
 
     const landing =
         ctx.landingSessionId && decision.storeFullPayload
@@ -147,11 +168,11 @@ export async function recordRegistrationEvent(
             eventName,
             eventId,
             eventSource: "server",
-            metaEnabled: e.META_CAPI_ENABLED,
+            metaEnabled: cfg.metaCapiEnabled,
             consentState: ctx.consentState,
             payload: (serverPayload as Prisma.InputJsonValue | null) ?? Prisma.JsonNull,
-            status: decision.serverDispatchAllowed ? "pending" : decision.initialStatus,
-            failureReason: decision.serverDispatchAllowed ? null : `consent_${ctx.consentState}`,
+            status: serverEffectiveAllowed ? "pending" : "skipped",
+            failureReason: serverSkipReason,
             lockToken: randomUUID(),
         },
     });
@@ -164,16 +185,17 @@ export async function recordRegistrationEvent(
             eventName,
             eventId,
             eventSource: "browser",
-            metaEnabled: e.META_PIXEL_ENABLED,
+            metaEnabled: cfg.metaPixelEnabled,
             consentState: ctx.consentState,
             payload: Prisma.JsonNull,
-            status: decision.browserDispatchAllowed ? "pending" : decision.initialStatus,
-            failureReason: decision.browserDispatchAllowed ? null : `consent_${ctx.consentState}`,
+            status: browserEffectiveAllowed ? "pending" : "skipped",
+            failureReason: browserSkipReason,
         },
     });
 
-    // ── Enqueue server dispatch if allowed
-    if (decision.serverDispatchAllowed) {
+    // ── Enqueue server dispatch only when actually deliverable.
+    // Skipping the queue when CAPI is globally off avoids dead worker churn.
+    if (serverEffectiveAllowed) {
         await enqueueMarketingEventDispatch(serverEvent.id);
     }
 
@@ -182,8 +204,10 @@ export async function recordRegistrationEvent(
             userId: ctx.userId,
             eventId,
             consentState: ctx.consentState,
-            serverDispatch: decision.serverDispatchAllowed,
-            browserDispatch: decision.browserDispatchAllowed,
+            serverDispatch: serverEffectiveAllowed,
+            browserDispatch: browserEffectiveAllowed,
+            capiEnabled: cfg.metaCapiEnabled,
+            pixelEnabled: cfg.metaPixelEnabled,
         },
         "registration event recorded",
     );
@@ -191,7 +215,7 @@ export async function recordRegistrationEvent(
     return {
         eventId,
         eventName,
-        browserDispatchAllowed: decision.browserDispatchAllowed && e.META_PIXEL_ENABLED,
+        browserDispatchAllowed: browserEffectiveAllowed,
     };
 }
 

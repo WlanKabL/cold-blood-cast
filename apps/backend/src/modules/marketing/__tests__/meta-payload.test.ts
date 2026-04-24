@@ -48,4 +48,16 @@ describe("buildMetaServerEventPayload (V3)", () => {
         expect(p.user_data.client_ip_address).toBe("1.2.3.4");
         expect(p.user_data.client_user_agent).toBe("ua");
     });
+
+    it("normalises email before hashing (lowercase + trim) — Meta dedup contract", () => {
+        const a = buildMetaServerEventPayload({
+            ...baseInput,
+            user: { id: "user_1", email: "  Foo@Example.COM  " },
+        });
+        const b = buildMetaServerEventPayload({
+            ...baseInput,
+            user: { id: "user_1", email: "foo@example.com" },
+        });
+        expect(a.user_data.em?.[0]).toBe(b.user_data.em?.[0]);
+    });
 });

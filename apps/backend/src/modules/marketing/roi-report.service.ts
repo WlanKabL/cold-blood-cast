@@ -12,6 +12,7 @@
 import type { MarketingRoiCampaignRow, MarketingRoiReport } from "@cold-blood-cast/shared";
 import { prisma } from "@/config/database.js";
 import { getMarketingConfig } from "./marketing-config.service.js";
+import { isActivatedWithinWindow } from "./activation-window.js";
 
 export interface RoiReportInput {
     cohortFrom?: Date | null;
@@ -20,8 +21,6 @@ export interface RoiReportInput {
 
 export async function buildRoiReport(input: RoiReportInput = {}): Promise<MarketingRoiReport> {
     const cfg = await getMarketingConfig();
-    const windowMs = cfg.activationWindowDays * 24 * 60 * 60 * 1000;
-    const now = new Date();
 
     const attrs = await prisma.userAttribution.findMany({
         where: {
@@ -43,6 +42,8 @@ export async function buildRoiReport(input: RoiReportInput = {}): Promise<Market
     });
 
     const userIds = attrs.map((a) => a.userId);
+    // Revenue is a business fact: count every recorded high-value event with a value,
+    // independent of CAPI delivery status (a delivery failure must not erase revenue).
     const highValueRows =
         userIds.length === 0
             ? []
@@ -51,7 +52,7 @@ export async function buildRoiReport(input: RoiReportInput = {}): Promise<Market
                   where: {
                       userId: { in: userIds },
                       eventName: { in: ["Subscribe", "Purchase"] },
-                      status: "sent",
+                      eventSource: "server",
                       value: { not: null },
                   },
                   _sum: { value: true },
@@ -88,9 +89,10 @@ export async function buildRoiReport(input: RoiReportInput = {}): Promise<Market
             v: { signups: 0, activated: 0, highValueEvents: 0, revenue: 0, currency: null },
         };
         bucket.v.signups += 1;
-        const cutoff = new Date(attr.boundAt.getTime() + windowMs);
-        const activated = attr.user.activationEvents.some(
-            (a) => a.occurredAt >= attr.boundAt && a.occurredAt <= cutoff,
+        const activated = isActivatedWithinWindow(
+            attr.boundAt,
+            attr.user.activationEvents,
+            cfg.activationWindowDays,
         );
         if (activated) bucket.v.activated += 1;
         const hv = hvByUser.get(attr.userId);

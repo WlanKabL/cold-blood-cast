@@ -23,6 +23,7 @@ import {
 import { prisma } from "@/config/database.js";
 import { env } from "@/config/env.js";
 import { getMarketingConfig } from "./marketing-config.service.js";
+import { isActivatedWithinWindow } from "./activation-window.js";
 
 const log = pino({ name: "marketing-audience-export" });
 
@@ -57,8 +58,6 @@ interface AudienceCandidate {
 
 async function collectCandidates(filter: AudienceExportFilter): Promise<AudienceCandidate[]> {
     const cfg = await getMarketingConfig();
-    const windowMs = cfg.activationWindowDays * 24 * 60 * 60 * 1000;
-    const now = new Date();
 
     const users = await prisma.user.findMany({
         where: {
@@ -87,7 +86,7 @@ async function collectCandidates(filter: AudienceExportFilter): Promise<Audience
         where: {
             userId: { in: users.map((u) => u.id) },
             eventName: { in: ["Subscribe", "Purchase"] },
-            status: "sent",
+            eventSource: "server",
             value: { not: null },
         },
         _sum: { value: true },
@@ -113,14 +112,9 @@ async function collectCandidates(filter: AudienceExportFilter): Promise<Audience
         if (filter.utmContent && attr?.landingAttribution.utmContent !== filter.utmContent)
             continue;
 
-        const activationCutoff = attr ? new Date(attr.boundAt.getTime() + windowMs) : null;
         const activated =
             !!attr &&
-            user.activationEvents.some(
-                (a) =>
-                    a.occurredAt >= attr.boundAt &&
-                    (activationCutoff ? a.occurredAt <= activationCutoff : a.occurredAt <= now),
-            );
+            isActivatedWithinWindow(attr.boundAt, user.activationEvents, cfg.activationWindowDays);
 
         if (filter.activatedOnly && !activated) continue;
 
