@@ -112,19 +112,20 @@ export const useAuthStore = defineStore("auth", () => {
                 pendingApproval?: boolean;
                 tokens?: { accessToken: string };
                 user?: AuthUser;
+                marketingDispatch?: import("@cold-blood-cast/shared").MarketingRegistrationDispatchInfo | null;
             }>("/api/auth/register", {
                 method: "POST",
                 body: JSON.stringify(payload),
             });
 
             if (data.pendingApproval) {
-                return { pendingApproval: true };
+                return { pendingApproval: true as const };
             }
 
             accessToken.value = data.tokens!.accessToken;
             user.value = data.user!;
             await fetchMe();
-            return data.user!;
+            return { user: data.user!, marketingDispatch: data.marketingDispatch ?? null };
         } finally {
             loading.value = false;
         }

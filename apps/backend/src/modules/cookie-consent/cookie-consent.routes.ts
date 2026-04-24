@@ -15,6 +15,7 @@ export async function cookieConsentRoutes(fastify: FastifyInstance) {
                     required: ["analytics", "version"],
                     properties: {
                         analytics: { type: "boolean" },
+                        marketing: { type: "boolean", default: false },
                         version: { type: "integer", minimum: 1 },
                     },
                     additionalProperties: false,
@@ -30,8 +31,9 @@ export async function cookieConsentRoutes(fastify: FastifyInstance) {
             },
         },
         async (request, reply) => {
-            const { analytics, version } = request.body as {
+            const { analytics, marketing, version } = request.body as {
                 analytics: boolean;
+                marketing?: boolean;
                 version: number;
             };
 
@@ -39,6 +41,7 @@ export async function cookieConsentRoutes(fastify: FastifyInstance) {
                 data: {
                     userId: request.userId,
                     analytics,
+                    marketing: marketing ?? false,
                     version,
                 },
             });

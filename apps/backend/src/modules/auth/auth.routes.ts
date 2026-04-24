@@ -81,7 +81,10 @@ export async function authRoutes(app: FastifyInstance) {
             );
         }
 
-        const result = await registerUser(parsed.data);
+        const result = await registerUser(parsed.data, {
+            ip: request.ip,
+            userAgent: request.headers["user-agent"],
+        });
 
         // If approval is required, don't issue tokens
         if (result.pendingApproval || !result.tokens) {
@@ -103,6 +106,7 @@ export async function authRoutes(app: FastifyInstance) {
                 tokens: {
                     accessToken: result.tokens.accessToken,
                 },
+                marketingDispatch: result.marketingDispatch,
             },
         });
     });

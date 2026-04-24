@@ -439,6 +439,8 @@ async function handleRegister() {
             email: string;
             password: string;
             inviteCode?: string;
+            landingSessionId?: string;
+            marketingConsent?: "granted" | "denied" | "unknown";
         } = {
             username: form.username.trim(),
             email: form.email.trim(),
@@ -449,11 +451,44 @@ async function handleRegister() {
             payload.inviteCode = form.inviteCode.trim().toUpperCase();
         }
 
+        // ── Marketing attribution: attach landing session + consent ──
+        try {
+            const { getLandingSessionId } = await import(
+                "~/plugins/01.marketing-attribution.client"
+            );
+            const sid = getLandingSessionId();
+            if (sid) payload.landingSessionId = sid;
+        } catch {
+            /* ignore — tracking is best-effort */
+        }
+        try {
+            const raw = localStorage.getItem("cbc-cookie-consent");
+            if (raw) {
+                const parsed = JSON.parse(raw) as { marketing?: boolean };
+                payload.marketingConsent = parsed.marketing ? "granted" : "denied";
+            } else {
+                payload.marketingConsent = "unknown";
+            }
+        } catch {
+            payload.marketingConsent = "unknown";
+        }
+
         const result = await authStore.register(payload);
-        if (result?.pendingApproval) {
+        if ("pendingApproval" in result && result.pendingApproval) {
             pendingApproval.value = true;
             return;
         }
+
+        // Fire Meta Pixel CompleteRegistration with canonical eventId for dedup.
+        try {
+            const { useMarketingTracking } = await import("~/composables/useMarketingTracking");
+            await useMarketingTracking().fireRegistrationPixel(
+                "marketingDispatch" in result ? result.marketingDispatch : null,
+            );
+        } catch {
+            /* ignore — tracking is best-effort */
+        }
+
         await router.push("/dashboard");
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : t("auth.register.registrationFailed");

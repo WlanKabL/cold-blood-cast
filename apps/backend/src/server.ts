@@ -61,6 +61,12 @@ import { tagRoutes, tagAdminRoutes } from "@/modules/tags/tags.routes.js";
 import { sitemapRoutes } from "@/modules/sitemap/sitemap.routes.js";
 import { subscriptionRoutes } from "@/modules/subscriptions/index.js";
 import {
+    marketingRoutes,
+    adminMarketingRoutes,
+    startMarketingWorker,
+    stopMarketingWorker,
+} from "@/modules/marketing/index.js";
+import {
     startWeeklyPlannerScheduler,
     stopWeeklyPlannerScheduler,
 } from "@/modules/weekly-planner/index.js";
@@ -325,6 +331,8 @@ async function main() {
     await app.register(tagAdminRoutes, { prefix: "/api/tags/admin/global" });
     await app.register(sitemapRoutes, { prefix: "/api/public/sitemap" });
     await app.register(subscriptionRoutes, { prefix: "/api/subscriptions" });
+    await app.register(marketingRoutes, { prefix: "/api/marketing" });
+    await app.register(adminMarketingRoutes, { prefix: "/api/admin/marketing" });
 
     // ── Start Maintenance Scheduler (daily 03:00 Berlin) ──
     try {
@@ -366,6 +374,14 @@ async function main() {
         app.log.warn({ err }, "Failed to start weekly planner scheduler");
     }
 
+    // ── Start Marketing Worker (BullMQ) ──
+    try {
+        startMarketingWorker();
+        app.log.info("Marketing worker started");
+    } catch (err) {
+        app.log.warn({ err }, "Failed to start marketing worker");
+    }
+
     // ── Graceful Shutdown ────────────────────────
     const shutdown = async (signal: string) => {
         app.log.info(`Received ${signal}, shutting down...`);
@@ -374,6 +390,7 @@ async function main() {
         stopVetReminderScheduler();
         stopMaintenanceReminderScheduler();
         stopWeeklyPlannerScheduler();
+        await stopMarketingWorker();
         await app.close();
         await prisma.$disconnect();
         process.exit(0);

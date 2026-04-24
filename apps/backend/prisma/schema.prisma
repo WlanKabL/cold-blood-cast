@@ -92,6 +92,11 @@ model User {
     profileComments         ProfileComment[]
     tags                    Tag[]
 
+    // ── Marketing attribution ───────────────────────
+    userAttribution         UserAttribution?
+    marketingEvents         MarketingEvent[]
+    activationEvents        UserActivationEvent[]
+
     @@map("users")
 }
 
@@ -514,6 +519,7 @@ model CookieConsent {
     id        String   @id @default(cuid())
     userId    String   @map("user_id")
     analytics Boolean  @default(false)
+    marketing Boolean  @default(false)
     version   Int
     createdAt DateTime @default(now()) @map("created_at")
 
@@ -521,6 +527,101 @@ model CookieConsent {
 
     @@index([userId])
     @@map("cookie_consents")
+}
+
+// ==========================================
+// Marketing Tracking & Attribution
+// ==========================================
+
+model LandingAttribution {
+    id               String   @id @default(cuid())
+    landingSessionId String   @unique @map("landing_session_id")
+    utmSource        String?  @map("utm_source")
+    utmMedium        String?  @map("utm_medium")
+    utmCampaign      String?  @map("utm_campaign")
+    utmContent       String?  @map("utm_content")
+    utmTerm          String?  @map("utm_term")
+    fbclid           String?
+    fbc              String?
+    fbp              String?
+    referrer         String?
+    landingPath      String?  @map("landing_path")
+    firstSeenAt      DateTime @default(now()) @map("first_seen_at")
+    expiresAt        DateTime @map("expires_at")
+    createdAt        DateTime @default(now()) @map("created_at")
+    updatedAt        DateTime @updatedAt @map("updated_at")
+
+    userAttributions UserAttribution[]
+
+    @@index([utmSource, utmCampaign, utmContent])
+    @@index([firstSeenAt])
+    @@index([expiresAt])
+    @@map("landing_attributions")
+}
+
+model UserAttribution {
+    id                   String   @id @default(cuid())
+    userId               String   @unique @map("user_id")
+    landingAttributionId String   @map("landing_attribution_id")
+    attributionModel     String   @default("first_touch") @map("attribution_model")
+    boundAt              DateTime @default(now()) @map("bound_at")
+    createdAt            DateTime @default(now()) @map("created_at")
+    updatedAt            DateTime @updatedAt @map("updated_at")
+
+    user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    landingAttribution LandingAttribution @relation(fields: [landingAttributionId], references: [id], onDelete: Restrict)
+
+    @@index([landingAttributionId])
+    @@index([boundAt])
+    @@map("user_attributions")
+}
+
+model MarketingEvent {
+    id                   String    @id @default(cuid())
+    userId               String?   @map("user_id")
+    landingSessionId     String?   @map("landing_session_id")
+    eventName            String    @map("event_name")
+    eventId              String    @map("event_id")
+    eventSource          String    @map("event_source")
+    metaEnabled          Boolean   @default(false) @map("meta_enabled")
+    consentState         String    @map("consent_state")
+    payload              Json?
+    status               String    @default("pending")
+    attemptCount         Int       @default(0) @map("attempt_count")
+    nextRetryAt          DateTime? @map("next_retry_at")
+    lastErrorCode        String?   @map("last_error_code")
+    providerResponseCode Int?      @map("provider_response_code")
+    failureReason        String?   @map("failure_reason")
+    processingStartedAt  DateTime? @map("processing_started_at")
+    lockToken            String?   @map("lock_token")
+    sentAt               DateTime? @map("sent_at")
+    createdAt            DateTime  @default(now()) @map("created_at")
+    updatedAt            DateTime  @updatedAt @map("updated_at")
+
+    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@unique([eventName, eventId, eventSource])
+    @@index([status, nextRetryAt])
+    @@index([userId])
+    @@index([landingSessionId])
+    @@index([createdAt])
+    @@index([eventName, status])
+    @@map("marketing_events")
+}
+
+model UserActivationEvent {
+    id             String   @id @default(cuid())
+    userId         String   @map("user_id")
+    activationType String   @map("activation_type")
+    occurredAt     DateTime @default(now()) @map("occurred_at")
+    metadata       Json?
+    createdAt      DateTime @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, activationType])
+    @@index([occurredAt])
+    @@map("user_activation_events")
 }
 
 // ==========================================

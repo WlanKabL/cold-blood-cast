@@ -97,6 +97,18 @@
         "alwaysOn": "Always on",
         "revoke": "Cookie Settings"
     },
+    "cookie_consent": {
+        "title": "Cookies & Tracking",
+        "message": "We use cookies to run Cold Blood Cast and — with your consent — to measure the reach of our campaigns.",
+        "essential": "Essential",
+        "essential_desc": "Login, security and core functionality. Cannot be disabled.",
+        "analytics": "Analytics",
+        "analytics_desc": "Help us understand how the website is used.",
+        "marketing": "Marketing",
+        "marketing_desc": "Allow measuring our advertising campaigns (e.g. Meta Pixel).",
+        "accept_all": "Accept all",
+        "save_preferences": "Save preferences"
+    },
     "common": {
         "loading": "Loading...",
         "redirecting": "Redirecting...",
@@ -258,7 +270,8 @@
             "legal": "Legal Documents",
             "reports": "Reports",
             "comments": "Comments",
-            "tags": "Tags"
+            "tags": "Tags",
+            "marketing": "Marketing"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -583,6 +596,27 @@
             "entries": "entries",
             "filterAction": "Filter by action...",
             "filterUserId": "User ID..."
+        },
+        "marketing": {
+            "title": "Marketing tracking",
+            "subtitle": "Attribution, campaign performance and event delivery.",
+            "tabs": {
+                "overview": "Overview",
+                "users": "Attributed users",
+                "events": "Events"
+            },
+            "totals": {
+                "landings": "Landings (total)",
+                "attributedUsers": "Attributed users",
+                "registrationEvents": "Registration events"
+            },
+            "eventStatus": "Event status",
+            "campaigns": "Campaign performance",
+            "signups": "Signups",
+            "activated": "Activated",
+            "activationRate": "Activation rate",
+            "user": "User",
+            "boundAt": "Bound at"
         },
         "legal": {
             "title": "Legal Documents",

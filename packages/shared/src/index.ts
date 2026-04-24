@@ -102,3 +102,33 @@ export type {
     ProfileLikeStatus,
     ProfileCommentForModeration,
 } from "./models.js";
+
+// ─── Marketing tracking ─────────────────────────────────────
+
+export {
+    MARKETING_EVENT_NAMES,
+    QUALIFYING_ACTIVATION_EVENTS,
+    MARKETING_EVENT_SOURCES,
+    MARKETING_EVENT_STATUSES,
+    MARKETING_CONSENT_STATES,
+    ATTRIBUTION_MODELS,
+    ATTRIBUTION_TTL_DAYS_DEFAULT,
+    ACTIVATION_WINDOW_DAYS_V1,
+    landingAttributionInputSchema,
+} from "./marketing.js";
+
+export type {
+    MarketingEventName,
+    QualifyingActivationEvent,
+    MarketingEventSource,
+    MarketingEventStatus,
+    MarketingConsentState,
+    AttributionModel,
+    LandingAttributionInput,
+    MarketingLandingResponse,
+    MarketingRegistrationDispatchInfo,
+    MarketingAttributionRow,
+    MarketingEventRow,
+    MarketingCampaignAggregate,
+    MarketingOverviewResponse,
+} from "./marketing.js";

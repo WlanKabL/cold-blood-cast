@@ -65,6 +65,21 @@ const envSchema = z.object({
     SMTP_USER: z.string().optional(),
     SMTP_PASS: z.string().optional(),
     SMTP_FROM: z.string().default("KeeperLog <noreply@cold-blood-cast.app>"),
+
+    // Marketing tracking — Meta Pixel / Conversions API
+    META_PIXEL_ENABLED: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
+    META_CAPI_ENABLED: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
+    META_CAPI_DRY_RUN: z.enum(["true", "false"]).default("true").transform((v) => v === "true"),
+    META_PIXEL_ID: z.string().optional(),
+    META_ACCESS_TOKEN: z.string().optional(),
+    META_TEST_EVENT_CODE: z.string().optional(),
+
+    // Marketing tracking — attribution & queue tuning
+    TRACKING_ATTRIBUTION_TTL_DAYS: z.coerce.number().int().positive().default(30),
+    TRACKING_MAX_RETRY_COUNT: z.coerce.number().int().min(0).default(5),
+    TRACKING_RETRY_BASE_DELAY_MS: z.coerce.number().int().min(100).default(5000),
+    TRACKING_DISPATCH_TIMEOUT_MS: z.coerce.number().int().min(500).default(5000),
+    TRACKING_EVENT_RETENTION_DAYS: z.coerce.number().int().positive().default(180),
 });
 
 export type Env = z.infer<typeof envSchema>;

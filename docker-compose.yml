@@ -21,6 +21,20 @@ services:
             timeout: 5s
             retries: 5
 
+    redis:
+        image: redis:7-alpine
+        container_name: cbc-redis
+        restart: unless-stopped
+        ports:
+            - "${REDIS_PORT:-6379}:6379"
+        volumes:
+            - redis_data:/data
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
     backend:
         profiles: [deploy]
         build:
@@ -31,12 +45,15 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
+            redis:
+                condition: service_healthy
         ports:
             - "${PORT:-3001}:3001"
         environment:
             PORT: 3001
             NODE_ENV: production
             DATABASE_URL: postgresql://${POSTGRES_USER:-coldblood}:${POSTGRES_PASSWORD:-coldblood}@postgres:5432/${POSTGRES_DB:-coldbloodcast}
+            REDIS_URL: redis://redis:6379
             DATA_DIR: /app/data
             CORS_ORIGINS: ${CORS_ORIGINS:-*}
             JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
@@ -66,3 +83,4 @@ services:
 volumes:
     postgres_data:
     backend_data:
+    redis_data:

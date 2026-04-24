@@ -142,3 +142,14 @@ Feel free to fork, improve and send PRs. This is a hobbyist project to help rept
 ## 📄 License
 
 MIT – Do whatever you want, but don't sue me if your lizard becomes self-aware 😄
+
+## 📣 Marketing tracking (Phase 1)
+
+Cold Blood Cast supports opt-in Meta Pixel + Conversions API tracking with full
+consent gating and audit trail. See:
+
+- [docs/marketing-event-taxonomy.md](docs/marketing-event-taxonomy.md)
+- [docs/marketing-env-vars.md](docs/marketing-env-vars.md)
+- [docs/marketing-privacy-impact.md](docs/marketing-privacy-impact.md)
+
+Default is **off + dry-run**. Tracking never blocks user registration.

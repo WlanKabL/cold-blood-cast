@@ -97,6 +97,18 @@
         "alwaysOn": "Immer aktiv",
         "revoke": "Cookie-Einstellungen"
     },
+    "cookie_consent": {
+        "title": "Cookies & Tracking",
+        "message": "Wir verwenden Cookies, um Cold Blood Cast zu betreiben und – wenn du zustimmst – unsere Reichweite zu messen.",
+        "essential": "Notwendig",
+        "essential_desc": "Login, Sicherheit und Kernfunktionen. Kann nicht deaktiviert werden.",
+        "analytics": "Analyse",
+        "analytics_desc": "Hilft uns zu verstehen, wie die Seite genutzt wird.",
+        "marketing": "Marketing",
+        "marketing_desc": "Erlaubt das Messen unserer Werbekampagnen (z. B. Meta Pixel).",
+        "accept_all": "Alle akzeptieren",
+        "save_preferences": "Einstellungen speichern"
+    },
     "common": {
         "loading": "Laden...",
         "redirecting": "Weiterleitung...",
@@ -258,7 +270,8 @@
             "legal": "Rechtliche Dokumente",
             "reports": "Meldungen",
             "comments": "Kommentare",
-            "tags": "Tags"
+            "tags": "Tags",
+            "marketing": "Marketing"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -583,6 +596,27 @@
             "entries": "Einträge",
             "filterAction": "Nach Aktion filtern...",
             "filterUserId": "Benutzer-ID..."
+        },
+        "marketing": {
+            "title": "Marketing-Tracking",
+            "subtitle": "Attribution, Kampagnen-Performance und Event-Auslieferung.",
+            "tabs": {
+                "overview": "Übersicht",
+                "users": "Zugeordnete Nutzer",
+                "events": "Events"
+            },
+            "totals": {
+                "landings": "Landings (gesamt)",
+                "attributedUsers": "Zugeordnete Nutzer",
+                "registrationEvents": "Registrierungs-Events"
+            },
+            "eventStatus": "Event-Status",
+            "campaigns": "Kampagnen-Performance",
+            "signups": "Signups",
+            "activated": "Aktiviert",
+            "activationRate": "Aktivierungs-Rate",
+            "user": "Nutzer",
+            "boundAt": "Verknüpft am"
         },
         "legal": {
             "title": "Rechtliche Dokumente",
