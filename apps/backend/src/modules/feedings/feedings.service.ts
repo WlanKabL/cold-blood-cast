@@ -71,7 +71,10 @@ export async function createFeeding(
         throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
     }
     const feeding = await prisma.feeding.create({ data });
-    void recordActivationEvent(userId, "FirstCareEntryCreated", { kind: "feeding", feedingId: feeding.id });
+    void recordActivationEvent(userId, "FirstCareEntryCreated", {
+        kind: "feeding",
+        feedingId: feeding.id,
+    });
     return feeding;
 }
 

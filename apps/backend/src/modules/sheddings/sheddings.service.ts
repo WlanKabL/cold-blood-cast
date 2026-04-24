@@ -61,7 +61,10 @@ export async function createShedding(
         throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
     }
     const shedding = await prisma.shedding.create({ data });
-    void recordActivationEvent(userId, "FirstCareEntryCreated", { kind: "shedding", sheddingId: shedding.id });
+    void recordActivationEvent(userId, "FirstCareEntryCreated", {
+        kind: "shedding",
+        sheddingId: shedding.id,
+    });
     return shedding;
 }
 

@@ -205,7 +205,9 @@ export async function createAudienceExport(
     const id = `aex_${randomBytes(8).toString("hex")}`;
     const downloadToken = randomBytes(24).toString("hex");
     const e = env();
-    const expiresAt = new Date(Date.now() + e.TRACKING_AUDIENCE_EXPORT_RETENTION_DAYS * 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(
+        Date.now() + e.TRACKING_AUDIENCE_EXPORT_RETENTION_DAYS * 24 * 60 * 60 * 1000,
+    );
 
     let candidates: AudienceCandidate[];
     try {
@@ -251,15 +253,15 @@ export async function createAudienceExport(
         },
     });
 
-    log.info(
-        { id, rowCount: candidates.length, format: input.format },
-        "audience export created",
-    );
+    log.info({ id, rowCount: candidates.length, format: input.format }, "audience export created");
     return rowToResponse(row);
 }
 
 export async function listAudienceExports(): Promise<AudienceExportRow[]> {
-    const rows = await prisma.audienceExport.findMany({ orderBy: { createdAt: "desc" }, take: 100 });
+    const rows = await prisma.audienceExport.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 100,
+    });
     return rows.map(rowToResponse);
 }
 

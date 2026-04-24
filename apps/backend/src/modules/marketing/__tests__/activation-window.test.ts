@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-    activationCutoff,
-    isActivatedWithinWindow,
-} from "../activation-window.js";
+import { activationCutoff, isActivatedWithinWindow } from "../activation-window.js";
 
 describe("activation-window", () => {
     const boundAt = new Date("2026-04-01T00:00:00.000Z");
@@ -14,12 +11,8 @@ describe("activation-window", () => {
         });
 
         it("supports configurable windows", () => {
-            expect(activationCutoff(boundAt, 1).toISOString()).toBe(
-                "2026-04-02T00:00:00.000Z",
-            );
-            expect(activationCutoff(boundAt, 30).toISOString()).toBe(
-                "2026-05-01T00:00:00.000Z",
-            );
+            expect(activationCutoff(boundAt, 1).toISOString()).toBe("2026-04-02T00:00:00.000Z");
+            expect(activationCutoff(boundAt, 30).toISOString()).toBe("2026-05-01T00:00:00.000Z");
         });
     });
 

@@ -58,13 +58,13 @@ export async function recordHighValueEvent(
             orderBy: { createdAt: "desc" },
             select: { consentState: true, landingSessionId: true },
         });
-        const consentState = (lastRegEvent?.consentState ??
-            "unknown") as MarketingConsentState;
+        const consentState = (lastRegEvent?.consentState ?? "unknown") as MarketingConsentState;
         const landingSessionId = lastRegEvent?.landingSessionId ?? null;
 
         // Build canonical event_id. Use externalId when supplied (e.g. Stripe charge id)
         // so webhook retries never create a second logical event.
-        const transactionId = input.externalId ?? `${input.eventName}:${input.userId}:${Date.now()}`;
+        const transactionId =
+            input.externalId ?? `${input.eventName}:${input.userId}:${Date.now()}`;
         const eventId = buildCanonicalEventId({
             registrationTransactionId: transactionId,
             userId: input.userId,

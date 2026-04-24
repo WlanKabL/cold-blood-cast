@@ -67,9 +67,18 @@ const envSchema = z.object({
     SMTP_FROM: z.string().default("KeeperLog <noreply@cold-blood-cast.app>"),
 
     // Marketing tracking — Meta Pixel / Conversions API
-    META_PIXEL_ENABLED: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
-    META_CAPI_ENABLED: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
-    META_CAPI_DRY_RUN: z.enum(["true", "false"]).default("true").transform((v) => v === "true"),
+    META_PIXEL_ENABLED: z
+        .enum(["true", "false"])
+        .default("false")
+        .transform((v) => v === "true"),
+    META_CAPI_ENABLED: z
+        .enum(["true", "false"])
+        .default("false")
+        .transform((v) => v === "true"),
+    META_CAPI_DRY_RUN: z
+        .enum(["true", "false"])
+        .default("true")
+        .transform((v) => v === "true"),
     META_PIXEL_ID: z.string().optional(),
     META_ACCESS_TOKEN: z.string().optional(),
     META_TEST_EVENT_CODE: z.string().optional(),

@@ -17,10 +17,7 @@ import { prisma } from "@/config/database.js";
 import { adminGuard, authGuard } from "@/middleware/auth.js";
 import { ErrorCodes, badRequest } from "@/helpers/errors.js";
 import { env } from "@/config/env.js";
-import {
-    getMarketingConfig,
-    updateMarketingSettings,
-} from "./marketing-config.service.js";
+import { getMarketingConfig, updateMarketingSettings } from "./marketing-config.service.js";
 import { getMarketingQueue, rescueStuckPendingEvents } from "./marketing.queue.js";
 import { recordHighValueEvent } from "./high-value-events.service.js";
 import {
@@ -69,7 +66,10 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
                         select: {
                             boundAt: true,
                             user: {
-                                select: { id: true, activationEvents: { select: { occurredAt: true } } },
+                                select: {
+                                    id: true,
+                                    activationEvents: { select: { occurredAt: true } },
+                                },
                             },
                             landingAttribution: {
                                 select: { utmSource: true, utmCampaign: true, utmContent: true },
@@ -360,14 +360,7 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
         async (_request, reply) => {
             const queue = getMarketingQueue();
             const [counts, paused, failedJobs] = await Promise.all([
-                queue.getJobCounts(
-                    "waiting",
-                    "active",
-                    "delayed",
-                    "completed",
-                    "failed",
-                    "paused",
-                ),
+                queue.getJobCounts("waiting", "active", "delayed", "completed", "failed", "paused"),
                 queue.isPaused(),
                 queue.getFailed(0, 19),
             ]);
@@ -627,9 +620,12 @@ export async function adminMarketingRoutes(fastify: FastifyInstance) {
         },
         async (request, reply) => {
             const { id } = request.params as { id: string };
-            const body = (request.body ?? {}) as { provider?: string; options?: Record<string, unknown> };
-            const providerName = (body.provider ?? "meta_custom_audience") as
-                | "meta_custom_audience";
+            const body = (request.body ?? {}) as {
+                provider?: string;
+                options?: Record<string, unknown>;
+            };
+            const providerName = (body.provider ??
+                "meta_custom_audience") as "meta_custom_audience";
             const provider = getAudienceSyncProvider(providerName);
             if (!provider) {
                 throw badRequest(ErrorCodes.E_VALIDATION_ERROR, "Unknown sync provider");

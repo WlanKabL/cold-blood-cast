@@ -23,7 +23,5 @@ export function isActivatedWithinWindow(
     windowDays: number,
 ): boolean {
     const cutoff = activationCutoff(boundAt, windowDays);
-    return activationOccurrences.some(
-        (e) => e.occurredAt >= boundAt && e.occurredAt <= cutoff,
-    );
+    return activationOccurrences.some((e) => e.occurredAt >= boundAt && e.occurredAt <= cutoff);
 }

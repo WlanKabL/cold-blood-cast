@@ -133,8 +133,7 @@ const authStore = useAuthStore();
 const api = useApi();
 
 function readStoredPrefs(): Partial<CookiePreferences> | null {
-    const raw =
-        localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return null;
     try {
         return JSON.parse(raw) as Partial<CookiePreferences>;
@@ -173,11 +172,9 @@ watch(
 );
 
 function syncToBackend(analytics: boolean, marketing: boolean, version: number) {
-    void api
-        .post("/api/users/me/cookie-consent", { analytics, marketing, version })
-        .catch(() => {
-            // Best-effort — consent is stored in localStorage regardless.
-        });
+    void api.post("/api/users/me/cookie-consent", { analytics, marketing, version }).catch(() => {
+        // Best-effort — consent is stored in localStorage regardless.
+    });
 }
 
 function save(analytics: boolean, marketing: boolean) {

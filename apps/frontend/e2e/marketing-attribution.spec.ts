@@ -36,8 +36,7 @@ test.describe("Marketing Attribution Flow", () => {
 
         const [landingReq] = await Promise.all([
             page.waitForRequest(
-                (req) =>
-                    req.url().includes("/api/marketing/landing") && req.method() === "POST",
+                (req) => req.url().includes("/api/marketing/landing") && req.method() === "POST",
                 { timeout: 15_000 },
             ),
             page.goto(
@@ -79,8 +78,7 @@ test.describe("Marketing Attribution Flow", () => {
 
         const [landingReq] = await Promise.all([
             page.waitForRequest(
-                (req) =>
-                    req.url().includes("/api/marketing/landing") && req.method() === "POST",
+                (req) => req.url().includes("/api/marketing/landing") && req.method() === "POST",
                 { timeout: 15_000 },
             ),
             page.goto(
@@ -280,8 +278,7 @@ test.describe("Marketing Attribution Flow", () => {
 
         const [registerReq] = await Promise.all([
             page.waitForRequest(
-                (req) =>
-                    req.url().includes("/api/auth/register") && req.method() === "POST",
+                (req) => req.url().includes("/api/auth/register") && req.method() === "POST",
                 { timeout: 15_000 },
             ),
             submitBtn.click(),
@@ -298,9 +295,7 @@ test.describe("Marketing Attribution Flow", () => {
                 req.method() === "POST",
             { timeout: 10_000 },
         );
-        const matchUrl = browserDeliveredReq
-            .url()
-            .match(/\/events\/([^/]+)\/browser-delivered/);
+        const matchUrl = browserDeliveredReq.url().match(/\/events\/([^/]+)\/browser-delivered/);
         expect(matchUrl?.[1]).toBe(CANONICAL_EVENT_ID);
 
         // Confirm fbq was called with the canonical eventID for Pixel/CAPI dedup.
@@ -314,9 +309,7 @@ test.describe("Marketing Attribution Flow", () => {
         expect((trackCall as unknown[])[3]).toMatchObject({ eventID: CANONICAL_EVENT_ID });
     });
 
-    test("registration without marketing consent does NOT fire browser pixel", async ({
-        page,
-    }) => {
+    test("registration without marketing consent does NOT fire browser pixel", async ({ page }) => {
         await page.addInitScript(() => {
             window.localStorage.setItem(
                 "cbc-cookie-consent",
@@ -329,9 +322,7 @@ test.describe("Marketing Attribution Flow", () => {
             );
             (window as unknown as { fbq: unknown }).fbq = Object.assign(
                 function fbqStub(...args: unknown[]) {
-                    ((window as unknown as { __fbqCalls: unknown[] }).__fbqCalls ||= []).push(
-                        args,
-                    );
+                    ((window as unknown as { __fbqCalls: unknown[] }).__fbqCalls ||= []).push(args);
                 },
                 { loaded: true, version: "2.0", queue: [] },
             );

@@ -50,10 +50,7 @@ import {
     checkInviteCode,
     validateAndConsumeInviteCode,
 } from "@/modules/invites/invites.service.js";
-import {
-    bindAttributionToUser,
-    recordRegistrationEvent,
-} from "@/modules/marketing/index.js";
+import { bindAttributionToUser, recordRegistrationEvent } from "@/modules/marketing/index.js";
 import type { MarketingRegistrationDispatchInfo } from "@cold-blood-cast/shared";
 import pino from "pino";
 

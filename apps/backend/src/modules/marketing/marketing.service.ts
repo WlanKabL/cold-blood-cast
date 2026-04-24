@@ -221,10 +221,7 @@ export async function recordRegistrationEvent(
             },
         });
     } catch (err) {
-        if (
-            err instanceof Prisma.PrismaClientKnownRequestError &&
-            err.code === "P2002"
-        ) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
             log.info({ userId: ctx.userId, eventId }, "browser audit row already exists");
         } else {
             throw err;

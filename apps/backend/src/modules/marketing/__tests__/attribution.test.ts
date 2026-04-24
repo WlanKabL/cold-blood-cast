@@ -77,9 +77,9 @@ describe("isWeakerOrEqualThan", () => {
         );
     });
     it("PAID_CAMPAIGN overwrites ORGANIC_CAMPAIGN", () => {
-        expect(isWeakerOrEqualThan(TouchPriority.PAID_CAMPAIGN, TouchPriority.ORGANIC_CAMPAIGN)).toBe(
-            false,
-        );
+        expect(
+            isWeakerOrEqualThan(TouchPriority.PAID_CAMPAIGN, TouchPriority.ORGANIC_CAMPAIGN),
+        ).toBe(false);
     });
     it("equal priority does not overwrite", () => {
         expect(isWeakerOrEqualThan(TouchPriority.PAID_CAMPAIGN, TouchPriority.PAID_CAMPAIGN)).toBe(

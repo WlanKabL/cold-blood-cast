@@ -18,9 +18,7 @@
                 role="tab"
                 :aria-selected="tabIndex === i"
                 class="text-fg-muted hover:text-fg border-b-2 px-3 py-2 text-sm transition"
-                :class="
-                    tabIndex === i ? 'text-fg border-primary-500' : 'border-transparent'
-                "
+                :class="tabIndex === i ? 'text-fg border-primary-500' : 'border-transparent'"
                 @click="tabIndex = i"
             >
                 {{ t.label }}
@@ -29,7 +27,9 @@
 
         <!-- Overview tab -->
         <div v-if="tabIndex === 0" class="space-y-6">
-            <div v-if="overviewLoading" class="text-fg-muted text-sm">{{ $t("common.loading") }}</div>
+            <div v-if="overviewLoading" class="text-fg-muted text-sm">
+                {{ $t("common.loading") }}
+            </div>
             <div v-else-if="overview" class="space-y-6">
                 <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
                     <div class="glass-card p-4">
@@ -138,14 +138,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="row in users.items" :key="row.userId" class="border-line border-t">
-                            <td class="py-2">{{ row.username }} <span class="text-fg-muted">({{ row.email }})</span></td>
+                        <tr
+                            v-for="row in users.items"
+                            :key="row.userId"
+                            class="border-line border-t"
+                        >
+                            <td class="py-2">
+                                {{ row.username }}
+                                <span class="text-fg-muted">({{ row.email }})</span>
+                            </td>
                             <td class="py-2">{{ row.utmSource ?? "—" }}</td>
                             <td class="py-2">{{ row.utmCampaign ?? "—" }}</td>
-                            <td class="py-2 max-w-[10rem] truncate" :title="row.utmContent ?? ''">{{ row.utmContent ?? "—" }}</td>
-                            <td class="py-2 max-w-[12rem] truncate" :title="row.adsetName ?? row.adsetId ?? ''">{{ row.adsetName ?? row.adsetId ?? "—" }}</td>
-                            <td class="py-2 max-w-[8rem] truncate" :title="row.fbclid ?? row.gclid ?? ''">{{ row.fbclid ? "fb" : row.gclid ? "gcl" : "—" }}</td>
-                            <td class="py-2 max-w-xs truncate">{{ row.referrer ?? "—" }}</td>
+                            <td class="max-w-[10rem] truncate py-2" :title="row.utmContent ?? ''">
+                                {{ row.utmContent ?? "—" }}
+                            </td>
+                            <td
+                                class="max-w-[12rem] truncate py-2"
+                                :title="row.adsetName ?? row.adsetId ?? ''"
+                            >
+                                {{ row.adsetName ?? row.adsetId ?? "—" }}
+                            </td>
+                            <td
+                                class="max-w-[8rem] truncate py-2"
+                                :title="row.fbclid ?? row.gclid ?? ''"
+                            >
+                                {{ row.fbclid ? "fb" : row.gclid ? "gcl" : "—" }}
+                            </td>
+                            <td class="max-w-xs truncate py-2">{{ row.referrer ?? "—" }}</td>
                             <td class="py-2">{{ formatDate(row.boundAt) }}</td>
                         </tr>
                     </tbody>
@@ -167,7 +186,9 @@
                             <th class="py-2">attempts</th>
                             <th class="py-2">created_at</th>
                             <th class="py-2">last_error</th>
-                            <th class="py-2 text-right">{{ $t("admin.marketing.queue.actions") }}</th>
+                            <th class="py-2 text-right">
+                                {{ $t("admin.marketing.queue.actions") }}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -265,7 +286,7 @@
                     </select>
                     <p
                         v-if="!settings.metaAccessTokenConfigured"
-                        class="text-amber-400 text-[11px]"
+                        class="text-[11px] text-amber-400"
                     >
                         {{ $t("admin.marketing.settings.tokenMissing") }}
                     </p>
@@ -353,17 +374,14 @@
                         <p class="text-fg text-xl font-bold">{{ count }}</p>
                     </div>
                 </div>
-                <div v-if="queueHealth.paused" class="text-amber-400 text-sm">
+                <div v-if="queueHealth.paused" class="text-sm text-amber-400">
                     {{ $t("admin.marketing.queue.paused") }}
                 </div>
                 <div class="glass-card overflow-x-auto p-4">
                     <h2 class="text-fg mb-3 text-sm font-semibold">
                         {{ $t("admin.marketing.queue.recentFailures") }}
                     </h2>
-                    <div
-                        v-if="queueHealth.failedJobs.length === 0"
-                        class="text-fg-muted text-xs"
-                    >
+                    <div v-if="queueHealth.failedJobs.length === 0" class="text-fg-muted text-xs">
                         {{ $t("admin.marketing.queue.noFailures") }}
                     </div>
                     <table v-else class="w-full text-left text-xs">
@@ -384,7 +402,7 @@
                                 <td class="py-2 font-mono">{{ job.id }}</td>
                                 <td class="py-2">{{ job.attemptsMade }}</td>
                                 <td class="py-2">{{ formatDate(job.timestamp) }}</td>
-                                <td class="py-2 text-rose-400 max-w-md truncate">
+                                <td class="max-w-md truncate py-2 text-rose-400">
                                     {{ job.failedReason ?? "—" }}
                                 </td>
                             </tr>
@@ -450,27 +468,45 @@
                                 <th class="py-2">utm_campaign</th>
                                 <th class="py-2">utm_content</th>
                                 <th class="py-2 text-right">{{ $t("admin.marketing.signups") }}</th>
-                                <th class="py-2 text-right">{{ $t("admin.marketing.activated") }}</th>
-                                <th class="py-2 text-right">{{ $t("admin.marketing.activationRate") }}</th>
-                                <th class="py-2 text-right">{{ $t("admin.marketing.reports.highValueEvents") }}</th>
-                                <th class="py-2 text-right">{{ $t("admin.marketing.reports.revenue") }}</th>
-                                <th class="py-2 text-right">{{ $t("admin.marketing.reports.revenuePerSignup") }}</th>
+                                <th class="py-2 text-right">
+                                    {{ $t("admin.marketing.activated") }}
+                                </th>
+                                <th class="py-2 text-right">
+                                    {{ $t("admin.marketing.activationRate") }}
+                                </th>
+                                <th class="py-2 text-right">
+                                    {{ $t("admin.marketing.reports.highValueEvents") }}
+                                </th>
+                                <th class="py-2 text-right">
+                                    {{ $t("admin.marketing.reports.revenue") }}
+                                </th>
+                                <th class="py-2 text-right">
+                                    {{ $t("admin.marketing.reports.revenuePerSignup") }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(c, i) in roi.campaigns" :key="i" class="border-line border-t">
+                            <tr
+                                v-for="(c, i) in roi.campaigns"
+                                :key="i"
+                                class="border-line border-t"
+                            >
                                 <td class="py-2">{{ c.utmSource ?? "(direct)" }}</td>
                                 <td class="py-2">{{ c.utmCampaign ?? "—" }}</td>
                                 <td class="py-2">{{ c.utmContent ?? "—" }}</td>
                                 <td class="py-2 text-right">{{ c.signups }}</td>
                                 <td class="py-2 text-right">{{ c.activated }}</td>
-                                <td class="py-2 text-right">{{ (c.activationRate * 100).toFixed(1) }}%</td>
+                                <td class="py-2 text-right">
+                                    {{ (c.activationRate * 100).toFixed(1) }}%
+                                </td>
                                 <td class="py-2 text-right">{{ c.highValueEvents }}</td>
-                                <td class="py-2 text-right">{{ c.revenue.toFixed(2) }} {{ c.currency ?? "" }}</td>
+                                <td class="py-2 text-right">
+                                    {{ c.revenue.toFixed(2) }} {{ c.currency ?? "" }}
+                                </td>
                                 <td class="py-2 text-right">{{ c.revenuePerSignup.toFixed(2) }}</td>
                             </tr>
                             <tr v-if="roi.campaigns.length === 0">
-                                <td colspan="9" class="py-4 text-center text-fg-muted">
+                                <td colspan="9" class="text-fg-muted py-4 text-center">
                                     {{ $t("admin.marketing.reports.empty") }}
                                 </td>
                             </tr>
@@ -555,7 +591,9 @@
                 </div>
             </div>
 
-            <div v-if="audiencesLoading" class="text-fg-muted text-sm">{{ $t("common.loading") }}</div>
+            <div v-if="audiencesLoading" class="text-fg-muted text-sm">
+                {{ $t("common.loading") }}
+            </div>
             <div v-else-if="audiences" class="glass-card overflow-x-auto p-4">
                 <table class="w-full text-left text-xs">
                     <thead class="text-fg-muted">
@@ -563,19 +601,29 @@
                             <th class="py-2">{{ $t("admin.marketing.audiences.name") }}</th>
                             <th class="py-2">format</th>
                             <th class="py-2">status</th>
-                            <th class="py-2 text-right">{{ $t("admin.marketing.audiences.rowCount") }}</th>
+                            <th class="py-2 text-right">
+                                {{ $t("admin.marketing.audiences.rowCount") }}
+                            </th>
                             <th class="py-2">{{ $t("admin.marketing.audiences.expiresAt") }}</th>
-                            <th class="py-2 text-right">{{ $t("admin.marketing.queue.actions") }}</th>
+                            <th class="py-2 text-right">
+                                {{ $t("admin.marketing.queue.actions") }}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="row in audiences.items" :key="row.id" class="border-line border-t">
+                        <tr
+                            v-for="row in audiences.items"
+                            :key="row.id"
+                            class="border-line border-t"
+                        >
                             <td class="py-2">{{ row.name }}</td>
                             <td class="py-2">{{ row.format }}</td>
                             <td class="py-2">{{ row.status }}</td>
                             <td class="py-2 text-right">{{ row.rowCount }}</td>
-                            <td class="py-2">{{ row.expiresAt ? formatDate(row.expiresAt) : "—" }}</td>
-                            <td class="py-2 space-x-2 text-right">
+                            <td class="py-2">
+                                {{ row.expiresAt ? formatDate(row.expiresAt) : "—" }}
+                            </td>
+                            <td class="space-x-2 py-2 text-right">
                                 <a
                                     v-if="row.downloadUrl"
                                     :href="row.downloadUrl"
@@ -590,7 +638,11 @@
                                     :disabled="syncingId === row.id"
                                     @click="syncAudience(row.id)"
                                 >
-                                    {{ syncingId === row.id ? $t("common.loading") : $t("admin.marketing.audiences.sync") }}
+                                    {{
+                                        syncingId === row.id
+                                            ? $t("common.loading")
+                                            : $t("admin.marketing.audiences.sync")
+                                    }}
                                 </button>
                                 <button
                                     type="button"
@@ -602,7 +654,7 @@
                             </td>
                         </tr>
                         <tr v-if="audiences.items.length === 0">
-                            <td colspan="6" class="py-4 text-center text-fg-muted">
+                            <td colspan="6" class="text-fg-muted py-4 text-center">
                                 {{ $t("admin.marketing.audiences.empty") }}
                             </td>
                         </tr>

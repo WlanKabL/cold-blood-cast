@@ -194,7 +194,10 @@ export async function rescueStuckPendingEvents(opts?: {
             reEnqueued += 1;
         } catch (err) {
             skipped += 1;
-            log.warn({ marketingEventId: row.id, err: (err as Error).message }, "rescue enqueue failed");
+            log.warn(
+                { marketingEventId: row.id, err: (err as Error).message },
+                "rescue enqueue failed",
+            );
         }
     }
     log.info(

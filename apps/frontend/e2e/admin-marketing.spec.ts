@@ -244,8 +244,7 @@ test.describe("Admin Marketing Dashboard", () => {
                     createdById: "admin",
                     createdAt: "2026-04-22T09:00:00.000Z",
                     expiresAt: "2026-05-22T09:00:00.000Z",
-                    downloadUrl:
-                        "/api/admin/marketing/audience-exports/download/tok_existing",
+                    downloadUrl: "/api/admin/marketing/audience-exports/download/tok_existing",
                 },
             ],
         };
@@ -274,8 +273,7 @@ test.describe("Admin Marketing Dashboard", () => {
                         createdById: "admin",
                         createdAt: new Date().toISOString(),
                         expiresAt: new Date(Date.now() + 30 * 86400_000).toISOString(),
-                        downloadUrl:
-                            "/api/admin/marketing/audience-exports/download/tok_new",
+                        downloadUrl: "/api/admin/marketing/audience-exports/download/tok_new",
                     },
                 }),
             });
@@ -287,7 +285,10 @@ test.describe("Admin Marketing Dashboard", () => {
         await expect(page.getByText("EU activated April")).toBeVisible({ timeout: 10_000 });
         await expect(page.getByText("142")).toBeVisible();
         // Download link must be present and tokenised (not raw email content).
-        const dl = page.getByRole("link").filter({ hasText: /download|herunterladen/i }).first();
+        const dl = page
+            .getByRole("link")
+            .filter({ hasText: /download|herunterladen/i })
+            .first();
         await expect(dl).toHaveAttribute("href", /\/audience-exports\/download\/tok_existing/);
     });
 

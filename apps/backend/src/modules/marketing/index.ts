@@ -15,10 +15,7 @@ export {
 } from "./marketing.queue.js";
 export { buildCanonicalEventId } from "./event-id.js";
 export { decideMarketingDispatch } from "./consent-matrix.js";
-export {
-    recordActivationEvent,
-    recordFirstCareEntryActivation,
-} from "./activation.service.js";
+export { recordActivationEvent, recordFirstCareEntryActivation } from "./activation.service.js";
 export {
     getMarketingConfig,
     updateMarketingSettings,
@@ -32,8 +29,5 @@ export {
     deleteAudienceExport,
     expireOldAudienceExports,
 } from "./audience-export.service.js";
-export {
-    registerAudienceSyncProvider,
-    getAudienceSyncProvider,
-} from "./audience-sync.service.js";
+export { registerAudienceSyncProvider, getAudienceSyncProvider } from "./audience-sync.service.js";
 export { buildRoiReport } from "./roi-report.service.js";

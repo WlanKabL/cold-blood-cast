@@ -453,9 +453,8 @@ async function handleRegister() {
 
         // ── Marketing attribution: attach landing session + consent ──
         try {
-            const { getLandingSessionId } = await import(
-                "~/plugins/01.marketing-attribution.client"
-            );
+            const { getLandingSessionId } =
+                await import("~/plugins/01.marketing-attribution.client");
             const sid = getLandingSessionId();
             if (sid) payload.landingSessionId = sid;
         } catch {

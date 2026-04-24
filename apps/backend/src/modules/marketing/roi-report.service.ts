@@ -75,7 +75,10 @@ export async function buildRoiReport(input: RoiReportInput = {}): Promise<Market
         revenue: number;
         currency: string | null;
     };
-    const buckets = new Map<string, { key: [string | null, string | null, string | null]; v: Bucket }>();
+    const buckets = new Map<
+        string,
+        { key: [string | null, string | null, string | null]; v: Bucket }
+    >();
 
     for (const attr of attrs) {
         const key: [string | null, string | null, string | null] = [
@@ -128,7 +131,13 @@ export async function buildRoiReport(input: RoiReportInput = {}): Promise<Market
             if (!acc.currency && c.currency) acc.currency = c.currency;
             return acc;
         },
-        { signups: 0, activated: 0, highValueEvents: 0, revenue: 0, currency: null as string | null },
+        {
+            signups: 0,
+            activated: 0,
+            highValueEvents: 0,
+            revenue: 0,
+            currency: null as string | null,
+        },
     );
     totals.revenue = Math.round(totals.revenue * 100) / 100;
 

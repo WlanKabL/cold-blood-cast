@@ -50,10 +50,7 @@ export function computeTouchPriority(input: {
 }
 
 /** Plan §6.2 — never overwrite valid first-touch with weaker traffic. */
-export function isWeakerOrEqualThan(
-    candidate: TouchPriority,
-    incumbent: TouchPriority,
-): boolean {
+export function isWeakerOrEqualThan(candidate: TouchPriority, incumbent: TouchPriority): boolean {
     return candidate <= incumbent;
 }
 
@@ -107,13 +104,7 @@ export function normalizeLandingInput(input: LandingAttributionInput): {
 /** Type alias for a landing attribution record (subset used by binding logic). */
 export type LandingAttributionRecord = Pick<
     Prisma.LandingAttributionGetPayload<true>,
-    | "id"
-    | "expiresAt"
-    | "utmSource"
-    | "utmMedium"
-    | "utmCampaign"
-    | "fbclid"
-    | "referrer"
+    "id" | "expiresAt" | "utmSource" | "utmMedium" | "utmCampaign" | "fbclid" | "referrer"
 >;
 
 /** Returns true if the landing attribution is still within its TTL. */
