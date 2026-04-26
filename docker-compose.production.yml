@@ -77,6 +77,11 @@ services:
         restart: unless-stopped
         environment:
             PORT: "3000"
+            # Marketing config is fetched at runtime from the backend
+            # (GET /api/marketing/config). The frontend container intentionally
+            # has NO META_* env vars — the CAPI access token must never reach
+            # this service, and the public Pixel settings come from the API
+            # so admin overrides take effect without a redeploy.
         ports:
             - "3300:3000"
         networks:

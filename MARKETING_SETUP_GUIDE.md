@@ -38,9 +38,31 @@ On top of that there is:
 
 ## Part B — What you need to configure
 
+### B.0 Where the env file lives (deploy flow)
+
+This repo has three relevant env files:
+
+| File                              | Tracked by git? | Purpose                                                                                                                           |
+| --------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/backend/.env.example`       | yes             | Local dev template for the backend process                                                                                        |
+| `.env.production.example`         | yes             | Production template — placeholders only, never real secrets                                                                       |
+| `.env.production.local`           | **no** (gitignored via `.env.*.local`) | Your real operator copy — paste this into the `DOTENV` GitHub Actions secret for the production environment |
+
+Production deploy flow:
+
+1. You edit `.env.production.local` locally with the real values.
+2. You copy its **entire contents** into GitHub → Settings → Environments → `production` → secret named `DOTENV`.
+3. The CD pipeline writes that secret to `.env` on the server next to `docker-compose.production.yml`.
+4. `docker-compose.production.yml` reads it two ways:
+   - `backend` service: `env_file: .env` → all variables (including `META_ACCESS_TOKEN`) are injected only into the backend container.
+   - `frontend` service: **no `META_*` env at all**. The frontend asks the backend for `/api/marketing/config` at runtime, so admin overrides take effect immediately without a redeploy and the CAPI access token never reaches the frontend container.
+
+> **Rule:** never put `META_ACCESS_TOKEN` (or any other secret) into a tracked file. The example/template files must contain placeholders only.
+
 ### B.1 Required environment variables
 
-Set these in `apps/backend/.env` (or your deployment env):
+For local dev: set these in `apps/backend/.env`.
+For production: set these in `.env.production.local` (then copy to the `DOTENV` GitHub secret — see B.0 above).
 
 | Variable                                  | Required when               | Default | Meaning                                                                                                                                                       |
 | ----------------------------------------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -210,6 +232,21 @@ If `META_CAPI_ENABLED=true` and `META_CAPI_DRY_RUN=false` but `META_PIXEL_ID` or
 
 1. restart the backend (so the env reload applies), or update via the admin settings UI
 2. for each affected row, `POST /api/admin/marketing/events/:id/retry` (or batch this from the admin UI)
+
+---
+
+## Part E3 — Rotating the Meta CAPI access token
+
+The system-user token is a long-lived secret. Rotate it periodically — and immediately if it leaks:
+
+1. Meta Business Manager → Events Manager → your Pixel → Settings → Conversions API → generate a fresh access token.
+2. Update `META_ACCESS_TOKEN` in `.env.production.local`.
+3. Re-paste the **whole** `.env.production.local` content into the GitHub `DOTENV` production secret.
+4. Re-run the deploy workflow (or `docker compose -f docker-compose.production.yml up -d backend`) so the backend picks up the new env.
+5. Verify: trigger a test event with `META_TEST_EVENT_CODE` set, confirm it lands in Meta's Test Events tab and that the `marketing_events` row has `status=sent`.
+6. Revoke the old token in Meta Business Manager.
+
+Never commit the token to the repo. Never paste it into Slack, issues, or chat logs.
 
 ---
 
