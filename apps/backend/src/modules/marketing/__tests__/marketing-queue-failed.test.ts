@@ -9,7 +9,12 @@ const mockPrisma = {
 };
 
 interface FailedHandler {
-    (job: { id?: string; opts?: { attempts?: number }; attemptsMade?: number; data?: unknown } | undefined, err: Error): void;
+    (
+        job:
+            | { id?: string; opts?: { attempts?: number }; attemptsMade?: number; data?: unknown }
+            | undefined,
+        err: Error,
+    ): void;
 }
 
 let capturedFailedHandler: FailedHandler | null = null;
