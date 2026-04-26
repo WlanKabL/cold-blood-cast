@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { isValidTheme, type Theme } from "~/types/settings";
+import { detectBrowserLocale } from "~/utils/detect-locale";
 
 export const useSettingsStore = defineStore("settings", () => {
     const i18n = useNuxtApp().$i18n as ReturnType<typeof useI18n>;
@@ -13,16 +14,21 @@ export const useSettingsStore = defineStore("settings", () => {
         return typeof value === "string" && availableLocales.value.includes(value);
     }
 
+    // First-visit default: detect from browser (de → German, otherwise English).
+    // Once the user explicitly picks a locale it gets persisted to kl_locale and
+    // detection is skipped on subsequent visits.
+    const initialLocale = detectBrowserLocale(availableLocales.value, "en");
+
     // Single source of truth - localStorage with validation
-    const currentLocale = useLocalStorage<string>("kl_locale", "en", {
+    const currentLocale = useLocalStorage<string>("kl_locale", initialLocale, {
         writeDefaults: false,
         serializer: {
             read: (value: string | null) => {
                 try {
                     const parsed = value ? JSON.parse(value) : null;
-                    return isValidLocale(parsed) ? parsed : "en";
+                    return isValidLocale(parsed) ? parsed : initialLocale;
                 } catch {
-                    return "en";
+                    return initialLocale;
                 }
             },
             write: (value: string) => JSON.stringify(value),
@@ -82,8 +88,17 @@ export const useSettingsStore = defineStore("settings", () => {
     applyTheme();
     watch(currentTheme, applyTheme);
 
+    // Sync <html lang> so SEO crawlers + screen readers see the right language.
+    function applyHtmlLang(localeCode: string) {
+        if (typeof document === "undefined") return;
+        const tag = availableLocales.value.includes(localeCode) ? localeCode : "en";
+        document.documentElement.setAttribute("lang", tag);
+    }
+
     // Set initial locale
     setLocale(currentLocale.value as Parameters<typeof setLocale>[0]);
+    applyHtmlLang(currentLocale.value);
+    watch(currentLocale, applyHtmlLang);
 
     return {
         currentLocale,

@@ -16,8 +16,9 @@ vi.stubGlobal("useNuxtApp", () => ({
 }));
 
 const mockClassList = { add: vi.fn(), remove: vi.fn() };
+const mockSetAttribute = vi.fn();
 vi.stubGlobal("document", {
-    documentElement: { classList: mockClassList },
+    documentElement: { classList: mockClassList, setAttribute: mockSetAttribute },
 });
 
 // useLocalStorage — simulate a plain reactive ref (no real localStorage in test)
