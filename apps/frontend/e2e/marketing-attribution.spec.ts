@@ -162,6 +162,16 @@ test.describe("Marketing Attribution Flow", () => {
                         timestamp: new Date().toISOString(),
                     }),
                 );
+                // Seed the cached public marketing config so `useMarketingTracking`
+                // considers the Pixel enabled even when the runtimeConfig env vars
+                // (METAPIXEL_*) are unset (which is the case in CI).
+                window.sessionStorage.setItem(
+                    "cbc-marketing-public-config",
+                    JSON.stringify({
+                        metaPixelEnabled: true,
+                        metaPixelId: "1234567890",
+                    }),
+                );
                 // Stub fbq so the plugin doesn't actually load Facebook's script.
                 (window as unknown as { fbq: unknown }).fbq = Object.assign(
                     function fbqStub(...args: unknown[]) {
