@@ -42,11 +42,11 @@ On top of that there is:
 
 This repo has three relevant env files:
 
-| File                              | Tracked by git? | Purpose                                                                                                                           |
-| --------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/backend/.env.example`       | yes             | Local dev template for the backend process                                                                                        |
-| `.env.production.example`         | yes             | Production template — placeholders only, never real secrets                                                                       |
-| `.env.production.local`           | **no** (gitignored via `.env.*.local`) | Your real operator copy — paste this into the `DOTENV` GitHub Actions secret for the production environment |
+| File                        | Tracked by git?                        | Purpose                                                                                                     |
+| --------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `apps/backend/.env.example` | yes                                    | Local dev template for the backend process                                                                  |
+| `.env.production.example`   | yes                                    | Production template — placeholders only, never real secrets                                                 |
+| `.env.production.local`     | **no** (gitignored via `.env.*.local`) | Your real operator copy — paste this into the `DOTENV` GitHub Actions secret for the production environment |
 
 Production deploy flow:
 
@@ -54,8 +54,8 @@ Production deploy flow:
 2. You copy its **entire contents** into GitHub → Settings → Environments → `production` → secret named `DOTENV`.
 3. The CD pipeline writes that secret to `.env` on the server next to `docker-compose.production.yml`.
 4. `docker-compose.production.yml` reads it two ways:
-   - `backend` service: `env_file: .env` → all variables (including `META_ACCESS_TOKEN`) are injected only into the backend container.
-   - `frontend` service: **no `META_*` env at all**. The frontend asks the backend for `/api/marketing/config` at runtime, so admin overrides take effect immediately without a redeploy and the CAPI access token never reaches the frontend container.
+    - `backend` service: `env_file: .env` → all variables (including `META_ACCESS_TOKEN`) are injected only into the backend container.
+    - `frontend` service: **no `META_*` env at all**. The frontend asks the backend for `/api/marketing/config` at runtime, so admin overrides take effect immediately without a redeploy and the CAPI access token never reaches the frontend container.
 
 > **Rule:** never put `META_ACCESS_TOKEN` (or any other secret) into a tracked file. The example/template files must contain placeholders only.
 
