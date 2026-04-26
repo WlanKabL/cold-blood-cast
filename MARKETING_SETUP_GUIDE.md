@@ -211,6 +211,14 @@ The CAPI worker is BullMQ-backed and depends on Redis. The system is built so th
 | `failed`     | hard failure after BullMQ retry budget exhausted                    | inspect `lastErrorCode`/`failureReason`, fix root cause, then `POST /api/admin/marketing/events/:id/retry` |
 | `skipped`    | deliberate non-dispatch (consent denied, channel disabled, dry-run) | none — informational only                                                                                  |
 
+**Browser delivery confirmation (browser events only):**
+
+The frontend only POSTs `/api/marketing/events/:id/browser-delivered` after `fbevents.js` has actually loaded (i.e. `window.fbq.callMethod` is wired) within a 3s timeout. If an ad-blocker or network failure prevents the script from loading, the event row stays `pending` and is reconciled by `rescueStuckPendingEvents`. This means the `sent` status reflects real delivery, not just "we called fbq".
+
+**Live consent changes:**
+
+When a visitor accepts marketing consent in the cookie banner, the banner dispatches a `cbc:consent-updated` window event. The Meta Pixel plugin listens for it and re-bootstraps the Pixel without requiring a page reload.
+
 **Recovery: stuck `pending` events (Redis was unreachable when the row was created)**
 
 The backend automatically calls `rescueStuckPendingEvents()` on startup. It re-enqueues every server event with `status=pending` older than `TRACKING_PENDING_RESCUE_AFTER_SECONDS` (default 120s). BullMQ uses the marketing-event id as `jobId`, so re-enqueueing the same event is a no-op — the sweep is **idempotent and safe to run repeatedly**.

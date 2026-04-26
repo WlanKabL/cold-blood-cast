@@ -170,16 +170,24 @@ test.describe("Marketing Attribution Flow", () => {
                     JSON.stringify({
                         metaPixelEnabled: true,
                         metaPixelId: "1234567890",
+                        cachedAt: Date.now(),
                     }),
                 );
                 // Stub fbq so the plugin doesn't actually load Facebook's script.
+                // `callMethod` is set so `waitForMetaPixelReady` resolves true,
+                // matching the post-load shape of the real fbevents.js stub.
                 (window as unknown as { fbq: unknown }).fbq = Object.assign(
                     function fbqStub(...args: unknown[]) {
                         ((window as unknown as { __fbqCalls: unknown[] }).__fbqCalls ||= []).push(
                             args,
                         );
                     },
-                    { loaded: true, version: "2.0", queue: [] },
+                    {
+                        loaded: true,
+                        version: "2.0",
+                        queue: [],
+                        callMethod: function callMethodStub() {},
+                    },
                 );
             },
             { sid: LANDING_SID },
@@ -455,6 +463,292 @@ test.describe("Marketing Attribution Flow", () => {
             (c) => c[0] === "track" && c[1] === "CompleteRegistration",
         );
         expect(trackCall).toBeUndefined();
+        expect(browserDeliveredCalled).toBe(false);
+    });
+
+    test("landing page fires Pixel PageView when consent + Pixel are enabled", async ({ page }) => {
+        await page.addInitScript(() => {
+            window.localStorage.setItem(
+                "cbc-cookie-consent",
+                JSON.stringify({
+                    version: 2,
+                    analytics: true,
+                    marketing: true,
+                    timestamp: new Date().toISOString(),
+                }),
+            );
+            window.sessionStorage.setItem(
+                "cbc-marketing-public-config",
+                JSON.stringify({
+                    metaPixelEnabled: true,
+                    metaPixelId: "9999999999",
+                    cachedAt: Date.now(),
+                }),
+            );
+            (window as unknown as { fbq: unknown }).fbq = Object.assign(
+                function fbqStub(...args: unknown[]) {
+                    ((window as unknown as { __fbqCalls: unknown[] }).__fbqCalls ||= []).push(args);
+                },
+                {
+                    loaded: true,
+                    version: "2.0",
+                    queue: [],
+                    callMethod: function callMethodStub() {},
+                },
+            );
+        });
+
+        await page.route("**/api/marketing/landing", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: { landingSessionId: LANDING_SID, expiresAt: new Date().toISOString() },
+                }),
+            }),
+        );
+        await page.route("**/api/marketing/config", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: { metaPixelEnabled: true, metaPixelId: "9999999999" },
+                }),
+            }),
+        );
+
+        await page.goto("/");
+        // The pixel plugin runs once after hydration; give it a tick to bootstrap.
+        await page.waitForFunction(
+            () => {
+                const calls = (window as unknown as { __fbqCalls?: unknown[][] }).__fbqCalls ?? [];
+                return (
+                    calls.some((c) => c[0] === "init") &&
+                    calls.some((c) => c[0] === "track" && c[1] === "PageView")
+                );
+            },
+            { timeout: 10_000 },
+        );
+
+        const fbqCalls = (await page.evaluate(
+            () => (window as unknown as { __fbqCalls?: unknown[] }).__fbqCalls ?? [],
+        )) as unknown[][];
+        const initCall = fbqCalls.find((c) => c[0] === "init");
+        const pageViewCall = fbqCalls.find((c) => c[0] === "track" && c[1] === "PageView");
+        expect(initCall).toBeDefined();
+        expect((initCall as unknown[])[1]).toBe("9999999999");
+        expect(pageViewCall).toBeDefined();
+    });
+
+    test("landing page does NOT init Pixel when marketing consent is denied", async ({ page }) => {
+        await page.addInitScript(() => {
+            window.localStorage.setItem(
+                "cbc-cookie-consent",
+                JSON.stringify({
+                    version: 2,
+                    analytics: false,
+                    marketing: false,
+                    timestamp: new Date().toISOString(),
+                }),
+            );
+            (window as unknown as { fbq: unknown }).fbq = Object.assign(
+                function fbqStub(...args: unknown[]) {
+                    ((window as unknown as { __fbqCalls: unknown[] }).__fbqCalls ||= []).push(args);
+                },
+                {
+                    loaded: true,
+                    version: "2.0",
+                    queue: [],
+                    callMethod: function callMethodStub() {},
+                },
+            );
+        });
+
+        await page.route("**/api/marketing/landing", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: { landingSessionId: LANDING_SID, expiresAt: new Date().toISOString() },
+                }),
+            }),
+        );
+        await page.route("**/api/marketing/config", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: { metaPixelEnabled: true, metaPixelId: "9999999999" },
+                }),
+            }),
+        );
+
+        await page.goto("/");
+        await page.waitForTimeout(800);
+        const fbqCalls = (await page.evaluate(
+            () => (window as unknown as { __fbqCalls?: unknown[] }).__fbqCalls ?? [],
+        )) as unknown[][];
+        const initCall = fbqCalls.find((c) => c[0] === "init");
+        const pageViewCall = fbqCalls.find((c) => c[0] === "track" && c[1] === "PageView");
+        expect(initCall).toBeUndefined();
+        expect(pageViewCall).toBeUndefined();
+    });
+
+    test("registration does NOT POST browser-delivered when fbevents.js never loads", async ({
+        page,
+    }) => {
+        // Pre-seed consent + cached pixel config + landing session, but NOT
+        // a `callMethod` on fbq. This simulates an adblocker / network failure
+        // where the script never wires the real implementation.
+        await page.addInitScript(
+            ({ sid }) => {
+                window.localStorage.setItem(
+                    "cbc-landing-attribution",
+                    JSON.stringify({ landingSessionId: sid, capturedAt: Date.now() }),
+                );
+                window.localStorage.setItem(
+                    "cbc-cookie-consent",
+                    JSON.stringify({
+                        version: 2,
+                        analytics: true,
+                        marketing: true,
+                        timestamp: new Date().toISOString(),
+                    }),
+                );
+                window.sessionStorage.setItem(
+                    "cbc-marketing-public-config",
+                    JSON.stringify({
+                        metaPixelEnabled: true,
+                        metaPixelId: "1234567890",
+                        cachedAt: Date.now(),
+                    }),
+                );
+                // fbq stub WITHOUT callMethod — script never loaded.
+                (window as unknown as { fbq: unknown }).fbq = Object.assign(
+                    function fbqStub(...args: unknown[]) {
+                        ((window as unknown as { __fbqCalls: unknown[] }).__fbqCalls ||= []).push(
+                            args,
+                        );
+                    },
+                    { loaded: true, version: "2.0", queue: [] },
+                );
+            },
+            { sid: LANDING_SID },
+        );
+
+        await page.route("**/api/auth/register", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: {
+                        user: {
+                            id: "usr_blocked_001",
+                            username: "blocked",
+                            email: "blocked@example.com",
+                            displayName: null,
+                            avatarUrl: null,
+                            createdAt: new Date().toISOString(),
+                            emailVerified: false,
+                            onboardingCompleted: false,
+                            locale: "en",
+                        },
+                        tokens: { accessToken: "mock-access", refreshToken: "mock-refresh" },
+                        marketingDispatch: {
+                            eventId: CANONICAL_EVENT_ID,
+                            eventName: "CompleteRegistration",
+                            browserDispatchAllowed: true,
+                        },
+                        pendingApproval: false,
+                    },
+                }),
+            }),
+        );
+        await page.route("**/api/auth/me", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: {
+                        user: {
+                            id: "usr_blocked_001",
+                            username: "blocked",
+                            email: "blocked@example.com",
+                            displayName: null,
+                            avatarUrl: null,
+                            createdAt: new Date().toISOString(),
+                            emailVerified: true,
+                            onboardingCompleted: true,
+                            locale: "en",
+                        },
+                        roles: ["user"],
+                        features: {},
+                        limits: {},
+                        enabledFlags: [],
+                        featureTiers: {},
+                        impersonatedBy: null,
+                    },
+                }),
+            }),
+        );
+        await page.route("**/api/marketing/landing", (route) =>
+            route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: true,
+                    data: { landingSessionId: LANDING_SID, expiresAt: new Date().toISOString() },
+                }),
+            }),
+        );
+
+        let browserDeliveredCalled = false;
+        await page.route("**/api/marketing/events/*/browser-delivered", (route) => {
+            browserDeliveredCalled = true;
+            return route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify({ success: true, data: { ok: true } }),
+            });
+        });
+
+        await page.goto("/register");
+        await page.locator("input[type='text'], input[name*='user']").first().fill("blocked");
+        await page.locator("input[type='email']").first().fill("blocked@example.com");
+        const pwInputs = page.locator("input[type='password']");
+        await pwInputs.nth(0).fill("Sup3rSecur3!Pa55");
+        await pwInputs.nth(1).fill("Sup3rSecur3!Pa55");
+        await page.getByRole("checkbox").first().check();
+
+        const submitBtn = page.getByRole("button", {
+            name: /create account|register|registrieren|sign up|konto erstellen/i,
+        });
+        await expect(submitBtn).toBeEnabled({ timeout: 15_000 });
+
+        await Promise.all([
+            page.waitForRequest(
+                (req) => req.url().includes("/api/auth/register") && req.method() === "POST",
+                { timeout: 15_000 },
+            ),
+            submitBtn.click(),
+        ]);
+
+        // The composable waits up to ~3s for fbq.callMethod, then bails.
+        await page.waitForTimeout(4500);
+
+        const fbqCalls = (await page.evaluate(
+            () => (window as unknown as { __fbqCalls?: unknown[] }).__fbqCalls ?? [],
+        )) as unknown[][];
+        // We DID push the track call into the fbq queue (Pixel pattern), but
+        // because the script never loaded we must NOT have confirmed delivery.
+        const trackCall = fbqCalls.find((c) => c[0] === "track" && c[1] === "CompleteRegistration");
+        expect(trackCall).toBeDefined();
         expect(browserDeliveredCalled).toBe(false);
     });
 });

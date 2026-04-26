@@ -191,6 +191,13 @@ function save(analytics: boolean, marketing: boolean) {
     visible.value = false;
     showDetails.value = false;
 
+    // Notify the Meta Pixel plugin (and any future trackers) that consent
+    // changed, so they can bootstrap immediately instead of waiting for a
+    // full page reload.
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("cbc:consent-updated"));
+    }
+
     if (authStore.isAuthenticated) {
         syncToBackend(analytics, marketing, CONSENT_VERSION);
     }
