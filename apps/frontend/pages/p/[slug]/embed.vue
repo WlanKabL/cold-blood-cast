@@ -1,5 +1,5 @@
 <template>
-    <div class="public-page-bg bg-base min-h-dvh p-4">
+    <div class="public-page-bg bg-page min-h-dvh p-4">
         <div class="flex min-h-[200px] items-center justify-center">
             <div v-if="loading" class="text-center">
                 <Icon name="lucide:loader-2" class="text-fg-faint h-6 w-6 animate-spin" />

@@ -1,5 +1,5 @@
-<template>
-    <div class="bg-base flex min-h-dvh items-center justify-center px-4 py-8">
+﻿<template>
+    <div class="bg-page flex min-h-dvh items-center justify-center px-4 py-8">
         <LayoutGuestControls />
         <div class="border-line bg-surface w-full max-w-md rounded-2xl border p-8 backdrop-blur-xl">
             <!-- Logo / Brand -->

@@ -1,13 +1,13 @@
-<template>
-    <div class="landing bg-base text-fg relative min-h-dvh">
+﻿<template>
+    <div class="landing bg-page text-fg relative min-h-dvh">
         <PublicNav />
 
         <!-- ═══ Hero ═══ -->
         <section class="relative z-10 overflow-hidden pt-32 pb-16 md:pt-40 md:pb-24">
             <div class="absolute inset-0 z-0" aria-hidden="true">
                 <img src="/bg2.png" alt="" class="h-full w-full object-cover" loading="eager" />
-                <div class="bg-base/70 absolute inset-0" />
-                <div class="from-base/40 to-base absolute inset-0 bg-linear-to-b via-transparent" />
+                <div class="bg-page/70 absolute inset-0" />
+                <div class="from-page/40 to-page absolute inset-0 bg-linear-to-b via-transparent" />
             </div>
             <div class="relative z-10 mx-auto max-w-7xl px-6 text-center">
                 <p
@@ -89,8 +89,8 @@
         <section class="relative z-10 overflow-hidden py-24 md:py-32">
             <div class="absolute inset-0 z-0" aria-hidden="true">
                 <img src="/bg5.png" alt="" class="h-full w-full object-cover" loading="lazy" />
-                <div class="bg-base/70 absolute inset-0" />
-                <div class="from-base to-base absolute inset-0 bg-linear-to-b via-transparent" />
+                <div class="bg-page/70 absolute inset-0" />
+                <div class="from-page to-page absolute inset-0 bg-linear-to-b via-transparent" />
             </div>
             <div class="relative z-10 mx-auto max-w-3xl px-6 text-center">
                 <div data-reveal>

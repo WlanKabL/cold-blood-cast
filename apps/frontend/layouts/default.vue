@@ -1,5 +1,5 @@
-<template>
-    <div class="page-bg bg-base flex h-dvh overflow-hidden">
+﻿<template>
+    <div class="page-bg bg-page flex h-dvh overflow-hidden">
         <LayoutAppSidebar :is-open="sidebarOpen" @close="sidebarOpen = false" />
 
         <!-- Main area -->

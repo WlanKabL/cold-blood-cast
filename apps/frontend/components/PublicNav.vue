@@ -1,9 +1,9 @@
-<template>
+﻿<template>
     <nav
         class="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
         :class="
             navScrolled || mobileMenuOpen
-                ? 'border-line bg-base-translucent border-b shadow-2xl shadow-black/30 backdrop-blur-xl backdrop-saturate-150'
+                ? 'border-line bg-page-translucent border-b shadow-2xl shadow-black/30 backdrop-blur-xl backdrop-saturate-150'
                 : 'bg-transparent'
         "
     >

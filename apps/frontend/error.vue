@@ -1,5 +1,5 @@
-<template>
-    <div class="bg-base flex min-h-dvh flex-col items-center justify-center px-4 text-center">
+﻿<template>
+    <div class="bg-page flex min-h-dvh flex-col items-center justify-center px-4 text-center">
         <img
             src="/cbc.png"
             alt="KeeperLog"

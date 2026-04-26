@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="space-y-2">
         <!-- Selected tags (above input) -->
         <div v-if="!inline && modelValue.length > 0" class="flex flex-wrap gap-1.5">
@@ -65,7 +65,7 @@
             >
                 <div
                     v-if="open && (filteredTags.length > 0 || canCreate)"
-                    class="border-line bg-base absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-xl border shadow-2xl"
+                    class="border-line bg-page absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-xl border shadow-2xl"
                 >
                     <button
                         v-for="tag in filteredTags"

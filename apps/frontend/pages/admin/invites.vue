@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="space-y-6">
         <!-- Header -->
         <div class="flex items-center justify-between">
@@ -61,7 +61,7 @@
                     <!-- Code + label -->
                     <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                         <div
-                            class="border-line bg-base flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1.5"
+                            class="border-line bg-page flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1.5"
                         >
                             <span
                                 class="text-fg font-mono text-[14px] font-semibold tracking-widest sm:text-[15px]"
@@ -128,7 +128,7 @@
                         <span
                             v-for="use in code.usages ?? []"
                             :key="use.userId"
-                            class="bg-base text-fg-muted rounded-lg px-2 py-1 text-[11px]"
+                            class="bg-page text-fg-muted rounded-lg px-2 py-1 text-[11px]"
                         >
                             {{ use.userId.slice(0, 8) }}…
                             <span class="text-fg-faint">
@@ -161,7 +161,7 @@
                             v-model="newCode.label"
                             type="text"
                             placeholder="e.g. For John Doe"
-                            class="border-line bg-base text-fg placeholder-fg-ghost focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
+                            class="border-line bg-page text-fg placeholder-fg-ghost focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
                         />
                     </div>
 
@@ -175,7 +175,7 @@
                             type="number"
                             min="1"
                             max="100"
-                            class="border-line bg-base text-fg focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
+                            class="border-line bg-page text-fg focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
                         />
                     </div>
 
@@ -187,7 +187,7 @@
                         <input
                             v-model="newCode.expiresAt"
                             type="datetime-local"
-                            class="border-line bg-base text-fg focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
+                            class="border-line bg-page text-fg focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
                         />
                     </div>
 
@@ -200,7 +200,7 @@
                             v-model="newCode.email"
                             type="email"
                             placeholder="user@example.com"
-                            class="border-line bg-base text-fg placeholder-fg-ghost focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
+                            class="border-line bg-page text-fg placeholder-fg-ghost focus:border-primary-500/50 w-full rounded-xl border px-3 py-2 text-[13px] outline-none"
                         />
                         <p class="text-fg-faint mt-1 text-[11px]">
                             If provided, the invite code will be emailed automatically.

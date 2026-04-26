@@ -1,6 +1,6 @@
-<template>
+﻿<template>
     <header
-        class="border-line bg-base-translucent sticky top-0 z-10 flex h-15 items-center gap-4 border-b px-4 backdrop-blur-xl lg:px-6"
+        class="border-line bg-page-translucent sticky top-0 z-10 flex h-15 items-center gap-4 border-b px-4 backdrop-blur-xl lg:px-6"
     >
         <!-- Mobile menu toggle -->
         <button

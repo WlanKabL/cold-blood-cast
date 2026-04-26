@@ -1,5 +1,5 @@
 <template>
-    <div class="public-page-bg bg-base" :class="themeClass">
+    <div class="public-page-bg bg-page" :class="themeClass">
         <LayoutGuestControls variant="dark" />
 
         <!-- Loading -->

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <Teleport to="body">
         <Transition
             enter-active-class="transition-all duration-200"
@@ -11,7 +11,7 @@
             <div
                 v-if="url"
                 ref="overlayRef"
-                class="bg-base-translucent/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+                class="bg-page-translucent/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
                 tabindex="-1"
                 @click="$emit('close')"
                 @keydown.escape="$emit('close')"

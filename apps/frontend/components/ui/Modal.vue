@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <Teleport to="body">
         <Transition
             enter-active-class="transition duration-150 ease-out"
@@ -10,11 +10,11 @@
         >
             <div
                 v-if="show"
-                class="bg-base-translucent fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+                class="bg-page-translucent fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
                 @mousedown.self="$emit('close')"
             >
                 <div
-                    class="border-line bg-base relative mx-3 w-full overflow-y-auto rounded-2xl border shadow-2xl sm:mx-0"
+                    class="border-line bg-page relative mx-3 w-full overflow-y-auto rounded-2xl border shadow-2xl sm:mx-0"
                     :class="[maxWidthClass, maxHeightClass, paddingClass]"
                 >
                     <!-- Header -->

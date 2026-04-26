@@ -89,8 +89,9 @@
 /* ─── Theme Registration (Tailwind v4) ─── */
 @theme {
     /* Neutral semantic tokens (auto-switch light/dark) */
-    --color-base: var(--z-base);
-    --color-base-translucent: var(--z-base-t);
+    /* Note: named --color-page (not --color-base) to avoid clobbering Tailwind's built-in text-base font-size utility. */
+    --color-page: var(--z-base);
+    --color-page-translucent: var(--z-base-t);
     --color-surface: var(--z-surface);
     --color-surface-hover: var(--z-surface-hover);
     --color-surface-active: var(--z-surface-active);

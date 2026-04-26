@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <Teleport to="body">
         <Transition
             enter-active-class="transition-opacity duration-300"
@@ -12,7 +12,7 @@
         >
             <div
                 v-if="show"
-                class="bg-base fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4"
+                class="bg-page fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4"
             >
                 <div class="w-full max-w-lg">
                     <!-- Progress -->

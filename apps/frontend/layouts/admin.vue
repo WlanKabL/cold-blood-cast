@@ -1,8 +1,8 @@
-<template>
-    <div class="bg-base flex h-dvh overflow-hidden">
+﻿<template>
+    <div class="bg-page flex h-dvh overflow-hidden">
         <!-- Admin Sidebar -->
         <aside
-            class="border-line bg-base fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r transition-transform duration-300 lg:static lg:translate-x-0"
+            class="border-line bg-page fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r transition-transform duration-300 lg:static lg:translate-x-0"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             <!-- Brand -->
@@ -137,7 +137,7 @@
         >
             <div
                 v-if="sidebarOpen"
-                class="bg-base-translucent fixed inset-0 z-20 backdrop-blur-sm lg:hidden"
+                class="bg-page-translucent fixed inset-0 z-20 backdrop-blur-sm lg:hidden"
                 @click="sidebarOpen = false"
             />
         </Transition>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <Teleport to="body">
         <Transition
             enter-active-class="transition duration-150 ease-out"
@@ -10,11 +10,11 @@
         >
             <div
                 v-if="showHelp"
-                class="bg-base-translucent fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-sm"
+                class="bg-page-translucent fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-sm"
                 @mousedown.self="showHelp = false"
             >
                 <div
-                    class="border-line bg-base mx-3 w-full max-w-md rounded-2xl border p-6 shadow-2xl"
+                    class="border-line bg-page mx-3 w-full max-w-md rounded-2xl border p-6 shadow-2xl"
                 >
                     <div class="mb-5 flex items-center justify-between">
                         <h2 class="text-fg text-lg font-bold">

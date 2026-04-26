@@ -1,5 +1,5 @@
 <template>
-    <div class="public-page-bg bg-base">
+    <div class="public-page-bg bg-page">
         <LayoutGuestControls />
         <div class="flex min-h-dvh items-center justify-center">
             <div v-if="loading" class="text-center">

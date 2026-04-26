@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="space-y-6">
         <!-- Header -->
         <div>
@@ -98,7 +98,7 @@
                             v-model="userSearch"
                             type="text"
                             :placeholder="$t('admin.emails.searchUsers')"
-                            class="border-line bg-base text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
+                            class="border-line bg-page text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
                             @input="debouncedSearchUsers"
                             @focus="showUserDropdown = true"
                         />
@@ -142,7 +142,7 @@
                             v-model="manualEmail"
                             type="email"
                             :placeholder="$t('admin.emails.emailPlaceholder')"
-                            class="border-line bg-base text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
+                            class="border-line bg-page text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
                         />
                     </div>
 
@@ -153,7 +153,7 @@
                         </label>
                         <select
                             v-model="selectedTemplate"
-                            class="border-line bg-base text-fg focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
+                            class="border-line bg-page text-fg focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
                             @change="onTemplateChange"
                         >
                             <option value="" disabled>
@@ -173,7 +173,7 @@
                         <input
                             v-model="subject"
                             type="text"
-                            class="border-line bg-base text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
+                            class="border-line bg-page text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
                         />
                     </div>
 
@@ -210,13 +210,13 @@
                                         v-else-if="field.type === 'textarea'"
                                         v-model="templateData[field.key]"
                                         rows="5"
-                                        class="border-line bg-base text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
+                                        class="border-line bg-page text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
                                     />
                                     <input
                                         v-else
                                         v-model="templateData[field.key]"
                                         type="text"
-                                        class="border-line bg-base text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
+                                        class="border-line bg-page text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xl border px-3 py-2.5 text-[13px] focus:ring-1 focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -264,7 +264,7 @@
                                             class="bg-surface-raised flex items-center gap-2 rounded-lg px-2.5 py-1.5"
                                         >
                                             <code
-                                                class="bg-base text-primary-400 rounded px-1.5 py-0.5 text-[11px] font-medium"
+                                                class="bg-page text-primary-400 rounded px-1.5 py-0.5 text-[11px] font-medium"
                                                 >{{ varTag(v.key) }}</code
                                             >
                                             <span class="text-fg-muted flex-1 text-[11px]">{{
@@ -291,7 +291,7 @@
                                             class="bg-surface-raised flex items-center gap-2 rounded-lg px-2.5 py-1.5"
                                         >
                                             <code
-                                                class="bg-base rounded px-1.5 py-0.5 text-[11px] font-medium text-green-400"
+                                                class="bg-page rounded px-1.5 py-0.5 text-[11px] font-medium text-green-400"
                                                 >{{ varTag(v.key) }}</code
                                             >
                                             <span class="text-fg-muted flex-1 text-[11px]">{{
@@ -365,12 +365,12 @@
                     v-model="logSearch"
                     type="text"
                     :placeholder="$t('admin.emails.logSearchPlaceholder')"
-                    class="border-line bg-base text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 flex-1 rounded-xl border px-3 py-2 text-[13px] focus:ring-1 focus:outline-none"
+                    class="border-line bg-page text-fg placeholder:text-fg-faint focus:border-primary-500 focus:ring-primary-500/30 flex-1 rounded-xl border px-3 py-2 text-[13px] focus:ring-1 focus:outline-none"
                     @input="debouncedLoadLog"
                 />
                 <select
                     v-model="logTemplateFilter"
-                    class="border-line bg-base text-fg focus:border-primary-500 rounded-xl border px-3 py-2 text-[13px] focus:outline-none"
+                    class="border-line bg-page text-fg focus:border-primary-500 rounded-xl border px-3 py-2 text-[13px] focus:outline-none"
                     @change="debouncedLoadLog"
                 >
                     <option value="">{{ $t("admin.emails.allTemplates") }}</option>
@@ -380,7 +380,7 @@
                 </select>
                 <select
                     v-model="logStatusFilter"
-                    class="border-line bg-base text-fg focus:border-primary-500 rounded-xl border px-3 py-2 text-[13px] focus:outline-none"
+                    class="border-line bg-page text-fg focus:border-primary-500 rounded-xl border px-3 py-2 text-[13px] focus:outline-none"
                     @change="debouncedLoadLog"
                 >
                     <option value="">{{ $t("admin.emails.allStatus") }}</option>
@@ -579,7 +579,7 @@
             >
                 <div
                     v-if="showConfirmModal"
-                    class="bg-base-translucent/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+                    class="bg-page-translucent/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
                     @click.self="showConfirmModal = false"
                 >
                     <div class="glass-card w-full max-w-md space-y-4 p-6">

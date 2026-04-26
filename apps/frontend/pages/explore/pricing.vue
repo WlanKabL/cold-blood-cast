@@ -1,5 +1,5 @@
-<template>
-    <div class="bg-base text-fg relative min-h-dvh">
+﻿<template>
+    <div class="bg-page text-fg relative min-h-dvh">
         <PublicNav />
 
         <!-- ═══ Content ═══ -->

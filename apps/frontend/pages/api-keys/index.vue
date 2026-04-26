@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="space-y-6">
         <div
             class="animate-fade-in-up flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
@@ -249,7 +249,7 @@
                 @click.self="showModal = false"
             >
                 <div
-                    class="border-line bg-base mx-3 w-full max-w-lg rounded-2xl border p-4 shadow-2xl sm:mx-0 sm:p-6"
+                    class="border-line bg-page mx-3 w-full max-w-lg rounded-2xl border p-4 shadow-2xl sm:mx-0 sm:p-6"
                 >
                     <h2 class="text-fg mb-4 text-[16px] font-semibold">
                         {{ $t("pages.apiKeys.create") }}
@@ -348,7 +348,7 @@
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
                 @click.self="revokeTarget = undefined"
             >
-                <div class="border-line bg-base w-full max-w-sm rounded-2xl border p-6 shadow-2xl">
+                <div class="border-line bg-page w-full max-w-sm rounded-2xl border p-6 shadow-2xl">
                     <h2 class="text-fg mb-2 text-[16px] font-semibold">
                         {{ $t("pages.apiKeys.revokeTitle") }}
                     </h2>
@@ -380,7 +380,7 @@
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
                 @click.self="deleteTarget = undefined"
             >
-                <div class="border-line bg-base w-full max-w-sm rounded-2xl border p-6 shadow-2xl">
+                <div class="border-line bg-page w-full max-w-sm rounded-2xl border p-6 shadow-2xl">
                     <h2 class="text-fg mb-2 text-[16px] font-semibold">
                         {{ $t("common.confirmDelete") }}
                     </h2>
