@@ -10,9 +10,11 @@
                 <div class="from-base/40 to-base absolute inset-0 bg-linear-to-b via-transparent" />
             </div>
 
-            <div class="relative z-10 mx-auto max-w-7xl px-6 pt-36 pb-32 text-center md:pt-48">
+            <div
+                class="relative z-10 mx-auto max-w-7xl px-6 pt-28 pb-24 text-center md:pt-36 md:pb-32"
+            >
                 <h1
-                    class="hero-enter hero-delay-1 mx-auto max-w-5xl text-4xl leading-[1.08] font-bold tracking-tight sm:text-5xl md:text-7xl lg:text-8xl"
+                    class="hero-enter hero-delay-1 mx-auto max-w-5xl text-4xl leading-[1.08] font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
                 >
                     <span class="text-fg block drop-shadow-lg">{{
                         $t("landing.hero.titleLine1")
@@ -29,6 +31,22 @@
                     {{ $t("landing.hero.subtitle") }}
                 </p>
 
+                <ul
+                    class="hero-enter hero-delay-2 text-fg-soft mx-auto mt-8 flex max-w-2xl flex-col gap-3 text-left text-base sm:text-lg"
+                >
+                    <li
+                        v-for="key in ['bullet1', 'bullet2', 'bullet3']"
+                        :key="key"
+                        class="flex items-start gap-3"
+                    >
+                        <Icon
+                            name="lucide:check-circle-2"
+                            class="text-primary-400 mt-1 h-5 w-5 shrink-0"
+                        />
+                        <span>{{ $t(`landing.hero.${key}`) }}</span>
+                    </li>
+                </ul>
+
                 <div
                     class="hero-enter hero-delay-3 mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
                 >
@@ -42,13 +60,17 @@
                             class="h-4 w-4 transition-transform group-hover:translate-x-1"
                         />
                     </NuxtLink>
-                    <NuxtLink
-                        to="/explore/features"
+                    <a
+                        href="#how-it-works"
                         class="border-line bg-surface-hover text-fg-soft hover:border-line hover:bg-surface-active hover:text-fg inline-flex items-center gap-2 rounded-full border px-8 py-4 font-medium backdrop-blur-md transition"
                     >
                         {{ $t("landing.hero.secondaryCta") }}
-                    </NuxtLink>
+                    </a>
                 </div>
+
+                <p class="hero-enter hero-delay-3 text-fg-faint mt-6 text-sm">
+                    {{ $t("landing.hero.trustLine") }}
+                </p>
             </div>
         </section>
 

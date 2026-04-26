@@ -9,11 +9,15 @@
             "getStarted": "Loslegen"
         },
         "hero": {
-            "titleLine1": "Jede Fütterung. Jede Häutung.",
-            "titleLine2": "Jeder Tierarztbesuch. An einem Ort.",
-            "subtitle": "KeeperLog ist das strukturierte Pflegedokumentationssystem für Reptilienhalter. Ersetze lose Notizen durch eine echte Pflegehistorie deiner Tiere.",
-            "primaryCta": "Jetzt dokumentieren",
-            "secondaryCta": "Features entdecken"
+            "titleLine1": "Deine ganze Reptilienhaltung.",
+            "titleLine2": "In einer App, für jedes Tier.",
+            "subtitle": "KeeperLog ist das Pflegebuch für ernsthafte Reptilien- und Exotenhalter. Schluss mit Notizzetteln und Kopfrechnen — Fütterungen, Häutungen, Gewichte und Tierarztbesuche an einem Ort.",
+            "bullet1": "Fütterungen, Häutungen, Gewichte & Tierarztbesuche in Sekunden eintragen",
+            "bullet2": "Erinnerungen, damit nichts vergessen wird",
+            "bullet3": "Komplette Historie pro Tier — durchsuchbar und teilbar",
+            "primaryCta": "Kostenloses Pflegebuch starten",
+            "secondaryCta": "So funktioniert's",
+            "trustLine": "Für immer kostenlos · Keine Kreditkarte · Von einem Halter gebaut"
         },
         "features": {
             "label": "Was du tracken kannst",
@@ -70,8 +74,8 @@
             }
         },
         "cta": {
-            "title": "Deine Tiere verdienen eine echte Akte.",
-            "subtitle": "Verlass dich nicht mehr auf dein Gedächtnis und verstreute Notizen. Bau dir noch heute eine strukturierte Pflegehistorie auf.",
+            "title": "Starte dein kostenloses Pflegebuch in 2 Minuten.",
+            "subtitle": "Tier anlegen, erste Fütterung loggen — und nie wieder den Überblick verlieren. Für immer kostenlos, keine Kreditkarte nötig.",
             "button": "Kostenloses Konto erstellen"
         },
         "footer": {

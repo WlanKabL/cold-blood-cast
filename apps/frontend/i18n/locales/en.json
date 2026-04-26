@@ -9,11 +9,15 @@
             "getStarted": "Get Started"
         },
         "hero": {
-            "titleLine1": "Every feeding. Every shed.",
-            "titleLine2": "Every vet visit. One place.",
-            "subtitle": "KeeperLog is the structured care documentation system for reptile keepers. Replace scattered notes with a real record of your animals' lives.",
-            "primaryCta": "Start documenting",
-            "secondaryCta": "Explore the features"
+            "titleLine1": "All your reptile care.",
+            "titleLine2": "In one app, for every animal.",
+            "subtitle": "KeeperLog is the care journal built for serious reptile and exotic pet keepers. Stop relying on memory and scattered notes — keep feedings, sheds, weights and vet visits in one place.",
+            "bullet1": "Log feedings, sheds, weights & vet visits in seconds",
+            "bullet2": "Reminders so nothing gets missed",
+            "bullet3": "Full history per animal — searchable and shareable",
+            "primaryCta": "Start your free care log",
+            "secondaryCta": "See how it works",
+            "trustLine": "Free forever · No credit card · Built by a keeper"
         },
         "features": {
             "label": "What you can track",
@@ -70,9 +74,9 @@
             }
         },
         "cta": {
-            "title": "Your animals deserve a real record.",
-            "subtitle": "Stop relying on memory and scattered notes. Start building a structured care history today.",
-            "button": "Create your free account"
+            "title": "Start your free care log in 2 minutes.",
+            "subtitle": "Add your first animal, log your first feeding, and never lose track again. Free forever — no credit card needed.",
+            "button": "Create my free account"
         },
         "footer": {
             "tagline": "Structured care documentation for reptile keepers — feedings, sheds, weights, vet visits, and more.",
