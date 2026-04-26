@@ -78,6 +78,21 @@
                             <UiToggle v-model="analyticsEnabled" />
                         </div>
 
+                        <!-- Marketing -->
+                        <div
+                            class="bg-bg/50 flex items-center justify-between rounded-lg px-3 py-2"
+                        >
+                            <div>
+                                <p class="text-fg text-[12px] font-medium">
+                                    {{ $t("cookie.marketing") }}
+                                </p>
+                                <p class="text-fg-muted text-[11px]">
+                                    {{ $t("cookie.marketingDesc") }}
+                                </p>
+                            </div>
+                            <UiToggle v-model="marketingEnabled" />
+                        </div>
+
                         <!-- Save preferences -->
                         <div class="flex justify-end pt-1">
                             <button
@@ -95,12 +110,16 @@
 </template>
 
 <script setup lang="ts">
-const STORAGE_KEY = "kl_cookie_consent";
-const CONSENT_VERSION = 1;
+// Storage key MUST stay in sync with the marketing-attribution + meta-pixel
+// plugins and pages/register.vue, which all read "cbc-cookie-consent".
+const STORAGE_KEY = "cbc-cookie-consent";
+const LEGACY_STORAGE_KEY = "kl_cookie_consent"; // pre-v2 banner key, read-only for migration
+const CONSENT_VERSION = 2; // v2 added the marketing flag
 
 interface CookiePreferences {
     necessary: true;
     analytics: boolean;
+    marketing: boolean;
     timestamp: number;
     version: number;
 }
@@ -108,79 +127,85 @@ interface CookiePreferences {
 const visible = ref(false);
 const showDetails = ref(false);
 const analyticsEnabled = ref(false);
+const marketingEnabled = ref(false);
 
 const authStore = useAuthStore();
 const api = useApi();
 
+function readStoredPrefs(): Partial<CookiePreferences> | null {
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw) as Partial<CookiePreferences>;
+    } catch {
+        return null;
+    }
+}
+
 onMounted(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
+    const prefs = readStoredPrefs();
+    if (!prefs) {
         visible.value = true;
         return;
     }
-    try {
-        const prefs: CookiePreferences = JSON.parse(stored);
-        if (!prefs.version || prefs.version < CONSENT_VERSION) {
-            visible.value = true;
-            return;
-        }
-        analyticsEnabled.value = prefs.analytics;
-    } catch {
+    // Re-prompt when consent schema bumps (v1 → v2 added marketing flag).
+    if (typeof prefs.version !== "number" || prefs.version < CONSENT_VERSION) {
+        // Pre-fill the analytics toggle from the prior decision so the user
+        // doesn't lose it on the schema bump.
+        if (typeof prefs.analytics === "boolean") analyticsEnabled.value = prefs.analytics;
         visible.value = true;
+        return;
     }
+    analyticsEnabled.value = prefs.analytics === true;
+    marketingEnabled.value = prefs.marketing === true;
 });
 
-// Sync stored consent to backend after login (covers pre-login consent)
+// Sync stored consent to backend after login (covers pre-login consent).
 watch(
     () => authStore.isAuthenticated,
     (isAuth) => {
         if (!isAuth) return;
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (!stored) return;
-        try {
-            const prefs: CookiePreferences = JSON.parse(stored);
-            if (prefs.version) {
-                syncToBackend(prefs.analytics, prefs.version);
-            }
-        } catch {
-            // Ignore malformed localStorage
-        }
+        const prefs = readStoredPrefs();
+        if (!prefs || typeof prefs.version !== "number") return;
+        syncToBackend(prefs.analytics === true, prefs.marketing === true, prefs.version);
     },
 );
 
-function syncToBackend(analytics: boolean, version: number) {
-    void api.post("/api/users/me/cookie-consent", { analytics, version }).catch(() => {
-        // Best-effort — consent is stored in localStorage regardless
+function syncToBackend(analytics: boolean, marketing: boolean, version: number) {
+    void api.post("/api/users/me/cookie-consent", { analytics, marketing, version }).catch(() => {
+        // Best-effort — consent is stored in localStorage regardless.
     });
 }
 
-function save(analytics: boolean) {
+function save(analytics: boolean, marketing: boolean) {
     const prefs: CookiePreferences = {
         necessary: true,
         analytics,
+        marketing,
         timestamp: Date.now(),
         version: CONSENT_VERSION,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    // Drop the legacy key so the user does not get re-prompted from the old slot.
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
     visible.value = false;
     showDetails.value = false;
 
-    // Persist to backend for authenticated users (GDPR audit trail)
     if (authStore.isAuthenticated) {
-        syncToBackend(analytics, CONSENT_VERSION);
+        syncToBackend(analytics, marketing, CONSENT_VERSION);
     }
 }
 
 function acceptAll() {
-    save(true);
+    save(true, true);
 }
 
 function acceptNecessary() {
-    save(false);
+    save(false, false);
 }
 
 function savePreferences() {
-    save(analyticsEnabled.value);
+    save(analyticsEnabled.value, marketingEnabled.value);
 }
 </script>
 

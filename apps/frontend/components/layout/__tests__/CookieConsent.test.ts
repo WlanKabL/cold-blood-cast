@@ -3,7 +3,9 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { nextTick } from "vue";
 import CookieConsent from "../CookieConsent.vue";
 
-const STORAGE_KEY = "kl_cookie_consent";
+const STORAGE_KEY = "cbc-cookie-consent";
+const LEGACY_STORAGE_KEY = "kl_cookie_consent";
+const CURRENT_VERSION = 2;
 
 const mockApi = {
     post: vi.fn().mockResolvedValue({}),
@@ -55,8 +57,9 @@ describe("CookieConsent", () => {
             JSON.stringify({
                 necessary: true,
                 analytics: false,
+                marketing: false,
                 timestamp: Date.now(),
-                version: 1,
+                version: CURRENT_VERSION,
             }),
         );
         const wrapper = await mountConsent();
@@ -70,10 +73,26 @@ describe("CookieConsent", () => {
                 necessary: true,
                 analytics: false,
                 timestamp: Date.now(),
-                version: 0,
+                version: 1,
             }),
         );
         const wrapper = await mountConsent();
+        expect(wrapper.text()).toContain("cookie.message");
+    });
+
+    it("migrates from legacy v1 storage key and re-prompts for marketing", async () => {
+        // Old banner stored under kl_cookie_consent with version=1 and no marketing flag.
+        localStorage.setItem(
+            LEGACY_STORAGE_KEY,
+            JSON.stringify({
+                necessary: true,
+                analytics: true,
+                timestamp: Date.now(),
+                version: 1,
+            }),
+        );
+        const wrapper = await mountConsent();
+        // Banner must re-appear so the user can decide on marketing.
         expect(wrapper.text()).toContain("cookie.message");
     });
 
@@ -107,11 +126,12 @@ describe("CookieConsent", () => {
         // Banner should be hidden
         expect(wrapper.text()).not.toContain("cookie.message");
 
-        // localStorage should have consent with analytics: true
+        // localStorage should have consent with analytics + marketing both true (Accept All).
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
         expect(stored.necessary).toBe(true);
         expect(stored.analytics).toBe(true);
-        expect(stored.version).toBe(1);
+        expect(stored.marketing).toBe(true);
+        expect(stored.version).toBe(CURRENT_VERSION);
     });
 
     it("hides banner and saves consent on Only Necessary", async () => {
@@ -123,6 +143,7 @@ describe("CookieConsent", () => {
 
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
         expect(stored.analytics).toBe(false);
+        expect(stored.marketing).toBe(false);
     });
 
     it("toggles settings panel visibility", async () => {
@@ -152,9 +173,9 @@ describe("CookieConsent", () => {
         await settingsBtn!.trigger("click");
         await nextTick();
 
-        // Toggle analytics ON (find the toggle stub)
-        const toggleBtn = wrapper.find(".toggle-stub");
-        await toggleBtn!.trigger("click");
+        // Toggle analytics ON (first toggle = analytics, second = marketing).
+        const toggles = wrapper.findAll(".toggle-stub");
+        await toggles[0]!.trigger("click");
         await nextTick();
 
         // Save preferences
@@ -166,6 +187,32 @@ describe("CookieConsent", () => {
 
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
         expect(stored.analytics).toBe(true);
+        expect(stored.marketing).toBe(false);
+    });
+
+    it("saves marketing preference independently from analytics", async () => {
+        const wrapper = await mountConsent();
+
+        const settingsBtn = wrapper
+            .findAll("button")
+            .find((b) => b.text().includes("cookie.settings"));
+        await settingsBtn!.trigger("click");
+        await nextTick();
+
+        // Toggle marketing only (second toggle).
+        const toggles = wrapper.findAll(".toggle-stub");
+        await toggles[1]!.trigger("click");
+        await nextTick();
+
+        const saveBtn = wrapper
+            .findAll("button")
+            .find((b) => b.text().includes("cookie.savePreferences"));
+        await saveBtn!.trigger("click");
+        await nextTick();
+
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+        expect(stored.analytics).toBe(false);
+        expect(stored.marketing).toBe(true);
     });
 
     it("syncs to backend when authenticated user accepts", async () => {
@@ -180,7 +227,8 @@ describe("CookieConsent", () => {
 
         expect(mockApi.post).toHaveBeenCalledWith("/api/users/me/cookie-consent", {
             analytics: true,
-            version: 1,
+            marketing: true,
+            version: CURRENT_VERSION,
         });
     });
 
@@ -200,7 +248,13 @@ describe("CookieConsent", () => {
     it("reads analytics state from stored consent", async () => {
         localStorage.setItem(
             STORAGE_KEY,
-            JSON.stringify({ necessary: true, analytics: true, timestamp: Date.now(), version: 1 }),
+            JSON.stringify({
+                necessary: true,
+                analytics: true,
+                marketing: false,
+                timestamp: Date.now(),
+                version: CURRENT_VERSION,
+            }),
         );
         const wrapper = await mountConsent();
         // Banner is hidden because valid consent exists

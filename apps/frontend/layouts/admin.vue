@@ -215,6 +215,7 @@ const systemNav = [
     { to: "/admin/settings", icon: "lucide:settings", label: "admin.nav.settings" },
     { to: "/admin/emails", icon: "lucide:mail", label: "admin.nav.emails" },
     { to: "/admin/audit-log", icon: "lucide:scroll-text", label: "admin.nav.auditLog" },
+    { to: "/admin/marketing", icon: "lucide:line-chart", label: "admin.nav.marketing" },
 ];
 
 function isActive(path: string): boolean {

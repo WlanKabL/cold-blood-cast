@@ -93,7 +93,9 @@
         "necessary": "Notwendig",
         "necessaryDesc": "Erforderlich für Login und Kernfunktionalität. Kann nicht deaktiviert werden.",
         "analytics": "Analyse",
-        "analyticsDesc": "Hilft uns zu verstehen, wie KeeperLog genutzt wird, um das Produkt zu verbessern.",
+        "analyticsDesc": "Hilft uns zu verstehen, wie Cold Blood Cast genutzt wird, um das Produkt zu verbessern.",
+        "marketing": "Marketing",
+        "marketingDesc": "Erlaubt das Messen unserer Werbekampagnen (z. B. Meta Pixel). Ohne Zustimmung wird kein Pixel geladen.",
         "alwaysOn": "Immer aktiv",
         "revoke": "Cookie-Einstellungen"
     },
@@ -240,6 +242,7 @@
         "disabled": "Deaktiviert",
         "grant": "Gewähren",
         "deny": "Verweigern",
+        "refresh": "Aktualisieren",
         "nav": {
             "overview": "Übersicht",
             "content": "Inhalt",
@@ -258,7 +261,8 @@
             "legal": "Rechtliche Dokumente",
             "reports": "Meldungen",
             "comments": "Kommentare",
-            "tags": "Tags"
+            "tags": "Tags",
+            "marketing": "Marketing"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -583,6 +587,81 @@
             "entries": "Einträge",
             "filterAction": "Nach Aktion filtern...",
             "filterUserId": "Benutzer-ID..."
+        },
+        "marketing": {
+            "title": "Marketing-Tracking",
+            "subtitle": "Attribution, Kampagnen-Performance und Event-Auslieferung.",
+            "tabs": {
+                "overview": "Übersicht",
+                "users": "Zugeordnete Nutzer",
+                "events": "Events",
+                "settings": "Einstellungen",
+                "queue": "Queue",
+                "reports": "Reports",
+                "audiences": "Audiences"
+            },
+            "totals": {
+                "landings": "Landings (gesamt)",
+                "attributedUsers": "Zugeordnete Nutzer",
+                "registrationEvents": "Registrierungs-Events"
+            },
+            "eventStatus": "Event-Status",
+            "campaigns": "Kampagnen-Performance",
+            "signups": "Signups",
+            "activated": "Aktiviert",
+            "activationRate": "Aktivierungs-Rate",
+            "user": "Nutzer",
+            "boundAt": "Verknüpft am",
+            "settings": {
+                "title": "Marketing-Konfiguration",
+                "subtitle": "Werte aus der Datenbank überschreiben die .env-Defaults. Leer lassen bedeutet 'Standard verwenden'. Der CAPI-Access-Token bleibt aus Sicherheitsgründen in der .env-Datei.",
+                "pixelId": "Meta Pixel ID",
+                "pixelIdHint": "Leer lassen, um den Wert aus META_PIXEL_ID zu verwenden.",
+                "pixelEnabled": "Meta Pixel aktiviert",
+                "capiEnabled": "Meta CAPI aktiviert",
+                "capiDryRun": "CAPI Dry-Run (nur Logging, kein echter Versand)",
+                "testEventCode": "Test-Event-Code",
+                "useEnv": "Standard aus .env",
+                "tokenMissing": "META_ACCESS_TOKEN ist nicht gesetzt — CAPI bleibt inaktiv, auch wenn aktiviert.",
+                "saved": "Einstellungen gespeichert",
+                "activationWindowDays": "Aktivierungs-Fenster (Tage)",
+                "activationWindowDaysHint": "Anzahl Tage nach Registrierung, in denen ein Aktivierungs-Event als 'aktiviert' zählt. Leer lassen für Standardwert (Env)."
+            },
+            "queue": {
+                "actions": "Aktionen",
+                "retry": "Erneut versuchen",
+                "retried": "Event neu eingereiht",
+                "paused": "⚠️ Queue ist pausiert",
+                "recentFailures": "Letzte Fehlgeschlagene Jobs",
+                "noFailures": "Keine fehlgeschlagenen Jobs."
+            },
+            "reports": {
+                "signups": "Signups",
+                "activated": "Aktiviert",
+                "highValueEvents": "High-Value-Events",
+                "revenue": "Umsatz",
+                "revenuePerSignup": "Umsatz / Signup",
+                "activationWindowDays": "Aktivierungs-Fenster (Tage)",
+                "perCampaign": "Pro Kampagne",
+                "empty": "Keine Daten im gewählten Zeitraum."
+            },
+            "audiences": {
+                "createTitle": "Audience-Export erstellen",
+                "createSubtitle": "Erzeugt eine Datei mit SHA-256-gehashten E-Mails — kompatibel mit Meta Custom Audiences. Klartext-E-Mails werden nie exportiert.",
+                "namePlaceholder": "Audience-Name (z. B. 'Aktivierte Trial-Nutzer Q1')",
+                "activatedOnly": "Nur aktivierte Nutzer",
+                "highValueOnly": "Nur Nutzer mit High-Value-Events",
+                "create": "Export starten",
+                "created": "Audience-Export erstellt",
+                "name": "Name",
+                "rowCount": "Zeilen",
+                "expiresAt": "Läuft ab",
+                "download": "Download",
+                "sync": "Sync",
+                "syncOk": "Audience an Provider übermittelt",
+                "syncStub": "Audience-Sync ist noch nicht implementiert. Bitte CSV manuell hochladen.",
+                "empty": "Noch keine Audience-Exporte erstellt."
+            }
         },
         "legal": {
             "title": "Rechtliche Dokumente",

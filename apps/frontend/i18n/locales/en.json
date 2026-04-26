@@ -93,7 +93,9 @@
         "necessary": "Necessary",
         "necessaryDesc": "Required for login and core functionality. Cannot be disabled.",
         "analytics": "Analytics",
-        "analyticsDesc": "Help us understand how KeeperLog is used to improve the product.",
+        "analyticsDesc": "Help us understand how Cold Blood Cast is used to improve the product.",
+        "marketing": "Marketing",
+        "marketingDesc": "Allow measuring our advertising campaigns (e.g. Meta Pixel). The pixel is not loaded without consent.",
         "alwaysOn": "Always on",
         "revoke": "Cookie Settings"
     },
@@ -240,6 +242,7 @@
         "disabled": "Disabled",
         "grant": "Grant",
         "deny": "Deny",
+        "refresh": "Refresh",
         "nav": {
             "overview": "Overview",
             "content": "Content",
@@ -258,7 +261,8 @@
             "legal": "Legal Documents",
             "reports": "Reports",
             "comments": "Comments",
-            "tags": "Tags"
+            "tags": "Tags",
+            "marketing": "Marketing"
         },
         "dashboard": {
             "title": "Dashboard",
@@ -583,6 +587,81 @@
             "entries": "entries",
             "filterAction": "Filter by action...",
             "filterUserId": "User ID..."
+        },
+        "marketing": {
+            "title": "Marketing tracking",
+            "subtitle": "Attribution, campaign performance and event delivery.",
+            "tabs": {
+                "overview": "Overview",
+                "users": "Attributed users",
+                "events": "Events",
+                "settings": "Settings",
+                "queue": "Queue",
+                "reports": "Reports",
+                "audiences": "Audiences"
+            },
+            "totals": {
+                "landings": "Landings (total)",
+                "attributedUsers": "Attributed users",
+                "registrationEvents": "Registration events"
+            },
+            "eventStatus": "Event status",
+            "campaigns": "Campaign performance",
+            "signups": "Signups",
+            "activated": "Activated",
+            "activationRate": "Activation rate",
+            "user": "User",
+            "boundAt": "Bound at",
+            "settings": {
+                "title": "Marketing configuration",
+                "subtitle": "Database values override .env defaults. Leave a field empty to use the default. The CAPI access token always stays in .env for security.",
+                "pixelId": "Meta Pixel ID",
+                "pixelIdHint": "Leave empty to use the META_PIXEL_ID env value.",
+                "pixelEnabled": "Meta Pixel enabled",
+                "capiEnabled": "Meta CAPI enabled",
+                "capiDryRun": "CAPI dry-run (log only, no real dispatch)",
+                "testEventCode": "Test event code",
+                "useEnv": "Use .env default",
+                "tokenMissing": "META_ACCESS_TOKEN is not set — CAPI stays inactive even if enabled.",
+                "saved": "Settings saved",
+                "activationWindowDays": "Activation window (days)",
+                "activationWindowDaysHint": "Number of days after sign-up during which an activation event still counts as 'activated'. Leave empty to use the env default."
+            },
+            "queue": {
+                "actions": "Actions",
+                "retry": "Retry",
+                "retried": "Event re-enqueued",
+                "paused": "⚠️ Queue is paused",
+                "recentFailures": "Recent failed jobs",
+                "noFailures": "No failed jobs."
+            },
+            "reports": {
+                "signups": "Signups",
+                "activated": "Activated",
+                "highValueEvents": "High-value events",
+                "revenue": "Revenue",
+                "revenuePerSignup": "Revenue / signup",
+                "activationWindowDays": "Activation window (days)",
+                "perCampaign": "Per campaign",
+                "empty": "No data in the selected range."
+            },
+            "audiences": {
+                "createTitle": "Create audience export",
+                "createSubtitle": "Generates a file with SHA-256 hashed emails — compatible with Meta Custom Audiences. Plain-text emails are never exported.",
+                "namePlaceholder": "Audience name (e.g. 'Activated trial users Q1')",
+                "activatedOnly": "Activated users only",
+                "highValueOnly": "Users with high-value events only",
+                "create": "Start export",
+                "created": "Audience export created",
+                "name": "Name",
+                "rowCount": "Rows",
+                "expiresAt": "Expires",
+                "download": "Download",
+                "sync": "Sync",
+                "syncOk": "Audience delivered to provider",
+                "syncStub": "Audience sync is not implemented yet. Please upload the CSV manually.",
+                "empty": "No audience exports yet."
+            }
         },
         "legal": {
             "title": "Legal Documents",

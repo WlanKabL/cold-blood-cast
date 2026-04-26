@@ -120,6 +120,8 @@ export default defineNuxtConfig({
             apiBaseURL: process.env.API_BASE_URL || "http://localhost:3001",
             showPricingNav: process.env.SHOW_PRICING_NAV === "true",
             appVersion: process.env.APP_VERSION || "dev",
+            metaPixelEnabled: process.env.META_PIXEL_ENABLED === "true",
+            metaPixelId: process.env.META_PIXEL_ID || "",
         },
     },
     sitemap: {

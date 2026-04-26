@@ -27,6 +27,20 @@ services:
             timeout: 5s
             retries: 5
 
+    redis:
+        image: redis:7-alpine
+        container_name: cbc-redis
+        restart: unless-stopped
+        volumes:
+            - ${DATA_DIR:-./data}/redis:/data
+        networks:
+            - internal
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
     backend:
         image: ${BACKEND_IMAGE:-ghcr.io/wlankabl/cold-blood-cast/backend:latest}
         container_name: cbc-backend
@@ -35,6 +49,7 @@ services:
             - .env
         environment:
             DATABASE_URL: postgresql://coldblood:${DB_PASSWORD}@postgres:5432/coldbloodcast?schema=public
+            REDIS_URL: redis://redis:6379
             PORT: "3001"
             NODE_ENV: production
         ports:
@@ -46,6 +61,8 @@ services:
             - web
         depends_on:
             postgres:
+                condition: service_healthy
+            redis:
                 condition: service_healthy
         healthcheck:
             test: ["CMD-SHELL", "curl -sf http://localhost:3001/api/health || exit 1"]
@@ -60,6 +77,11 @@ services:
         restart: unless-stopped
         environment:
             PORT: "3000"
+            # Marketing config is fetched at runtime from the backend
+            # (GET /api/marketing/config). The frontend container intentionally
+            # has NO META_* env vars — the CAPI access token must never reach
+            # this service, and the public Pixel settings come from the API
+            # so admin overrides take effect without a redeploy.
         ports:
             - "3300:3000"
         networks:

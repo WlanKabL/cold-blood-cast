@@ -50,11 +50,16 @@ import {
     checkInviteCode,
     validateAndConsumeInviteCode,
 } from "@/modules/invites/invites.service.js";
+import { bindAttributionToUser, recordRegistrationEvent } from "@/modules/marketing/index.js";
+import type { MarketingRegistrationDispatchInfo } from "@cold-blood-cast/shared";
 import pino from "pino";
 
 // ─── Register ────────────────────────────────────────────────
 
-export async function registerUser(input: RegisterInput) {
+export async function registerUser(
+    input: RegisterInput,
+    ctx: { ip?: string | null; userAgent?: string | null; sourceUrl?: string | null } = {},
+) {
     // Check registration mode
     const regMode = await getSystemSetting<string>("registration_mode", "open");
 
@@ -142,9 +147,28 @@ export async function registerUser(input: RegisterInput) {
     // Send verification email (fire-and-forget)
     void sendVerificationEmail(user.id);
 
+    // ── Marketing attribution & registration event ──
+    let marketingDispatch: MarketingRegistrationDispatchInfo | null = null;
+    try {
+        await bindAttributionToUser(user.id, input.landingSessionId ?? null);
+        marketingDispatch = await recordRegistrationEvent({
+            userId: user.id,
+            userEmail: user.email,
+            consentState: input.marketingConsent ?? "unknown",
+            landingSessionId: input.landingSessionId ?? null,
+            requestIp: ctx.ip ?? null,
+            requestUserAgent: ctx.userAgent ?? null,
+            sourceUrl: ctx.sourceUrl ?? undefined,
+        });
+    } catch (err) {
+        // Tracking must never block registration.
+        const log = pino({ name: "auth-register-tracking" });
+        log.warn({ userId: user.id, err: (err as Error).message }, "marketing tracking failed");
+    }
+
     const tokens = await generateTokens(user.id, user.username);
 
-    return { user, tokens, pendingApproval: false };
+    return { user, tokens, pendingApproval: false, marketingDispatch };
 }
 
 // ─── Login ───────────────────────────────────────────────────

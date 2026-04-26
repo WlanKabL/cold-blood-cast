@@ -27,6 +27,10 @@ export const registerSchema = z.object({
     password: passwordField,
     displayName: z.string().min(1).max(64).optional(),
     inviteCode: z.string().optional(),
+    /** Marketing attribution: client-generated UUID for first-touch landing. */
+    landingSessionId: z.string().uuid().optional(),
+    /** Marketing tracking consent state at signup time. */
+    marketingConsent: z.enum(["granted", "denied", "unknown"]).optional(),
 });
 
 export const loginSchema = z.object({

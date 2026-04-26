@@ -19,6 +19,9 @@
         "format:fix": "echo 'no format configured'",
         "types:check": "tsc --noEmit"
     },
+    "dependencies": {
+        "zod": "^3.24.2"
+    },
     "devDependencies": {
         "typescript": "^5.9.3"
     }

@@ -49,6 +49,10 @@ export interface RegisterPayload {
     password: string;
     displayName?: string;
     inviteCode?: string;
+    /** Marketing first-touch attribution session id (uuid). */
+    landingSessionId?: string;
+    /** Marketing tracking consent state at time of signup. */
+    marketingConsent?: "granted" | "denied" | "unknown";
 }
 
 // ─── Roles ───────────────────────────────────────────────────

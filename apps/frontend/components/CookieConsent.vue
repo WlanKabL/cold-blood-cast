@@ -43,6 +43,21 @@
                             </p>
                         </div>
                     </label>
+                    <label class="flex items-center gap-3">
+                        <input
+                            v-model="marketing"
+                            type="checkbox"
+                            class="h-4 w-4 rounded accent-emerald-600"
+                        />
+                        <div>
+                            <span class="text-fg text-sm font-medium">{{
+                                $t("cookie_consent.marketing")
+                            }}</span>
+                            <p class="text-fg-muted text-[11px]">
+                                {{ $t("cookie_consent.marketing_desc") }}
+                            </p>
+                        </div>
+                    </label>
                 </div>
 
                 <!-- Actions -->
@@ -78,43 +93,66 @@ const authStore = useAuthStore();
 
 const visible = ref(false);
 const analytics = ref(false);
+const marketing = ref(false);
 
 const COOKIE_KEY = "cbc-cookie-consent";
-const COOKIE_CONSENT_VERSION = 1;
+const COOKIE_CONSENT_VERSION = 2;
 
 function hasConsented(): boolean {
     if (!import.meta.client) return true;
-    return localStorage.getItem(COOKIE_KEY) !== null;
+    const raw = localStorage.getItem(COOKIE_KEY);
+    if (!raw) return false;
+    try {
+        const parsed = JSON.parse(raw) as { version?: number };
+        // Re-prompt when consent schema bumps (e.g. v1 → v2 added marketing flag).
+        return typeof parsed.version === "number" && parsed.version >= COOKIE_CONSENT_VERSION;
+    } catch {
+        return false;
+    }
 }
 
-function saveConsent(analyticsVal: boolean) {
+function saveConsent(analyticsVal: boolean, marketingVal: boolean) {
     const consent = {
         analytics: analyticsVal,
+        marketing: marketingVal,
         version: COOKIE_CONSENT_VERSION,
         timestamp: new Date().toISOString(),
     };
     localStorage.setItem(COOKIE_KEY, JSON.stringify(consent));
 
     if (authStore.isLoggedIn) {
-        http.post("/api/gdpr/cookie-consent", {
+        http.post("/api/users/me/cookie-consent", {
             analytics: analyticsVal,
+            marketing: marketingVal,
             version: COOKIE_CONSENT_VERSION,
         }).catch(() => {});
     }
 }
 
 function acceptAll() {
-    saveConsent(true);
+    saveConsent(true, true);
     visible.value = false;
 }
 
 function savePreferences() {
-    saveConsent(analytics.value);
+    saveConsent(analytics.value, marketing.value);
     visible.value = false;
 }
 
 onMounted(() => {
     if (!hasConsented()) {
+        // Pre-fill toggles from a previous (older-version) consent so the user
+        // doesn't lose their analytics preference on a schema bump.
+        const raw = localStorage.getItem(COOKIE_KEY);
+        if (raw) {
+            try {
+                const prev = JSON.parse(raw) as { analytics?: boolean; marketing?: boolean };
+                if (typeof prev.analytics === "boolean") analytics.value = prev.analytics;
+                if (typeof prev.marketing === "boolean") marketing.value = prev.marketing;
+            } catch {
+                // ignore – treat as fresh consent
+            }
+        }
         visible.value = true;
     }
 });

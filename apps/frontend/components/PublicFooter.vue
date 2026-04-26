@@ -91,6 +91,9 @@ const { data: legalLinksData } = useQuery({
 const legalLinks = computed(() => legalLinksData.value ?? []);
 
 function revokeCookieConsent() {
+    // Clear both the current and the legacy storage key so the banner re-prompts
+    // regardless of which schema version was previously stored.
+    localStorage.removeItem("cbc-cookie-consent");
     localStorage.removeItem("kl_cookie_consent");
     window.location.reload();
 }

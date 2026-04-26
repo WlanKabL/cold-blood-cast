@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const mockPrisma = {
     pet: { findMany: vi.fn() },
@@ -30,6 +30,12 @@ const USER_ID = "user_123";
 const MONDAY = new Date("2026-04-13T00:00:00.000Z"); // A Monday
 
 beforeEach(() => {
+    // Freeze time to the test week's Monday so that "isOverdue" checks
+    // (which compare task.nextDueAt against `new Date()` in the service) are
+    // deterministic regardless of when the suite is executed.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-13T08:00:00.000Z"));
+
     vi.clearAllMocks();
     mockPrisma.pet.findMany.mockResolvedValue([]);
     mockPrisma.vetVisit.findMany.mockResolvedValue([]);
@@ -50,6 +56,10 @@ beforeEach(() => {
         isAnomaly: false,
         anomalyMessage: null,
     });
+});
+
+afterEach(() => {
+    vi.useRealTimers();
 });
 
 describe("getWeekEvents", () => {

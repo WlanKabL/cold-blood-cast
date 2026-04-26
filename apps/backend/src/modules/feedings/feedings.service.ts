@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database.js";
 import { ErrorCodes, notFound } from "@/helpers/errors.js";
+import { recordActivationEvent } from "@/modules/marketing/index.js";
 
 export async function listFeedings(
     userId: string,
@@ -69,7 +70,12 @@ export async function createFeeding(
     if (!pet || pet.userId !== userId) {
         throw notFound(ErrorCodes.E_PET_NOT_FOUND, "Pet not found");
     }
-    return prisma.feeding.create({ data });
+    const feeding = await prisma.feeding.create({ data });
+    void recordActivationEvent(userId, "FirstCareEntryCreated", {
+        kind: "feeding",
+        feedingId: feeding.id,
+    });
+    return feeding;
 }
 
 export async function updateFeeding(
