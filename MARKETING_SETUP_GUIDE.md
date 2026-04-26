@@ -54,11 +54,11 @@ Set these in `apps/backend/.env` (or your deployment env):
 | `TRACKING_PENDING_RESCUE_AFTER_SECONDS`   | always                      | `120`   | Server events stuck in `pending` longer than this are re-enqueued on startup and via `POST /api/admin/marketing/rescue-pending` (recovery from Redis outages) |
 | `TRACKING_ACTIVATION_WINDOW_DAYS`         | always                      | `7`     | Window after signup in which activation events count                                                                                                          |
 | `TRACKING_AUDIENCE_EXPORT_RETENTION_DAYS` | always                      | `30`    | How long generated audience CSVs remain downloadable                                                                                                          |
-| `TRACKING_DISPATCH_TIMEOUT_MS`            | always                      | `8000`  | HTTP timeout per Meta CAPI call                                                                                                                               |
+| `TRACKING_DISPATCH_TIMEOUT_MS`            | always                      | `5000`  | HTTP timeout per Meta CAPI call                                                                                                                               |
 | `TRACKING_MAX_RETRY_COUNT`                | always                      | `5`     | BullMQ retry budget per event                                                                                                                                 |
 | `REDIS_URL`                               | always                      | —       | Required by BullMQ worker. **Without Redis the CAPI queue cannot run.**                                                                                       |
 
-> **Important:** _every_ one of these must be added to `apps/backend/src/config.ts` — never read `process.env.X` ad-hoc.
+> **Important:** _every_ one of these must be added to `apps/backend/src/config/env.ts` — never read `process.env.X` ad-hoc.
 
 ### B.2 Admin runtime overrides
 
@@ -223,4 +223,4 @@ If `META_CAPI_ENABLED=true` and `META_CAPI_DRY_RUN=false` but `META_PIXEL_ID` or
 
 ---
 
-If anything in this guide doesn't match your environment, the source of truth is `apps/backend/src/config.ts` for env vars and the `LandingAttribution` model in `apps/backend/prisma/schema.prisma` for what is actually stored. Trust those over any third-party doc.
+If anything in this guide doesn't match your environment, the source of truth is `apps/backend/src/config/env.ts` for env vars and the `LandingAttribution` model in `apps/backend/prisma/schema.prisma` for what is actually stored. Trust those over any third-party doc.

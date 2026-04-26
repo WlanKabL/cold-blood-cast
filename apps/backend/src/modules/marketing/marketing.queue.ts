@@ -127,6 +127,33 @@ export function startMarketingWorker(): Worker<MarketingJobData> {
             { jobId: job?.id, attemptsMade: job?.attemptsMade, err: err.message },
             "marketing job failed",
         );
+        // Once BullMQ has exhausted its retry budget, mark the DB row as
+        // terminal `failed` so it stops being retried and so the rescue
+        // sweep does not pick it up again. The row remains recoverable
+        // via POST /api/admin/marketing/events/:id/retry.
+        if (
+            job &&
+            typeof job.opts?.attempts === "number" &&
+            (job.attemptsMade ?? 0) >= job.opts.attempts
+        ) {
+            const marketingEventId = (job.data as MarketingJobData | undefined)?.marketingEventId;
+            if (marketingEventId) {
+                prisma.marketingEvent
+                    .update({
+                        where: { id: marketingEventId },
+                        data: {
+                            status: "failed",
+                            failureReason: err.message,
+                        },
+                    })
+                    .catch((updateErr: unknown) => {
+                        log.error(
+                            { marketingEventId, err: updateErr },
+                            "failed to mark marketing event as terminally failed",
+                        );
+                    });
+            }
+        }
     });
     workerInstance.on("completed", (job) => {
         log.debug({ jobId: job.id }, "marketing job completed");
