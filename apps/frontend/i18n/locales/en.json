@@ -17,7 +17,7 @@
             "bullet3": "Full history per animal — searchable and shareable",
             "primaryCta": "Start your free care log",
             "secondaryCta": "See how it works",
-            "trustLine": "Free forever · No credit card · Built by a keeper"
+            "trustLine": "Built by a keeper"
         },
         "features": {
             "label": "What you can track",
@@ -75,7 +75,7 @@
         },
         "cta": {
             "title": "Start your free care log in 2 minutes.",
-            "subtitle": "Add your first animal, log your first feeding, and never lose track again. Free forever — no credit card needed.",
+            "subtitle": "Add your first animal, log your first feeding, and never lose track again.",
             "button": "Create my free account"
         },
         "footer": {

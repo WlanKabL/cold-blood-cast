@@ -11,7 +11,7 @@
             </div>
 
             <div
-                class="relative z-10 mx-auto max-w-7xl px-6 pt-28 pb-24 text-center md:pt-36 md:pb-32"
+                class="relative z-10 mx-auto max-w-7xl px-4 pt-24 pb-20 text-center sm:px-6 md:pt-36 md:pb-32"
             >
                 <h1
                     class="hero-enter hero-delay-1 mx-auto max-w-5xl text-4xl leading-[1.08] font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
@@ -26,13 +26,13 @@
                 </h1>
 
                 <p
-                    class="hero-enter hero-delay-2 text-fg-dim mx-auto mt-8 max-w-2xl text-lg leading-relaxed md:text-xl"
+                    class="hero-enter hero-delay-2 text-fg-dim mx-auto mt-6 max-w-2xl text-base leading-relaxed sm:text-lg md:mt-8 md:text-xl"
                 >
                     {{ $t("landing.hero.subtitle") }}
                 </p>
 
                 <ul
-                    class="hero-enter hero-delay-2 text-fg-soft mx-auto mt-8 flex max-w-2xl flex-col gap-3 text-left text-base sm:text-lg"
+                    class="hero-enter hero-delay-2 text-fg-soft mx-auto mt-6 flex max-w-xl flex-col gap-2.5 text-left text-sm sm:text-base md:mt-8 md:gap-3 md:text-lg"
                 >
                     <li
                         v-for="key in ['bullet1', 'bullet2', 'bullet3']"
@@ -41,18 +41,18 @@
                     >
                         <Icon
                             name="lucide:check-circle-2"
-                            class="text-primary-400 mt-1 h-5 w-5 shrink-0"
+                            class="text-primary-400 mt-0.5 h-5 w-5 shrink-0 md:mt-1"
                         />
                         <span>{{ $t(`landing.hero.${key}`) }}</span>
                     </li>
                 </ul>
 
                 <div
-                    class="hero-enter hero-delay-3 mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+                    class="hero-enter hero-delay-3 mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4 md:mt-12"
                 >
                     <NuxtLink
                         to="/register"
-                        class="group bg-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-4 font-semibold text-white shadow-xl transition-all hover:brightness-110"
+                        class="group bg-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-8 py-4 font-semibold text-white shadow-xl transition-all hover:brightness-110"
                     >
                         {{ $t("landing.hero.primaryCta") }}
                         <Icon
@@ -62,13 +62,13 @@
                     </NuxtLink>
                     <a
                         href="#how-it-works"
-                        class="border-line bg-surface-hover text-fg-soft hover:border-line hover:bg-surface-active hover:text-fg inline-flex items-center gap-2 rounded-full border px-8 py-4 font-medium backdrop-blur-md transition"
+                        class="border-line bg-surface-hover text-fg-soft hover:border-line hover:bg-surface-active hover:text-fg inline-flex items-center justify-center gap-2 rounded-full border px-8 py-4 font-medium backdrop-blur-md transition"
                     >
                         {{ $t("landing.hero.secondaryCta") }}
                     </a>
                 </div>
 
-                <p class="hero-enter hero-delay-3 text-fg-faint mt-6 text-sm">
+                <p class="hero-enter hero-delay-3 text-fg-faint mt-5 text-sm md:mt-6">
                     {{ $t("landing.hero.trustLine") }}
                 </p>
             </div>

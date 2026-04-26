@@ -17,7 +17,7 @@
             "bullet3": "Komplette Historie pro Tier — durchsuchbar und teilbar",
             "primaryCta": "Kostenloses Pflegebuch starten",
             "secondaryCta": "So funktioniert's",
-            "trustLine": "Für immer kostenlos · Keine Kreditkarte · Von einem Halter gebaut"
+            "trustLine": "Von einem Halter gebaut"
         },
         "features": {
             "label": "Was du tracken kannst",
@@ -75,7 +75,7 @@
         },
         "cta": {
             "title": "Starte dein kostenloses Pflegebuch in 2 Minuten.",
-            "subtitle": "Tier anlegen, erste Fütterung loggen — und nie wieder den Überblick verlieren. Für immer kostenlos, keine Kreditkarte nötig.",
+            "subtitle": "Tier anlegen, erste Fütterung loggen — und nie wieder den Überblick verlieren.",
             "button": "Kostenloses Konto erstellen"
         },
         "footer": {
